@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TURBO RACE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Pantalla: Rotar celular -->
+    <div id="pantalla-rotar" class="pantalla" style="display:none">
+        <div class="rotar-msg">
+            <div class="rotar-icono">📱➡️</div>
+            <p>Gira tu celular para jugar</p>
+        </div>
+    </div>
+
+    <!-- Pantalla: Inicio -->
+    <div id="pantalla-inicio" class="pantalla activa">
+        <div class="titulo-logo">TURBO<span class="neon-c">RACE</span></div>
+
+        <div class="card-setup">
+            <div class="campo">
+                <label>Nombre</label>
+                <input id="inp-nombre" type="text" placeholder="Jugador" maxlength="12" autocomplete="off">
+            </div>
+
+            <div class="campo">
+                <label>Color del carro</label>
+                <div class="colores-grid" id="colores-grid">
+                    <div class="color-btn sel" data-color="#ef4444" style="background:#ef4444"></div>
+                    <div class="color-btn" data-color="#3b82f6" style="background:#3b82f6"></div>
+                    <div class="color-btn" data-color="#10b981" style="background:#10b981"></div>
+                    <div class="color-btn" data-color="#f59e0b" style="background:#f59e0b"></div>
+                    <div class="color-btn" data-color="#a855f7" style="background:#a855f7"></div>
+                    <div class="color-btn" data-color="#f0f0f0" style="background:#f0f0f0"></div>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label>Control</label>
+                <div class="control-tabs" id="control-tabs">
+                    <button class="tab-btn sel" data-ctrl="botones">Botones</button>
+                    <button class="tab-btn" data-ctrl="timon">Timón</button>
+                    <button class="tab-btn" data-ctrl="giro">Giroscopio</button>
+                </div>
+            </div>
+
+            <div class="botones-acceso">
+                <button id="btn-crear" class="btn-neon">Crear Sala</button>
+                <button id="btn-unirse" class="btn-ghost">Unirse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla: Crear sala -->
+    <div id="pantalla-crear" class="pantalla">
+        <div class="sala-card">
+            <h2>Tu Sala</h2>
+            <div class="codigo-box" id="codigo-display">----</div>
+            <p class="sub-texto">Comparte este código con tu amigo</p>
+            <button id="btn-copiar" class="btn-ghost">📋 Copiar código</button>
+            <div class="esperando-box">
+                <div class="loader"></div>
+                <span>Esperando oponente...</span>
+            </div>
+            <button id="btn-volver-1" class="btn-link">← Volver</button>
+        </div>
+    </div>
+
+    <!-- Pantalla: Unirse a sala -->
+    <div id="pantalla-unirse" class="pantalla">
+        <div class="sala-card">
+            <h2>Unirse</h2>
+            <input id="inp-codigo" type="text" placeholder="Código (ej: ABCD)" maxlength="4" class="inp-codigo" autocomplete="off">
+            <button id="btn-confirmar-unirse" class="btn-neon">Unirse →</button>
+            <p id="error-unirse" class="error-txt"></p>
+            <button id="btn-volver-2" class="btn-link">← Volver</button>
+        </div>
+    </div>
+
+    <!-- Pantalla: Sala de espera (ambos conectados) -->
+    <div id="pantalla-espera" class="pantalla">
+        <div class="sala-card">
+            <h2>¡Listos!</h2>
+            <div class="jugadores-box">
+                <div class="jugador-row">
+                    <div class="dot-color" id="dot-j1"></div>
+                    <span id="nombre-j1">---</span>
+                    <span class="badge-listo">✓</span>
+                </div>
+                <div class="vs-sep">VS</div>
+                <div class="jugador-row">
+                    <div class="dot-color" id="dot-j2"></div>
+                    <span id="nombre-j2">---</span>
+                    <span class="badge-listo">✓</span>
+                </div>
+            </div>
+            <div id="cuenta-regresiva" class="cuenta-txt"></div>
+        </div>
+    </div>
+
+    <!-- Pantalla: Juego -->
+    <div id="pantalla-juego" class="pantalla">
+        <canvas id="canvas-juego"></canvas>
+
+        <!-- Controles botones -->
+        <div id="ctrl-botones" class="ctrl-overlay" style="display:none">
+            <button id="btn-izq" class="btn-dir">◀</button>
+            <button id="btn-der" class="btn-dir">▶</button>
+        </div>
+
+        <!-- Timón -->
+        <div id="ctrl-timon" class="ctrl-overlay" style="display:none">
+            <div id="timon-wrap">
+                <canvas id="canvas-timon" width="160" height="160"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla: Resultado -->
+    <div id="pantalla-resultado" class="pantalla">
+        <div class="resultado-card">
+            <div id="titulo-resultado" class="resultado-titulo"></div>
+            <div class="stats-grid">
+                <div class="stat">
+                    <span class="stat-lbl">Tu tiempo</span>
+                    <span id="stat-tutiempo" class="stat-val">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-lbl">Oponente</span>
+                    <span id="stat-eltiempo" class="stat-val">--</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-lbl">Vel. máx</span>
+                    <span id="stat-velmax" class="stat-val">--</span>
+                </div>
+            </div>
+            <button id="btn-revancha" class="btn-neon">Revancha 🔄</button>
+            <button id="btn-menu" class="btn-link">Menú principal</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-client.js"></script>
+    <script src="game.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
