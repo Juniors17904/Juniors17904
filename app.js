@@ -70,9 +70,17 @@ document.getElementById('control-tabs').addEventListener('click', e => {
     estado.control = btn.dataset.ctrl;
 });
 
+// Botón: Jugar solo
+document.getElementById('btn-solo').addEventListener('click', () => {
+    estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
+    estado.modoSolo = true;
+    iniciarCuentaRegresiva();
+});
+
 // Botón: Crear sala
 document.getElementById('btn-crear').addEventListener('click', async () => {
     estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
+    estado.modoSolo = false;
     mostrar('pantalla-crear');
     await iniciarCrearSala();
 });
@@ -166,10 +174,21 @@ function prepararSalaEspera(nombre1, color1, nombre2, color2) {
 }
 
 function iniciarCuentaRegresiva() {
+    if (estado.modoSolo) {
+        // En modo solo: mostrar cuenta directamente sobre fondo negro
+        mostrar('pantalla-espera');
+        document.getElementById('nombre-j1').textContent = estado.nombre;
+        document.getElementById('dot-j1').style.background = estado.color;
+        document.getElementById('nombre-j2').textContent = 'CPU / Sin oponente';
+        document.getElementById('dot-j2').style.background = '#475569';
+        document.querySelectorAll('.vs-sep').forEach(el => el.textContent = '');
+    }
+
     const el = document.getElementById('cuenta-regresiva');
     const pasos = ['3', '2', '1', '¡YA!'];
     let i = 0;
 
+    mostrar('pantalla-espera');
     const intervalo = setInterval(() => {
         el.textContent = pasos[i];
         i++;
@@ -188,15 +207,17 @@ function iniciarJuego() {
     verificarOrientacion();
 
     // Determinar nombre del oponente
-    const oponenteNombre = window.multiJugador?.jugadorNum === 1
-        ? document.getElementById('nombre-j2').textContent
-        : document.getElementById('nombre-j1').textContent;
+    const oponenteNombre = estado.modoSolo
+        ? null
+        : (window.multiJugador?.jugadorNum === 1
+            ? document.getElementById('nombre-j2').textContent
+            : document.getElementById('nombre-j1').textContent);
 
     estado.juego = new Juego(estado.color, estado.control);
 
     // Callback cuando termina la carrera
     window.onCarreraTerminada = (tiempoMs, velMax) => {
-        if (window.multiJugador) window.multiJugador.reportarGanador();
+        if (!estado.modoSolo && window.multiJugador) window.multiJugador.reportarGanador();
         mostrarResultado(true, tiempoMs, velMax);
     };
 

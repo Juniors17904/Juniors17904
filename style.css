@@ -145,6 +145,11 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     display: flex;
     gap: 10px;
 }
+.botones-multi {
+    display: flex;
+    justify-content: center;
+    margin-top: -8px;
+}
 
 /* Botones */
 .btn-neon {
