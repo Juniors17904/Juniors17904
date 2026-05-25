@@ -1,12 +1,14 @@
-const CACHE = 'turbo-race-v2';
+const CACHE = 'turbo-race-v3';
 const ARCHIVOS = [
-  '/Juniors17904/',
-  '/Juniors17904/index.html',
-  '/Juniors17904/style.css',
-  '/Juniors17904/game.js',
-  '/Juniors17904/app.js',
-  '/Juniors17904/supabase-client.js',
-  'https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap',
+  '/',
+  '/index.html',
+  '/style.css',
+  '/game.js',
+  '/app.js',
+  '/garage.js',
+  '/supabase-client.js',
+  '/icon-192.png',
+  '/icon-512.png',
 ];
 
 self.addEventListener('install', e => {
