@@ -443,6 +443,39 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 .btn-tuerca:hover { background: rgba(124,58,237,0.4); box-shadow: 0 0 20px rgba(124,58,237,0.7); }
 
 /* =============================================
+   AJUSTES
+   ============================================= */
+.ajustes-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(90vw, 340px);
+}
+.ajuste-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+.ajuste-item:hover { border-color: var(--neon-v); box-shadow: 0 0 14px rgba(124,58,237,0.3); }
+.ajuste-icono { font-size: 24px; }
+.ajuste-txt {
+    flex: 1;
+    text-align: left;
+    font-family: var(--font);
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--txt);
+}
+.ajuste-arrow { color: var(--txt2); font-size: 22px; }
+
+/* =============================================
    GARAGE
    ============================================= */
 .garage-grid {

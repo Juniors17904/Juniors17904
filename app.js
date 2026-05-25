@@ -55,6 +55,10 @@ window.addEventListener('orientationchange', verificarOrientacion);
 // GARAGE — botón tuerca
 // ================================================================
 document.getElementById('btn-garage').addEventListener('click', () => {
+    mostrar('pantalla-ajustes');
+});
+document.getElementById('btn-volver-ajustes').addEventListener('click', () => mostrar('pantalla-inicio'));
+document.getElementById('btn-ir-garage').addEventListener('click', () => {
     mostrar('pantalla-garage');
     iniciarGarage();
 });
