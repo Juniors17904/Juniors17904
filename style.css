@@ -527,27 +527,11 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 /* =============================================
    RESPONSIVE / LANDSCAPE
    ============================================= */
+@media (orientation: portrait) and (max-width: 600px) {
+    #pantalla-juego #pantalla-rotar { display: flex !important; }
+}
+
 @media (max-height: 500px) {
     .titulo-logo { font-size: 24px; margin-bottom: 14px; }
     .card-setup { padding: 16px; gap: 12px; }
-}
-
-/* Rotación CSS cuando el sistema no permite girar la pantalla */
-@media screen and (orientation: portrait) {
-    #pantalla-juego.activa,
-    #pantalla-espera.activa {
-        width: 100vh;
-        height: 100vw;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        margin-top: -50vw;
-        margin-left: -50vh;
-        transform: rotate(90deg);
-        transform-origin: center center;
-        overflow: hidden;
-    }
-    #pantalla-espera.activa .sala-card {
-        transform: none;
-    }
 }
