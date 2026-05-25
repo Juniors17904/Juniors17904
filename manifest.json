@@ -4,8 +4,7 @@
   "description": "Juego de carreras multijugador en tiempo real",
   "start_url": "/",
   "scope": "/",
-  "display": "fullscreen",
-  "orientation": "landscape",
+  "display": "standalone",
   "background_color": "#0a0a14",
   "theme_color": "#7c3aed",
   "icons": [
