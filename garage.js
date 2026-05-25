@@ -11,6 +11,10 @@ class Garage {
         formula:   { nombre: 'Fórmula',  desc: 'Ultra aerodinámico' },
         pickup:    { nombre: 'Pickup',    desc: 'Resistente' },
         clasico:   { nombre: 'Clásico',  desc: 'Estilo retro' },
+        dragster:  { nombre: 'Dragster',  desc: 'Velocidad extrema' },
+        rally:     { nombre: 'Rally',     desc: 'Domina el terreno' },
+        kart:      { nombre: 'Kart',      desc: 'Ágil y preciso' },
+        hypercar:  { nombre: 'Hypercar',  desc: 'El futuro del asfalto' },
     };
 
     // ── Miniatura lateral ────────────────────────────────────────
