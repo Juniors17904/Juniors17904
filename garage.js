@@ -13,167 +13,226 @@ const TIPOS_CARRO = {
 };
 
 // ================================================================
-// DIBUJA CARRO DESDE ATRÁS (miniatura en tarjeta del garage)
+// DIBUJA CARRO DE PERFIL LATERAL (miniatura garage)
 // ================================================================
 function dibujarCarroMini(canvas, tipo, color) {
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
-
-    // Fondo pequeño
     ctx.fillStyle = '#0a0a1e';
-    ctx.beginPath();
-    ctx.roundRect(0, 0, W, H, 8);
-    ctx.fill();
+    ctx.beginPath(); ctx.roundRect(0, 0, W, H, 8); ctx.fill();
 
-    const cx = W / 2, by = H * 0.88;
-
+    ctx.save();
+    ctx.translate(W / 2, H * 0.78);
     switch (tipo) {
-        case 'deportivo': dibujarMiniDeportivo(ctx, cx, by, color); break;
-        case 'suv':       dibujarMiniSUV(ctx, cx, by, color);       break;
-        case 'muscle':    dibujarMiniMuscle(ctx, cx, by, color);    break;
-        case 'formula':   dibujarMiniFormula(ctx, cx, by, color);   break;
-        case 'pickup':    dibujarMiniPickup(ctx, cx, by, color);    break;
-        case 'clasico':   dibujarMiniClasico(ctx, cx, by, color);   break;
+        case 'deportivo': perfilDeportivo(ctx, color); break;
+        case 'suv':       perfilSUV(ctx, color);       break;
+        case 'muscle':    perfilMuscle(ctx, color);    break;
+        case 'formula':   perfilFormula(ctx, color);   break;
+        case 'pickup':    perfilPickup(ctx, color);    break;
+        case 'clasico':   perfilClasico(ctx, color);   break;
     }
+    ctx.restore();
 }
 
-function dibujarMiniDeportivo(ctx, cx, by, color) {
-    const w = 38, h = 44;
-    // Sombra
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(cx, by, w*0.55, 5, 0, 0, Math.PI*2); ctx.fill();
-    // Carrocería baja y aerodinámica
+// Helper: rueda lateral
+function rueda(ctx, x, y, r) {
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#333';
+    ctx.beginPath(); ctx.arc(x, y, r * 0.65, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#555';
+    ctx.beginPath(); ctx.arc(x, y, r * 0.28, 0, Math.PI * 2); ctx.fill();
+}
+
+function perfilDeportivo(ctx, color) {
+    // Carro bajo, techo inclinado tipo fastback
     ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(cx-w/2, by-h, w, h, [2,2,5,5]); ctx.fill();
-    // Techo muy bajo
-    ctx.fillStyle = brillante(color);
-    ctx.beginPath(); ctx.roundRect(cx-w*0.32, by-h-h*0.2, w*0.64, h*0.22, [6,6,2,2]); ctx.fill();
+    ctx.beginPath();
+    ctx.moveTo(-44, 0);        // trasera abajo
+    ctx.lineTo(-44, -14);      // trasera arriba
+    ctx.lineTo(-20, -30);      // inicio techo
+    ctx.lineTo(14, -30);       // fin techo
+    ctx.lineTo(38, -16);       // parabrisas delantera
+    ctx.lineTo(44, -16);       // capó delantero
+    ctx.lineTo(44, 0);         // delantera abajo
+    ctx.closePath(); ctx.fill();
     // Vidrio
-    ctx.fillStyle = 'rgba(140,220,255,0.6)';
-    ctx.beginPath(); ctx.roundRect(cx-w*0.28, by-h-h*0.17, w*0.56, h*0.15, 3); ctx.fill();
-    // Luces traseras
-    ctx.fillStyle = '#ff2222';
-    ctx.fillRect(cx-w/2+2, by-7, w*0.3, 5);
-    ctx.fillRect(cx+w/2-w*0.3-2, by-7, w*0.3, 5);
-    // Ruedas
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.roundRect(cx-w/2-5, by-h*0.35, 9, 6, 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx+w/2-4, by-h*0.35, 9, 6, 2); ctx.fill();
-}
-
-function dibujarMiniSUV(ctx, cx, by, color) {
-    const w = 40, h = 54;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(cx, by, w*0.55, 5, 0, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(cx-w/2, by-h, w, h, [4,4,6,6]); ctx.fill();
-    // Techo alto y cuadrado
-    ctx.fillStyle = brillante(color);
-    ctx.beginPath(); ctx.roundRect(cx-w*0.42, by-h-h*0.35, w*0.84, h*0.38, [5,5,2,2]); ctx.fill();
-    ctx.fillStyle = 'rgba(140,220,255,0.55)';
-    ctx.beginPath(); ctx.roundRect(cx-w*0.37, by-h-h*0.3, w*0.74, h*0.28, 3); ctx.fill();
-    ctx.fillStyle = '#ff2222';
-    ctx.fillRect(cx-w/2+2, by-8, w*0.28, 6);
-    ctx.fillRect(cx+w/2-w*0.28-2, by-8, w*0.28, 6);
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.roundRect(cx-w/2-6, by-h*0.32, 10, 8, 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx+w/2-4, by-h*0.32, 10, 8, 2); ctx.fill();
-}
-
-function dibujarMiniMuscle(ctx, cx, by, color) {
-    const w = 46, h = 46;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(cx, by, w*0.55, 5, 0, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(cx-w/2, by-h, w, h, [3,3,6,6]); ctx.fill();
-    // Capó elevado (músculo)
-    ctx.fillStyle = brillante(color, 15);
-    ctx.beginPath(); ctx.roundRect(cx-w*0.35, by-h-h*0.14, w*0.7, h*0.17, [5,5,1,1]); ctx.fill();
-    ctx.fillStyle = brillante(color);
-    ctx.beginPath(); ctx.roundRect(cx-w*0.3, by-h-h*0.28, w*0.6, h*0.16, [5,5,2,2]); ctx.fill();
-    ctx.fillStyle = 'rgba(140,220,255,0.5)';
-    ctx.beginPath(); ctx.roundRect(cx-w*0.25, by-h-h*0.24, w*0.5, h*0.11, 3); ctx.fill();
-    ctx.fillStyle = '#ff2222';
-    ctx.fillRect(cx-w/2+2, by-7, w*0.32, 5);
-    ctx.fillRect(cx+w/2-w*0.32-2, by-7, w*0.32, 5);
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.roundRect(cx-w/2-7, by-h*0.3, 11, 8, 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx+w/2-4, by-h*0.3, 11, 8, 2); ctx.fill();
-}
-
-function dibujarMiniFormula(ctx, cx, by, color) {
-    const w = 22, h = 38;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(cx, by, w*0.9, 4, 0, 0, Math.PI*2); ctx.fill();
-    // Cuerpo muy estrecho
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(cx-w/2, by-h, w, h, [2,2,3,3]); ctx.fill();
-    // Alas traseras
-    ctx.fillStyle = brillante(color, 20);
-    ctx.fillRect(cx-w/2-12, by-h*0.18, 10, 4);
-    ctx.fillRect(cx+w/2+2, by-h*0.18, 10, 4);
-    // Cockpit pequeño
-    ctx.fillStyle = brillante(color);
-    ctx.beginPath(); ctx.ellipse(cx, by-h*0.65, w*0.3, h*0.12, 0, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = 'rgba(100,200,255,0.7)';
-    ctx.beginPath(); ctx.ellipse(cx, by-h*0.65, w*0.22, h*0.08, 0, 0, Math.PI*2); ctx.fill();
-    // Ruedas grandes formula
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.roundRect(cx-w/2-8, by-h*0.22, 10, 14, 3); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx+w/2-2, by-h*0.22, 10, 14, 3); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx-w/2-6, by-h*0.78, 9, 12, 3); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx+w/2-3, by-h*0.78, 9, 12, 3); ctx.fill();
-}
-
-function dibujarMiniPickup(ctx, cx, by, color) {
-    const w = 42, h = 50;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(cx, by, w*0.55, 5, 0, 0, Math.PI*2); ctx.fill();
-    // Caja trasera
-    ctx.fillStyle = brillante(color, -20);
-    ctx.beginPath(); ctx.roundRect(cx-w/2, by-h*0.45, w, h*0.45, [1,1,4,4]); ctx.fill();
-    // Cabina
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(cx-w*0.4, by-h, w*0.8, h, [4,4,2,2]); ctx.fill();
-    ctx.fillStyle = brillante(color);
-    ctx.beginPath(); ctx.roundRect(cx-w*0.36, by-h-h*0.32, w*0.72, h*0.35, [5,5,2,2]); ctx.fill();
-    ctx.fillStyle = 'rgba(140,220,255,0.55)';
-    ctx.beginPath(); ctx.roundRect(cx-w*0.3, by-h-h*0.27, w*0.6, h*0.22, 3); ctx.fill();
-    ctx.fillStyle = '#ff2222';
-    ctx.fillRect(cx-w/2+2, by-8, w*0.25, 6);
-    ctx.fillRect(cx+w/2-w*0.25-2, by-8, w*0.25, 6);
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.roundRect(cx-w/2-6, by-h*0.28, 11, 9, 3); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx+w/2-5, by-h*0.28, 11, 9, 3); ctx.fill();
-}
-
-function dibujarMiniClasico(ctx, cx, by, color) {
-    const w = 42, h = 48;
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    ctx.beginPath(); ctx.ellipse(cx, by, w*0.55, 5, 0, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = color;
-    ctx.beginPath(); ctx.roundRect(cx-w/2, by-h, w, h, [1,1,5,5]); ctx.fill();
-    // Techo estilo retro (arco suave)
-    ctx.fillStyle = brillante(color);
+    ctx.fillStyle = 'rgba(120,210,255,0.6)';
     ctx.beginPath();
-    ctx.moveTo(cx-w*0.38, by-h);
-    ctx.quadraticCurveTo(cx, by-h-h*0.38, cx+w*0.38, by-h);
-    ctx.lineTo(cx+w*0.38, by-h+4);
-    ctx.lineTo(cx-w*0.38, by-h+4);
+    ctx.moveTo(-18, -28); ctx.lineTo(12, -28); ctx.lineTo(36, -17); ctx.lineTo(-18, -17);
     ctx.closePath(); ctx.fill();
-    ctx.fillStyle = 'rgba(140,220,255,0.5)';
-    ctx.beginPath();
-    ctx.moveTo(cx-w*0.3, by-h+2);
-    ctx.quadraticCurveTo(cx, by-h-h*0.28, cx+w*0.3, by-h+2);
-    ctx.closePath(); ctx.fill();
-    // Luces retro redondas
+    // Luces delantera
+    ctx.fillStyle = '#ffffaa';
+    ctx.beginPath(); ctx.roundRect(40, -22, 5, 5, 1); ctx.fill();
+    // Luces trasera
     ctx.fillStyle = '#ff3333';
-    ctx.beginPath(); ctx.arc(cx-w/2+7, by-9, 5, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(cx+w/2-7, by-9, 5, 0, Math.PI*2); ctx.fill();
-    ctx.fillStyle = '#111';
-    ctx.beginPath(); ctx.roundRect(cx-w/2-6, by-h*0.32, 10, 8, 5); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(cx+w/2-4, by-h*0.32, 10, 8, 5); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-47, -18, 4, 8, 1); ctx.fill();
+    // Ruedas
+    rueda(ctx, -28, 4, 10);
+    rueda(ctx, 26, 4, 10);
+}
+
+function perfilSUV(ctx, color) {
+    // Alto, cuadrado, robusto
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-46, 0);
+    ctx.lineTo(-46, -20);
+    ctx.lineTo(-38, -38);      // techo trasero
+    ctx.lineTo(30, -38);       // techo plano
+    ctx.lineTo(42, -26);       // parabrisas
+    ctx.lineTo(46, -20);
+    ctx.lineTo(46, 0);
+    ctx.closePath(); ctx.fill();
+    // Vidrio grande
+    ctx.fillStyle = 'rgba(120,210,255,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(-36, -36); ctx.lineTo(28, -36); ctx.lineTo(40, -26); ctx.lineTo(-36, -22);
+    ctx.closePath(); ctx.fill();
+    // Detalles laterales
+    ctx.fillStyle = brillante(color, -30);
+    ctx.fillRect(-44, -12, 88, 4);
+    ctx.fillStyle = '#ffffaa';
+    ctx.beginPath(); ctx.roundRect(42, -28, 5, 7, 1); ctx.fill();
+    ctx.fillStyle = '#ff3333';
+    ctx.beginPath(); ctx.roundRect(-48, -28, 4, 10, 1); ctx.fill();
+    rueda(ctx, -28, 4, 11);
+    rueda(ctx, 26, 4, 11);
+}
+
+function perfilMuscle(ctx, color) {
+    // Ancho, con joroba en el capó
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-48, 0);
+    ctx.lineTo(-48, -16);
+    ctx.lineTo(-30, -28);
+    ctx.lineTo(-4, -34);
+    ctx.lineTo(16, -34);
+    ctx.lineTo(28, -28);       // joroba capó
+    ctx.lineTo(40, -28);
+    ctx.lineTo(48, -18);
+    ctx.lineTo(48, 0);
+    ctx.closePath(); ctx.fill();
+    // Joroba capó highlight
+    ctx.fillStyle = brillante(color, 25);
+    ctx.beginPath();
+    ctx.moveTo(10, -32); ctx.lineTo(26, -26); ctx.lineTo(38, -26); ctx.lineTo(32, -32);
+    ctx.closePath(); ctx.fill();
+    // Vidrio
+    ctx.fillStyle = 'rgba(120,210,255,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(-28, -27); ctx.lineTo(14, -33); ctx.lineTo(26, -27); ctx.lineTo(-28, -18);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffaa';
+    ctx.beginPath(); ctx.roundRect(44, -24, 5, 6, 1); ctx.fill();
+    ctx.fillStyle = '#ff3333';
+    ctx.beginPath(); ctx.roundRect(-51, -22, 5, 9, 1); ctx.fill();
+    rueda(ctx, -30, 5, 12);
+    rueda(ctx, 28, 5, 12);
+}
+
+function perfilFormula(ctx, color) {
+    // Ultra bajo, alas, cockpit abierto
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-50, 0);
+    ctx.lineTo(-50, -8);
+    ctx.lineTo(-36, -16);
+    ctx.lineTo(-10, -16);
+    ctx.lineTo(0, -22);        // cockpit
+    ctx.lineTo(14, -22);
+    ctx.lineTo(14, -16);
+    ctx.lineTo(46, -12);
+    ctx.lineTo(50, -8);
+    ctx.lineTo(50, 0);
+    ctx.closePath(); ctx.fill();
+    // Cockpit
+    ctx.fillStyle = 'rgba(100,200,255,0.7)';
+    ctx.beginPath(); ctx.ellipse(6, -22, 10, 6, 0, 0, Math.PI * 2); ctx.fill();
+    // Ala trasera
+    ctx.fillStyle = brillante(color, -20);
+    ctx.fillRect(-54, -20, 10, 3);
+    ctx.fillRect(-50, -20, 3, 8);
+    // Ala delantera
+    ctx.fillRect(46, -14, 10, 3);
+    // Ruedas grandes
+    rueda(ctx, -34, 3, 9);
+    rueda(ctx, 30, 3, 9);
+    // Ruedas delanteras visibles
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.ellipse(30, 0, 9, 6, 0, 0, Math.PI*2); ctx.fill();
+}
+
+function perfilPickup(ctx, color) {
+    // Cabina + caja de carga trasera
+    // Caja de carga (trasera, más baja)
+    ctx.fillStyle = brillante(color, -25);
+    ctx.beginPath();
+    ctx.moveTo(-48, 0); ctx.lineTo(-48, -18); ctx.lineTo(-10, -18); ctx.lineTo(-10, 0);
+    ctx.closePath(); ctx.fill();
+    // Borde interior caja
+    ctx.strokeStyle = brillante(color, -50);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(-46, -16, 34, 14);
+    // Cabina (delantera, alta)
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-12, 0);
+    ctx.lineTo(-12, -26);
+    ctx.lineTo(-4, -40);
+    ctx.lineTo(28, -40);
+    ctx.lineTo(44, -28);
+    ctx.lineTo(48, -20);
+    ctx.lineTo(48, 0);
+    ctx.closePath(); ctx.fill();
+    // Vidrio
+    ctx.fillStyle = 'rgba(120,210,255,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(-3, -38); ctx.lineTo(26, -38); ctx.lineTo(42, -28); ctx.lineTo(-3, -28);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffaa';
+    ctx.beginPath(); ctx.roundRect(44, -28, 5, 7, 1); ctx.fill();
+    ctx.fillStyle = '#ff3333';
+    ctx.beginPath(); ctx.roundRect(-51, -18, 4, 10, 1); ctx.fill();
+    rueda(ctx, -32, 4, 11);
+    rueda(ctx, 28, 4, 11);
+}
+
+function perfilClasico(ctx, color) {
+    // Techo redondeado tipo burbuja, estilo 60s
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(-44, 0);
+    ctx.lineTo(-44, -18);
+    ctx.lineTo(-34, -18);
+    ctx.bezierCurveTo(-30, -42, 30, -42, 34, -18);
+    ctx.lineTo(44, -18);
+    ctx.lineTo(44, 0);
+    ctx.closePath(); ctx.fill();
+    // Techo color claro
+    ctx.fillStyle = brillante(color, 28);
+    ctx.beginPath();
+    ctx.moveTo(-28, -20);
+    ctx.bezierCurveTo(-24, -40, 24, -40, 28, -20);
+    ctx.closePath(); ctx.fill();
+    // Vidrio
+    ctx.fillStyle = 'rgba(120,210,255,0.55)';
+    ctx.beginPath();
+    ctx.moveTo(-22, -20); ctx.bezierCurveTo(-18, -36, 18, -36, 22, -20);
+    ctx.closePath(); ctx.fill();
+    // Luces redondas retro
+    ctx.fillStyle = '#ffffaa';
+    ctx.beginPath(); ctx.arc(40, -12, 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ff3333';
+    ctx.beginPath(); ctx.arc(-40, -12, 4, 0, Math.PI*2); ctx.fill();
+    // Detalle cromado
+    ctx.strokeStyle = brillante(color, 50);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-44, -10); ctx.lineTo(44, -10); ctx.stroke();
+    rueda(ctx, -28, 4, 10);
+    rueda(ctx, 26, 4, 10);
 }
 
 // ================================================================

@@ -481,9 +481,13 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 .garage-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    width: min(94vw, 400px);
+    gap: 10px;
+    width: min(96vw, 420px);
     padding: 4px;
+}
+.carro-mini-canvas {
+    width: 100% !important;
+    height: auto !important;
 }
 
 .carro-card {
