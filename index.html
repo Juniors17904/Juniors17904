@@ -145,7 +145,33 @@
                 <span class="ajuste-txt">Diseño de carro</span>
                 <span class="ajuste-arrow">›</span>
             </button>
+            <button id="btn-ir-giro" class="ajuste-item">
+                <span class="ajuste-icono">🔄</span>
+                <span class="ajuste-txt">Verificar giroscopio</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
         </div>
+    </div>
+
+    <!-- Pantalla: Verificar giroscopio -->
+    <div id="pantalla-giro" class="pantalla">
+        <button id="btn-volver-giro" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:20px;margin-bottom:24px">GIROSCOPIO</div>
+        <div class="burbuja-nivel">
+            <div class="burbuja-centro"></div>
+            <div class="burbuja-bola" id="burbuja-bola"></div>
+        </div>
+        <div class="giro-valores">
+            <div class="giro-val">
+                <span class="giro-lbl">γ GAMMA</span>
+                <span class="giro-num" id="val-gamma">0°</span>
+            </div>
+            <div class="giro-val">
+                <span class="giro-lbl">β BETA</span>
+                <span class="giro-num" id="val-beta">0°</span>
+            </div>
+        </div>
+        <div id="giro-estado" class="giro-estado">Esperando datos...</div>
     </div>
 
     <!-- Pantalla: Garage (selección de carro) -->
