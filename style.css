@@ -423,6 +423,70 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 }
 
 /* =============================================
+   BOTÓN TUERCA
+   ============================================= */
+.btn-tuerca {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(124,58,237,0.2);
+    border: 2px solid var(--neon-v);
+    color: var(--neon-v);
+    font-size: 22px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 12px rgba(124,58,237,0.4);
+    transition: all 0.2s;
+    z-index: 10;
+}
+.btn-tuerca:hover { background: rgba(124,58,237,0.4); box-shadow: 0 0 20px rgba(124,58,237,0.7); }
+
+/* =============================================
+   GARAGE
+   ============================================= */
+.garage-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: min(94vw, 400px);
+    padding: 4px;
+}
+
+.carro-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 8px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.carro-card span {
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--txt2);
+    text-transform: uppercase;
+}
+.carro-card.sel {
+    border-color: var(--neon-v);
+    box-shadow: 0 0 16px rgba(124,58,237,0.5);
+}
+.carro-card:hover { border-color: var(--neon-c); }
+.carro-mini-canvas { border-radius: 6px; }
+
+/* Preview 3D */
+#canvas-preview-3d {
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: #080818;
+    max-width: 90vw;
+}
+
+/* =============================================
    RESPONSIVE / LANDSCAPE
    ============================================= */
 @media (orientation: portrait) and (max-width: 600px) {

@@ -25,6 +25,9 @@
 
     <!-- Pantalla: Inicio -->
     <div id="pantalla-inicio" class="pantalla activa">
+        <!-- Botón tuerca garage -->
+        <button id="btn-garage" class="btn-tuerca">⚙</button>
+
         <div class="titulo-logo">TURBO<span class="neon-c">RACE</span></div>
 
         <div class="card-setup">
@@ -129,6 +132,55 @@
         </div>
     </div>
 
+    <!-- Pantalla: Garage (selección de carro) -->
+    <div id="pantalla-garage" class="pantalla">
+        <button id="btn-volver-garage" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:22px;margin-bottom:20px">GARAGE</div>
+        <div class="garage-grid" id="garage-grid">
+            <div class="carro-card sel" data-tipo="deportivo">
+                <canvas class="carro-mini-canvas" width="110" height="80" data-tipo="deportivo"></canvas>
+                <span>Deportivo</span>
+            </div>
+            <div class="carro-card" data-tipo="suv">
+                <canvas class="carro-mini-canvas" width="110" height="80" data-tipo="suv"></canvas>
+                <span>SUV</span>
+            </div>
+            <div class="carro-card" data-tipo="muscle">
+                <canvas class="carro-mini-canvas" width="110" height="80" data-tipo="muscle"></canvas>
+                <span>Muscle</span>
+            </div>
+            <div class="carro-card" data-tipo="formula">
+                <canvas class="carro-mini-canvas" width="110" height="80" data-tipo="formula"></canvas>
+                <span>Fórmula</span>
+            </div>
+            <div class="carro-card" data-tipo="pickup">
+                <canvas class="carro-mini-canvas" width="110" height="80" data-tipo="pickup"></canvas>
+                <span>Pickup</span>
+            </div>
+            <div class="carro-card" data-tipo="clasico">
+                <canvas class="carro-mini-canvas" width="110" height="80" data-tipo="clasico"></canvas>
+                <span>Clásico</span>
+            </div>
+        </div>
+        <button id="btn-ver-carro" class="btn-neon" style="width:200px;margin-top:8px">Ver en 3D →</button>
+    </div>
+
+    <!-- Pantalla: Preview 3D del carro -->
+    <div id="pantalla-preview" class="pantalla">
+        <button id="btn-volver-preview" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:18px;margin-bottom:8px" id="preview-nombre">Deportivo</div>
+        <canvas id="canvas-preview-3d" width="340" height="260"></canvas>
+        <div class="colores-grid" id="colores-preview" style="justify-content:center;margin-top:16px">
+            <div class="color-btn sel" data-color="#ef4444" style="background:#ef4444"></div>
+            <div class="color-btn" data-color="#3b82f6" style="background:#3b82f6"></div>
+            <div class="color-btn" data-color="#10b981" style="background:#10b981"></div>
+            <div class="color-btn" data-color="#f59e0b" style="background:#f59e0b"></div>
+            <div class="color-btn" data-color="#a855f7" style="background:#a855f7"></div>
+            <div class="color-btn" data-color="#f0f0f0" style="background:#f0f0f0"></div>
+        </div>
+        <button id="btn-seleccionar-carro" class="btn-neon" style="width:220px;margin-top:16px">Seleccionar este carro ✓</button>
+    </div>
+
     <!-- Pantalla: Resultado -->
     <div id="pantalla-resultado" class="pantalla">
         <div class="resultado-card">
@@ -158,6 +210,7 @@
       }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="garage.js"></script>
     <script src="supabase-client.js"></script>
     <script src="game.js"></script>
     <script src="app.js"></script>

@@ -52,6 +52,14 @@ window.addEventListener('resize', verificarOrientacion);
 window.addEventListener('orientationchange', verificarOrientacion);
 
 // ================================================================
+// GARAGE — botón tuerca
+// ================================================================
+document.getElementById('btn-garage').addEventListener('click', () => {
+    mostrar('pantalla-garage');
+    iniciarGarage();
+});
+
+// ================================================================
 // PANTALLA: INICIO — selectores de color y control
 // ================================================================
 document.getElementById('colores-grid').addEventListener('click', e => {
