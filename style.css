@@ -536,6 +536,79 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 .ajuste-arrow { color: var(--txt2); font-size: 22px; }
 
 /* =============================================
+   PANTALLA: VERIFICAR GIROSCOPIO
+   ============================================= */
+.burbuja-nivel {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-c);
+    background: radial-gradient(circle at center, #0d0d2e 0%, #060610 100%);
+    box-shadow: 0 0 30px rgba(6,182,212,0.25), inset 0 0 40px rgba(0,0,0,0.6);
+    position: relative;
+    overflow: hidden;
+}
+.burbuja-nivel::before, .burbuja-nivel::after {
+    content: '';
+    position: absolute;
+    background: rgba(6,182,212,0.2);
+}
+.burbuja-nivel::before { width: 1px; height: 100%; left: 50%; top: 0; }
+.burbuja-nivel::after  { width: 100%; height: 1px; top: 50%; left: 0; }
+
+.burbuja-centro {
+    position: absolute;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    border: 1px solid rgba(6,182,212,0.35);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+}
+.burbuja-bola {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, rgba(6,182,212,0.95), rgba(6,182,212,0.3));
+    box-shadow: 0 0 20px var(--neon-c), 0 0 40px rgba(6,182,212,0.4);
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: top 0.08s linear, left 0.08s linear;
+    z-index: 2;
+}
+.giro-valores {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+.giro-val {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: #0a0a1e;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 24px;
+}
+.giro-lbl {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--txt2);
+}
+.giro-num {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--neon-c);
+}
+.giro-estado {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--txt2);
+    margin-top: 16px;
+    text-align: center;
+}
+
+/* =============================================
    GARAGE
    ============================================= */
 .garage-grid {
