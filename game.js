@@ -706,21 +706,20 @@ class Controles {
 
     #initGiroscopio() {
         if (!window.DeviceOrientationEvent) {
-            alert('Tu dispositivo no soporta giroscopio. Cambia a botones o timón.');
+            ToastManager.mostrar('Tu dispositivo no soporta giroscopio', 'warn');
             return;
         }
+        const h = e => {
+            const gamma = e.gamma || 0;
+            this.#giroRaw = Math.max(-1, Math.min(1, gamma / 30));
+        };
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-            DeviceOrientationEvent.requestPermission().then(p => {
-                if (p === 'granted') window.addEventListener('deviceorientation', h);
-            });
+            DeviceOrientationEvent.requestPermission()
+                .then(p => { if (p === 'granted') window.addEventListener('deviceorientation', h); })
+                .catch(e => ToastManager.mostrar('Giroscopio: ' + e.message, 'error'));
         } else {
             window.addEventListener('deviceorientation', h);
         }
-        const h = e => {
-            const gamma = e.gamma || 0; // inclinación lateral -90 a 90
-            this.#giroRaw = Math.max(-1, Math.min(1, gamma / 30));
-        };
-        window.addEventListener('deviceorientation', h);
     }
 
     leerGiro() {
