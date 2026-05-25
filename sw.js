@@ -1,4 +1,4 @@
-const CACHE = 'turbo-race-v1';
+const CACHE = 'turbo-race-v2';
 const ARCHIVOS = [
   '/Juniors17904/',
   '/Juniors17904/index.html',
