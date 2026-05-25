@@ -532,22 +532,43 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     .card-setup { padding: 16px; gap: 12px; }
 }
 
-/* Rotación CSS cuando el sistema no permite girar la pantalla */
-@media screen and (orientation: portrait) {
-    #pantalla-juego.activa,
-    #pantalla-espera.activa {
-        width: 100vh;
-        height: 100vw;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        margin-top: -50vw;
-        margin-left: -50vh;
-        transform: rotate(90deg);
-        transform-origin: center center;
-        overflow: hidden;
-    }
-    #pantalla-espera.activa .sala-card {
-        transform: none;
-    }
+/* =============================================
+   AVISO: GIRAR CELULAR
+   ============================================= */
+#aviso-rotar {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: #0a0a14;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+#aviso-rotar.visible { display: flex; }
+
+.rotar-icono-grande {
+    font-size: 80px;
+    animation: balanceo 1.2s ease-in-out infinite;
+}
+@keyframes balanceo {
+    0%   { transform: rotate(-20deg); }
+    50%  { transform: rotate(20deg); }
+    100% { transform: rotate(-20deg); }
+}
+.rotar-titulo {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--neon-c);
+    text-shadow: 0 0 20px var(--neon-c);
+    text-align: center;
+}
+.rotar-subtitulo {
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--txt2);
+    text-align: center;
+    line-height: 1.8;
 }

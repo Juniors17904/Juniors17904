@@ -59,16 +59,28 @@ function formatearTiempo(ms) {
 // ================================================================
 // DETECTOR DE ORIENTACIÓN
 // ================================================================
-function verificarOrientacion() {
-    const esMovil = window.innerWidth < 900 && 'ontouchstart' in window;
-    const esVertical = window.innerHeight > window.innerWidth;
-    const pantJuego = document.getElementById('pantalla-juego');
-    const enJuego = pantJuego && pantJuego.style.display === 'flex';
+const PANTALLAS_QUE_REQUIEREN_LANDSCAPE = ['pantalla-juego', 'pantalla-espera'];
 
-    if (esMovil && esVertical && enJuego) {
-        document.getElementById('pantalla-rotar').style.display = 'flex';
+function verificarOrientacion() {
+    const esMovil = 'ontouchstart' in window;
+    const esVertical = window.innerHeight > window.innerWidth;
+
+    const pantallaActiva = [...document.querySelectorAll('.pantalla.activa')]
+        .map(p => p.id);
+
+    const necesitaLandscape = pantallaActiva.some(id =>
+        PANTALLAS_QUE_REQUIEREN_LANDSCAPE.includes(id)
+    );
+
+    const aviso = document.getElementById('aviso-rotar');
+    if (esMovil && esVertical && necesitaLandscape) {
+        aviso.classList.add('visible');
+        // Intentar forzar orientación cada vez que se detecta vertical
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+        }
     } else {
-        document.getElementById('pantalla-rotar').style.display = 'none';
+        aviso.classList.remove('visible');
     }
 }
 window.addEventListener('resize', verificarOrientacion);
