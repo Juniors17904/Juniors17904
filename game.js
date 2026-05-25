@@ -710,8 +710,17 @@ class Controles {
             return;
         }
         const h = e => {
-            const gamma = e.gamma || 0;
-            this.#giroRaw = Math.max(-1, Math.min(1, gamma / 30));
+            const angle = screen.orientation?.angle ?? 0;
+            const gamma = e.gamma ?? 0;
+            const beta  = e.beta  ?? 0;
+
+            // En landscape los ejes rotan con el celular
+            let valor;
+            if (angle === 90)                  valor = -beta / 30;  // landscape derecha
+            else if (angle === 270 || angle === -90) valor =  beta / 30;  // landscape izquierda
+            else                               valor =  gamma / 30; // portrait
+
+            this.#giroRaw = Math.max(-1, Math.min(1, valor));
         };
         if (typeof DeviceOrientationEvent.requestPermission === 'function') {
             DeviceOrientationEvent.requestPermission()
