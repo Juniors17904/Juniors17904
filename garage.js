@@ -4,6 +4,8 @@
 // CLASS: Garage — dibujo de carros y UI del garage
 // ================================================================
 class Garage {
+    static #viewer = null;
+
     static #TIPOS = {
         deportivo: { nombre: 'Deportivo', desc: 'Rápido y bajo' },
         suv:       { nombre: 'SUV',       desc: 'Alto y robusto' },
@@ -99,7 +101,11 @@ class Garage {
             mostrar('pantalla-preview');
             document.getElementById('preview-nombre').textContent =
                 Garage.#TIPOS[tipoSel]?.nombre || tipoSel;
-            Garage.dibujar3D(document.getElementById('canvas-preview-3d'), tipoSel, colorPreview);
+
+            const canvas = document.getElementById('canvas-preview-3d');
+            Garage.#viewer?.detener();
+            Garage.#viewer = new Viewer3D(canvas);
+            Garage.#viewer.cargar(tipoSel, colorPreview);
 
             document.getElementById('colores-preview').onclick = e => {
                 const btn = e.target.closest('.color-btn');
@@ -107,7 +113,7 @@ class Garage {
                 document.querySelectorAll('#colores-preview .color-btn').forEach(b => b.classList.remove('sel'));
                 btn.classList.add('sel');
                 colorPreview = btn.dataset.color;
-                Garage.dibujar3D(document.getElementById('canvas-preview-3d'), tipoSel, colorPreview);
+                Garage.#viewer?.cambiarColor(colorPreview);
                 document.querySelectorAll('.carro-mini-canvas').forEach(c =>
                     Garage.dibujarMini(c, c.dataset.tipo, colorPreview)
                 );
@@ -115,6 +121,8 @@ class Garage {
         });
 
         document.getElementById('btn-seleccionar-carro').addEventListener('click', () => {
+            Garage.#viewer?.detener();
+            Garage.#viewer = null;
             estado.tipoAuto = tipoSel;
             estado.color = colorPreview;
             document.querySelectorAll('#colores-grid .color-btn').forEach(b =>
@@ -123,7 +131,11 @@ class Garage {
             mostrar('pantalla-inicio');
         });
 
-        document.getElementById('btn-volver-preview').addEventListener('click', () => mostrar('pantalla-garage'));
+        document.getElementById('btn-volver-preview').addEventListener('click', () => {
+            Garage.#viewer?.detener();
+            Garage.#viewer = null;
+            mostrar('pantalla-garage');
+        });
         document.getElementById('btn-volver-garage').addEventListener('click', () => mostrar('pantalla-inicio'));
     }
 
