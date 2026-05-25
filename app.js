@@ -109,6 +109,7 @@ document.getElementById('control-tabs').addEventListener('click', e => {
 document.getElementById('btn-solo').addEventListener('click', () => {
     estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
     estado.modoSolo = true;
+    forzarLandscape();
     iniciarCuentaRegresiva();
 });
 
@@ -116,6 +117,7 @@ document.getElementById('btn-solo').addEventListener('click', () => {
 document.getElementById('btn-crear').addEventListener('click', async () => {
     estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
     estado.modoSolo = false;
+    forzarLandscape();
     mostrar('pantalla-crear');
     await iniciarCrearSala();
 });
@@ -239,7 +241,6 @@ function iniciarCuentaRegresiva() {
 // ================================================================
 function iniciarJuego() {
     mostrar('pantalla-juego');
-    forzarLandscape();
     verificarOrientacion();
 
     // Determinar nombre del oponente
