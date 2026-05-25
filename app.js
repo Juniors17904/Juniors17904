@@ -1,16 +1,42 @@
 'use strict';
 
 // ================================================================
+// TOAST
+// ================================================================
+function toast(msg, tipo = 'info') {
+    const el = document.createElement('div');
+    el.className = 'toast' + (tipo !== 'info' ? ' ' + tipo : '');
+    el.textContent = msg;
+    document.body.appendChild(el);
+    requestAnimationFrame(() => el.classList.add('visible'));
+    setTimeout(() => {
+        el.classList.remove('visible');
+        setTimeout(() => el.remove(), 400);
+    }, 4000);
+}
+
+// ================================================================
 // FORZAR LANDSCAPE AL INICIAR JUEGO
 // ================================================================
-function forzarLandscape() {
-    // API moderna
-    if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock('landscape').catch(() => {});
+async function forzarLandscape() {
+    // Paso 1: Fullscreen (Chrome Android lo exige antes del orientation lock)
+    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+        try {
+            await document.documentElement.requestFullscreen();
+        } catch (e) {
+            toast('Fullscreen: ' + e.message, 'error');
+        }
     }
-    // Fallback para Safari/otros
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
+
+    // Paso 2: Lock de orientación
+    if (screen.orientation && screen.orientation.lock) {
+        try {
+            await screen.orientation.lock('landscape');
+        } catch (e) {
+            toast('Orientación: ' + e.message, 'error');
+        }
+    } else {
+        toast('Tu navegador no soporta orientation lock', 'warn');
     }
 }
 
@@ -59,16 +85,34 @@ function formatearTiempo(ms) {
 // ================================================================
 // DETECTOR DE ORIENTACIÓN
 // ================================================================
-function verificarOrientacion() {
-    const esMovil = window.innerWidth < 900 && 'ontouchstart' in window;
-    const esVertical = window.innerHeight > window.innerWidth;
-    const pantJuego = document.getElementById('pantalla-juego');
-    const enJuego = pantJuego && pantJuego.style.display === 'flex';
+const PANTALLAS_LANDSCAPE = ['pantalla-juego', 'pantalla-espera'];
+let _toastOrientacionTimer = 0;
 
-    if (esMovil && esVertical && enJuego) {
-        document.getElementById('pantalla-rotar').style.display = 'flex';
+function verificarOrientacion() {
+    const esMovil = 'ontouchstart' in window;
+    const esVertical = window.innerHeight > window.innerWidth;
+    const pantallaActiva = [...document.querySelectorAll('.pantalla.activa')].map(p => p.id);
+    const necesitaLandscape = pantallaActiva.some(id => PANTALLAS_LANDSCAPE.includes(id));
+
+    const aviso = document.getElementById('pantalla-rotar');
+
+    if (esMovil && esVertical && necesitaLandscape) {
+        aviso.style.display = 'flex';
+        aviso.classList.add('activa');
+
+        // Reintentar lock; solo mostrar toast si han pasado más de 5 segundos
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(e => {
+                const ahora = Date.now();
+                if (ahora - _toastOrientacionTimer > 5000) {
+                    _toastOrientacionTimer = ahora;
+                    toast('Activa la rotación automática del sistema', 'warn');
+                }
+            });
+        }
     } else {
-        document.getElementById('pantalla-rotar').style.display = 'none';
+        aviso.style.display = 'none';
+        aviso.classList.remove('activa');
     }
 }
 window.addEventListener('resize', verificarOrientacion);
