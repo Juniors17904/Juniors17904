@@ -236,50 +236,224 @@ function perfilClasico(ctx, color) {
 }
 
 // ================================================================
-// DIBUJA CARRO EN 3D (vista isométrica 3/4) para la pantalla preview
+// DIBUJA CARRO EN 3D — vista 3/4 lateral izquierda
 // ================================================================
 function dibujarCarro3D(canvas, tipo, color) {
     const ctx = canvas.getContext('2d');
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    // Fondo con gradiente
-    const bg = ctx.createRadialGradient(W/2, H/2, 10, W/2, H/2, W*0.7);
-    bg.addColorStop(0, '#12122a');
-    bg.addColorStop(1, '#070710');
+    const bg = ctx.createRadialGradient(W/2, H*0.5, 20, W/2, H*0.5, W*0.8);
+    bg.addColorStop(0, '#14142e');
+    bg.addColorStop(1, '#060610');
     ctx.fillStyle = bg;
     ctx.beginPath(); ctx.roundRect(0, 0, W, H, 16); ctx.fill();
 
-    // Suelo con reflejo
-    ctx.fillStyle = 'rgba(124,58,237,0.08)';
-    ctx.beginPath(); ctx.ellipse(W/2, H*0.82, W*0.42, H*0.08, 0, 0, Math.PI*2); ctx.fill();
+    // Suelo reflejo
+    ctx.fillStyle = 'rgba(124,58,237,0.12)';
+    ctx.beginPath(); ctx.ellipse(W*0.5, H*0.84, W*0.38, H*0.06, 0, 0, Math.PI*2); ctx.fill();
 
-    // Dibujar en 3D según tipo
     ctx.save();
-    ctx.translate(W/2, H*0.72);
+    ctx.translate(W * 0.5, H * 0.78);
+    const scale = Math.min(W, H) / 220;
+    ctx.scale(scale, scale);
+
     switch (tipo) {
-        case 'deportivo': dibujar3DDeportivo(ctx, color); break;
-        case 'suv':       dibujar3DSUV(ctx, color);       break;
-        case 'muscle':    dibujar3DMuscle(ctx, color);    break;
-        case 'formula':   dibujar3DFormula(ctx, color);   break;
-        case 'pickup':    dibujar3DPickup(ctx, color);    break;
-        case 'clasico':   dibujar3DClasico(ctx, color);   break;
+        case 'deportivo': carro3DDeportivo(ctx, color); break;
+        case 'suv':       carro3DSUV(ctx, color);       break;
+        case 'muscle':    carro3DMuscle(ctx, color);    break;
+        case 'formula':   carro3DFormula(ctx, color);   break;
+        case 'pickup':    carro3DPickup(ctx, color);    break;
+        case 'clasico':   carro3DClasico(ctx, color);   break;
     }
     ctx.restore();
 
-    // Nombre neon
     ctx.fillStyle = '#7c3aed';
-    ctx.font = 'bold 13px Orbitron';
+    ctx.font = `bold ${Math.round(W*0.038)}px Orbitron`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
-    ctx.shadowColor = '#7c3aed';
-    ctx.shadowBlur = 10;
-    ctx.fillText(TIPOS_CARRO[tipo]?.desc || '', W/2, H - 10);
+    ctx.shadowColor = '#7c3aed'; ctx.shadowBlur = 8;
+    ctx.fillText(TIPOS_CARRO[tipo]?.desc || '', W/2, H - 8);
     ctx.shadowBlur = 0;
 }
 
-// Función auxiliar isométrica: convierte 3D (x,y,z) a 2D pantalla
-// x = ancho, y = alto, z = profundidad
+// Helper: rueda 3D con llanta
+function rueda3D(ctx, x, y, rx, ry) {
+    // Sombra rueda
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.ellipse(x+4, y+4, rx, ry, 0, 0, Math.PI*2); ctx.fill();
+    // Caucho
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI*2); ctx.fill();
+    // Llanta
+    ctx.fillStyle = '#3a3a3a';
+    ctx.beginPath(); ctx.ellipse(x, y, rx*0.72, ry*0.72, 0, 0, Math.PI*2); ctx.fill();
+    // Rayos
+    ctx.strokeStyle = '#666'; ctx.lineWidth = 1.5;
+    for (let a = 0; a < Math.PI*2; a += Math.PI/3) {
+        ctx.beginPath();
+        ctx.moveTo(x + Math.cos(a)*rx*0.18, y + Math.sin(a)*ry*0.18);
+        ctx.lineTo(x + Math.cos(a)*rx*0.65, y + Math.sin(a)*ry*0.65);
+        ctx.stroke();
+    }
+    // Centro
+    ctx.fillStyle = '#888';
+    ctx.beginPath(); ctx.ellipse(x, y, rx*0.16, ry*0.16, 0, 0, Math.PI*2); ctx.fill();
+}
+
+// Helper: cara lateral del carro (polígono + vidrio)
+function caraLateral(ctx, pts, fill) {
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    pts.slice(1).forEach(p => ctx.lineTo(p[0], p[1]));
+    ctx.closePath();
+    ctx.fillStyle = fill; ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,0.3)'; ctx.lineWidth = 0.8; ctx.stroke();
+}
+
+function carro3DDeportivo(ctx, color) {
+    const c = color, cl = brillante(color,40), cd = brillante(color,-50), cs = brillante(color,-20);
+    // Cuerpo lateral principal
+    caraLateral(ctx, [[-90,0],[-90,-38],[-60,-55],[40,-55],[85,-38],[85,0]], c);
+    // Techo / cabina más oscuro
+    caraLateral(ctx, [[-58,-55],[-30,-80],[30,-80],[60,-55]], cl);
+    // Cara lateral derecha (profundidad)
+    caraLateral(ctx, [[85,0],[95,-10],[95,-42],[85,-38]], cs);
+    // Cara superior derecha
+    caraLateral(ctx, [[85,-38],[95,-42],[65,-58],[60,-55]], cd);
+    // Vidrio lateral
+    ctx.fillStyle = 'rgba(100,200,255,0.50)';
+    ctx.beginPath(); ctx.moveTo(-55,-54); ctx.lineTo(-28,-76); ctx.lineTo(28,-76); ctx.lineTo(58,-54); ctx.closePath(); ctx.fill();
+    // Vidrio frontal (derecha)
+    ctx.fillStyle = 'rgba(100,200,255,0.35)';
+    ctx.beginPath(); ctx.moveTo(60,-55); ctx.lineTo(65,-58); ctx.lineTo(82,-42); ctx.lineTo(80,-38); ctx.closePath(); ctx.fill();
+    // Luz delantera
+    ctx.fillStyle = '#ffffc0'; ctx.shadowColor='#ffff00'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.roundRect(78,-36,10,8,2); ctx.fill(); ctx.shadowBlur=0;
+    // Luz trasera
+    ctx.fillStyle = '#ff2222'; ctx.shadowColor='#ff0000'; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.roundRect(-92,-30,6,12,2); ctx.fill(); ctx.shadowBlur=0;
+    // Ruedas
+    rueda3D(ctx, -52, 4, 22, 14);
+    rueda3D(ctx, 52, 4, 22, 14);
+}
+
+function carro3DSUV(ctx, color) {
+    const c = color, cl = brillante(color,35), cd = brillante(color,-45), cs = brillante(color,-15);
+    caraLateral(ctx, [[-88,0],[-88,-52],[-70,-70],[65,-70],[85,-52],[85,0]], c);
+    caraLateral(ctx, [[-68,-70],[-68,-100],[62,-100],[62,-70]], cl);
+    caraLateral(ctx, [[85,0],[96,-10],[96,-56],[85,-52]], cs);
+    caraLateral(ctx, [[85,-52],[96,-56],[64,-72],[62,-70]], cd);
+    ctx.fillStyle = 'rgba(100,200,255,0.48)';
+    ctx.beginPath(); ctx.moveTo(-66,-70); ctx.lineTo(-66,-96); ctx.lineTo(60,-96); ctx.lineTo(60,-70); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(100,200,255,0.32)';
+    ctx.beginPath(); ctx.moveTo(62,-70); ctx.lineTo(64,-72); ctx.lineTo(93,-55); ctx.lineTo(84,-52); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffc0'; ctx.shadowColor='#ffff00'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.roundRect(80,-48,10,10,2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle = '#ff2222'; ctx.shadowColor='#ff0000'; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.roundRect(-91,-44,6,14,2); ctx.fill(); ctx.shadowBlur=0;
+    rueda3D(ctx, -54, 4, 24, 16);
+    rueda3D(ctx, 54, 4, 24, 16);
+}
+
+function carro3DMuscle(ctx, color) {
+    const c = color, cl = brillante(color,40), cd = brillante(color,-45), cs = brillante(color,-18);
+    caraLateral(ctx, [[-92,0],[-92,-42],[-65,-58],[55,-58],[90,-42],[90,0]], c);
+    // Joroba del capó
+    caraLateral(ctx, [[20,-58],[40,-70],[75,-50],[90,-42],[55,-58]], brillante(color,20));
+    caraLateral(ctx, [[-63,-58],[-35,-82],[30,-82],[55,-58]], cl);
+    caraLateral(ctx, [[90,0],[100,-10],[100,-46],[90,-42]], cs);
+    caraLateral(ctx, [[90,-42],[100,-46],[76,-53],[75,-50]], cd);
+    ctx.fillStyle = 'rgba(100,200,255,0.48)';
+    ctx.beginPath(); ctx.moveTo(-60,-57); ctx.lineTo(-33,-78); ctx.lineTo(28,-78); ctx.lineTo(52,-57); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(100,200,255,0.30)';
+    ctx.beginPath(); ctx.moveTo(55,-58); ctx.lineTo(76,-53); ctx.lineTo(98,-45); ctx.lineTo(88,-42); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffc0'; ctx.shadowColor='#ffff00'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.roundRect(85,-40,10,10,2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle = '#ff2222'; ctx.shadowColor='#ff0000'; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.roundRect(-95,-34,6,14,2); ctx.fill(); ctx.shadowBlur=0;
+    rueda3D(ctx, -56, 4, 26, 17);
+    rueda3D(ctx, 56, 4, 26, 17);
+}
+
+function carro3DFormula(ctx, color) {
+    const c = color, cl = brillante(color,40), cd = brillante(color,-40);
+    // Cuerpo bajo y estrecho
+    caraLateral(ctx, [[-95,-5],[-95,-20],[-50,-28],[55,-28],[90,-18],[90,-5]], c);
+    caraLateral(ctx, [[-95,-5],[-95,-20],[-50,-28],[55,-28],[90,-18],[90,-5],[95,-8],[95,-22],[56,-32],[-50,-32],[-100,-23],[-100,-8]], cd);
+    // Cockpit
+    ctx.fillStyle = brillante(color,30);
+    ctx.beginPath(); ctx.ellipse(-5,-30,28,14,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(100,200,255,0.65)';
+    ctx.beginPath(); ctx.ellipse(-5,-30,20,10,0,0,Math.PI*2); ctx.fill();
+    // Ala trasera
+    caraLateral(ctx, [[-100,-24],[-100,-30],[-75,-30],[-75,-24]], cd);
+    ctx.fillStyle = cd;
+    ctx.beginPath(); ctx.roundRect(-92,-30,5,20,1); ctx.fill();
+    // Ala delantera
+    caraLateral(ctx, [[80,-18],[96,-12],[96,-18],[80,-22]], cd);
+    // Ruedas grandes
+    rueda3D(ctx, -60, 8, 22, 22);
+    rueda3D(ctx, 55, 8, 22, 22);
+    // Ruedas traseras visibles
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.ellipse(-60, 8, 8, 22, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath(); ctx.ellipse(55, 8, 8, 22, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#ffffc0'; ctx.shadowColor='#ffff00'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.roundRect(85,-16,8,6,1); ctx.fill(); ctx.shadowBlur=0;
+}
+
+function carro3DPickup(ctx, color) {
+    const c = color, cl = brillante(color,35), cd = brillante(color,-45), cs = brillante(color,-18);
+    // Caja de carga (trasera)
+    caraLateral(ctx, [[-90,0],[-90,-40],[-10,-40],[-10,0]], brillante(color,-30));
+    caraLateral(ctx, [[-90,-40],[-10,-40],[-10,-46],[-90,-46]], cd);
+    // Cabina (delantera)
+    caraLateral(ctx, [[-12,0],[-12,-58],[-5,-72],[58,-72],[85,-55],[85,0]], c);
+    caraLateral(ctx, [[-3,-72],[56,-72],[76,-58],[56,-55],[-3,-55]], cl);
+    caraLateral(ctx, [[85,0],[95,-10],[95,-58],[85,-55]], cs);
+    caraLateral(ctx, [[85,-55],[95,-58],[76,-62],[56,-55]], cd);
+    ctx.fillStyle = 'rgba(100,200,255,0.48)';
+    ctx.beginPath(); ctx.moveTo(-2,-55); ctx.lineTo(-2,-68); ctx.lineTo(55,-68); ctx.lineTo(74,-57); ctx.lineTo(55,-55); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#ffffc0'; ctx.shadowColor='#ffff00'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.roundRect(80,-50,10,10,2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle = '#ff2222'; ctx.shadowColor='#ff0000'; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.roundRect(-93,-34,6,12,2); ctx.fill(); ctx.shadowBlur=0;
+    rueda3D(ctx, -58, 4, 24, 16);
+    rueda3D(ctx, 54, 4, 24, 16);
+}
+
+function carro3DClasico(ctx, color) {
+    const c = color, cl = brillante(color,35), cd = brillante(color,-45), cs = brillante(color,-18);
+    caraLateral(ctx, [[-85,0],[-85,-40],[-70,-40],[65,-40],[82,-30],[82,0]], c);
+    // Techo burbuja redondeado
+    ctx.fillStyle = cl;
+    ctx.beginPath();
+    ctx.moveTo(-68,-40); ctx.bezierCurveTo(-68,-90, 62,-90, 62,-40);
+    ctx.closePath(); ctx.fill();
+    caraLateral(ctx, [[82,0],[92,-8],[92,-34],[82,-30]], cs);
+    ctx.fillStyle = cd;
+    ctx.beginPath(); ctx.moveTo(82,-30); ctx.lineTo(92,-34); ctx.bezierCurveTo(72,-80,62,-88,62,-40); ctx.closePath(); ctx.fill();
+    // Vidrio burbuja
+    ctx.fillStyle = 'rgba(100,200,255,0.50)';
+    ctx.beginPath();
+    ctx.moveTo(-60,-42); ctx.bezierCurveTo(-60,-82, 56,-82, 56,-42);
+    ctx.closePath(); ctx.fill();
+    // Franja cromada
+    ctx.strokeStyle = brillante(color,60); ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(-84,-20); ctx.lineTo(80,-20); ctx.stroke();
+    ctx.fillStyle = '#ffffc0'; ctx.shadowColor='#ffff00'; ctx.shadowBlur=8;
+    ctx.beginPath(); ctx.arc(76,-14,6,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    ctx.fillStyle = '#ff2222'; ctx.shadowColor='#ff0000'; ctx.shadowBlur=6;
+    ctx.beginPath(); ctx.arc(-80,-14,6,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+    rueda3D(ctx, -52, 4, 22, 14);
+    rueda3D(ctx, 50, 4, 22, 14);
+}
+
+// ================================================================
+// FUNCIONES ANTIGUAS — mantenidas por compatibilidad (no se usan)
+// ================================================================
 function iso(x, y, z) {
     const angleX = Math.PI / 6; // 30 grados
     const sx = (x - z) * Math.cos(angleX) * 1.1;

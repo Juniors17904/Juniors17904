@@ -168,6 +168,7 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     transition: all 0.2s;
 }
 .btn-neon:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(124,58,237,0.8); }
+.btn-compacto { flex: none; width: auto; padding: 14px 28px; margin-top: 14px; }
 .btn-neon:active { transform: translateY(0); }
 
 .btn-ghost {
