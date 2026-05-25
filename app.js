@@ -59,28 +59,16 @@ function formatearTiempo(ms) {
 // ================================================================
 // DETECTOR DE ORIENTACIÓN
 // ================================================================
-const PANTALLAS_QUE_REQUIEREN_LANDSCAPE = ['pantalla-juego', 'pantalla-espera'];
-
 function verificarOrientacion() {
-    const esMovil = 'ontouchstart' in window;
+    const esMovil = window.innerWidth < 900 && 'ontouchstart' in window;
     const esVertical = window.innerHeight > window.innerWidth;
+    const pantJuego = document.getElementById('pantalla-juego');
+    const enJuego = pantJuego && pantJuego.style.display === 'flex';
 
-    const pantallaActiva = [...document.querySelectorAll('.pantalla.activa')]
-        .map(p => p.id);
-
-    const necesitaLandscape = pantallaActiva.some(id =>
-        PANTALLAS_QUE_REQUIEREN_LANDSCAPE.includes(id)
-    );
-
-    const aviso = document.getElementById('aviso-rotar');
-    if (esMovil && esVertical && necesitaLandscape) {
-        aviso.classList.add('visible');
-        // Intentar forzar orientación cada vez que se detecta vertical
-        if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(() => {});
-        }
+    if (esMovil && esVertical && enJuego) {
+        document.getElementById('pantalla-rotar').style.display = 'flex';
     } else {
-        aviso.classList.remove('visible');
+        document.getElementById('pantalla-rotar').style.display = 'none';
     }
 }
 window.addEventListener('resize', verificarOrientacion);
