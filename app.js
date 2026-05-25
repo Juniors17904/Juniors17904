@@ -1,6 +1,29 @@
 'use strict';
 
 // ================================================================
+// FORZAR LANDSCAPE AL INICIAR JUEGO
+// ================================================================
+function forzarLandscape() {
+    // API moderna
+    if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {});
+    }
+    // Fallback para Safari/otros
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    }
+}
+
+function liberarOrientacion() {
+    if (screen.orientation && screen.orientation.unlock) {
+        screen.orientation.unlock();
+    }
+    if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+    }
+}
+
+// ================================================================
 // ESTADO DE LA APP
 // ================================================================
 const estado = {
@@ -216,6 +239,7 @@ function iniciarCuentaRegresiva() {
 // ================================================================
 function iniciarJuego() {
     mostrar('pantalla-juego');
+    forzarLandscape();
     verificarOrientacion();
 
     // Determinar nombre del oponente
@@ -266,6 +290,7 @@ document.getElementById('btn-revancha').addEventListener('click', () => {
 });
 
 document.getElementById('btn-menu').addEventListener('click', async () => {
+    liberarOrientacion();
     if (window.multiJugador) await window.multiJugador.limpiar();
     window.multiJugador = null;
     estado.juego = null;
