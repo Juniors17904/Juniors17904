@@ -115,8 +115,8 @@ class Carretera {
         for (let i = CFG.STRIPS - 2; i >= 0; i--) {
             const t1 = tiras[i].t;
             const t2 = tiras[i + 1].t;
-            const y1 = HY + (1 - t1) * (H - HY);
-            const y2 = HY + (1 - t2) * (H - HY);
+            const y1 = HY + t1 * (H - HY);
+            const y2 = HY + t2 * (H - HY);
             const w1 = t1 * halfRoadW;
             const w2 = t2 * halfRoadW;
 
