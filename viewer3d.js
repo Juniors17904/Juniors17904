@@ -132,21 +132,24 @@ class Viewer3D {
         const prefix = Viewer3D.MAPA[tipo] ?? 'Sports';
         const group  = new THREE.Group();
 
+        // Clonar grupos completos para preservar posición de llantas
         const pfxLo = prefix.toLowerCase();
         gltf.scene.traverse(node => {
-            if (!node.isMesh) return;
             const lo = node.name.toLowerCase();
-            if (!lo.startsWith(pfxLo + '_') && !lo.startsWith(pfxLo + ' ')) return;
+            // Tomar el grupo del cuerpo (nombre exacto) o cada grupo de rueda
+            if (lo !== pfxLo && !lo.startsWith(pfxLo + ' wheel')) return;
 
-            const mesh = node.clone();
-            mesh.material = node.material.clone();
-            mesh.castShadow    = true;
-            mesh.receiveShadow = true;
-
-            if (Viewer3D.#esCarroceria(node.name)) {
-                mesh.material.color.set(color);
-            }
-            group.add(mesh);
+            const clone = node.clone();
+            clone.traverse(child => {
+                if (!child.isMesh) return;
+                child.material  = child.material.clone();
+                child.castShadow    = true;
+                child.receiveShadow = true;
+                if (Viewer3D.#esCarroceria(child.name)) {
+                    child.material.color.set(color);
+                }
+            });
+            group.add(clone);
         });
 
         // Corregir orientación: el GLB exporta en Z-up (Blender), Three.js usa Y-up
