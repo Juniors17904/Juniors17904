@@ -238,7 +238,6 @@ class VisorJuego3D {
         if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
         const group = _buildGroup(gltf, tipo, color);
         _centerGroup(group, 2.6);
-        group.rotation.y = Math.PI;
         this.#scene.add(group);
         this.#carGroup = group;
     }
