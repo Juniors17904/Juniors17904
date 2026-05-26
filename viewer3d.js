@@ -178,8 +178,17 @@ class Viewer3D {
         this.#carGroup = group;
 
         const carH = (box2.max.y - box2.min.y) * 0.5;
+        // Resetear cámara para que cada carro se muestre centrado
+        this.#camera.position.set(4, 2.5, 5);
         this.#controls.target.set(0, carH, 0);
         this.#controls.update();
+
+        Viewer3D.#dbgPanel(
+            dbg.join('\n') +
+            `\nsize x=${size.x.toFixed(0)} y=${size.y.toFixed(0)} z=${size.z.toFixed(0)}` +
+            `\nscale=${scale.toExponential(2)} carH=${carH.toFixed(3)}` +
+            `\ncenter x=${center.x.toFixed(1)} y=${center.y.toFixed(1)} z=${center.z.toFixed(1)}`
+        );
     }
 
     // ── Debug overlay ────────────────────────────────────────────
