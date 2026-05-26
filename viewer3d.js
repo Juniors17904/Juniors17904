@@ -135,6 +135,7 @@ class Viewer3D {
         // Clonar grupos completos para preservar posición de llantas
         const pfxLo = prefix.toLowerCase();
         gltf.scene.traverse(node => {
+            if (node.isMesh) return;   // solo grupos, no meshes sueltos
             const lo = node.name.toLowerCase();
             // Tomar el grupo del cuerpo (nombre exacto) o cada grupo de rueda
             if (lo !== pfxLo && !lo.startsWith(pfxLo + ' wheel')) return;
