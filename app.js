@@ -380,7 +380,7 @@ class App {
                 ? document.getElementById('nombre-j2').textContent
                 : document.getElementById('nombre-j1').textContent);
 
-        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto);
+        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, this.#estado.pista);
 
         window.onCarreraTerminada = (tiempoMs, velMax) => {
             if (!this.#estado.modoSolo && window.multiJugador) window.multiJugador.reportarGanador();

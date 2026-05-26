@@ -32,6 +32,37 @@ const NIVELES = [
 ];
 
 // ================================================================
+// DEFINICIÓN DE PISTAS
+// ================================================================
+const PISTAS = {
+    ciudad: {
+        nombre:    'Circuito Urbano',
+        totalSegs: 300,
+        distMeta:  1800,
+        nivelFijo: { nombre:'Ciudad', cielo:['#060a14','#0d1b2a'], cesped:['#0a200a','#081808'], asfalto:['#3a3a3a','#2e2e2e'], borde:'#555' },
+        // [desde, hasta, curva]  positivo=derecha, negativo=izquierda
+        tramos: [
+            [0,   65,  0   ],  // recta principal
+            [65,  82,  0.9 ],  // curva 1 derecha
+            [82,  100, 1.7 ],  // horquilla derecha (Loews)
+            [100, 120, -0.5],  // salida horquilla
+            [120, 135, 0   ],  // recta Portier
+            [135, 155, -0.8],  // curva izquierda (túnel)
+            [155, 185, 0   ],  // recta del túnel (rápida)
+            [185, 210, 0.6 ],  // salida túnel, sweeper derecha
+            [210, 228, -1.2],  // chicane izquierda
+            [228, 246, 1.2 ],  // chicane derecha
+            [246, 265, 0   ],  // recta boxes
+            [265, 285, -1.0],  // horquilla izquierda (Rascasse)
+            [285, 300, 0.4 ],  // curva final al inicio
+        ],
+        obstFrecuencia: 0.12,
+        obstTipos: ['carro','carro','carro','bache','turbo'],
+        coloresTrafico: ['#ef4444','#3b82f6','#eab308','#6b7280','#f97316'],
+    },
+};
+
+// ================================================================
 // CLASE: Segmento de pista
 // ================================================================
 class Segmento {
@@ -48,32 +79,45 @@ class Segmento {
 // ================================================================
 class Carretera {
     #segmentos = [];
+    #totalSegs;
+    #nivelFijo = null;
 
-    constructor() {
+    constructor(tipoPista) {
+        this.pista = PISTAS[tipoPista] || null;
+        this.#totalSegs = this.pista ? this.pista.totalSegs : CFG.TOTAL_SEGS;
+        this.#nivelFijo = this.pista ? this.pista.nivelFijo : null;
         this.#generarPista();
     }
 
     #generarPista() {
-        const N = CFG.TOTAL_SEGS;
-        for (let i = 0; i < N; i++) {
-            const nivelActual = NIVELES.reduce((prev, nv) => {
-                return (i * CFG.SEG_LARGO < nv.desde) ? prev : nv;
-            }, NIVELES[0]);
+        const N = this.#totalSegs;
+        const p = this.pista;
 
-            // Curvas variadas por secciones
-            let curva = 0;
-            const bloque = Math.floor(i / 40);
-            if (bloque % 3 === 1) curva = 0.8;
-            if (bloque % 3 === 2) curva = -0.6;
+        for (let i = 0; i < N; i++) {
+            let nivelActual, curva;
+
+            if (p) {
+                nivelActual = p.nivelFijo;
+                const tramo = p.tramos.find(([d, h]) => i >= d && i < h);
+                curva = tramo ? tramo[2] : 0;
+            } else {
+                nivelActual = NIVELES.reduce((prev, nv) =>
+                    (i * CFG.SEG_LARGO < nv.desde) ? prev : nv, NIVELES[0]);
+                const bloque = Math.floor(i / 40);
+                curva = bloque % 3 === 1 ? 0.8 : bloque % 3 === 2 ? -0.6 : 0;
+            }
 
             const seg = new Segmento(i, curva, nivelActual);
 
-            // Colocar obstáculos aleatorios
-            if (i > 10 && Math.random() < 0.10) {
+            const frecuencia = p ? p.obstFrecuencia : 0.10;
+            const tipos      = p ? p.obstTipos      : ['carro','carro','bache','turbo'];
+            const colores    = p ? p.coloresTrafico  : ['#666','#888','#aaa','#f59e0b'];
+
+            if (i > 10 && Math.random() < frecuencia) {
                 seg.obstaculos.push({
-                    tipo: Math.random() < 0.6 ? 'carro' : (Math.random() < 0.5 ? 'bache' : 'turbo'),
-                    carril: Math.floor(Math.random() * 3) - 1, // -1, 0, 1
-                    color: ['#666','#888','#aaa','#f59e0b'][Math.floor(Math.random() * 4)],
+                    tipo:   tipos[Math.floor(Math.random() * tipos.length)],
+                    carril: Math.floor(Math.random() * 3) - 1,
+                    color:  colores[Math.floor(Math.random() * colores.length)],
                 });
             }
             this.#segmentos.push(seg);
@@ -81,8 +125,8 @@ class Carretera {
     }
 
     obtenerSeg(pos) {
-        const idx = Math.floor(pos / CFG.SEG_LARGO) % CFG.TOTAL_SEGS;
-        return this.#segmentos[idx < 0 ? idx + CFG.TOTAL_SEGS : idx];
+        const idx = Math.floor(pos / CFG.SEG_LARGO) % this.#totalSegs;
+        return this.#segmentos[idx < 0 ? idx + this.#totalSegs : idx];
     }
 
     // Renderiza la carretera pseudo-3D en el canvas
@@ -247,6 +291,7 @@ class Carretera {
     }
 
     #nivelParaPos(pos) {
+        if (this.#nivelFijo) return this.#nivelFijo;
         const dist = pos * CFG.SEG_LARGO;
         return NIVELES.reduce((prev, nv) => (dist >= nv.desde ? nv : prev), NIVELES[0]);
     }
@@ -279,12 +324,13 @@ class Carretera {
 class Carro {
     #tilt = 0; // inclinación visual al girar
 
-    constructor(color) {
+    constructor(color, distMeta = CFG.DIST_META) {
         this.color = color;
+        this.distMeta = distMeta;
         this.velocidad = 0;
-        this.posicion = 0;    // distancia recorrida
-        this.camX = 0;        // offset lateral de cámara (-1 a 1)
-        this.giro = 0;        // entrada de giro (-1, 0, 1)
+        this.posicion = 0;
+        this.camX = 0;
+        this.giro = 0;
         this.turbosLeft = CFG.TURBO_MAX;
         this.turboActivo = false;
         this.turboTimer = 0;
@@ -338,7 +384,7 @@ class Carro {
     }
 
     get progreso() {
-        return Math.min(1, this.posicion / CFG.DIST_META);
+        return Math.min(1, this.posicion / this.distMeta);
     }
 
     get tilt() { return this.#tilt; }
@@ -811,12 +857,15 @@ class Juego {
     #enCurso = false;
     #tiempoInicio = 0;
     #visor3d = null;
+    #distMeta = CFG.DIST_META;
 
-    constructor(color, tipoControl, tipoAuto = 'deportivo') {
+    constructor(color, tipoControl, tipoAuto = 'deportivo', tipoPista = null) {
         this.#canvas = document.getElementById('canvas-juego');
         this.#ctx = this.#canvas.getContext('2d');
-        this.#carretera = new Carretera();
-        this.#carro = new Carro(color);
+        this.#carretera = new Carretera(tipoPista);
+        const pistaCfg = PISTAS[tipoPista];
+        this.#distMeta = pistaCfg ? pistaCfg.distMeta : CFG.DIST_META;
+        this.#carro = new Carro(color, this.#distMeta);
         this.#hud = new HUD();
         this.#controles = new Controles(tipoControl, this.#carro);
 
