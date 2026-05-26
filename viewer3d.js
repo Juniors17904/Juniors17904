@@ -132,15 +132,18 @@ class Viewer3D {
         const prefix = Viewer3D.MAPA[tipo] ?? 'Sports';
         const group  = new THREE.Group();
 
-        // Clonar grupos completos para preservar posición de llantas
-        const pfxLo = prefix.toLowerCase();
-        gltf.scene.traverse(node => {
-            if (node.isMesh) return;   // solo grupos, no meshes sueltos
-            const lo = node.name.toLowerCase();
-            // Tomar el grupo del cuerpo (nombre exacto) o cada grupo de rueda
-            if (lo !== pfxLo && !lo.startsWith(pfxLo + ' wheel')) return;
+        // Buscar nodos directamente por nombre para evitar ambigüedades del traverse
+        const nodos = [
+            gltf.scene.getObjectByName(prefix),
+            gltf.scene.getObjectByName(`${prefix} wheel front right`),
+            gltf.scene.getObjectByName(`${prefix} wheel front left`),
+            gltf.scene.getObjectByName(`${prefix} wheel rear right`),
+            gltf.scene.getObjectByName(`${prefix} wheel rear left`),
+        ];
 
-            const clone = node.clone();
+        for (const nodo of nodos) {
+            if (!nodo) continue;
+            const clone = nodo.clone();
             clone.traverse(child => {
                 if (!child.isMesh) return;
                 child.material  = child.material.clone();
@@ -151,7 +154,7 @@ class Viewer3D {
                 }
             });
             group.add(clone);
-        });
+        }
 
         // Centrar y escalar para que llene bien el canvas
         const box    = new THREE.Box3().setFromObject(group);
