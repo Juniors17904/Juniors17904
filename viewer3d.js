@@ -152,9 +152,6 @@ class Viewer3D {
             group.add(clone);
         });
 
-        // Corregir orientación: el GLB exporta en Z-up (Blender), Three.js usa Y-up
-        group.rotation.x = -Math.PI / 2;
-
         // Centrar y escalar para que llene bien el canvas
         const box    = new THREE.Box3().setFromObject(group);
         const size   = box.getSize(new THREE.Vector3());
