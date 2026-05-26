@@ -652,7 +652,7 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 #canvas-preview-3d {
     border-radius: 16px;
     border: 1px solid var(--border);
-    background: #080818;
+    background: #87ceeb;
     width: min(92vw, 400px);
     aspect-ratio: 4 / 3;
     display: block;

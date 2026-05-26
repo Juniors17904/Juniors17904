@@ -49,7 +49,8 @@ class Viewer3D {
         const W = this.#canvas.width, H = this.#canvas.height;
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = new THREE.Color(0x06060f);
+        this.#scene.background = new THREE.Color(0x87ceeb);
+        this.#scene.fog = new THREE.Fog(0x87ceeb, 18, 40);
 
         this.#camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
         this.#camera.position.set(4, 2.5, 5);
@@ -60,25 +61,25 @@ class Viewer3D {
         this.#renderer.shadowMap.enabled = true;
         this.#renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.#renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.#renderer.toneMappingExposure = 1.1;
+        this.#renderer.toneMappingExposure = 1.4;
 
         // Luces
-        this.#scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+        this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.4));
 
-        const sun = new THREE.DirectionalLight(0xffffff, 1.8);
-        sun.position.set(5, 10, 5);
+        const sun = new THREE.DirectionalLight(0xfffbe6, 2.4);
+        sun.position.set(6, 12, 6);
         sun.castShadow = true;
         sun.shadow.mapSize.set(1024, 1024);
         this.#scene.add(sun);
 
-        const fill = new THREE.DirectionalLight(0x8899ff, 0.5);
-        fill.position.set(-4, 3, -3);
+        const fill = new THREE.DirectionalLight(0xc8e8ff, 0.6);
+        fill.position.set(-5, 4, -3);
         this.#scene.add(fill);
 
         // Suelo
         const ground = new THREE.Mesh(
             new THREE.CircleGeometry(5, 48),
-            new THREE.MeshStandardMaterial({ color: 0x12122a, roughness: 0.9, metalness: 0.1 })
+            new THREE.MeshStandardMaterial({ color: 0x7a9e6e, roughness: 0.85, metalness: 0.0 })
         );
         ground.rotation.x = -Math.PI / 2;
         ground.receiveShadow = true;
@@ -87,7 +88,7 @@ class Viewer3D {
         // Anillo neón en el suelo
         const ring = new THREE.Mesh(
             new THREE.RingGeometry(1.9, 2.1, 48),
-            new THREE.MeshBasicMaterial({ color: 0x7c3aed, side: THREE.DoubleSide })
+            new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, opacity: 0.4, transparent: true })
         );
         ring.rotation.x = -Math.PI / 2;
         ring.position.y = 0.005;
