@@ -131,36 +131,13 @@ class Viewer3D {
 
         const prefix = Viewer3D.MAPA[tipo] ?? 'Sports';
         const group  = new THREE.Group();
-        const dbg = [];
-
-        // Buscar nodos directamente por nombre para evitar ambigüedades del traverse
-        const nombres = [
-            prefix,
-            `${prefix} wheel front right`,
-            `${prefix} wheel front left`,
-            `${prefix} wheel rear right`,
-            `${prefix} wheel rear left`,
-        ];
-
-        for (const nombre of nombres) {
-            const nodo = gltf.scene.getObjectByName(nombre);
-            if (!nodo) { dbg.push(`✗ ${nombre}`); continue; }
-            let meshCount = 0;
-            const clone = nodo.clone();
-            clone.traverse(child => {
-                if (!child.isMesh) return;
-                meshCount++;
-                child.material  = child.material.clone();
-                child.castShadow    = true;
-                child.receiveShadow = true;
-                if (Viewer3D.#esCarroceria(child.name)) {
-                    child.material.color.set(color);
-                }
-            });
-            dbg.push(`✓ ${nombre} (${meshCount} meshes)`);
-            group.add(clone);
-        }
-
+        // Listar todos los nombres que contienen el prefix en la escena cargada
+        const dbg = [`prefix="${prefix}"`];
+        gltf.scene.traverse(n => {
+            if (n.name && n.name.toLowerCase().includes(prefix.toLowerCase())) {
+                dbg.push(`[${n.type}] ${n.name}`);
+            }
+        });
         Viewer3D.#dbgPanel(dbg.join('\n'));
 
         // Centrar y escalar para que llene bien el canvas
