@@ -659,6 +659,63 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 .carro-card:hover { border-color: var(--neon-c); }
 .carro-mini-canvas { border-radius: 6px; }
 
+/* Pistas */
+.pista-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: min(96vw, 420px);
+}
+.pista-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pista-card.sel {
+    border-color: var(--neon-v);
+    box-shadow: 0 0 16px rgba(124,58,237,0.4);
+}
+.pista-card:hover { border-color: var(--neon-c); }
+.pista-preview {
+    width: 72px; height: 48px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+.pista-road {
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 18px; height: 100%;
+    background: rgba(0,0,0,0.45);
+    clip-path: polygon(30% 100%, 70% 100%, 90% 0%, 10% 0%);
+}
+.pista-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+.pista-nombre {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--txt);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.pista-desc {
+    font-size: 9px;
+    color: var(--txt2);
+    letter-spacing: 0.5px;
+}
+
 /* Preview 3D */
 #canvas-preview-3d {
     border-radius: 16px;

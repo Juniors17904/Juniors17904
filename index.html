@@ -188,6 +188,44 @@
         <div id="giro-estado" class="giro-estado">Esperando datos...</div>
     </div>
 
+    <!-- Pantalla: Diseño de pista -->
+    <div id="pantalla-pista" class="pantalla">
+        <button id="btn-volver-pista" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:22px;margin-bottom:24px">PISTAS</div>
+        <div class="pista-lista">
+            <div class="pista-card sel" data-pista="ciudad">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#0d1b2a,#1b3a4b)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Circuito Urbano</span>
+                    <span class="pista-desc">Ciudad de noche · Curvas técnicas</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+            <div class="pista-card" data-pista="desierto">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#c97d00,#f5d060)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Autopista Solar</span>
+                    <span class="pista-desc">Desierto al mediodía · Recta veloz</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+            <div class="pista-card" data-pista="montana">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#1a2c40,#253c55)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Cañón Rojo</span>
+                    <span class="pista-desc">Montaña nocturna · Curvas cerradas</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Pantalla: Garage (selección de carro) -->
     <div id="pantalla-garage" class="pantalla">
         <button id="btn-volver-garage" class="btn-tuerca" style="top:16px;left:16px">←</button>

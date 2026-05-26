@@ -163,6 +163,7 @@ class App {
         control: 'botones',
         modoSolo: true,
         tipoAuto: 'deportivo',
+        pista: 'ciudad',
         juego: null,
     };
 
@@ -252,6 +253,16 @@ class App {
         document.getElementById('btn-volver-giro').addEventListener('click', () => {
             giroscopioTester.detener();
             this.#mostrar('pantalla-ajustes');
+        });
+
+        document.getElementById('btn-ir-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
+        document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+        document.getElementById('pantalla-pista').addEventListener('click', e => {
+            const card = e.target.closest('.pista-card');
+            if (!card) return;
+            document.querySelectorAll('.pista-card').forEach(c => c.classList.remove('sel'));
+            card.classList.add('sel');
+            this.#estado.pista = card.dataset.pista;
         });
 
         document.getElementById('btn-revancha').addEventListener('click', () => {
