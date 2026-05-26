@@ -44,9 +44,9 @@ class Viewer3D {
         rz = y * SX + rz * CX;
 
         const W = this.#canvas.width, H = this.#canvas.height;
-        const FOV = W * 0.90, DIST = 4.4;
+        const FOV = W * 0.90, DIST = 3.8;
         const s = FOV / (rz + DIST);
-        return [W * 0.5 + rx * s, H * 0.54 - ry * s, rz];
+        return [W * 0.5 + rx * s, H * 0.50 - ry * s, rz];
     }
 
     // ── Loop de animación ────────────────────────────────────────
@@ -70,14 +70,6 @@ class Viewer3D {
         ctx.beginPath();
         ctx.ellipse(W * 0.5, H * 0.80, W * 0.36, H * 0.055, 0, 0, Math.PI * 2);
         ctx.fill();
-
-        // Hint de arrastre (solo al inicio)
-        if (this.#autoRot) {
-            ctx.fillStyle = 'rgba(255,255,255,0.12)';
-            ctx.font = `${Math.round(H*0.042)}px Orbitron, monospace`;
-            ctx.textAlign = 'center';
-            ctx.fillText('← arrastra →', W/2, H * 0.96);
-        }
 
         // Proyectar
         const pros = this.#caras.map(f => {
@@ -105,6 +97,16 @@ class Viewer3D {
             ctx.lineWidth = 0.6;
             ctx.stroke();
         });
+
+        // Hint siempre encima
+        if (this.#autoRot) {
+            ctx.globalAlpha = 0.35;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `${Math.round(H * 0.042)}px Orbitron, monospace`;
+            ctx.textAlign = 'center';
+            ctx.fillText('← arrastra →', W / 2, H * 0.96);
+            ctx.globalAlpha = 1;
+        }
     }
 
     // ── Eventos táctiles y mouse ─────────────────────────────────

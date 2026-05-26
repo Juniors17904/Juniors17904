@@ -653,8 +653,9 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     border-radius: 16px;
     border: 1px solid var(--border);
     background: #080818;
-    width: min(92vw, 440px);
-    height: auto;
+    width: min(92vw, 400px);
+    aspect-ratio: 4 / 3;
+    display: block;
     cursor: grab;
     touch-action: none;
 }
