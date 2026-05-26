@@ -672,3 +672,16 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     .titulo-logo { font-size: 24px; margin-bottom: 14px; }
     .card-setup { padding: 16px; gap: 12px; }
 }
+
+/* 3D car canvas overlay during game */
+#canvas-carro-3d {
+    position: absolute;
+    bottom: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(32vw, 240px);
+    aspect-ratio: 3 / 2;
+    pointer-events: none;
+    z-index: 5;
+    display: none;
+}

@@ -12,6 +12,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TurboRace">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.min.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+        }
+    }
+    </script>
 </head>
 <body>
 
@@ -120,6 +128,7 @@
     <!-- Pantalla: Juego -->
     <div id="pantalla-juego" class="pantalla">
         <canvas id="canvas-juego"></canvas>
+        <canvas id="canvas-carro-3d" width="240" height="160"></canvas>
 
         <!-- Controles botones -->
         <div id="ctrl-botones" class="ctrl-overlay" style="display:none">
@@ -252,7 +261,7 @@
       }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="viewer3d.js"></script>
+    <script type="module" src="viewer3d.js"></script>
     <script src="garage.js"></script>
     <script src="supabase-client.js"></script>
     <script src="game.js"></script>

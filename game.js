@@ -426,11 +426,20 @@ class Carro {
 // CLASE: HUD (velocímetro, turbos, progreso, minimapa)
 // ================================================================
 class HUD {
-    dibujar(ctx, W, H, carro, oponenteProgreso, nombreOponente) {
+    #mmPts = null; #mmSegs = null; #mmLen = 0;
+
+    static #CIRC_NORM = [
+        [0.82, 0.20], [0.82, 0.55], [0.72, 0.80], [0.52, 0.90],
+        [0.32, 0.85], [0.14, 0.70], [0.14, 0.45], [0.22, 0.25],
+        [0.40, 0.12], [0.62, 0.12], [0.82, 0.20],
+    ];
+
+    dibujar(ctx, W, H, carro, oponenteProgreso, nombreOponente, nivel) {
         this.#dibujarVelocimetro(ctx, W, H, carro.velocidad / CFG.VEL_MAX);
         this.#dibujarTurbos(ctx, W, H, carro.turbosLeft, carro.turboActivo);
         this.#dibujarProgreso(ctx, W, H, carro.progreso, oponenteProgreso, nombreOponente);
         if (carro.turboActivo) this.#dibujarTurboFX(ctx, W, H);
+        this.#dibujarMinimap(ctx, carro, oponenteProgreso, nivel);
     }
 
     #dibujarVelocimetro(ctx, W, H, fraccion) {
@@ -596,13 +605,99 @@ class HUD {
         ctx.restore();
     }
 
-    dibujarNivel(ctx, W, nivel) {
+    #buildMinimap() {
+        if (this.#mmPts) return;
+        const x0 = 11, y0 = 20, w = 100, h = 63;
+        this.#mmPts = HUD.#CIRC_NORM.map(([nx, ny]) => ({ x: x0 + nx * w, y: y0 + ny * h }));
+        this.#mmSegs = [];
+        this.#mmLen = 0;
+        for (let i = 0; i < this.#mmPts.length - 1; i++) {
+            const dx = this.#mmPts[i+1].x - this.#mmPts[i].x;
+            const dy = this.#mmPts[i+1].y - this.#mmPts[i].y;
+            const len = Math.sqrt(dx*dx + dy*dy);
+            this.#mmSegs.push(len);
+            this.#mmLen += len;
+        }
+    }
+
+    #posOnPath(progress) {
+        let t = Math.max(0, Math.min(1, progress)) * this.#mmLen;
+        for (let i = 0; i < this.#mmSegs.length; i++) {
+            if (t <= this.#mmSegs[i]) {
+                const f = t / this.#mmSegs[i];
+                return {
+                    x: this.#mmPts[i].x + f * (this.#mmPts[i+1].x - this.#mmPts[i].x),
+                    y: this.#mmPts[i].y + f * (this.#mmPts[i+1].y - this.#mmPts[i].y),
+                };
+            }
+            t -= this.#mmSegs[i];
+        }
+        return this.#mmPts[this.#mmPts.length - 1];
+    }
+
+    #drawCircuit(ctx, pts) {
+        const N = pts.length - 1;
+        ctx.beginPath();
+        ctx.moveTo((pts[0].x + pts[1].x) / 2, (pts[0].y + pts[1].y) / 2);
+        for (let i = 1; i < N; i++) {
+            const mx = (pts[i].x + pts[i+1].x) / 2;
+            const my = (pts[i].y + pts[i+1].y) / 2;
+            ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+        }
+        ctx.quadraticCurveTo(pts[N].x, pts[N].y,
+            (pts[0].x + pts[1].x) / 2, (pts[0].y + pts[1].y) / 2);
+        ctx.stroke();
+    }
+
+    #dibujarMinimap(ctx, carro, oponenteProgreso, nivel) {
+        this.#buildMinimap();
+        const pts = this.#mmPts;
+
         ctx.save();
-        ctx.fillStyle = '#06b6d4';
-        ctx.font = '10px Orbitron';
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'top';
-        ctx.fillText(nivel.toUpperCase(), W - 12, 12);
+
+        // Panel
+        ctx.globalAlpha = 0.88;
+        ctx.fillStyle = '#0a0a1e';
+        ctx.beginPath(); ctx.roundRect(6, 4, 116, 88, 8); ctx.fill();
+        ctx.strokeStyle = '#7c3aed'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        // Nombre del nivel
+        ctx.fillStyle = '#06b6d4'; ctx.font = '8px Orbitron';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        ctx.fillText((nivel || '').toUpperCase(), 12, 8);
+
+        // Circuito: capa sombra + capa visible
+        ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = 7;
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        this.#drawCircuit(ctx, pts);
+
+        ctx.strokeStyle = '#c8d0e0'; ctx.lineWidth = 3;
+        this.#drawCircuit(ctx, pts);
+
+        // Línea de salida/meta
+        const sf = pts[0];
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(sf.x - 5, sf.y); ctx.lineTo(sf.x + 5, sf.y);
+        ctx.stroke();
+
+        // Punto del jugador
+        const pp = this.#posOnPath(carro.progreso);
+        ctx.shadowColor = carro.color; ctx.shadowBlur = 10;
+        ctx.fillStyle = carro.color;
+        ctx.beginPath(); ctx.arc(pp.x, pp.y, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Punto del oponente
+        if (oponenteProgreso !== null) {
+            const op = this.#posOnPath(oponenteProgreso);
+            ctx.shadowColor = '#06b6d4'; ctx.shadowBlur = 7;
+            ctx.fillStyle = '#06b6d4';
+            ctx.beginPath(); ctx.arc(op.x, op.y, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+
         ctx.restore();
     }
 }
@@ -756,14 +851,22 @@ class Juego {
     #nivel = NIVELES[0];
     #enCurso = false;
     #tiempoInicio = 0;
+    #visor3d = null;
 
-    constructor(color, tipoControl) {
+    constructor(color, tipoControl, tipoAuto = 'deportivo') {
         this.#canvas = document.getElementById('canvas-juego');
         this.#ctx = this.#canvas.getContext('2d');
         this.#carretera = new Carretera();
         this.#carro = new Carro(color);
         this.#hud = new HUD();
         this.#controles = new Controles(tipoControl, this.#carro);
+
+        const c3d = document.getElementById('canvas-carro-3d');
+        if (c3d && window.VisorJuego3D) {
+            this.#visor3d = new window.VisorJuego3D(c3d);
+            this.#visor3d.cargar(tipoAuto, color);
+            c3d.style.display = 'block';
+        }
 
         window.addEventListener('resize', () => this.#ajustarCanvas());
         this.#ajustarCanvas();
@@ -842,8 +945,11 @@ class Juego {
         ctx.clearRect(0, 0, W, H);
         this.#carretera.dibujar(ctx, W, H, c.posicion, c.camX / (CFG.GIRO_MAX * 4.5));
         c.dibujar(ctx, W, H);
-        this.#hud.dibujar(ctx, W, H, c, this.#oponenteProgreso, this.#oponenteNombre);
-        this.#hud.dibujarNivel(ctx, W, this.#nivel.nombre);
+        if (this.#visor3d) {
+            this.#visor3d.setTilt(c.tilt);
+            this.#visor3d.render();
+        }
+        this.#hud.dibujar(ctx, W, H, c, this.#oponenteProgreso, this.#oponenteNombre, this.#nivel.nombre);
     }
 
     actualizarOponente(progreso) {
@@ -853,6 +959,12 @@ class Juego {
     detener() {
         this.#enCurso = false;
         if (this.#animFrame) cancelAnimationFrame(this.#animFrame);
+        if (this.#visor3d) {
+            this.#visor3d.detener();
+            this.#visor3d = null;
+            const c3d = document.getElementById('canvas-carro-3d');
+            if (c3d) c3d.style.display = 'none';
+        }
     }
 
     get carro() { return this.#carro; }
