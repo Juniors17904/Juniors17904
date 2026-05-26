@@ -131,13 +131,36 @@ class Viewer3D {
 
         const prefix = Viewer3D.MAPA[tipo] ?? 'Sports';
         const group  = new THREE.Group();
-        // Listar todos los nombres que contienen el prefix en la escena cargada
-        const dbg = [`prefix="${prefix}"`];
-        gltf.scene.traverse(n => {
-            if (n.name && n.name.toLowerCase().includes(prefix.toLowerCase())) {
-                dbg.push(`[${n.type}] ${n.name}`);
-            }
-        });
+        const dbg = [];
+
+        // Three.js reemplaza espacios con _ al cargar GLB
+        const nombres = [
+            prefix,
+            `${prefix}_wheel_front_right`,
+            `${prefix}_wheel_front_left`,
+            `${prefix}_wheel_rear_right`,
+            `${prefix}_wheel_rear_left`,
+        ];
+
+        for (const nombre of nombres) {
+            const nodo = gltf.scene.getObjectByName(nombre);
+            if (!nodo) { dbg.push(`✗ ${nombre}`); continue; }
+            let meshCount = 0;
+            const clone = nodo.clone();
+            clone.traverse(child => {
+                if (!child.isMesh) return;
+                meshCount++;
+                child.material  = child.material.clone();
+                child.castShadow    = true;
+                child.receiveShadow = true;
+                if (Viewer3D.#esCarroceria(child.name)) {
+                    child.material.color.set(color);
+                }
+            });
+            dbg.push(`✓ ${nombre} (${meshCount})`);
+            group.add(clone);
+        }
+
         Viewer3D.#dbgPanel(dbg.join('\n'));
 
         // Centrar y escalar para que llene bien el canvas
