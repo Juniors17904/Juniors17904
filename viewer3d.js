@@ -132,10 +132,11 @@ class Viewer3D {
         const prefix = Viewer3D.MAPA[tipo] ?? 'Sports';
         const group  = new THREE.Group();
 
+        const pfxLo = prefix.toLowerCase();
         gltf.scene.traverse(node => {
             if (!node.isMesh) return;
-            if (!node.name.startsWith(prefix + '_') &&
-                !node.name.startsWith(prefix + ' wheel')) return;
+            const lo = node.name.toLowerCase();
+            if (!lo.startsWith(pfxLo + '_') && !lo.startsWith(pfxLo + ' ')) return;
 
             const mesh = node.clone();
             mesh.material = node.material.clone();
@@ -147,6 +148,9 @@ class Viewer3D {
             }
             group.add(mesh);
         });
+
+        // Corregir orientación: el GLB exporta en Z-up (Blender), Three.js usa Y-up
+        group.rotation.x = -Math.PI / 2;
 
         // Centrar y escalar para que llene bien el canvas
         const box    = new THREE.Box3().setFromObject(group);
