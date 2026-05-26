@@ -341,9 +341,11 @@ class Carro {
         return Math.min(1, this.posicion / CFG.DIST_META);
     }
 
+    get tilt() { return this.#tilt; }
+
     dibujar(ctx, W, H) {
-        const cx = W / 2;
-        const by = H * 0.93;
+        const cx  = W / 2;
+        const by  = H * 0.93;
         const carW = W * 0.12;
         const carH = carW * 1.7;
 
@@ -351,62 +353,19 @@ class Carro {
         ctx.translate(cx, by - carH / 2);
         ctx.rotate(this.#tilt * 0.15);
 
-        // Sombra
-        ctx.fillStyle = 'rgba(0,0,0,0.35)';
+        // Sombra (siempre visible debajo del carro 3D)
+        ctx.fillStyle = 'rgba(0,0,0,0.30)';
         ctx.beginPath();
-        ctx.ellipse(0, carH * 0.52, carW * 0.55, carH * 0.08, 0, 0, Math.PI * 2);
+        ctx.ellipse(0, carH * 0.52, carW * 0.7, carH * 0.10, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Carrocería
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.roundRect(-carW / 2, -carH / 2, carW, carH, [4, 4, 6, 6]);
-        ctx.fill();
-
-        // Techo
-        const roofW = carW * 0.72, roofH = carH * 0.3;
-        const roofX = -roofW / 2, roofY = -carH / 2 - roofH;
-        ctx.fillStyle = this.#colorMasBrillante(this.color, 25);
-        ctx.beginPath();
-        ctx.roundRect(roofX, roofY, roofW, roofH, [8, 8, 2, 2]);
-        ctx.fill();
-
-        // Vidrio trasero
-        ctx.fillStyle = 'rgba(140,220,255,0.55)';
-        ctx.beginPath();
-        ctx.roundRect(roofX + 4, roofY + 4, roofW - 8, roofH - 8, 4);
-        ctx.fill();
-
-        // Luces traseras
-        ctx.fillStyle = '#ff2222';
-        ctx.fillRect(-carW / 2 + 2, carH / 2 - 10, carW * 0.28, 7);
-        ctx.fillRect(carW / 2 - carW * 0.28 - 2, carH / 2 - 10, carW * 0.28, 7);
-
-        // Detalles de velocidad (turbo glow)
+        // Turbo glow
         if (this.turboActivo) {
-            ctx.fillStyle = `rgba(251,191,36,${0.4 + Math.sin(Date.now() * 0.015) * 0.3})`;
+            ctx.fillStyle = `rgba(251,191,36,${0.5 + Math.sin(Date.now() * 0.015) * 0.3})`;
             ctx.beginPath();
-            ctx.ellipse(0, carH / 2, carW * 0.25, carH * 0.18, 0, 0, Math.PI * 2);
+            ctx.ellipse(0, carH * 0.52, carW * 0.4, carH * 0.22, 0, 0, Math.PI * 2);
             ctx.fill();
         }
-
-        // Ruedas traseras
-        ctx.fillStyle = '#111';
-        const rW = carW * 0.22, rH = rW * 0.5;
-        ctx.beginPath();
-        ctx.roundRect(-carW / 2 - rW * 0.5, carH * 0.28, rW, rH, 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.roundRect(carW / 2 - rW * 0.5, carH * 0.28, rW, rH, 2);
-        ctx.fill();
-
-        // Llanta delantera izquierda visible
-        ctx.beginPath();
-        ctx.roundRect(-carW / 2 - rW * 0.4, -carH * 0.1, rW, rH, 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.roundRect(carW / 2 - rW * 0.6, -carH * 0.1, rW, rH, 2);
-        ctx.fill();
 
         ctx.restore();
     }
@@ -757,13 +716,23 @@ class Juego {
     #enCurso = false;
     #tiempoInicio = 0;
 
-    constructor(color, tipoControl) {
+    #visor3d = null;
+
+    constructor(color, tipoControl, tipoAuto = 'deportivo') {
         this.#canvas = document.getElementById('canvas-juego');
         this.#ctx = this.#canvas.getContext('2d');
         this.#carretera = new Carretera();
         this.#carro = new Carro(color);
         this.#hud = new HUD();
         this.#controles = new Controles(tipoControl, this.#carro);
+
+        // Visor 3D del carro
+        const c3d = document.getElementById('canvas-carro-3d');
+        if (c3d && window.VisorJuego3D) {
+            this.#visor3d = new window.VisorJuego3D(c3d);
+            this.#visor3d.cargar(tipoAuto, color);
+            c3d.style.display = 'block';
+        }
 
         window.addEventListener('resize', () => this.#ajustarCanvas());
         this.#ajustarCanvas();
@@ -842,6 +811,10 @@ class Juego {
         ctx.clearRect(0, 0, W, H);
         this.#carretera.dibujar(ctx, W, H, c.posicion, c.camX / (CFG.GIRO_MAX * 4.5));
         c.dibujar(ctx, W, H);
+        if (this.#visor3d) {
+            this.#visor3d.setTilt(c.tilt);
+            this.#visor3d.render();
+        }
         this.#hud.dibujar(ctx, W, H, c, this.#oponenteProgreso, this.#oponenteNombre);
         this.#hud.dibujarNivel(ctx, W, this.#nivel.nombre);
     }
@@ -853,6 +826,12 @@ class Juego {
     detener() {
         this.#enCurso = false;
         if (this.#animFrame) cancelAnimationFrame(this.#animFrame);
+        if (this.#visor3d) {
+            this.#visor3d.detener();
+            this.#visor3d = null;
+            const c3d = document.getElementById('canvas-carro-3d');
+            if (c3d) c3d.style.display = 'none';
+        }
     }
 
     get carro() { return this.#carro; }
