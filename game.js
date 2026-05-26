@@ -109,18 +109,7 @@ class Carretera {
 
             const seg = new Segmento(i, curva, nivelActual);
 
-            const frecuencia = p ? p.obstFrecuencia : 0.10;
-            const tipos      = p ? p.obstTipos      : ['carro','carro','bache','turbo'];
-            const colores    = p ? p.coloresTrafico  : ['#666','#888','#aaa','#f59e0b'];
-
-            if (i > 10 && Math.random() < frecuencia) {
-                seg.obstaculos.push({
-                    tipo:   tipos[Math.floor(Math.random() * tipos.length)],
-                    carril: Math.floor(Math.random() * 3) - 1,
-                    color:  colores[Math.floor(Math.random() * colores.length)],
-                });
-            }
-            this.#segmentos.push(seg);
+                this.#segmentos.push(seg);
         }
     }
 
