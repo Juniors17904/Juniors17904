@@ -968,4 +968,5 @@ class Juego {
 }
 
 // Exponer para uso desde app.js
-window.Juego = Juego;
+window.Juego   = Juego;
+window.PISTAS  = PISTAS;

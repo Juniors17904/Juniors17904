@@ -257,15 +257,23 @@ class App {
 
         document.getElementById('btn-ir-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
         document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+        document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
+        document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
+            ToastManager.mostrar('Pista seleccionada ✓', 'info');
+            this.#mostrar('pantalla-ajustes');
+        });
         document.getElementById('pantalla-pista').addEventListener('click', e => {
             const card = e.target.closest('.pista-card');
             if (!card) return;
             document.querySelectorAll('.pista-card').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
             this.#estado.pista = card.dataset.pista;
-            const nombre = card.querySelector('.pista-nombre').textContent;
-            ToastManager.mostrar('Pista: ' + nombre, 'info');
-            setTimeout(() => this.#mostrar('pantalla-ajustes'), 600);
+            document.getElementById('detalle-pista-nombre').textContent =
+                card.querySelector('.pista-nombre').textContent;
+            document.getElementById('detalle-pista-desc').textContent =
+                card.querySelector('.pista-desc').textContent;
+            this.#dibujarMapaPista(card.dataset.pista);
+            this.#mostrar('pantalla-detalle-pista');
         });
 
         document.getElementById('btn-revancha').addEventListener('click', () => {
@@ -405,6 +413,79 @@ class App {
         document.getElementById('stat-tutiempo').textContent = tiempoMs ? this.#formatearTiempo(tiempoMs) : '--';
         document.getElementById('stat-eltiempo').textContent = '--';
         document.getElementById('stat-velmax').textContent = Math.round((velMax / CFG.VEL_MAX) * 220) + ' km/h';
+    }
+
+    // ── Mapa de pista ────────────────────────────────────────────
+    #dibujarMapaPista(tipoPista) {
+        const canvas = document.getElementById('canvas-mapa-pista');
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        ctx.clearRect(0, 0, W, H);
+
+        const pista = window.PISTAS?.[tipoPista];
+        if (!pista) {
+            ctx.fillStyle = '#1e1e40';
+            ctx.fillRect(0, 0, W, H);
+            ctx.fillStyle = '#4a4a70';
+            ctx.font = '13px Orbitron';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('PRÓXIMAMENTE', W / 2, H / 2);
+            return;
+        }
+
+        // Simular trayectoria con los tramos de curvas
+        const puntos = [];
+        let x = 0, y = 0, angle = -Math.PI / 2;
+        const paso = 1.5;
+        for (let i = 0; i < pista.totalSegs; i++) {
+            const tramo = pista.tramos.find(([d, h]) => i >= d && i < h);
+            angle += (tramo ? tramo[2] : 0) * 0.045;
+            x += Math.cos(angle) * paso;
+            y += Math.sin(angle) * paso;
+            puntos.push([x, y]);
+        }
+
+        // Escalar para centrar en el canvas
+        const xs = puntos.map(p => p[0]), ys = puntos.map(p => p[1]);
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        const minY = Math.min(...ys), maxY = Math.max(...ys);
+        const pad = 30;
+        const scl = Math.min((W - pad * 2) / (maxX - minX || 1), (H - pad * 2) / (maxY - minY || 1));
+        const ox = (W - (maxX - minX) * scl) / 2 - minX * scl;
+        const oy = (H - (maxY - minY) * scl) / 2 - minY * scl;
+        const sx = px => px * scl + ox;
+        const sy = py => py * scl + oy;
+
+        // Sombra del trazado
+        ctx.strokeStyle = 'rgba(124,58,237,0.15)';
+        ctx.lineWidth = 10;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        puntos.forEach(([px, py], i) => i === 0 ? ctx.moveTo(sx(px), sy(py)) : ctx.lineTo(sx(px), sy(py)));
+        ctx.closePath();
+        ctx.stroke();
+
+        // Trazado principal
+        ctx.strokeStyle = '#7c3aed';
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        puntos.forEach(([px, py], i) => i === 0 ? ctx.moveTo(sx(px), sy(py)) : ctx.lineTo(sx(px), sy(py)));
+        ctx.closePath();
+        ctx.stroke();
+
+        // Línea de salida/meta
+        const [fx, fy] = puntos[0];
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(sx(fx), sy(fy), 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fbbf24';
+        ctx.font = 'bold 10px Orbitron';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('S/F', sx(fx) + 8, sy(fy));
     }
 }
 

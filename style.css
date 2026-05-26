@@ -719,6 +719,23 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     letter-spacing: 0.5px;
 }
 
+/* Detalle de pista */
+#canvas-mapa-pista {
+    border-radius: 16px;
+    background: #0a0a1e;
+    border: 2px solid #1e1e40;
+    width: min(88vw, 320px);
+    height: auto;
+    aspect-ratio: 320/260;
+}
+.detalle-pista-desc {
+    font-size: 10px;
+    color: var(--txt2);
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+}
+
 /* Preview 3D */
 #canvas-preview-3d {
     border-radius: 16px;
