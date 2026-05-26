@@ -131,21 +131,25 @@ class Viewer3D {
 
         const prefix = Viewer3D.MAPA[tipo] ?? 'Sports';
         const group  = new THREE.Group();
+        const dbg = [];
 
         // Buscar nodos directamente por nombre para evitar ambigüedades del traverse
-        const nodos = [
-            gltf.scene.getObjectByName(prefix),
-            gltf.scene.getObjectByName(`${prefix} wheel front right`),
-            gltf.scene.getObjectByName(`${prefix} wheel front left`),
-            gltf.scene.getObjectByName(`${prefix} wheel rear right`),
-            gltf.scene.getObjectByName(`${prefix} wheel rear left`),
+        const nombres = [
+            prefix,
+            `${prefix} wheel front right`,
+            `${prefix} wheel front left`,
+            `${prefix} wheel rear right`,
+            `${prefix} wheel rear left`,
         ];
 
-        for (const nodo of nodos) {
-            if (!nodo) continue;
+        for (const nombre of nombres) {
+            const nodo = gltf.scene.getObjectByName(nombre);
+            if (!nodo) { dbg.push(`✗ ${nombre}`); continue; }
+            let meshCount = 0;
             const clone = nodo.clone();
             clone.traverse(child => {
                 if (!child.isMesh) return;
+                meshCount++;
                 child.material  = child.material.clone();
                 child.castShadow    = true;
                 child.receiveShadow = true;
@@ -153,8 +157,11 @@ class Viewer3D {
                     child.material.color.set(color);
                 }
             });
+            dbg.push(`✓ ${nombre} (${meshCount} meshes)`);
             group.add(clone);
         }
+
+        Viewer3D.#dbgPanel(dbg.join('\n'));
 
         // Centrar y escalar para que llene bien el canvas
         const box    = new THREE.Box3().setFromObject(group);
@@ -173,6 +180,25 @@ class Viewer3D {
         const carH = (box2.max.y - box2.min.y) * 0.5;
         this.#controls.target.set(0, carH, 0);
         this.#controls.update();
+    }
+
+    // ── Debug overlay ────────────────────────────────────────────
+    static #dbgPanel(msg) {
+        let el = document.getElementById('v3d-dbg');
+        if (!el) {
+            el = document.createElement('pre');
+            el.id = 'v3d-dbg';
+            Object.assign(el.style, {
+                position:'fixed', top:'8px', left:'8px', right:'8px',
+                background:'rgba(0,0,0,0.75)', color:'#0f0', fontSize:'11px',
+                padding:'6px', borderRadius:'6px', zIndex:'9999',
+                pointerEvents:'none', whiteSpace:'pre-wrap', margin:'0',
+            });
+            document.body.appendChild(el);
+        }
+        el.textContent = msg;
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.remove(), 15000);
     }
 
     // ── Helpers ──────────────────────────────────────────────────
