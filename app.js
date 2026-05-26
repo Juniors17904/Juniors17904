@@ -263,6 +263,9 @@ class App {
             document.querySelectorAll('.pista-card').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
             this.#estado.pista = card.dataset.pista;
+            const nombre = card.querySelector('.pista-nombre').textContent;
+            ToastManager.mostrar('Pista: ' + nombre, 'info');
+            setTimeout(() => this.#mostrar('pantalla-ajustes'), 600);
         });
 
         document.getElementById('btn-revancha').addEventListener('click', () => {
