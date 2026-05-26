@@ -214,7 +214,7 @@ class VisorJuego3D {
         const W = this.#canvas.width, H = this.#canvas.height;
         this.#scene  = new THREE.Scene();
         this.#camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 50);
-        this.#camera.position.set(0, 1.6, 4.2);
+        this.#camera.position.set(0, 1.6, -4.2);
         this.#camera.lookAt(0, 0.35, 0);
 
         this.#renderer = new THREE.WebGLRenderer({
