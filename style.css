@@ -665,6 +665,9 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     flex-direction: column;
     gap: 12px;
     width: min(96vw, 420px);
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 .pista-card {
     display: flex;
