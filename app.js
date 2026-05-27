@@ -238,6 +238,12 @@ class App {
         document.getElementById('btn-volver-1').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
         document.getElementById('btn-volver-2').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
 
+        document.getElementById('btn-test-drive').addEventListener('click', () => {
+            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
+            OrientacionManager.forzar();
+            this.#iniciarTestDrive();
+        });
+
         document.getElementById('btn-garage').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-ajustes').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
         document.getElementById('btn-ir-garage').addEventListener('click', () => {
@@ -413,6 +419,16 @@ class App {
         document.getElementById('stat-tutiempo').textContent = tiempoMs ? this.#formatearTiempo(tiempoMs) : '--';
         document.getElementById('stat-eltiempo').textContent = '--';
         document.getElementById('stat-velmax').textContent = Math.round((velMax / CFG.VEL_MAX) * 220) + ' km/h';
+    }
+
+    // ── Test Drive ───────────────────────────────────────────────
+    #iniciarTestDrive() {
+        this.#mostrar('pantalla-juego');
+        OrientacionManager.verificar();
+        document.getElementById('ctrl-accel').style.display = 'flex';
+        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, 'testdrive');
+        window.onCarreraTerminada = null;
+        this.#estado.juego.iniciar(null);
     }
 
     // ── Mapa de pista ────────────────────────────────────────────

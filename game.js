@@ -60,6 +60,14 @@ const PISTAS = {
         obstTipos: ['carro','carro','carro','bache','turbo'],
         coloresTrafico: ['#ef4444','#3b82f6','#eab308','#6b7280','#f97316'],
     },
+    testdrive: {
+        nombre: 'Test Drive',
+        totalSegs: 80,
+        distMeta: Infinity,
+        nivelFijo: { nombre:'Test', cielo:['#0d1b2a','#1b3a4b'], cesped:['#1a5c1a','#174d17'], asfalto:['#484848','#3d3d3d'], borde:'#888' },
+        tramos: [],
+        esTestDrive: true,
+    },
 };
 
 // ================================================================
@@ -320,6 +328,7 @@ class Carro {
         this.posicion = 0;
         this.camX = 0;
         this.giro = 0;
+        this.accelInput = 1;  // 1=adelante, 0=neutro, -1=reversa
         this.turbosLeft = CFG.TURBO_MAX;
         this.turboActivo = false;
         this.turboTimer = 0;
@@ -347,18 +356,22 @@ class Carro {
         const velLimite = this.turboActivo ? CFG.VEL_MAX * CFG.TURBO_MULT : CFG.VEL_MAX;
         const freno = fuera ? CFG.VEL_FRENO * 3 : CFG.VEL_FRENO;
 
-        // Aceleración automática
-        if (this.velocidad < velLimite) {
-            this.velocidad = Math.min(velLimite, this.velocidad + CFG.VEL_ACC * dt * 0.06);
+        if (this.accelInput > 0) {
+            if (this.velocidad < velLimite)
+                this.velocidad = Math.min(velLimite, this.velocidad + CFG.VEL_ACC * dt * 0.06);
+            else
+                this.velocidad += (velLimite - this.velocidad) * 0.05;
+            if (fuera) this.velocidad = Math.max(0, this.velocidad - freno * dt * 0.06);
+        } else if (this.accelInput < 0) {
+            const velRev = CFG.VEL_MAX * 0.45;
+            this.velocidad = Math.max(-velRev, this.velocidad - CFG.VEL_ACC * dt * 0.05);
         } else {
-            this.velocidad += (velLimite - this.velocidad) * 0.05;
+            this.velocidad *= Math.pow(0.97, dt * 0.06 * 10);
+            if (Math.abs(this.velocidad) < 0.001) this.velocidad = 0;
         }
 
-        // Fricción
-        if (fuera) this.velocidad = Math.max(0, this.velocidad - freno * dt * 0.06);
-
         // Giro de cámara
-        this.camX += this.giro * CFG.GIRO_VEL * this.velocidad * 8;
+        this.camX += this.giro * CFG.GIRO_VEL * Math.abs(this.velocidad) * 8;
         if (this.giro === 0) {
             this.camX *= (1 - CFG.GIRO_RETURN);
         }
@@ -702,6 +715,8 @@ class HUD {
 class Controles {
     #izq = false;
     #der = false;
+    #gas = false;
+    #rev = false;
     #giroRaw = 0;
 
     constructor(modo, carro) {
@@ -718,9 +733,13 @@ class Controles {
         document.addEventListener('keydown', e => {
             if (e.key === 'ArrowLeft')  this.#izq = true;
             if (e.key === 'ArrowRight') this.#der = true;
+            if (e.key === 'ArrowUp'   || e.key === 'w') this.#gas = true;
+            if (e.key === 'ArrowDown' || e.key === 's') this.#rev = true;
             if (e.key === ' ') this.carro.activarTurbo();
         });
         document.addEventListener('keyup', e => {
+            if (e.key === 'ArrowUp'   || e.key === 'w') this.#gas = false;
+            if (e.key === 'ArrowDown' || e.key === 's') this.#rev = false;
             if (e.key === 'ArrowLeft')  this.#izq = false;
             if (e.key === 'ArrowRight') this.#der = false;
         });
@@ -744,6 +763,19 @@ class Controles {
         // Doble tap = turbo
         izqEl.addEventListener('dblclick', () => this.carro.activarTurbo());
         derEl.addEventListener('dblclick', () => this.carro.activarTurbo());
+
+        const gasEl = document.getElementById('btn-gas');
+        const revEl = document.getElementById('btn-rev');
+        if (gasEl && revEl) {
+            ['touchstart','mousedown'].forEach(ev => {
+                gasEl.addEventListener(ev, e => { e.preventDefault(); this.#gas = true; });
+                revEl.addEventListener(ev, e => { e.preventDefault(); this.#rev = true; });
+            });
+            ['touchend','mouseup','touchcancel'].forEach(ev => {
+                gasEl.addEventListener(ev, e => { e.preventDefault(); this.#gas = false; });
+                revEl.addEventListener(ev, e => { e.preventDefault(); this.#rev = false; });
+            });
+        }
     }
 
     #initTimon() {
@@ -825,6 +857,12 @@ class Controles {
         if (this.#der) return  1;
         return this.#giroRaw;
     }
+
+    leerAcel() {
+        if (this.#gas) return  1;
+        if (this.#rev) return -1;
+        return 0;
+    }
 }
 
 // ================================================================
@@ -839,6 +877,7 @@ class Juego {
     #ctx;
     #ultimoTiempo = 0;
     #animFrame = null;
+    #esTestDrive = false;
     #syncTimer = 0;
     #oponenteProgreso = null;
     #oponenteNombre = '';
@@ -854,6 +893,7 @@ class Juego {
         this.#carretera = new Carretera(tipoPista);
         const pistaCfg = PISTAS[tipoPista];
         this.#distMeta = pistaCfg ? pistaCfg.distMeta : CFG.DIST_META;
+        this.#esTestDrive = pistaCfg?.esTestDrive ?? false;
         this.#carro = new Carro(color, this.#distMeta);
         this.#hud = new HUD();
         this.#controles = new Controles(tipoControl, this.#carro);
@@ -896,6 +936,7 @@ class Juego {
     #actualizar(dt) {
         const c = this.#carro;
         c.giro = this.#controles.leerGiro();
+        if (this.#esTestDrive) c.accelInput = this.#controles.leerAcel();
 
         const fuera = this.#carretera.fueraDePista(c.camX / (CFG.GIRO_MAX * 4));
         c.update(dt, fuera);
@@ -923,7 +964,7 @@ class Juego {
         }
 
         // Fin de carrera
-        if (c.progreso >= 1 && !c.tiempoFin) {
+        if (!this.#esTestDrive && c.progreso >= 1 && !c.tiempoFin) {
             c.tiempoFin = Date.now();
             this.#enCurso = false;
             cancelAnimationFrame(this.#animFrame);
