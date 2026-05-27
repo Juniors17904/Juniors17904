@@ -243,5 +243,213 @@ class VisorJuego3D {
     }
 }
 
+// ================================================================
+// CLASS: TestDrive3D — pista 3D completa con cámara chase
+// ================================================================
+class TestDrive3D {
+    #renderer = null; #scene = null; #camera = null;
+    #canvas; #carGroup = null; #raf = 0; #sun = null;
+    #px = 0; #pz = 0; #rotY = 0; #speed = 0;
+    #wheels = [];
+
+    accelInput = 0;
+    steerInput = 0;
+
+    constructor(canvas) {
+        this.#canvas = canvas;
+        this.#canvas.width  = window.innerWidth;
+        this.#canvas.height = window.innerHeight;
+        this.#init();
+    }
+
+    async cargar(tipo, color) {
+        try {
+            const gltf = await _loadGLTF();
+            this.#setCar(gltf, tipo, color);
+        } catch (e) { console.error('TestDrive3D:', e); }
+    }
+
+    iniciar() {
+        if (!this.#raf) this.#tick();
+    }
+
+    detener() {
+        cancelAnimationFrame(this.#raf);
+        this.#raf = 0;
+        this.#renderer?.dispose();
+        this.#renderer = null;
+    }
+
+    #init() {
+        const W = this.#canvas.width, H = this.#canvas.height;
+
+        this.#scene = new THREE.Scene();
+        this.#scene.background = new THREE.Color(0x4a9eca);
+        this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
+
+        this.#camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 200);
+
+        this.#renderer = new THREE.WebGLRenderer({ canvas: this.#canvas, antialias: true });
+        this.#renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.#renderer.setSize(W, H, false);
+        this.#renderer.shadowMap.enabled = true;
+        this.#renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.#renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.#renderer.toneMappingExposure = 1.4;
+
+        this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
+        this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
+        this.#sun.castShadow = true;
+        this.#sun.shadow.mapSize.set(1024, 1024);
+        this.#sun.shadow.camera.near = 1;
+        this.#sun.shadow.camera.far  = 60;
+        this.#sun.shadow.camera.left   = -15;
+        this.#sun.shadow.camera.right  =  15;
+        this.#sun.shadow.camera.top    =  15;
+        this.#sun.shadow.camera.bottom = -15;
+        this.#scene.add(this.#sun);
+        this.#scene.add(this.#sun.target);
+        const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
+        fill.position.set(-5, 4, -3);
+        this.#scene.add(fill);
+
+        this.#buildRoad();
+    }
+
+    #buildRoad() {
+        const L = 2000;
+
+        const road = new THREE.Mesh(
+            new THREE.PlaneGeometry(8, L),
+            new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85 })
+        );
+        road.rotation.x = -Math.PI / 2;
+        road.receiveShadow = true;
+        this.#scene.add(road);
+
+        const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
+        for (const side of [-1, 1]) {
+            const g = new THREE.Mesh(new THREE.PlaneGeometry(200, L), grassMat);
+            g.rotation.x = -Math.PI / 2;
+            g.position.set(side * 104, -0.01, 0);
+            g.receiveShadow = true;
+            this.#scene.add(g);
+        }
+
+        const edgeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        for (const side of [-1, 1]) {
+            const line = new THREE.Mesh(new THREE.PlaneGeometry(0.18, L), edgeMat);
+            line.rotation.x = -Math.PI / 2;
+            line.position.set(side * 3.9, 0.01, 0);
+            this.#scene.add(line);
+        }
+
+        const dc = document.createElement('canvas');
+        dc.width = 16; dc.height = 128;
+        dc.getContext('2d').fillStyle = '#ffff88';
+        dc.getContext('2d').fillRect(0, 0, 16, 64);
+        const dTex = new THREE.CanvasTexture(dc);
+        dTex.wrapT = THREE.RepeatWrapping;
+        dTex.repeat.set(1, L / 8);
+        const centerLine = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.14, L),
+            new THREE.MeshBasicMaterial({ map: dTex, transparent: true })
+        );
+        centerLine.rotation.x = -Math.PI / 2;
+        centerLine.position.y = 0.01;
+        this.#scene.add(centerLine);
+
+        const segLen = 3, nSegs = Math.floor(L / segLen);
+        const curbGeo = new THREE.BoxGeometry(0.6, 0.06, segLen - 0.05);
+        const iRed = new THREE.InstancedMesh(curbGeo, new THREE.MeshStandardMaterial({ color: 0xff3333 }), nSegs);
+        const iWht = new THREE.InstancedMesh(curbGeo, new THREE.MeshStandardMaterial({ color: 0xfafafa }), nSegs);
+        const dummy = new THREE.Object3D();
+        let ri = 0, wi = 0;
+        for (let i = 0; i < nSegs; i++) {
+            const z = -L / 2 + i * segLen + segLen / 2;
+            for (const side of [-1, 1]) {
+                dummy.position.set(side * 4.35, 0.03, z);
+                dummy.updateMatrix();
+                if (i % 2 === 0) iRed.setMatrixAt(ri++, dummy.matrix);
+                else             iWht.setMatrixAt(wi++, dummy.matrix);
+            }
+        }
+        iRed.count = ri; iWht.count = wi;
+        iRed.instanceMatrix.needsUpdate = true;
+        iWht.instanceMatrix.needsUpdate = true;
+        this.#scene.add(iRed, iWht);
+    }
+
+    #setCar(gltf, tipo, color) {
+        if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
+        const group = _buildGroup(gltf, tipo, color);
+        _centerGroup(group, 2.6);
+        this.#scene.add(group);
+        this.#carGroup = group;
+        this.#wheels = [];
+        const prefix = _MAPA[tipo] ?? 'Sports';
+        for (const w of ['front_right', 'front_left', 'rear_right', 'rear_left']) {
+            const node = group.getObjectByName(`${prefix}_wheel_${w}`);
+            if (node) this.#wheels.push(node);
+        }
+    }
+
+    #tick() {
+        this.#raf = requestAnimationFrame(() => this.#tick());
+        this.#updatePhysics();
+        this.#updateCamera();
+        this.#sun.position.set(this.#px + 10, 20, this.#pz + 10);
+        this.#sun.target.position.set(this.#px, 0, this.#pz);
+        this.#sun.target.updateMatrixWorld();
+        this.#renderer.render(this.#scene, this.#camera);
+    }
+
+    #updatePhysics() {
+        const MAX_FWD = 0.30, MAX_REV = 0.12;
+        const ACCEL = 0.009, BRAKE = 0.014, DRAG = 0.005, STEER = 0.038;
+
+        if (this.accelInput === 1) {
+            this.#speed = Math.min(MAX_FWD, this.#speed + ACCEL);
+        } else if (this.accelInput === -1) {
+            if (this.#speed > 0.01) this.#speed = Math.max(0, this.#speed - BRAKE);
+            else this.#speed = Math.max(-MAX_REV, this.#speed - ACCEL * 0.6);
+        } else {
+            if (this.#speed > 0) this.#speed = Math.max(0, this.#speed - DRAG);
+            else                 this.#speed = Math.min(0, this.#speed + DRAG);
+        }
+
+        if (Math.abs(this.#speed) > 0.005)
+            this.#rotY += this.steerInput * STEER * Math.sign(this.#speed);
+
+        this.#pz += Math.cos(this.#rotY) * this.#speed;
+        this.#px += Math.sin(this.#rotY) * this.#speed;
+
+        if (Math.abs(this.#px) > 3.8) this.#px *= 0.90;
+        if (this.#pz >  950) this.#pz -= 1900;
+        if (this.#pz < -950) this.#pz += 1900;
+
+        if (this.#carGroup) {
+            this.#carGroup.position.set(this.#px, 0, this.#pz);
+            this.#carGroup.rotation.y = this.#rotY;
+        }
+
+        const spin = this.#speed * 6;
+        for (const w of this.#wheels) w.rotation.x += spin;
+    }
+
+    #updateCamera() {
+        const D = 7;
+        const cx = this.#px - Math.sin(this.#rotY) * D;
+        const cz = this.#pz - Math.cos(this.#rotY) * D;
+        this.#camera.position.set(cx, 2.8, cz);
+        this.#camera.lookAt(
+            this.#px + Math.sin(this.#rotY) * 4,
+            0.6,
+            this.#pz + Math.cos(this.#rotY) * 4
+        );
+    }
+}
+
 window.Viewer3D     = Viewer3D;
 window.VisorJuego3D = VisorJuego3D;
+window.TestDrive3D  = TestDrive3D;

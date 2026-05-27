@@ -244,6 +244,18 @@ class App {
             this.#iniciarTestDrive();
         });
 
+        document.getElementById('btn-test-drive-3d').addEventListener('click', () => {
+            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
+            OrientacionManager.forzar();
+            this.#iniciarTestDrive3D();
+        });
+
+        document.getElementById('btn-exit-td3d').addEventListener('click', () => {
+            this.#limpiarTestDrive3D();
+            OrientacionManager.liberar();
+            this.#mostrar('pantalla-ajustes');
+        });
+
         document.getElementById('btn-garage').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-ajustes').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
         document.getElementById('btn-ir-garage').addEventListener('click', () => {
@@ -296,6 +308,7 @@ class App {
             if (window.multiJugador) await window.multiJugador.limpiar();
             window.multiJugador = null;
             this.#estado.juego = null;
+            this.#limpiarTestDrive3D();
             this.#mostrar('pantalla-inicio');
         });
     }
@@ -429,6 +442,73 @@ class App {
         this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, 'testdrive');
         window.onCarreraTerminada = null;
         this.#estado.juego.iniciar(null);
+    }
+
+    // ── Test Drive 3D ────────────────────────────────────────────
+    #td3d = null;
+    #td3dKeyDown = null;
+    #td3dKeyUp = null;
+    #td3dTouchHandlers = [];
+
+    #iniciarTestDrive3D() {
+        this.#mostrar('pantalla-juego');
+        OrientacionManager.verificar();
+
+        document.getElementById('canvas-carro-3d').style.display = 'none';
+        document.getElementById('ctrl-botones').style.display = 'flex';
+        document.getElementById('ctrl-accel').style.display = 'flex';
+        document.getElementById('btn-exit-td3d').style.display = 'flex';
+
+        const canvas = document.getElementById('canvas-juego');
+        const td = new window.TestDrive3D(canvas);
+        this.#td3d = td;
+        td.cargar(this.#estado.tipoAuto, this.#estado.color);
+        td.iniciar();
+
+        this.#td3dKeyDown = e => {
+            if (e.key === 'ArrowUp'    || e.key === 'w') td.accelInput =  1;
+            if (e.key === 'ArrowDown'  || e.key === 's') td.accelInput = -1;
+            if (e.key === 'ArrowLeft'  || e.key === 'a') td.steerInput = -1;
+            if (e.key === 'ArrowRight' || e.key === 'd') td.steerInput =  1;
+        };
+        this.#td3dKeyUp = e => {
+            if (e.key === 'ArrowUp'   || e.key === 'w' ||
+                e.key === 'ArrowDown' || e.key === 's') td.accelInput = 0;
+            if (e.key === 'ArrowLeft' || e.key === 'a' ||
+                e.key === 'ArrowRight'|| e.key === 'd') td.steerInput = 0;
+        };
+        window.addEventListener('keydown', this.#td3dKeyDown);
+        window.addEventListener('keyup',   this.#td3dKeyUp);
+
+        this.#td3dTouchHandlers = [];
+        const addTouch = (id, onStart, onEnd) => {
+            const el = document.getElementById(id);
+            el.addEventListener('touchstart', onStart, { passive: true });
+            el.addEventListener('touchend',   onEnd);
+            this.#td3dTouchHandlers.push({ el, onStart, onEnd });
+        };
+        addTouch('btn-gas', () => { td.accelInput =  1; }, () => { td.accelInput = 0; });
+        addTouch('btn-rev', () => { td.accelInput = -1; }, () => { td.accelInput = 0; });
+        addTouch('btn-izq', () => { td.steerInput = -1; }, () => { td.steerInput = 0; });
+        addTouch('btn-der', () => { td.steerInput =  1; }, () => { td.steerInput = 0; });
+    }
+
+    #limpiarTestDrive3D() {
+        if (!this.#td3d) return;
+        this.#td3d.detener();
+        this.#td3d = null;
+        if (this.#td3dKeyDown) window.removeEventListener('keydown', this.#td3dKeyDown);
+        if (this.#td3dKeyUp)   window.removeEventListener('keyup',   this.#td3dKeyUp);
+        this.#td3dKeyDown = null;
+        this.#td3dKeyUp   = null;
+        for (const { el, onStart, onEnd } of this.#td3dTouchHandlers) {
+            el.removeEventListener('touchstart', onStart);
+            el.removeEventListener('touchend',   onEnd);
+        }
+        this.#td3dTouchHandlers = [];
+        document.getElementById('canvas-carro-3d').style.display = '';
+        document.getElementById('ctrl-accel').style.display = 'none';
+        document.getElementById('btn-exit-td3d').style.display = 'none';
     }
 
     // ── Mapa de pista ────────────────────────────────────────────
