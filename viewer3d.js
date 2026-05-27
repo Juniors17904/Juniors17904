@@ -378,6 +378,124 @@ class TestDrive3D {
         iRed.instanceMatrix.needsUpdate = true;
         iWht.instanceMatrix.needsUpdate = true;
         this.#scene.add(iRed, iWht);
+
+        this.#addStartArch(50);
+        this.#addFinishArch(700);
+    }
+
+    #addStartArch(z) {
+        const poleMat = new THREE.MeshStandardMaterial({ color: 0x22c55e });
+        const barMat  = new THREE.MeshStandardMaterial({ color: 0xffffff });
+
+        const poleGeo = new THREE.BoxGeometry(0.22, 5, 0.22);
+        const barGeo  = new THREE.BoxGeometry(9.5, 0.35, 0.22);
+
+        for (const side of [-1, 1]) {
+            const pole = new THREE.Mesh(poleGeo, poleMat);
+            pole.position.set(side * 4.7, 2.5, z);
+            pole.castShadow = true;
+            this.#scene.add(pole);
+        }
+        const bar = new THREE.Mesh(barGeo, barMat);
+        bar.position.set(0, 5.1, z);
+        bar.castShadow = true;
+        this.#scene.add(bar);
+
+        // "SALIDA" sign on the bar
+        const sc = document.createElement('canvas');
+        sc.width = 256; sc.height = 32;
+        const sx = sc.getContext('2d');
+        sx.fillStyle = '#22c55e';
+        sx.fillRect(0, 0, 256, 32);
+        sx.fillStyle = '#ffffff';
+        sx.font = 'bold 22px Arial';
+        sx.textAlign = 'center';
+        sx.textBaseline = 'middle';
+        sx.fillText('SALIDA', 128, 16);
+        const sTex = new THREE.CanvasTexture(sc);
+        const sign = new THREE.Mesh(
+            new THREE.PlaneGeometry(4, 0.5),
+            new THREE.MeshBasicMaterial({ map: sTex, transparent: true })
+        );
+        sign.position.set(0, 5.5, z - 0.12);
+        this.#scene.add(sign);
+
+        // White line on road
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const line = new THREE.Mesh(new THREE.PlaneGeometry(8, 0.5), lineMat);
+        line.rotation.x = -Math.PI / 2;
+        line.position.set(0, 0.02, z);
+        this.#scene.add(line);
+    }
+
+    #addFinishArch(z) {
+        // Checkered texture
+        const fc = document.createElement('canvas');
+        fc.width = 128; fc.height = 128;
+        const fx = fc.getContext('2d');
+        const sq = 16;
+        for (let cx = 0; cx < fc.width; cx += sq) {
+            for (let cy = 0; cy < fc.height; cy += sq) {
+                fx.fillStyle = (Math.floor(cx / sq) + Math.floor(cy / sq)) % 2 === 0 ? '#111' : '#fff';
+                fx.fillRect(cx, cy, sq, sq);
+            }
+        }
+        const fTex = new THREE.CanvasTexture(fc);
+
+        const poleMat = new THREE.MeshStandardMaterial({ color: 0xf97316 });
+        const barMat  = new THREE.MeshStandardMaterial({ map: fTex });
+
+        const poleGeo = new THREE.BoxGeometry(0.22, 5, 0.22);
+        const barGeo  = new THREE.BoxGeometry(9.5, 0.7, 0.22);
+
+        for (const side of [-1, 1]) {
+            const pole = new THREE.Mesh(poleGeo, poleMat);
+            pole.position.set(side * 4.7, 2.5, z);
+            pole.castShadow = true;
+            this.#scene.add(pole);
+        }
+        const bar = new THREE.Mesh(barGeo, barMat);
+        bar.position.set(0, 5.2, z);
+        bar.castShadow = true;
+        this.#scene.add(bar);
+
+        // "META" sign
+        const mc = document.createElement('canvas');
+        mc.width = 256; mc.height = 32;
+        const mx = mc.getContext('2d');
+        mx.fillStyle = '#f97316';
+        mx.fillRect(0, 0, 256, 32);
+        mx.fillStyle = '#ffffff';
+        mx.font = 'bold 22px Arial';
+        mx.textAlign = 'center';
+        mx.textBaseline = 'middle';
+        mx.fillText('META', 128, 16);
+        const mTex = new THREE.CanvasTexture(mc);
+        const sign = new THREE.Mesh(
+            new THREE.PlaneGeometry(3, 0.5),
+            new THREE.MeshBasicMaterial({ map: mTex, transparent: true })
+        );
+        sign.position.set(0, 5.9, z - 0.12);
+        this.#scene.add(sign);
+
+        // Checkered road line
+        const rc = document.createElement('canvas');
+        rc.width = 128; rc.height = 128;
+        const rx = rc.getContext('2d');
+        for (let cx = 0; cx < rc.width; cx += sq) {
+            for (let cy = 0; cy < rc.height; cy += sq) {
+                rx.fillStyle = (Math.floor(cx / sq) + Math.floor(cy / sq)) % 2 === 0 ? '#111' : '#fff';
+                rx.fillRect(cx, cy, sq, sq);
+            }
+        }
+        const rTex = new THREE.CanvasTexture(rc);
+        const roadLine = new THREE.Mesh(
+            new THREE.PlaneGeometry(8, 1.2),
+            new THREE.MeshBasicMaterial({ map: rTex })
+        );
+        roadLine.rotation.x = -Math.PI / 2;
+        roadLine.position.set(0, 0.02, z);
+        this.#scene.add(roadLine);
     }
 
     #setCar(gltf, tipo, color) {
