@@ -4,7 +4,7 @@
 
 **NUNCA** modifiques, edites, crees ni borres ningún archivo de código a menos que el usuario use palabras de acción explícitas como:
 
-- **hazlo**, **impleméntalo**, **cámbialo**, **ponlo**, **agrégalo**
+- **hazlo**, **impleméntalo**, **cámbialo**, **cambia**, **ponlo**, **agrégalo**
 - **modifica**, **arréglalo**, **crea**, **borra**, **actualiza**
 - **pushealo**, **commitea**, **aplícalo**
 
