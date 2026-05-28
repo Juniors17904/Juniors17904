@@ -252,6 +252,7 @@ class TestDrive3D {
     #resizeHandler = null;
     #px = -2; #pz = 0; #rotY = 0; #speed = 0;
     #accel = 0; #maxSpeed = 0; #carLean = 0;
+    #camRotY = 0;
     #leanGroup = null;
     #wheels = [];
 
@@ -603,14 +604,10 @@ class TestDrive3D {
 
     #updateCamera() {
         const D = 7;
-        const cx = this.#px - Math.sin(this.#rotY) * D;
-        const cz = this.#pz - Math.cos(this.#rotY) * D;
+        const cx = this.#px - Math.sin(this.#camRotY) * D;
+        const cz = this.#pz - Math.cos(this.#camRotY) * D;
         this.#camera.position.set(cx, this.camHeight, cz);
-        this.#camera.lookAt(
-            this.#px + Math.sin(this.#rotY) * 4,
-            0.6,
-            this.#pz + Math.cos(this.#rotY) * 4
-        );
+        this.#camera.lookAt(this.#px, 0.6, this.#pz);
     }
 }
 
