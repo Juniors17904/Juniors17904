@@ -249,6 +249,7 @@ class VisorJuego3D {
 class TestDrive3D {
     #renderer = null; #scene = null; #camera = null;
     #canvas; #carGroup = null; #raf = 0; #sun = null;
+    #resizeHandler = null;
     #px = 0; #pz = 0; #rotY = 0; #speed = 0;
     #accel = 0; #maxSpeed = 0;
     #wheels = [];
@@ -278,12 +279,27 @@ class TestDrive3D {
     }
 
     iniciar() {
-        if (!this.#raf) this.#tick();
+        if (!this.#raf) {
+            this.#resizeHandler = () => {
+                const W = window.innerWidth, H = window.innerHeight;
+                this.#canvas.width = W;
+                this.#canvas.height = H;
+                this.#camera.aspect = W / H;
+                this.#camera.updateProjectionMatrix();
+                this.#renderer?.setSize(W, H, false);
+            };
+            window.addEventListener('resize', this.#resizeHandler);
+            this.#tick();
+        }
     }
 
     detener() {
         cancelAnimationFrame(this.#raf);
         this.#raf = 0;
+        if (this.#resizeHandler) {
+            window.removeEventListener('resize', this.#resizeHandler);
+            this.#resizeHandler = null;
+        }
         this.#renderer?.dispose();
         this.#renderer = null;
     }

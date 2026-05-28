@@ -124,7 +124,8 @@ class OrientacionManager {
     static verificar() {
         if (OrientacionManager.saltarCheck) return;
         const esMovil = 'ontouchstart' in window;
-        const esVertical = window.innerHeight > window.innerWidth;
+        const tipo = screen.orientation?.type ?? '';
+        const esVertical = tipo ? tipo.startsWith('portrait') : window.innerHeight > window.innerWidth;
         const pantallaActiva = [...document.querySelectorAll('.pantalla.activa')].map(p => p.id);
         const necesitaLandscape = pantallaActiva.some(
             id => OrientacionManager.#PANTALLAS_LANDSCAPE.includes(id)
@@ -218,14 +219,12 @@ class App {
         document.getElementById('btn-solo').addEventListener('click', () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#estado.modoSolo = true;
-            OrientacionManager.forzar();
             this.#iniciarCuentaRegresiva();
         });
 
         document.getElementById('btn-crear').addEventListener('click', async () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#estado.modoSolo = false;
-            OrientacionManager.forzar();
             this.#mostrar('pantalla-crear');
             await this.#iniciarCrearSala();
         });
@@ -242,13 +241,11 @@ class App {
 
         document.getElementById('btn-test-drive').addEventListener('click', () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
-            OrientacionManager.forzar();
             this.#iniciarTestDrive();
         });
 
         document.getElementById('btn-test-drive-3d').addEventListener('click', () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
-            OrientacionManager.forzar();
             this.#iniciarTestDrive3D();
         });
 
