@@ -520,11 +520,47 @@ class App {
 
         // Minimapa
         const mmCanvas = document.getElementById('minimap-td3d');
+        const mmBtn    = document.getElementById('btn-toggle-minimap');
+        let   mmVisible = true;
         mmCanvas.style.display = 'block';
+        mmBtn.style.display = 'block';
+        mmBtn.addEventListener('click', () => {
+            mmVisible = !mmVisible;
+            mmCanvas.style.display = mmVisible ? 'block' : 'none';
+            mmBtn.textContent = mmVisible ? 'MAPA' : 'MAPA ✕';
+        });
         const mmCtx = mmCanvas.getContext('2d');
-        const MM_W = 60, MM_H = 110, MM_Z_MIN = -950, MM_Z_MAX = 950;
-        const mmCarX = x  => (x + 4) / 8 * MM_W;
-        const mmCarZ = z  => (MM_Z_MAX - z) / (MM_Z_MAX - MM_Z_MIN) * MM_H;
+        const MM_W = 90, MM_H = 120;
+        // Trazado del circuito — puntos normalizados (0..1)
+        const MM_PTS = [
+            [0.80, 0.10], [0.80, 0.42], [0.70, 0.70],
+            [0.55, 0.85], [0.33, 0.85], [0.15, 0.72],
+            [0.12, 0.50], [0.20, 0.28], [0.38, 0.13],
+            [0.58, 0.10], [0.80, 0.10],
+        ];
+        const pad = 8;
+        const mmPx = (nx) => pad + nx * (MM_W - pad * 2);
+        const mmPy = (ny) => pad + ny * (MM_H - pad * 2);
+        // Precalcular puntos absolutos y longitudes de segmento para interpolar posición
+        const mmAbs  = MM_PTS.map(([x, y]) => ({ x: mmPx(x), y: mmPy(y) }));
+        const mmSegs = [];
+        let   mmLen  = 0;
+        for (let i = 0; i < mmAbs.length - 1; i++) {
+            const dx = mmAbs[i+1].x - mmAbs[i].x, dy = mmAbs[i+1].y - mmAbs[i].y;
+            const d = Math.sqrt(dx*dx + dy*dy);
+            mmSegs.push(d); mmLen += d;
+        }
+        const mmPosOnPath = (progress) => {
+            let target = ((progress % 1) + 1) % 1 * mmLen;
+            for (let i = 0; i < mmSegs.length; i++) {
+                if (target <= mmSegs[i]) {
+                    const t = target / mmSegs[i];
+                    return { x: mmAbs[i].x + t*(mmAbs[i+1].x-mmAbs[i].x), y: mmAbs[i].y + t*(mmAbs[i+1].y-mmAbs[i].y) };
+                }
+                target -= mmSegs[i];
+            }
+            return mmAbs[0];
+        };
 
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
@@ -568,30 +604,34 @@ class App {
             document.getElementById('dbg-f-maxfwd').textContent = ph.maxFwd;
             document.getElementById('dbg-f-maxrev').textContent = ph.maxRev;
             // Minimapa
-            mmCtx.clearRect(0, 0, MM_W, MM_H);
-            mmCtx.fillStyle = 'rgba(0,0,0,0.65)';
-            mmCtx.roundRect(0, 0, MM_W, MM_H, 5);
-            mmCtx.fill();
-            // pista
-            mmCtx.fillStyle = '#444';
-            mmCtx.fillRect(4, 4, MM_W - 8, MM_H - 8);
-            // línea de salida (Z=50)
-            const sy = mmCarZ(50);
-            mmCtx.fillStyle = '#22c55e';
-            mmCtx.fillRect(4, sy - 1, MM_W - 8, 2);
-            // línea de meta (Z=700)
-            const fy = mmCarZ(700);
-            mmCtx.fillStyle = '#f59e0b';
-            mmCtx.fillRect(4, fy - 1, MM_W - 8, 2);
-            // auto
-            const cx = mmCarX(td.px), cz = mmCarZ(td.pz);
-            mmCtx.shadowColor = '#ef4444';
-            mmCtx.shadowBlur = 6;
-            mmCtx.fillStyle = '#ef4444';
-            mmCtx.beginPath();
-            mmCtx.arc(cx, cz, 4, 0, Math.PI * 2);
-            mmCtx.fill();
-            mmCtx.shadowBlur = 0;
+            if (mmVisible) {
+                mmCtx.clearRect(0, 0, MM_W, MM_H);
+                mmCtx.fillStyle = 'rgba(0,0,0,0.70)';
+                mmCtx.roundRect(0, 0, MM_W, MM_H, 8); mmCtx.fill();
+                // trazado — sombra + línea
+                for (const [lw, col] of [[5, 'rgba(0,0,0,0.6)'], [2.5, '#6b7280']]) {
+                    mmCtx.beginPath();
+                    mmCtx.moveTo(mmAbs[0].x, mmAbs[0].y);
+                    for (let i = 0; i < mmAbs.length - 1; i++) {
+                        const mx = (mmAbs[i].x + mmAbs[i+1].x) / 2;
+                        const my = (mmAbs[i].y + mmAbs[i+1].y) / 2;
+                        mmCtx.quadraticCurveTo(mmAbs[i].x, mmAbs[i].y, mx, my);
+                    }
+                    mmCtx.strokeStyle = col; mmCtx.lineWidth = lw;
+                    mmCtx.lineCap = 'round'; mmCtx.stroke();
+                }
+                // marca de meta
+                const meta = mmPosOnPath(0);
+                mmCtx.fillStyle = '#f59e0b';
+                mmCtx.fillRect(meta.x - 5, meta.y - 1, 10, 2);
+                // punto del auto
+                const prog = (td.pz + 950) / 1900;
+                const pos  = mmPosOnPath(prog);
+                mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
+                mmCtx.fillStyle = '#ef4444';
+                mmCtx.beginPath(); mmCtx.arc(pos.x, pos.y, 4, 0, Math.PI * 2); mmCtx.fill();
+                mmCtx.shadowBlur = 0;
+            }
 
             requestAnimationFrame(_dbgLoop);
         };
@@ -617,6 +657,7 @@ class App {
         document.getElementById('btn-exit-td3d').style.display = 'none';
         document.getElementById('debug-td3d').style.display = 'none';
         document.getElementById('minimap-td3d').style.display = 'none';
+        document.getElementById('btn-toggle-minimap').style.display = 'none';
         document.getElementById('ctrl-cam-height').style.display = 'none';
     }
 
