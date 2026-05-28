@@ -265,6 +265,7 @@ class TestDrive3D {
     get px()       { return this.#px; }
     get pz()       { return this.#pz; }
     get rotY()     { return this.#rotY; }
+    get rotZ()     { return this.#carLean; }
 
     constructor(canvas) {
         this.#canvas = canvas;

@@ -521,7 +521,9 @@ class App {
                                                              : td.steerInput >  0.1 ? 'DER ▶' : 'RECTO';
             document.getElementById('dbg-px').textContent    = td.px.toFixed(2);
             document.getElementById('dbg-pz').textContent    = td.pz.toFixed(2);
+            document.getElementById('dbg-rotx').textContent  = (0).toFixed(1);
             document.getElementById('dbg-rumbo').textContent = ((td.rotY * 180 / Math.PI) % 360).toFixed(1);
+            document.getElementById('dbg-rotz').textContent  = (td.rotZ * 180 / Math.PI).toFixed(1);
             document.getElementById('dbg-camh').textContent  = td.camHeight.toFixed(2);
             document.getElementById('dbg-fps').textContent   = _dbgFps;
             requestAnimationFrame(_dbgLoop);
