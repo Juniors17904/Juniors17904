@@ -498,7 +498,7 @@ class App {
         ctrlCam.style.display = 'flex';
         sliderCam.addEventListener('input', e => { td.camHeight = parseFloat(e.target.value); });
 
-        // Debug overlay
+        // HUD Test Drive 3D
         document.getElementById('debug-td3d').style.display = 'block';
         let _dbgLast = performance.now(), _dbgFrames = 0, _dbgFps = 60;
         const _dbgLoop = () => {
@@ -510,15 +510,13 @@ class App {
                 _dbgFrames = 0; _dbgLast = now;
             }
             const s = td.speed, a = td.accel;
-            const kmh = Math.round(Math.abs(s) * 216);
-            document.getElementById('dbg-vel').textContent   = Math.abs(s).toFixed(3);
-            document.getElementById('dbg-kmh').textContent   = kmh;
+            document.getElementById('dbg-kmh').textContent   = Math.round(Math.abs(s) * 216);
             document.getElementById('dbg-acel').textContent  = (a >= 0 ? '+' : '') + a.toFixed(4);
             document.getElementById('dbg-vmax').textContent  = td.maxSpeed.toFixed(3);
             document.getElementById('dbg-iacel').textContent = td.accelInput ===  1 ? '⬆ GAS'
                                                              : td.accelInput === -1 ? '⬇ REVERSA' : 'NEUTRO';
             document.getElementById('dbg-idir').textContent  = td.steerInput < -0.1 ? '◀ IZQ'
-                                                             : td.steerInput >  0.1 ? 'DER ▶' : 'RECTO';
+                                                             : td.steerInput >  0.1 ? 'DER ▶' : '—';
             document.getElementById('dbg-px').textContent    = td.px.toFixed(2);
             document.getElementById('dbg-pz').textContent    = td.pz.toFixed(2);
             document.getElementById('dbg-rumbo').textContent = ((td.rotY * 180 / Math.PI) % 360).toFixed(1);
