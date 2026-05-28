@@ -251,7 +251,8 @@ class TestDrive3D {
     #canvas; #carGroup = null; #raf = 0; #sun = null;
     #resizeHandler = null;
     #px = -2; #pz = 0; #rotY = 0; #speed = 0;
-    #accel = 0; #maxSpeed = 0; #camLateral = 0;
+    #accel = 0; #maxSpeed = 0; #carLean = 0;
+    #leanGroup = null;
     #wheels = [];
 
     accelInput = 0;
@@ -530,10 +531,13 @@ class TestDrive3D {
         if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
         const inner = _buildGroup(gltf, tipo, color);
         _centerGroup(inner, 2.6);
-        // Wrap in outer group so physics moves the outer while
-        // inner keeps its centering offset intact
+        // lean group: rotates around car's forward axis (Z in outer's local space)
+        const lean = new THREE.Group();
+        lean.add(inner);
+        this.#leanGroup = lean;
+        // outer group: handles position + heading (rotation.y)
         const outer = new THREE.Group();
-        outer.add(inner);
+        outer.add(lean);
         this.#scene.add(outer);
         this.#carGroup = outer;
         this.#wheels = [];
@@ -587,22 +591,18 @@ class TestDrive3D {
             this.#carGroup.rotation.y = this.#rotY;
         }
 
+        // Lean the car body into the turn (around its own forward axis)
+        this.#carLean += (-this.steerInput * 0.22 - this.#carLean) * 0.08;
+        if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carLean;
+
         const spin = this.#speed * 6;
         for (const w of this.#wheels) w.rotation.x += spin;
     }
 
     #updateCamera() {
         const D = 7;
-        // Lateral offset: camera slides to the side when steering so the
-        // car's flank becomes visible (same direction as steer)
-        this.#camLateral += (this.steerInput * 2.2 - this.#camLateral) * 0.06;
-
-        // Car's right perpendicular vector
-        const rightX =  Math.cos(this.#rotY);
-        const rightZ = -Math.sin(this.#rotY);
-
-        const cx = this.#px - Math.sin(this.#rotY) * D + rightX * this.#camLateral;
-        const cz = this.#pz - Math.cos(this.#rotY) * D + rightZ * this.#camLateral;
+        const cx = this.#px - Math.sin(this.#rotY) * D;
+        const cz = this.#pz - Math.cos(this.#rotY) * D;
         this.#camera.position.set(cx, 2.8, cz);
         this.#camera.lookAt(
             this.#px + Math.sin(this.#rotY) * 4,
