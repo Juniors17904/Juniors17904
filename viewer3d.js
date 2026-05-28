@@ -528,14 +528,18 @@ class TestDrive3D {
 
     #setCar(gltf, tipo, color) {
         if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
-        const group = _buildGroup(gltf, tipo, color);
-        _centerGroup(group, 2.6);
-        this.#scene.add(group);
-        this.#carGroup = group;
+        const inner = _buildGroup(gltf, tipo, color);
+        _centerGroup(inner, 2.6);
+        // Wrap in outer group so physics moves the outer while
+        // inner keeps its centering offset intact
+        const outer = new THREE.Group();
+        outer.add(inner);
+        this.#scene.add(outer);
+        this.#carGroup = outer;
         this.#wheels = [];
         const prefix = _MAPA[tipo] ?? 'Sports';
         for (const w of ['front_right', 'front_left', 'rear_right', 'rear_left']) {
-            const node = group.getObjectByName(`${prefix}_wheel_${w}`);
+            const node = inner.getObjectByName(`${prefix}_wheel_${w}`);
             if (node) this.#wheels.push(node);
         }
     }
