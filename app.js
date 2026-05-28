@@ -513,8 +513,6 @@ class App {
             const kmh = Math.round(Math.abs(s) * 216);
             document.getElementById('dbg-vel').textContent   = Math.abs(s).toFixed(3);
             document.getElementById('dbg-kmh').textContent   = kmh;
-            document.getElementById('dbg-velx').textContent  = td.velX.toFixed(3);
-            document.getElementById('dbg-velz').textContent  = td.velZ.toFixed(3);
             document.getElementById('dbg-acel').textContent  = (a >= 0 ? '+' : '') + a.toFixed(4);
             document.getElementById('dbg-vmax').textContent  = td.maxSpeed.toFixed(3);
             document.getElementById('dbg-iacel').textContent = td.accelInput ===  1 ? '⬆ GAS'

@@ -262,8 +262,6 @@ class TestDrive3D {
     get speed()    { return this.#speed; }
     get accel()    { return this.#accel; }
     get maxSpeed() { return this.#maxSpeed; }
-    get velX()     { return Math.sin(this.#rotY) * this.#speed; }
-    get velZ()     { return Math.cos(this.#rotY) * this.#speed; }
     get px()       { return this.#px; }
     get pz()       { return this.#pz; }
     get rotY()     { return this.#rotY; }
