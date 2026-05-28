@@ -251,7 +251,7 @@ class TestDrive3D {
     #canvas; #carGroup = null; #raf = 0; #sun = null;
     #resizeHandler = null;
     #px = -2; #pz = 0; #rotY = 0; #speed = 0;
-    #accel = 0; #maxSpeed = 0;
+    #accel = 0; #maxSpeed = 0; #camLateral = 0;
     #wheels = [];
 
     accelInput = 0;
@@ -593,8 +593,16 @@ class TestDrive3D {
 
     #updateCamera() {
         const D = 7;
-        const cx = this.#px - Math.sin(this.#rotY) * D;
-        const cz = this.#pz - Math.cos(this.#rotY) * D;
+        // Lateral offset: camera slides to the side when steering so the
+        // car's flank becomes visible (same direction as steer)
+        this.#camLateral += (this.steerInput * 2.2 - this.#camLateral) * 0.06;
+
+        // Car's right perpendicular vector
+        const rightX =  Math.cos(this.#rotY);
+        const rightZ = -Math.sin(this.#rotY);
+
+        const cx = this.#px - Math.sin(this.#rotY) * D + rightX * this.#camLateral;
+        const cz = this.#pz - Math.cos(this.#rotY) * D + rightZ * this.#camLateral;
         this.#camera.position.set(cx, 2.8, cz);
         this.#camera.lookAt(
             this.#px + Math.sin(this.#rotY) * 4,
