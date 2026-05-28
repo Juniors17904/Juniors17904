@@ -295,7 +295,8 @@ class App {
         document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
         document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
-            this.#iniciarTestDrive3D();
+            ToastManager.mostrar('Pista seleccionada ✓', 'info');
+            this.#mostrar('pantalla-ajustes');
         });
         document.getElementById('pantalla-pista').addEventListener('click', e => {
             const card = e.target.closest('.pista-card');
