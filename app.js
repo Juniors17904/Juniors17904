@@ -273,6 +273,11 @@ class App {
             OrientacionManager.liberar();
             this.#mostrar('pantalla-ajustes');
         });
+        document.getElementById('btn-exit-cir3d').addEventListener('click', () => {
+            this.#limpiarCircuito3D();
+            OrientacionManager.liberar();
+            this.#mostrar('pantalla-detalle-pista');
+        });
 
         document.getElementById('btn-garage').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-ajustes').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
@@ -295,7 +300,8 @@ class App {
         document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
         document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
-            this.#iniciarTestDrivePista(this.#estado.pista);
+            this.#mostrar('pantalla-juego');
+            this.#iniciarCircuito3D(this.#estado.pista);
         });
         document.getElementById('pantalla-pista').addEventListener('click', e => {
             const card = e.target.closest('.pista-card');
@@ -676,6 +682,170 @@ class App {
         document.getElementById('minimap-td3d').style.display = 'none';
         document.getElementById('btn-toggle-minimap').style.display = 'none';
         document.getElementById('ctrl-cam-height').style.display = 'none';
+    }
+
+    // ── Circuito 3D (pista con curvas) ──────────────────────────
+    #cir3d = null;
+    #cir3dKeyDown = null;
+    #cir3dKeyUp   = null;
+    #cir3dTouchHandlers = [];
+
+    #iniciarCircuito3D(tipoPista = 'ciudad') {
+        OrientacionManager.saltarCheck = true;
+        const canvas = document.getElementById('canvas-juego');
+        canvas.style.display = 'block';
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+        document.getElementById('canvas-carro-3d').style.display = 'none';
+        document.getElementById('btn-exit-cir3d').style.display = 'block';
+
+        const cir = new window.Circuito3D(canvas, tipoPista);
+        this.#cir3d = cir;
+        cir.cargar(this.#estado.tipoAuto, this.#estado.color);
+        cir.iniciar();
+        const cirInitRotY = cir.rotY;
+
+        this.#cir3dKeyDown = e => {
+            if (e.key==='ArrowUp'   ||e.key==='w') cir.accelInput= 1;
+            if (e.key==='ArrowDown' ||e.key==='s') cir.accelInput=-1;
+            if (e.key==='ArrowLeft' ||e.key==='a') cir.steerInput=-1;
+            if (e.key==='ArrowRight'||e.key==='d') cir.steerInput= 1;
+        };
+        this.#cir3dKeyUp = e => {
+            if (e.key==='ArrowUp'||e.key==='w'||e.key==='ArrowDown'||e.key==='s') cir.accelInput=0;
+            if (e.key==='ArrowLeft'||e.key==='a'||e.key==='ArrowRight'||e.key==='d') cir.steerInput=0;
+        };
+        window.addEventListener('keydown', this.#cir3dKeyDown);
+        window.addEventListener('keyup',   this.#cir3dKeyUp);
+
+        document.getElementById('ctrl-botones').style.display = 'flex';
+        document.getElementById('ctrl-accel').style.display   = 'flex';
+
+        const addTouch = (id, onStart, onEnd) => {
+            const el = document.getElementById(id);
+            el.addEventListener('touchstart', onStart, {passive:true});
+            el.addEventListener('touchend', onEnd);
+            this.#cir3dTouchHandlers.push({el, onStart, onEnd});
+        };
+        addTouch('btn-gas', ()=>{cir.accelInput= 1;}, ()=>{cir.accelInput=0;});
+        addTouch('btn-rev', ()=>{cir.accelInput=-1;}, ()=>{cir.accelInput=0;});
+        addTouch('btn-izq', ()=>{cir.steerInput=-1;}, ()=>{cir.steerInput=0;});
+        addTouch('btn-der', ()=>{cir.steerInput= 1;}, ()=>{cir.steerInput=0;});
+
+        // Slider cámara
+        const sliderCam = document.getElementById('slider-cam-height');
+        sliderCam.value = '2.8';
+        document.getElementById('ctrl-cam-height').style.display = 'flex';
+        sliderCam.addEventListener('input', e => { cir.camHeight = parseFloat(e.target.value); });
+
+        // Debug overlay
+        document.getElementById('debug-td3d').style.display = 'flex';
+
+        // Minimapa — trazado desde tramos
+        const mmCanvas = document.getElementById('minimap-td3d');
+        const mmBtn    = document.getElementById('btn-toggle-minimap');
+        let   mmVisible = true;
+        mmCanvas.style.display = 'block';
+        mmBtn.style.display    = 'block';
+        mmBtn.onclick = () => {
+            mmVisible = !mmVisible;
+            mmCanvas.style.display = mmVisible ? 'block' : 'none';
+            mmBtn.textContent = mmVisible ? 'MAPA' : 'MAPA ✕';
+        };
+        const mmCtx = mmCanvas.getContext('2d');
+        const MM_W=90, MM_H=120, MM_PAD=10;
+        const pistaCfg = window.PISTAS?.[tipoPista];
+        const mmCircuit = (() => {
+            if (!pistaCfg?.tramos?.length) return null;
+            const pts=[];
+            let x=0,y=0,angle=-Math.PI/2;
+            for (let i=0; i<pistaCfg.totalSegs; i++) {
+                const tr=pistaCfg.tramos.find(([d,h])=>i>=d&&i<h);
+                angle+=(tr?tr[2]:0)*0.045;
+                x+=Math.cos(angle)*1.5; y+=Math.sin(angle)*1.5; pts.push([x,y]);
+            }
+            const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+            const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
+            const scl=Math.min((MM_W-MM_PAD*2)/(maxX-minX||1),(MM_H-MM_PAD*2)/(maxY-minY||1));
+            const ox=(MM_W-(maxX-minX)*scl)/2-minX*scl, oy=(MM_H-(maxY-minY)*scl)/2-minY*scl;
+            return pts.map(([px,py])=>({x:px*scl+ox, y:py*scl+oy}));
+        })();
+
+        let _dbgLast=performance.now(), _dbgFrames=0, _dbgFps=60;
+        const _dbgLoop = () => {
+            if (!this.#cir3d) return;
+            _dbgFrames++;
+            const now=performance.now();
+            if (now-_dbgLast>=500) { _dbgFps=Math.round(_dbgFrames*1000/(now-_dbgLast)); _dbgFrames=0; _dbgLast=now; }
+            const s=cir.speed, a=cir.accel, kmh=Math.round(Math.abs(s)*216);
+            // AUTO
+            document.getElementById('dbg-vel').textContent   = Math.abs(s).toFixed(3);
+            document.getElementById('dbg-kmh').textContent   = kmh;
+            document.getElementById('dbg-acel').textContent  = (a>=0?'+':'')+a.toFixed(4);
+            document.getElementById('dbg-vmax').textContent  = cir.maxSpeed.toFixed(3);
+            document.getElementById('dbg-iacel').textContent = cir.accelInput===1?'⬆ GAS':cir.accelInput===-1?'⬇ REVERSA':'NEUTRO';
+            document.getElementById('dbg-idir').textContent  = cir.steerInput<-0.1?'◀ IZQ':cir.steerInput>0.1?'DER ▶':'RECTO';
+            document.getElementById('dbg-rotx').textContent  = (0).toFixed(1);
+            document.getElementById('dbg-rumbo').textContent = (((cir.rotY-cirInitRotY)*180/Math.PI%360)+360)%360 |0;
+            document.getElementById('dbg-rotz').textContent  = (cir.rotZ*180/Math.PI).toFixed(1);
+            // PISTA
+            document.getElementById('dbg-px').textContent    = cir.px.toFixed(1);
+            document.getElementById('dbg-pz').textContent    = cir.pz.toFixed(1);
+            document.getElementById('dbg-fps').textContent   = _dbgFps;
+            // CÁMARA
+            document.getElementById('dbg-camh').textContent      = cir.camHeight.toFixed(2);
+            document.getElementById('dbg-cam-roty').textContent  = (cir.rotY*180/Math.PI|0);
+            document.getElementById('dbg-cam-dist').textContent  = cir.physics.camDist;
+            // FÍSICAS
+            const ph=cir.physics;
+            document.getElementById('dbg-f-accel').textContent = ph.accel;
+            document.getElementById('dbg-f-brake').textContent = ph.brake;
+            document.getElementById('dbg-f-drag').textContent  = ph.drag;
+            document.getElementById('dbg-f-steer').textContent = ph.steer;
+            document.getElementById('dbg-f-maxfwd').textContent= ph.maxFwd;
+            document.getElementById('dbg-f-maxrev').textContent= ph.maxRev;
+            // Minimapa
+            if (mmVisible && mmCircuit) {
+                mmCtx.clearRect(0,0,MM_W,MM_H);
+                mmCtx.fillStyle='rgba(0,0,0,0.70)';
+                mmCtx.roundRect(0,0,MM_W,MM_H,8); mmCtx.fill();
+                mmCtx.strokeStyle='#6b7280'; mmCtx.lineWidth=2.5; mmCtx.lineCap='round'; mmCtx.lineJoin='round';
+                mmCtx.beginPath();
+                mmCircuit.forEach((p,i)=>i===0?mmCtx.moveTo(p.x,p.y):mmCtx.lineTo(p.x,p.y));
+                mmCtx.closePath(); mmCtx.stroke();
+                mmCtx.fillStyle='#f59e0b';
+                mmCtx.fillRect(mmCircuit[0].x-5,mmCircuit[0].y-1,10,2);
+                const idx=(cir.progress*mmCircuit.length)|0;
+                const cp=mmCircuit[Math.min(idx,mmCircuit.length-1)];
+                mmCtx.shadowColor='#ef4444'; mmCtx.shadowBlur=8;
+                mmCtx.fillStyle='#ef4444';
+                mmCtx.beginPath(); mmCtx.arc(cp.x,cp.y,4,0,Math.PI*2); mmCtx.fill();
+                mmCtx.shadowBlur=0;
+            }
+            requestAnimationFrame(_dbgLoop);
+        };
+        requestAnimationFrame(_dbgLoop);
+    }
+
+    #limpiarCircuito3D() {
+        if (!this.#cir3d) return;
+        this.#cir3d.detener(); this.#cir3d=null;
+        if (this.#cir3dKeyDown) window.removeEventListener('keydown',this.#cir3dKeyDown);
+        if (this.#cir3dKeyUp)   window.removeEventListener('keyup',  this.#cir3dKeyUp);
+        this.#cir3dKeyDown=null; this.#cir3dKeyUp=null;
+        for (const {el,onStart,onEnd} of this.#cir3dTouchHandlers) {
+            el.removeEventListener('touchstart',onStart);
+            el.removeEventListener('touchend',onEnd);
+        }
+        this.#cir3dTouchHandlers=[];
+        OrientacionManager.saltarCheck=false;
+        document.getElementById('canvas-carro-3d').style.display='';
+        document.getElementById('ctrl-accel').style.display='none';
+        document.getElementById('btn-exit-cir3d').style.display='none';
+        document.getElementById('debug-td3d').style.display='none';
+        document.getElementById('minimap-td3d').style.display='none';
+        document.getElementById('btn-toggle-minimap').style.display='none';
+        document.getElementById('ctrl-cam-height').style.display='none';
     }
 
     // ── Mapa de pista ────────────────────────────────────────────
