@@ -91,6 +91,7 @@ class ToastManager {
 class OrientacionManager {
     static #PANTALLAS_LANDSCAPE = ['pantalla-juego', 'pantalla-espera'];
     static #toastTimer = 0;
+    static saltarCheck = false;
 
     static async forzar() {
         if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
@@ -121,6 +122,7 @@ class OrientacionManager {
     }
 
     static verificar() {
+        if (OrientacionManager.saltarCheck) return;
         const esMovil = 'ontouchstart' in window;
         const esVertical = window.innerHeight > window.innerWidth;
         const pantallaActiva = [...document.querySelectorAll('.pantalla.activa')].map(p => p.id);
@@ -451,8 +453,8 @@ class App {
     #td3dTouchHandlers = [];
 
     #iniciarTestDrive3D() {
+        OrientacionManager.saltarCheck = true;
         this.#mostrar('pantalla-juego');
-        OrientacionManager.verificar();
 
         document.getElementById('canvas-carro-3d').style.display = 'none';
         document.getElementById('ctrl-botones').style.display = 'flex';
@@ -535,6 +537,7 @@ class App {
             el.removeEventListener('touchend',   onEnd);
         }
         this.#td3dTouchHandlers = [];
+        OrientacionManager.saltarCheck = false;
         document.getElementById('canvas-carro-3d').style.display = '';
         document.getElementById('ctrl-accel').style.display = 'none';
         document.getElementById('btn-exit-td3d').style.display = 'none';
