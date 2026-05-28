@@ -289,6 +289,10 @@ class TestDrive3D {
                 this.#renderer?.setSize(W, H, false);
             };
             window.addEventListener('resize', this.#resizeHandler);
+            // iOS Safari fires orientationchange instead of resize
+            window.addEventListener('orientationchange', () => {
+                setTimeout(this.#resizeHandler, 120);
+            });
             this.#tick();
         }
     }
