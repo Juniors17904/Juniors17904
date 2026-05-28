@@ -555,7 +555,7 @@ class TestDrive3D {
     }
 
     #updatePhysics() {
-        const MAX_FWD = 0.58, MAX_REV = 0.24;
+        const MAX_FWD = 0.74, MAX_REV = 0.28;
         const ACCEL = 0.006, BRAKE = 0.026, DRAG = 0.009, STEER = 0.010;
         const prevSpeed = this.#speed;
 
