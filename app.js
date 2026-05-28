@@ -500,7 +500,7 @@ class App {
         sliderCam.addEventListener('input', e => { td.camHeight = parseFloat(e.target.value); });
 
         // Debug overlay
-        document.getElementById('debug-td3d').style.display = 'block';
+        document.getElementById('debug-td3d').style.display = 'flex';
         let _dbgLast = performance.now(), _dbgFrames = 0, _dbgFps = 60;
         const _dbgLoop = () => {
             if (!this.#td3d) return;
@@ -512,21 +512,34 @@ class App {
             }
             const s = td.speed, a = td.accel;
             const kmh = Math.round(Math.abs(s) * 216);
-            document.getElementById('dbg-vel').textContent   = Math.abs(s).toFixed(3);
-            document.getElementById('dbg-kmh').textContent   = kmh;
-            document.getElementById('dbg-acel').textContent  = (a >= 0 ? '+' : '') + a.toFixed(4);
-            document.getElementById('dbg-vmax').textContent  = td.maxSpeed.toFixed(3);
-            document.getElementById('dbg-iacel').textContent = td.accelInput ===  1 ? '⬆ GAS'
-                                                             : td.accelInput === -1 ? '⬇ REVERSA' : 'NEUTRO';
-            document.getElementById('dbg-idir').textContent  = td.steerInput < -0.1 ? '◀ IZQ'
-                                                             : td.steerInput >  0.1 ? 'DER ▶' : 'RECTO';
-            document.getElementById('dbg-px').textContent    = td.px.toFixed(2);
-            document.getElementById('dbg-pz').textContent    = td.pz.toFixed(2);
-            document.getElementById('dbg-rotx').textContent  = (0).toFixed(1);
-            document.getElementById('dbg-rumbo').textContent = (((td.rotY - td3dInitRotY) * 180 / Math.PI % 360 + 360) % 360).toFixed(1);
-            document.getElementById('dbg-rotz').textContent  = (td.rotZ * 180 / Math.PI).toFixed(1);
-            document.getElementById('dbg-camh').textContent  = td.camHeight.toFixed(2);
-            document.getElementById('dbg-fps').textContent   = _dbgFps;
+            // AUTO
+            document.getElementById('dbg-vel').textContent    = Math.abs(s).toFixed(3);
+            document.getElementById('dbg-kmh').textContent    = kmh;
+            document.getElementById('dbg-acel').textContent   = (a >= 0 ? '+' : '') + a.toFixed(4);
+            document.getElementById('dbg-vmax').textContent   = td.maxSpeed.toFixed(3);
+            document.getElementById('dbg-iacel').textContent  = td.accelInput ===  1 ? '⬆ GAS'
+                                                              : td.accelInput === -1 ? '⬇ REVERSA' : 'NEUTRO';
+            document.getElementById('dbg-idir').textContent   = td.steerInput < -0.1 ? '◀ IZQ'
+                                                              : td.steerInput >  0.1 ? 'DER ▶' : 'RECTO';
+            // PISTA
+            document.getElementById('dbg-px').textContent     = td.px.toFixed(2);
+            document.getElementById('dbg-pz').textContent     = td.pz.toFixed(2);
+            document.getElementById('dbg-rotx').textContent   = (0).toFixed(1);
+            document.getElementById('dbg-rumbo').textContent  = (((td.rotY - td3dInitRotY) * 180 / Math.PI % 360 + 360) % 360).toFixed(1);
+            document.getElementById('dbg-rotz').textContent   = (td.rotZ * 180 / Math.PI).toFixed(1);
+            document.getElementById('dbg-fps').textContent    = _dbgFps;
+            // CÁMARA
+            document.getElementById('dbg-camh').textContent   = td.camHeight.toFixed(2);
+            document.getElementById('dbg-cam-roty').textContent = (td.camRotY * 180 / Math.PI).toFixed(1);
+            document.getElementById('dbg-cam-dist').textContent = td.physics.camDist;
+            // FÍSICAS
+            const ph = td.physics;
+            document.getElementById('dbg-f-accel').textContent  = ph.accel;
+            document.getElementById('dbg-f-brake').textContent  = ph.brake;
+            document.getElementById('dbg-f-drag').textContent   = ph.drag;
+            document.getElementById('dbg-f-steer').textContent  = ph.steer;
+            document.getElementById('dbg-f-maxfwd').textContent = ph.maxFwd;
+            document.getElementById('dbg-f-maxrev').textContent = ph.maxRev;
             requestAnimationFrame(_dbgLoop);
         };
         requestAnimationFrame(_dbgLoop);

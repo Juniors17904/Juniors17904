@@ -140,20 +140,45 @@
             <span style="font:10px monospace;color:rgba(255,255,255,0.7)">▼</span>
         </div>
 
-        <div id="debug-td3d" style="display:none;position:absolute;top:48px;right:6px;background:rgba(255,255,255,0.12);color:rgba(0,0,0,0.82);font:9px/1.6 monospace;padding:5px 8px;border-radius:5px;z-index:200;pointer-events:none;text-shadow:0 1px 2px rgba(255,255,255,0.6);backdrop-filter:blur(2px)">
-            <div style="font-weight:bold;letter-spacing:1px;opacity:.6">AUTO</div>
-            <div>VEL <span id="dbg-vel">0.000</span> · <span id="dbg-kmh">0</span> km/h</div>
-            <div>ACEL <span id="dbg-acel">+0.0000</span></div>
-            <div>MAX <span id="dbg-vmax">0.000</span></div>
-            <div><span id="dbg-iacel">NEUTRO</span> · <span id="dbg-idir">RECTO</span></div>
-            <div style="font-weight:bold;letter-spacing:1px;opacity:.6;margin-top:3px">GIROS</div>
-            <div>EJE X <span id="dbg-rotx">0.0</span>°</div>
-            <div>EJE Y <span id="dbg-rumbo">0.0</span>°</div>
-            <div>EJE Z <span id="dbg-rotz">0.0</span>°</div>
-            <div style="font-weight:bold;letter-spacing:1px;opacity:.6;margin-top:3px">PISTA</div>
-            <div>X <span id="dbg-px">0.00</span> · Z <span id="dbg-pz">0.00</span></div>
-            <div>CAM H <span id="dbg-camh">2.80</span> m</div>
-            <div>FPS <span id="dbg-fps">--</span></div>
+        <div id="debug-td3d" style="display:none;position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.72);color:#e0e0e0;font:8px/1.55 monospace;padding:4px 6px;z-index:200;pointer-events:none;backdrop-filter:blur(3px)">
+            <div style="display:flex;gap:6px">
+                <!-- AUTO -->
+                <div style="flex:1;border-right:1px solid rgba(255,255,255,0.15);padding-right:5px">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">AUTO</div>
+                    <div>VEL <span id="dbg-vel">0.000</span> · <span id="dbg-kmh">0</span> km/h</div>
+                    <div>ACEL <span id="dbg-acel">+0.0000</span></div>
+                    <div>MAX <span id="dbg-vmax">0.000</span></div>
+                    <div><span id="dbg-iacel">NEUTRO</span></div>
+                    <div><span id="dbg-idir">RECTO</span></div>
+                </div>
+                <!-- PISTA -->
+                <div style="flex:1;border-right:1px solid rgba(255,255,255,0.15);padding-right:5px">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">PISTA</div>
+                    <div>X <span id="dbg-px">0.00</span></div>
+                    <div>Z <span id="dbg-pz">0.00</span></div>
+                    <div>EJE X <span id="dbg-rotx">0.0</span>°</div>
+                    <div>EJE Y <span id="dbg-rumbo">0.0</span>°</div>
+                    <div>EJE Z <span id="dbg-rotz">0.0</span>°</div>
+                    <div>FPS <span id="dbg-fps">--</span></div>
+                </div>
+                <!-- CÁMARA -->
+                <div style="flex:1;border-right:1px solid rgba(255,255,255,0.15);padding-right:5px">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">CÁMARA</div>
+                    <div>ALTURA <span id="dbg-camh">2.80</span> m</div>
+                    <div>ROT <span id="dbg-cam-roty">0.0</span>°</div>
+                    <div>DIST <span id="dbg-cam-dist">7</span> m</div>
+                </div>
+                <!-- FÍSICAS -->
+                <div style="flex:1">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">FÍSICAS</div>
+                    <div>ACEL <span id="dbg-f-accel">-</span></div>
+                    <div>FREN <span id="dbg-f-brake">-</span></div>
+                    <div>DRAG <span id="dbg-f-drag">-</span></div>
+                    <div>GIRO <span id="dbg-f-steer">-</span></div>
+                    <div>MAX+ <span id="dbg-f-maxfwd">-</span></div>
+                    <div>MAX- <span id="dbg-f-maxrev">-</span></div>
+                </div>
+            </div>
         </div>
 
         <!-- Controles botones -->

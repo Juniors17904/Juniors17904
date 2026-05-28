@@ -263,6 +263,8 @@ class TestDrive3D {
     get speed()    { return this.#speed; }
     get accel()    { return this.#accel; }
     get maxSpeed() { return this.#maxSpeed; }
+    get camRotY()  { return this.#camRotY; }
+    get physics()  { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
     get px()       { return this.#px; }
     get pz()       { return this.#pz; }
     get rotY()     { return this.#rotY; }
