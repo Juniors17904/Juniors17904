@@ -518,6 +518,14 @@ class App {
         ctrlCam.style.display = 'flex';
         sliderCam.addEventListener('input', e => { td.camHeight = parseFloat(e.target.value); });
 
+        // Minimapa
+        const mmCanvas = document.getElementById('minimap-td3d');
+        mmCanvas.style.display = 'block';
+        const mmCtx = mmCanvas.getContext('2d');
+        const MM_W = 60, MM_H = 110, MM_Z_MIN = -950, MM_Z_MAX = 950;
+        const mmCarX = x  => (x + 4) / 8 * MM_W;
+        const mmCarZ = z  => (MM_Z_MAX - z) / (MM_Z_MAX - MM_Z_MIN) * MM_H;
+
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
         let _dbgLast = performance.now(), _dbgFrames = 0, _dbgFps = 60;
@@ -559,6 +567,32 @@ class App {
             document.getElementById('dbg-f-steer').textContent  = ph.steer;
             document.getElementById('dbg-f-maxfwd').textContent = ph.maxFwd;
             document.getElementById('dbg-f-maxrev').textContent = ph.maxRev;
+            // Minimapa
+            mmCtx.clearRect(0, 0, MM_W, MM_H);
+            mmCtx.fillStyle = 'rgba(0,0,0,0.65)';
+            mmCtx.roundRect(0, 0, MM_W, MM_H, 5);
+            mmCtx.fill();
+            // pista
+            mmCtx.fillStyle = '#444';
+            mmCtx.fillRect(4, 4, MM_W - 8, MM_H - 8);
+            // línea de salida (Z=50)
+            const sy = mmCarZ(50);
+            mmCtx.fillStyle = '#22c55e';
+            mmCtx.fillRect(4, sy - 1, MM_W - 8, 2);
+            // línea de meta (Z=700)
+            const fy = mmCarZ(700);
+            mmCtx.fillStyle = '#f59e0b';
+            mmCtx.fillRect(4, fy - 1, MM_W - 8, 2);
+            // auto
+            const cx = mmCarX(td.px), cz = mmCarZ(td.pz);
+            mmCtx.shadowColor = '#ef4444';
+            mmCtx.shadowBlur = 6;
+            mmCtx.fillStyle = '#ef4444';
+            mmCtx.beginPath();
+            mmCtx.arc(cx, cz, 4, 0, Math.PI * 2);
+            mmCtx.fill();
+            mmCtx.shadowBlur = 0;
+
             requestAnimationFrame(_dbgLoop);
         };
         requestAnimationFrame(_dbgLoop);
@@ -582,6 +616,7 @@ class App {
         document.getElementById('ctrl-accel').style.display = 'none';
         document.getElementById('btn-exit-td3d').style.display = 'none';
         document.getElementById('debug-td3d').style.display = 'none';
+        document.getElementById('minimap-td3d').style.display = 'none';
         document.getElementById('ctrl-cam-height').style.display = 'none';
     }
 
