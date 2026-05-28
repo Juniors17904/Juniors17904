@@ -295,8 +295,7 @@ class App {
         document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
         document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
-            ToastManager.mostrar('Pista seleccionada ✓', 'info');
-            this.#mostrar('pantalla-ajustes');
+            this.#iniciarTestDrive3D(this.#estado.pista);
         });
         document.getElementById('pantalla-pista').addEventListener('click', e => {
             const card = e.target.closest('.pista-card');
@@ -467,8 +466,10 @@ class App {
     #td3dKeyDown = null;
     #td3dKeyUp = null;
     #td3dTouchHandlers = [];
+    #td3dPista = 'ciudad';
 
-    #iniciarTestDrive3D() {
+    #iniciarTestDrive3D(tipoPista = 'ciudad') {
+        this.#td3dPista = tipoPista;
         OrientacionManager.saltarCheck = true;
         this.#mostrar('pantalla-juego');
 
@@ -534,6 +535,29 @@ class App {
         const MM_CX = MM_W / 2;
         const MM_PAD = 10;
 
+        // Generar trazado del circuito desde los tramos de la pista
+        const pistaCfg = window.PISTAS?.[this.#td3dPista];
+        const mmCircuit = (() => {
+            if (!pistaCfg?.tramos?.length) return null;
+            const pts = [];
+            let x = 0, y = 0, angle = -Math.PI / 2;
+            for (let i = 0; i < pistaCfg.totalSegs; i++) {
+                const tramo = pistaCfg.tramos.find(([d, h]) => i >= d && i < h);
+                angle += (tramo ? tramo[2] : 0) * 0.045;
+                x += Math.cos(angle) * 1.5;
+                y += Math.sin(angle) * 1.5;
+                pts.push([x, y]);
+            }
+            // Escalar a minimap
+            const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+            const minX = Math.min(...xs), maxX = Math.max(...xs);
+            const minY = Math.min(...ys), maxY = Math.max(...ys);
+            const scl = Math.min((MM_W - MM_PAD*2) / (maxX-minX||1), (MM_H - MM_PAD*2) / (maxY-minY||1));
+            const ox = (MM_W - (maxX-minX)*scl) / 2 - minX*scl;
+            const oy = (MM_H - (maxY-minY)*scl) / 2 - minY*scl;
+            return pts.map(([px, py]) => ({ x: px*scl+ox, y: py*scl+oy }));
+        })();
+
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
         let _dbgLast = performance.now(), _dbgFrames = 0, _dbgFps = 60;
@@ -580,27 +604,33 @@ class App {
                 mmCtx.clearRect(0, 0, MM_W, MM_H);
                 mmCtx.fillStyle = 'rgba(0,0,0,0.70)';
                 mmCtx.roundRect(0, 0, MM_W, MM_H, 8); mmCtx.fill();
-                // línea recta de la pista
-                mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 3;
-                mmCtx.lineCap = 'round';
-                mmCtx.beginPath();
-                mmCtx.moveTo(MM_CX, MM_PAD);
-                mmCtx.lineTo(MM_CX, MM_H - MM_PAD);
-                mmCtx.stroke();
-                // marca de meta (Z=700) — naranja
-                const fy = MM_PAD + (1 - (700 + 950) / 1900) * (MM_H - MM_PAD * 2);
-                mmCtx.fillStyle = '#f59e0b';
-                mmCtx.fillRect(MM_CX - 6, fy - 1, 12, 2);
-                // marca de salida (Z=50) — verde
-                const sy = MM_PAD + (1 - (50 + 950) / 1900) * (MM_H - MM_PAD * 2);
-                mmCtx.fillStyle = '#22c55e';
-                mmCtx.fillRect(MM_CX - 6, sy - 1, 12, 2);
-                // punto del auto
-                const py = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
-                mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
-                mmCtx.fillStyle = '#ef4444';
-                mmCtx.beginPath(); mmCtx.arc(MM_CX, py, 4, 0, Math.PI * 2); mmCtx.fill();
-                mmCtx.shadowBlur = 0;
+                if (mmCircuit) {
+                    // trazado del circuito desde los tramos
+                    mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 2.5;
+                    mmCtx.lineCap = 'round'; mmCtx.lineJoin = 'round';
+                    mmCtx.beginPath();
+                    mmCircuit.forEach((p, i) => i === 0 ? mmCtx.moveTo(p.x, p.y) : mmCtx.lineTo(p.x, p.y));
+                    mmCtx.closePath(); mmCtx.stroke();
+                    // marca de meta — inicio del circuito
+                    mmCtx.fillStyle = '#f59e0b';
+                    mmCtx.fillRect(mmCircuit[0].x - 5, mmCircuit[0].y - 1, 10, 2);
+                    // punto del auto — progreso en el circuito
+                    const prog = ((td.pz + 950) / 1900) * mmCircuit.length | 0;
+                    const cp = mmCircuit[Math.min(prog, mmCircuit.length - 1)];
+                    mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
+                    mmCtx.fillStyle = '#ef4444';
+                    mmCtx.beginPath(); mmCtx.arc(cp.x, cp.y, 4, 0, Math.PI * 2); mmCtx.fill();
+                    mmCtx.shadowBlur = 0;
+                } else {
+                    // pista recta (sin tramos definidos)
+                    mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 3; mmCtx.lineCap = 'round';
+                    mmCtx.beginPath(); mmCtx.moveTo(MM_CX, MM_PAD); mmCtx.lineTo(MM_CX, MM_H - MM_PAD); mmCtx.stroke();
+                    const py = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
+                    mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
+                    mmCtx.fillStyle = '#ef4444';
+                    mmCtx.beginPath(); mmCtx.arc(MM_CX, py, 4, 0, Math.PI * 2); mmCtx.fill();
+                    mmCtx.shadowBlur = 0;
+                }
             }
 
             requestAnimationFrame(_dbgLoop);
