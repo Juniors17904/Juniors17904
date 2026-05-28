@@ -531,36 +531,8 @@ class App {
         });
         const mmCtx = mmCanvas.getContext('2d');
         const MM_W = 90, MM_H = 120;
-        // Trazado del circuito — puntos normalizados (0..1)
-        const MM_PTS = [
-            [0.80, 0.10], [0.80, 0.42], [0.70, 0.70],
-            [0.55, 0.85], [0.33, 0.85], [0.15, 0.72],
-            [0.12, 0.50], [0.20, 0.28], [0.38, 0.13],
-            [0.58, 0.10], [0.80, 0.10],
-        ];
-        const pad = 8;
-        const mmPx = (nx) => pad + nx * (MM_W - pad * 2);
-        const mmPy = (ny) => pad + ny * (MM_H - pad * 2);
-        // Precalcular puntos absolutos y longitudes de segmento para interpolar posición
-        const mmAbs  = MM_PTS.map(([x, y]) => ({ x: mmPx(x), y: mmPy(y) }));
-        const mmSegs = [];
-        let   mmLen  = 0;
-        for (let i = 0; i < mmAbs.length - 1; i++) {
-            const dx = mmAbs[i+1].x - mmAbs[i].x, dy = mmAbs[i+1].y - mmAbs[i].y;
-            const d = Math.sqrt(dx*dx + dy*dy);
-            mmSegs.push(d); mmLen += d;
-        }
-        const mmPosOnPath = (progress) => {
-            let target = ((progress % 1) + 1) % 1 * mmLen;
-            for (let i = 0; i < mmSegs.length; i++) {
-                if (target <= mmSegs[i]) {
-                    const t = target / mmSegs[i];
-                    return { x: mmAbs[i].x + t*(mmAbs[i+1].x-mmAbs[i].x), y: mmAbs[i].y + t*(mmAbs[i+1].y-mmAbs[i].y) };
-                }
-                target -= mmSegs[i];
-            }
-            return mmAbs[0];
-        };
+        const MM_CX = MM_W / 2;
+        const MM_PAD = 10;
 
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
@@ -608,28 +580,26 @@ class App {
                 mmCtx.clearRect(0, 0, MM_W, MM_H);
                 mmCtx.fillStyle = 'rgba(0,0,0,0.70)';
                 mmCtx.roundRect(0, 0, MM_W, MM_H, 8); mmCtx.fill();
-                // trazado — sombra + línea
-                for (const [lw, col] of [[5, 'rgba(0,0,0,0.6)'], [2.5, '#6b7280']]) {
-                    mmCtx.beginPath();
-                    mmCtx.moveTo(mmAbs[0].x, mmAbs[0].y);
-                    for (let i = 0; i < mmAbs.length - 1; i++) {
-                        const mx = (mmAbs[i].x + mmAbs[i+1].x) / 2;
-                        const my = (mmAbs[i].y + mmAbs[i+1].y) / 2;
-                        mmCtx.quadraticCurveTo(mmAbs[i].x, mmAbs[i].y, mx, my);
-                    }
-                    mmCtx.strokeStyle = col; mmCtx.lineWidth = lw;
-                    mmCtx.lineCap = 'round'; mmCtx.stroke();
-                }
-                // marca de meta
-                const meta = mmPosOnPath(0);
+                // línea recta de la pista
+                mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 3;
+                mmCtx.lineCap = 'round';
+                mmCtx.beginPath();
+                mmCtx.moveTo(MM_CX, MM_PAD);
+                mmCtx.lineTo(MM_CX, MM_H - MM_PAD);
+                mmCtx.stroke();
+                // marca de meta (Z=700) — naranja
+                const fy = MM_PAD + (1 - (700 + 950) / 1900) * (MM_H - MM_PAD * 2);
                 mmCtx.fillStyle = '#f59e0b';
-                mmCtx.fillRect(meta.x - 5, meta.y - 1, 10, 2);
+                mmCtx.fillRect(MM_CX - 6, fy - 1, 12, 2);
+                // marca de salida (Z=50) — verde
+                const sy = MM_PAD + (1 - (50 + 950) / 1900) * (MM_H - MM_PAD * 2);
+                mmCtx.fillStyle = '#22c55e';
+                mmCtx.fillRect(MM_CX - 6, sy - 1, 12, 2);
                 // punto del auto
-                const prog = (td.pz + 950) / 1900;
-                const pos  = mmPosOnPath(prog);
+                const py = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
                 mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
                 mmCtx.fillStyle = '#ef4444';
-                mmCtx.beginPath(); mmCtx.arc(pos.x, pos.y, 4, 0, Math.PI * 2); mmCtx.fill();
+                mmCtx.beginPath(); mmCtx.arc(MM_CX, py, 4, 0, Math.PI * 2); mmCtx.fill();
                 mmCtx.shadowBlur = 0;
             }
 
