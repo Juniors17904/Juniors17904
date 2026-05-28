@@ -295,7 +295,7 @@ class App {
         document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
         document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
-            this.#iniciarTestDrive3D(this.#estado.pista);
+            this.#iniciarTestDrivePista(this.#estado.pista);
         });
         document.getElementById('pantalla-pista').addEventListener('click', e => {
             const card = e.target.closest('.pista-card');
@@ -457,6 +457,23 @@ class App {
         OrientacionManager.verificar();
         document.getElementById('ctrl-accel').style.display = 'flex';
         this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, 'testdrive');
+        window.onCarreraTerminada = null;
+        this.#estado.juego.iniciar(null);
+    }
+
+    #iniciarTestDrivePista(tipoPista) {
+        // Crea una versión libre de la pista (sin meta, sin fin)
+        const base = window.PISTAS?.[tipoPista];
+        if (!base) { this.#iniciarTestDrive(); return; }
+        window.PISTAS['__td__'] = {
+            ...base,
+            distMeta: Infinity,
+            esTestDrive: true,
+        };
+        this.#mostrar('pantalla-juego');
+        OrientacionManager.verificar();
+        document.getElementById('ctrl-accel').style.display = 'flex';
+        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, '__td__');
         window.onCarreraTerminada = null;
         this.#estado.juego.iniciar(null);
     }
