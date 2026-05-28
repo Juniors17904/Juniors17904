@@ -491,6 +491,13 @@ class App {
         addTouch('btn-izq', () => { td.steerInput = -1; }, () => { td.steerInput = 0; });
         addTouch('btn-der', () => { td.steerInput =  1; }, () => { td.steerInput = 0; });
 
+        // Slider altura de cámara
+        const sliderCam = document.getElementById('slider-cam-height');
+        const ctrlCam   = document.getElementById('ctrl-cam-height');
+        sliderCam.value = '2.8';
+        ctrlCam.style.display = 'flex';
+        sliderCam.addEventListener('input', e => { td.camHeight = parseFloat(e.target.value); });
+
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'block';
         let _dbgLast = performance.now(), _dbgFrames = 0, _dbgFps = 60;
@@ -539,6 +546,7 @@ class App {
         document.getElementById('ctrl-accel').style.display = 'none';
         document.getElementById('btn-exit-td3d').style.display = 'none';
         document.getElementById('debug-td3d').style.display = 'none';
+        document.getElementById('ctrl-cam-height').style.display = 'none';
     }
 
     // ── Mapa de pista ────────────────────────────────────────────

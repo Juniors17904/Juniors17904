@@ -257,6 +257,7 @@ class TestDrive3D {
 
     accelInput = 0;
     steerInput = 0;
+    camHeight  = 2.8;
 
     get speed()    { return this.#speed; }
     get accel()    { return this.#accel; }
@@ -603,7 +604,7 @@ class TestDrive3D {
         const D = 7;
         const cx = this.#px - Math.sin(this.#rotY) * D;
         const cz = this.#pz - Math.cos(this.#rotY) * D;
-        this.#camera.position.set(cx, 2.8, cz);
+        this.#camera.position.set(cx, this.camHeight, cz);
         this.#camera.lookAt(
             this.#px + Math.sin(this.#rotY) * 4,
             0.6,
