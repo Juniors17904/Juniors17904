@@ -138,7 +138,7 @@ class Circuito3D {
         const pts = [{ x, z, angle }];
         for (let i = 0; i < pista.totalSegs; i++) {
             const tr = pista.tramos.find(([d, h]) => i >= d && i < h);
-            angle += (tr ? tr[2] : 0) * 0.045;
+            angle -= (tr ? tr[2] : 0) * 0.045;
             x += Math.sin(angle) * paso;
             z += Math.cos(angle) * paso;
             pts.push({ x, z, angle });
