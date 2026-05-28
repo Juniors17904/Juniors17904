@@ -566,7 +566,7 @@ class TestDrive3D {
         }
 
         if (Math.abs(this.#speed) > 0.005)
-            this.#rotY += this.steerInput * STEER * Math.sign(this.#speed);
+            this.#rotY -= this.steerInput * STEER * Math.sign(this.#speed);
 
         this.#pz += Math.cos(this.#rotY) * this.#speed;
         this.#px += Math.sin(this.#rotY) * this.#speed;
