@@ -131,6 +131,21 @@
         <canvas id="canvas-carro-3d" width="240" height="160"></canvas>
         <button id="btn-exit-td3d" class="btn-tuerca" style="top:16px;left:16px;display:none">←</button>
 
+        <div id="debug-td3d" style="display:none;position:absolute;top:52px;right:10px;background:rgba(0,0,0,0.80);color:#00ff88;font:12px/1.7 monospace;padding:10px 14px;border-radius:8px;border:1px solid rgba(0,255,136,0.25);min-width:220px;z-index:200;pointer-events:none">
+            <div style="color:#7c3aed;font-weight:bold;letter-spacing:2px;margin-bottom:2px">AUTO</div>
+            <div>VELOCIDAD    <span id="dbg-vel">0.000</span> m/f → <span id="dbg-kmh">0</span> km/h</div>
+            <div>ACELERACIÓN  <span id="dbg-acel">+0.0000</span> m/f²</div>
+            <div>VEL. MÁXIMA  <span id="dbg-vmax">0.000</span> m/f</div>
+            <div>ENTRADA ACEL <span id="dbg-iacel" style="color:#fff">NEUTRO</span></div>
+            <div>ENTRADA DIR  <span id="dbg-idir" style="color:#fff">RECTO</span></div>
+            <div style="color:#7c3aed;font-weight:bold;letter-spacing:2px;margin:6px 0 2px">PISTA</div>
+            <div>POS X        <span id="dbg-px">0.00</span></div>
+            <div>POS Z        <span id="dbg-pz">0.00</span></div>
+            <div>RUMBO        <span id="dbg-rumbo">0.0</span>°</div>
+            <div style="color:#7c3aed;font-weight:bold;letter-spacing:2px;margin:6px 0 2px">SISTEMA</div>
+            <div>FPS          <span id="dbg-fps">--</span></div>
+        </div>
+
         <!-- Controles botones -->
         <div id="ctrl-botones" class="ctrl-overlay" style="display:none">
             <button id="btn-izq" class="btn-dir">◀</button>

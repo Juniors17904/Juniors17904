@@ -250,10 +250,18 @@ class TestDrive3D {
     #renderer = null; #scene = null; #camera = null;
     #canvas; #carGroup = null; #raf = 0; #sun = null;
     #px = 0; #pz = 0; #rotY = 0; #speed = 0;
+    #accel = 0; #maxSpeed = 0;
     #wheels = [];
 
     accelInput = 0;
     steerInput = 0;
+
+    get speed()    { return this.#speed; }
+    get accel()    { return this.#accel; }
+    get maxSpeed() { return this.#maxSpeed; }
+    get px()       { return this.#px; }
+    get pz()       { return this.#pz; }
+    get rotY()     { return this.#rotY; }
 
     constructor(canvas) {
         this.#canvas = canvas;
@@ -525,6 +533,7 @@ class TestDrive3D {
     #updatePhysics() {
         const MAX_FWD = 0.30, MAX_REV = 0.12;
         const ACCEL = 0.009, BRAKE = 0.014, DRAG = 0.005, STEER = 0.038;
+        const prevSpeed = this.#speed;
 
         if (this.accelInput === 1) {
             this.#speed = Math.min(MAX_FWD, this.#speed + ACCEL);
@@ -541,6 +550,9 @@ class TestDrive3D {
 
         this.#pz += Math.cos(this.#rotY) * this.#speed;
         this.#px += Math.sin(this.#rotY) * this.#speed;
+
+        this.#accel = this.#speed - prevSpeed;
+        if (Math.abs(this.#speed) > this.#maxSpeed) this.#maxSpeed = Math.abs(this.#speed);
 
         if (Math.abs(this.#px) > 3.8) this.#px *= 0.90;
         if (this.#pz >  950) this.#pz -= 1900;

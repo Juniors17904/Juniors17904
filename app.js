@@ -491,6 +491,35 @@ class App {
         addTouch('btn-rev', () => { td.accelInput = -1; }, () => { td.accelInput = 0; });
         addTouch('btn-izq', () => { td.steerInput = -1; }, () => { td.steerInput = 0; });
         addTouch('btn-der', () => { td.steerInput =  1; }, () => { td.steerInput = 0; });
+
+        // Debug overlay
+        document.getElementById('debug-td3d').style.display = 'block';
+        let _dbgLast = performance.now(), _dbgFrames = 0, _dbgFps = 60;
+        const _dbgLoop = () => {
+            if (!this.#td3d) return;
+            _dbgFrames++;
+            const now = performance.now();
+            if (now - _dbgLast >= 500) {
+                _dbgFps = Math.round(_dbgFrames * 1000 / (now - _dbgLast));
+                _dbgFrames = 0; _dbgLast = now;
+            }
+            const s = td.speed, a = td.accel;
+            const kmh = Math.round(Math.abs(s) * 216);
+            document.getElementById('dbg-vel').textContent   = Math.abs(s).toFixed(3);
+            document.getElementById('dbg-kmh').textContent   = kmh;
+            document.getElementById('dbg-acel').textContent  = (a >= 0 ? '+' : '') + a.toFixed(4);
+            document.getElementById('dbg-vmax').textContent  = td.maxSpeed.toFixed(3);
+            document.getElementById('dbg-iacel').textContent = td.accelInput ===  1 ? '⬆ GAS'
+                                                             : td.accelInput === -1 ? '⬇ REVERSA' : 'NEUTRO';
+            document.getElementById('dbg-idir').textContent  = td.steerInput < -0.1 ? '◀ IZQ'
+                                                             : td.steerInput >  0.1 ? 'DER ▶' : 'RECTO';
+            document.getElementById('dbg-px').textContent    = td.px.toFixed(2);
+            document.getElementById('dbg-pz').textContent    = td.pz.toFixed(2);
+            document.getElementById('dbg-rumbo').textContent = ((td.rotY * 180 / Math.PI) % 360).toFixed(1);
+            document.getElementById('dbg-fps').textContent   = _dbgFps;
+            requestAnimationFrame(_dbgLoop);
+        };
+        requestAnimationFrame(_dbgLoop);
     }
 
     #limpiarTestDrive3D() {
@@ -509,6 +538,7 @@ class App {
         document.getElementById('canvas-carro-3d').style.display = '';
         document.getElementById('ctrl-accel').style.display = 'none';
         document.getElementById('btn-exit-td3d').style.display = 'none';
+        document.getElementById('debug-td3d').style.display = 'none';
     }
 
     // ── Mapa de pista ────────────────────────────────────────────
