@@ -596,8 +596,10 @@ class TestDrive3D {
             this.#carGroup.rotation.y = this.#rotY;
         }
 
-        // Lean the car body into the turn (around its own forward axis)
-        this.#carLean += (-this.steerInput * 0.22 - this.#carLean) * 0.08;
+        // Lean the car body into the turn — scales with speed (no lean at rest, max at full speed)
+        const speedFactor = Math.abs(this.#speed) / 0.74;
+        const targetLean = -this.steerInput * 0.22 * speedFactor;
+        this.#carLean += (targetLean - this.#carLean) * 0.08;
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carLean;
 
         const spin = this.#speed * 6;
