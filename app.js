@@ -170,10 +170,26 @@ class App {
         juego: null,
     };
 
+    #backNav = false;
+
     constructor() {
         OrientacionManager.iniciarListeners();
         this.#inicializarEventos();
+        history.replaceState({ pantalla: 'pantalla-inicio' }, '');
         this.#mostrar('pantalla-inicio');
+        window.addEventListener('popstate', e => {
+            const id = e.state?.pantalla;
+            if (id) {
+                this.#backNav = true;
+                this.#mostrar(id);
+                this.#backNav = false;
+            } else {
+                history.pushState({ pantalla: 'pantalla-inicio' }, '');
+                this.#backNav = true;
+                this.#mostrar('pantalla-inicio');
+                this.#backNav = false;
+            }
+        });
     }
 
     // ── Navegación ──────────────────────────────────────────────
@@ -186,6 +202,9 @@ class App {
         if (el) {
             el.style.display = 'flex';
             el.classList.add('activa');
+        }
+        if (!this.#backNav) {
+            history.pushState({ pantalla: id }, '');
         }
     }
 
