@@ -186,58 +186,100 @@ class Circuito3D {
         grass.receiveShadow = true;
         this.#scene.add(grass);
 
-        // Asfalto: segmentos PlaneGeometry siguiendo el path
-        const roadMat  = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
-        const edgeMat  = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const curbRed  = new THREE.MeshStandardMaterial({ color: 0xff3333 });
-        const curbWht  = new THREE.MeshStandardMaterial({ color: 0xfafafa });
+        // CatmullRomCurve3 — curva cerrada y suave desde los puntos del path
+        const curve = new THREE.CatmullRomCurve3(
+            pts.slice(0, -1).map(p => new THREE.Vector3(p.x, 0, p.z)),
+            true
+        );
+        const DIV = Math.max(pts.length * 3, 600);
+        const cp  = curve.getPoints(DIV);
 
-        for (let i = 0; i < pts.length - 1; i++) {
-            const dx = pts[i+1].x - pts[i].x, dz = pts[i+1].z - pts[i].z;
-            const segLen = Math.sqrt(dx*dx + dz*dz) + 0.05; // slight overlap
-            const mx = (pts[i].x + pts[i+1].x) / 2;
-            const mz = (pts[i].z + pts[i+1].z) / 2;
-            const ang = Math.atan2(dx, dz);
+        // Perpendicular en XZ para cada punto de la curva suavizada
+        const _perp = i => {
+            const a = cp[i], b = cp[(i + 1) % cp.length];
+            const tx = b.x - a.x, tz = b.z - a.z;
+            const L  = Math.sqrt(tx*tx + tz*tz) || 1;
+            return { px: -tz/L, pz: tx/L };
+        };
 
-            // Asfalto
-            const road = new THREE.Mesh(new THREE.PlaneGeometry(8, segLen), roadMat);
-            road.rotation.x = -Math.PI / 2;
-            road.rotation.z = -ang;
-            road.position.set(mx, 0, mz);
-            road.receiveShadow = true;
-            this.#scene.add(road);
-
-            // Línea central (cada 6 segmentos)
-            if (i % 6 === 0) {
-                const dash = new THREE.Mesh(new THREE.PlaneGeometry(0.14, Math.min(segLen * 6, 2.5)), edgeMat);
-                dash.rotation.x = -Math.PI / 2;
-                dash.rotation.z = -ang;
-                dash.position.set(mx, 0.01, mz);
-                this.#scene.add(dash);
+        // Geometría ribbon continua entre dos offsets laterales
+        const _ribbon = (lo, ro, y, i0, i1) => {
+            const pos = [], nor = [], uv = [], idx = [];
+            for (let i = i0; i <= i1; i++) {
+                const q = cp[i % cp.length];
+                const { px, pz } = _perp(i % cp.length);
+                const u = (i - i0) / (i1 - i0 || 1);
+                pos.push(q.x + px*lo, y, q.z + pz*lo, q.x + px*ro, y, q.z + pz*ro);
+                nor.push(0,1,0, 0,1,0);
+                uv.push(0,u, 1,u);
             }
-
-            // Bordillos rojos/blancos
-            const perp = { x: Math.cos(ang), z: -Math.sin(ang) };
-            for (const side of [-1, 1]) {
-                const cx = mx + perp.x * side * 4.35;
-                const cz = mz + perp.z * side * 4.35;
-                const curb = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.6, 0.06, segLen),
-                    i % 2 === 0 ? curbRed : curbWht
-                );
-                curb.rotation.y = ang;
-                curb.position.set(cx, 0.03, cz);
-                this.#scene.add(curb);
+            for (let i = 0; i < i1 - i0; i++) {
+                const a=i*2, b=a+1, c=a+2, d=a+3;
+                idx.push(a,c,b, b,c,d);
             }
+            const g = new THREE.BufferGeometry();
+            g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+            g.setAttribute('normal',   new THREE.Float32BufferAttribute(nor, 3));
+            g.setAttribute('uv',       new THREE.Float32BufferAttribute(uv, 2));
+            g.setIndex(idx);
+            return g;
+        };
+
+        // Asfalto: una sola geometría continua (cero gaps en curvas)
+        const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
+        const road = new THREE.Mesh(_ribbon(-4, 4, 0, 0, DIV), roadMat);
+        road.receiveShadow = true;
+        this.#scene.add(road);
+
+        // Bordillos alternados: 4 meshes (rojo/blanco × izq/der), cada uno agrupa sus bandas
+        const curbW  = 0.7;
+        const BAND   = 10;
+        const redMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.7, side: THREE.DoubleSide });
+        const whtMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.7, side: THREE.DoubleSide });
+
+        const _buildCurbs = (lo, ro) => {
+            const rPos=[], rNor=[], rIdx=[], wPos=[], wNor=[], wIdx=[];
+            for (let b = 0; b * BAND <= DIV; b++) {
+                const i0 = b * BAND, i1 = Math.min((b+1)*BAND, DIV);
+                const pos = b%2===0 ? rPos : wPos;
+                const nor = b%2===0 ? rNor : wNor;
+                const idx = b%2===0 ? rIdx : wIdx;
+                const v0  = pos.length / 3;
+                for (let i = i0; i <= i1; i++) {
+                    const q = cp[i % cp.length];
+                    const { px, pz } = _perp(i % cp.length);
+                    pos.push(q.x + px*lo, 0.04, q.z + pz*lo);
+                    pos.push(q.x + px*ro, 0.04, q.z + pz*ro);
+                    nor.push(0,1,0, 0,1,0);
+                }
+                for (let j = 0; j < i1-i0; j++) {
+                    const a=v0+j*2, b2=a+1, c=a+2, d=a+3;
+                    idx.push(a,c,b2, b2,c,d);
+                }
+            }
+            const _geo = (p, n, i) => {
+                const g = new THREE.BufferGeometry();
+                g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
+                g.setAttribute('normal',   new THREE.Float32BufferAttribute(n, 3));
+                g.setIndex(i);
+                return g;
+            };
+            if (rPos.length) this.#scene.add(new THREE.Mesh(_geo(rPos,rNor,rIdx), redMat));
+            if (wPos.length) this.#scene.add(new THREE.Mesh(_geo(wPos,wNor,wIdx), whtMat));
+        };
+        _buildCurbs(-4-curbW, -4);  // bordillo izquierdo
+        _buildCurbs(4, 4+curbW);    // bordillo derecho
+
+        // Línea central (dashes)
+        const dashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const DASH = 10, GAP = 10;
+        for (let i = 0; i < DIV; i += DASH+GAP) {
+            this.#scene.add(new THREE.Mesh(_ribbon(-0.12, 0.12, 0.005, i, Math.min(i+DASH, DIV)), dashMat));
         }
 
-        // Línea de meta en pts[0]
-        const ang0 = this.#pathPts[0].angle;
-        const finish = new THREE.Mesh(new THREE.PlaneGeometry(8, 1.2), edgeMat);
-        finish.rotation.x = -Math.PI / 2;
-        finish.rotation.z = -ang0;
-        finish.position.set(pts[0].x, 0.02, pts[0].z);
-        this.#scene.add(finish);
+        // Línea de meta (blanco al inicio de la curva)
+        const finMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        this.#scene.add(new THREE.Mesh(_ribbon(-4, 4, 0.015, 0, 5), finMat));
     }
 
     // ── Cargar auto (igual que TestDrive3D) ─────────────────────
