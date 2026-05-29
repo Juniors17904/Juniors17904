@@ -567,7 +567,7 @@ class App {
             for (let i = 0; i < pistaCfg.totalSegs; i++) {
                 const tramo = pistaCfg.tramos.find(([d, h]) => i >= d && i < h);
                 angle += (tramo ? tramo[2] : 0) * 0.045;
-                x += Math.cos(angle) * 1.5;
+                x -= Math.cos(angle) * 1.5;
                 y += Math.sin(angle) * 1.5;
                 pts.push([x, y]);
             }
@@ -766,7 +766,7 @@ class App {
             for (let i=0; i<pistaCfg.totalSegs; i++) {
                 const tr=pistaCfg.tramos.find(([d,h])=>i>=d&&i<h);
                 angle+=(tr?tr[2]:0)*0.045;
-                x+=Math.cos(angle)*1.5; y+=Math.sin(angle)*1.5; pts.push([x,y]);
+                x-=Math.cos(angle)*1.5; y+=Math.sin(angle)*1.5; pts.push([x,y]);
             }
             const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
             const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
@@ -777,7 +777,7 @@ class App {
         })();
         // Transforma coordenadas mundo 3D → canvas (mismo espacio que mmCircuit)
         const RATIO = 1.5/4;
-        const wToC = (wx,wz) => ({ x: wx*RATIO*_mmScl+_mmOx, y: -wz*RATIO*_mmScl+_mmOy });
+        const wToC = (wx,wz) => ({ x: -wx*RATIO*_mmScl+_mmOx, y: -wz*RATIO*_mmScl+_mmOy });
 
         // Mapa de recorrido (trail)
         const trailCanvas = document.getElementById('trail-map');
@@ -802,12 +802,12 @@ class App {
             const minX=Math.min(...wxs)-8, maxX=Math.max(...wxs)+8;
             const minZ=Math.min(...wzs)-8, maxZ=Math.max(...wzs)+8;
             const scl=Math.min((MM_W-MM_PAD*2)/(maxX-minX),(MM_H-MM_PAD*2)/(maxZ-minZ));
-            const ox=(MM_W-(maxX-minX)*scl)/2-minX*scl;
+            const ox=(MM_W-(maxX-minX)*scl)/2+maxX*scl;
             const oz=(MM_H-(maxZ-minZ)*scl)/2+maxZ*scl;
             return { scl, ox, oz };
         };
         const _ts = _buildTrailScale();
-        const wToT = _ts ? (wx,wz) => ({ x: wx*_ts.scl+_ts.ox, y: -wz*_ts.scl+_ts.oz }) : null;
+        const wToT = _ts ? (wx,wz) => ({ x: -wx*_ts.scl+_ts.ox, y: -wz*_ts.scl+_ts.oz }) : null;
 
         let _dbgLast=performance.now(), _dbgFrames=0, _dbgFps=60;
         const _dbgLoop = () => {
@@ -973,7 +973,7 @@ class App {
         for (let i = 0; i < pista.totalSegs; i++) {
             const tramo = pista.tramos.find(([d, h]) => i >= d && i < h);
             angle += (tramo ? tramo[2] : 0) * 0.045;
-            x += Math.cos(angle) * 1.5;
+            x -= Math.cos(angle) * 1.5;
             y += Math.sin(angle) * 1.5;
             puntos.push([x, y]);
         }
