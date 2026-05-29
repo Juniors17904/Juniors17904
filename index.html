@@ -141,7 +141,7 @@
             <span style="font:10px monospace;color:rgba(255,255,255,0.7)">▼</span>
         </div>
 
-        <div id="debug-td3d" style="display:none;position:absolute;top:0;left:0;right:0;background:rgba(0,0,0,0.72);color:#e0e0e0;font:8px/1.55 monospace;padding:4px 6px;z-index:200;pointer-events:none;backdrop-filter:blur(3px)">
+        <div id="debug-td3d" style="display:none;position:absolute;top:0;left:0;background:rgba(0,0,0,0.72);color:#e0e0e0;font:8px/1.55 monospace;padding:4px 6px;z-index:200;pointer-events:none;backdrop-filter:blur(3px)">
             <div style="display:flex;gap:6px">
                 <!-- AUTO -->
                 <div style="flex:1;border-right:1px solid rgba(255,255,255,0.15);padding-right:5px">
@@ -180,6 +180,17 @@
                     <div>MAX- <span id="dbg-f-maxrev">-</span></div>
                 </div>
             </div>
+        </div>
+
+        <!-- Panel verificación PATH (solo Circuito3D) -->
+        <div id="debug-path" style="display:none;position:absolute;top:0;right:0;background:rgba(0,0,0,0.72);color:#e0e0e0;font:8px/1.55 monospace;padding:4px 6px;z-index:200;pointer-events:none;backdrop-filter:blur(3px)">
+            <div style="color:#86efac;font-weight:bold;letter-spacing:1px;margin-bottom:1px">PATH</div>
+            <div>SEG <span id="dbg-seg">--</span></div>
+            <div>CURVA <span id="dbg-curva">0.0</span></div>
+            <div>PATH X <span id="dbg-path-x">0.0</span></div>
+            <div>PATH Z <span id="dbg-path-z">0.0</span></div>
+            <div>OFF <span id="dbg-off">0.00</span> m</div>
+            <div>LAT <span id="dbg-lat">0.00</span> m</div>
         </div>
 
         <!-- Minimapa Test Drive 3D -->

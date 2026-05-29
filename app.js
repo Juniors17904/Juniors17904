@@ -740,6 +740,7 @@ class App {
 
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
+        document.getElementById('debug-path').style.display = 'block';
 
         // Minimapa — trazado desde tramos
         const mmCanvas = document.getElementById('minimap-td3d');
@@ -804,6 +805,18 @@ class App {
             document.getElementById('dbg-f-steer').textContent = ph.steer;
             document.getElementById('dbg-f-maxfwd').textContent= ph.maxFwd;
             document.getElementById('dbg-f-maxrev').textContent= ph.maxRev;
+            // Panel PATH
+            const pp  = cir.pathPos;
+            const off = Math.sqrt((cir.px-pp.x)**2 + (cir.pz-pp.z)**2);
+            const seg = (cir.progress * pistaCfg.totalSegs) | 0;
+            const trP = pistaCfg.tramos.find(([d,h]) => seg>=d && seg<h);
+            document.getElementById('dbg-seg').textContent    = seg;
+            document.getElementById('dbg-curva').textContent  = trP ? trP[2].toFixed(1) : '0.0';
+            document.getElementById('dbg-path-x').textContent = pp.x.toFixed(1);
+            document.getElementById('dbg-path-z').textContent = pp.z.toFixed(1);
+            document.getElementById('dbg-off').textContent    = off.toFixed(2);
+            document.getElementById('dbg-lat').textContent    = cir.lateral.toFixed(2);
+
             // Minimapa
             if (mmVisible && mmCircuit) {
                 mmCtx.clearRect(0,0,MM_W,MM_H);
@@ -843,6 +856,7 @@ class App {
         document.getElementById('ctrl-accel').style.display='none';
         document.getElementById('btn-exit-cir3d').style.display='none';
         document.getElementById('debug-td3d').style.display='none';
+        document.getElementById('debug-path').style.display='none';
         document.getElementById('minimap-td3d').style.display='none';
         document.getElementById('btn-toggle-minimap').style.display='none';
         document.getElementById('ctrl-cam-height').style.display='none';
