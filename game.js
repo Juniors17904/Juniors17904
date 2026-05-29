@@ -433,13 +433,7 @@ class Carro {
 // CLASE: HUD (velocímetro, turbos, progreso, minimapa)
 // ================================================================
 class HUD {
-    #mmPts = null; #mmSegs = null; #mmLen = 0;
-
-    static #CIRC_NORM = [
-        [0.82, 0.20], [0.82, 0.55], [0.72, 0.80], [0.52, 0.90],
-        [0.32, 0.85], [0.14, 0.70], [0.14, 0.45], [0.22, 0.25],
-        [0.40, 0.12], [0.62, 0.12], [0.82, 0.20],
-    ];
+    #mmPts = null; #mmSegs = null; #mmLen = 0; #mmNivel = '';
 
     dibujar(ctx, W, H, carro, oponenteProgreso, nombreOponente, nivel) {
         this.#dibujarVelocimetro(ctx, W, H, carro.velocidad / CFG.VEL_MAX);
@@ -612,18 +606,41 @@ class HUD {
         ctx.restore();
     }
 
-    #buildMinimap() {
-        if (this.#mmPts) return;
+    #buildMinimap(nivel) {
+        if (this.#mmPts && this.#mmNivel === nivel) return;
+        this.#mmNivel = nivel;
+        const pista = window.PISTAS?.[nivel];
         const x0 = 11, y0 = 20, w = 100, h = 63;
-        this.#mmPts = HUD.#CIRC_NORM.map(([nx, ny]) => ({ x: x0 + nx * w, y: y0 + ny * h }));
-        this.#mmSegs = [];
-        this.#mmLen = 0;
+
+        // Generar puntos desde tramos (misma fórmula que el minimapa de debug)
+        const raw = [];
+        let px = 0, py = 0, angle = -Math.PI / 2;
+        if (pista?.tramos?.length) {
+            for (let i = 0; i < pista.totalSegs; i++) {
+                const tr = pista.tramos.find(([d, hh]) => i >= d && i < hh);
+                angle += (tr ? tr[2] : 0) * 0.045;
+                px -= Math.cos(angle) * 1.5;
+                py += Math.sin(angle) * 1.5;
+                raw.push([px, py]);
+            }
+        }
+
+        // Escalar al panel del minimapa
+        const xs = raw.map(p => p[0]), ys = raw.map(p => p[1]);
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        const minY = Math.min(...ys), maxY = Math.max(...ys);
+        const pad = 6;
+        const scl = Math.min((w - pad*2) / (maxX-minX||1), (h - pad*2) / (maxY-minY||1));
+        const ox = x0 + (w - (maxX-minX)*scl) / 2 - minX*scl;
+        const oy = y0 + (h - (maxY-minY)*scl) / 2 - minY*scl;
+        this.#mmPts = raw.map(([x, y]) => ({ x: x*scl+ox, y: y*scl+oy }));
+
+        this.#mmSegs = []; this.#mmLen = 0;
         for (let i = 0; i < this.#mmPts.length - 1; i++) {
             const dx = this.#mmPts[i+1].x - this.#mmPts[i].x;
             const dy = this.#mmPts[i+1].y - this.#mmPts[i].y;
             const len = Math.sqrt(dx*dx + dy*dy);
-            this.#mmSegs.push(len);
-            this.#mmLen += len;
+            this.#mmSegs.push(len); this.#mmLen += len;
         }
     }
 
@@ -657,7 +674,8 @@ class HUD {
     }
 
     #dibujarMinimap(ctx, carro, oponenteProgreso, nivel) {
-        this.#buildMinimap();
+        this.#buildMinimap(nivel);
+        if (!this.#mmPts?.length) return;
         const pts = this.#mmPts;
 
         ctx.save();
