@@ -966,22 +966,33 @@ class App {
         const sx = px => px * scl + ox;
         const sy = py => py * scl + oy;
 
+        // Función de trazo suave por midpoints (elimina puntas en el cierre)
+        const traceSuave = () => {
+            const n = puntos.length;
+            const last = puntos[n - 1], first = puntos[0];
+            ctx.moveTo((sx(last[0]) + sx(first[0])) / 2, (sy(last[1]) + sy(first[1])) / 2);
+            for (let i = 0; i < n; i++) {
+                const [px0, py0] = puntos[i];
+                const [px1, py1] = puntos[(i + 1) % n];
+                ctx.quadraticCurveTo(sx(px0), sy(py0), (sx(px0) + sx(px1)) / 2, (sy(py0) + sy(py1)) / 2);
+            }
+            ctx.closePath();
+        };
+
         // Sombra del trazado
         ctx.strokeStyle = 'rgba(124,58,237,0.15)';
         ctx.lineWidth = 10;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.beginPath();
-        puntos.forEach(([px, py], i) => i === 0 ? ctx.moveTo(sx(px), sy(py)) : ctx.lineTo(sx(px), sy(py)));
-        ctx.closePath();
+        traceSuave();
         ctx.stroke();
 
         // Trazado principal
         ctx.strokeStyle = '#7c3aed';
         ctx.lineWidth = 4;
         ctx.beginPath();
-        puntos.forEach(([px, py], i) => i === 0 ? ctx.moveTo(sx(px), sy(py)) : ctx.lineTo(sx(px), sy(py)));
-        ctx.closePath();
+        traceSuave();
         ctx.stroke();
 
         // Línea de salida/meta
