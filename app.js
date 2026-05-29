@@ -680,7 +680,9 @@ class App {
         document.getElementById('btn-exit-td3d').style.display = 'none';
         document.getElementById('debug-td3d').style.display = 'none';
         document.getElementById('minimap-td3d').style.display = 'none';
+        document.getElementById('trail-map').style.display = 'none';
         document.getElementById('btn-toggle-minimap').style.display = 'none';
+        document.getElementById('btn-toggle-trail').style.display = 'none';
         document.getElementById('ctrl-cam-height').style.display = 'none';
     }
 
@@ -751,7 +753,7 @@ class App {
         mmBtn.onclick = () => {
             mmVisible = !mmVisible;
             mmCanvas.style.display = mmVisible ? 'block' : 'none';
-            mmBtn.textContent = mmVisible ? 'MAPA' : 'MAPA ✕';
+            mmBtn.textContent = mmVisible ? 'MINIMAPA' : 'MINIMAPA ✕';
         };
         const mmCtx = mmCanvas.getContext('2d');
         const MM_W=90, MM_H=120, MM_PAD=10;
@@ -779,8 +781,16 @@ class App {
 
         // Mapa de recorrido (trail)
         const trailCanvas = document.getElementById('trail-map');
+        const trailBtn    = document.getElementById('btn-toggle-trail');
         const trailCtx = trailCanvas.getContext('2d');
+        let trailVisible = true;
         trailCanvas.style.display = 'block';
+        trailBtn.style.display    = 'block';
+        trailBtn.onclick = () => {
+            trailVisible = !trailVisible;
+            trailCanvas.style.display = trailVisible ? 'block' : 'none';
+            trailBtn.textContent = trailVisible ? 'RECORRIDO' : 'RECORRIDO ✕';
+        };
         const trailPts = [];
 
         let _dbgLast=performance.now(), _dbgFrames=0, _dbgFps=60;
@@ -851,7 +861,7 @@ class App {
             }
 
             // Mapa de recorrido (trail)
-            {
+            if (trailVisible) {
                 // Registrar progreso actual (0..1) cada pequeño avance
                 const lastProg = trailPts[trailPts.length-1];
                 if (lastProg === undefined || Math.abs(cir.progress - lastProg) > 0.0003)
@@ -923,6 +933,7 @@ class App {
         document.getElementById('minimap-td3d').style.display='none';
         document.getElementById('trail-map').style.display='none';
         document.getElementById('btn-toggle-minimap').style.display='none';
+        document.getElementById('btn-toggle-trail').style.display='none';
         document.getElementById('ctrl-cam-height').style.display='none';
     }
 
