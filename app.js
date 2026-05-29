@@ -862,11 +862,25 @@ class App {
 
             // Mapa de recorrido (trail)
             if (trailVisible) {
-                // Registrar progreso actual (0..1) cada pequeño avance
-                const lastProg = trailPts[trailPts.length-1];
-                if (lastProg === undefined || Math.abs(cir.progress - lastProg) > 0.0003)
-                    trailPts.push(cir.progress);
+                // Registrar [progress, lateral] cada pequeño avance
+                const lastPt = trailPts[trailPts.length-1];
+                if (!lastPt || Math.abs(cir.progress - lastPt[0]) > 0.0003)
+                    trailPts.push([cir.progress, cir.lateral]);
                 if (trailPts.length > 4000) trailPts.shift();
+
+                // Convierte [progress, lateral] → canvas {x, y}
+                // usando la posición en mmCircuit + offset perpendicular al trazado
+                const mmPtAt = (prog, lat) => {
+                    const n = mmCircuit.length;
+                    const i = Math.min((prog * n)|0, n - 2);
+                    const p0 = mmCircuit[i], p1 = mmCircuit[i + 1];
+                    const dx = p1.x - p0.x, dy = p1.y - p0.y;
+                    const len = Math.sqrt(dx*dx + dy*dy) || 1;
+                    // normal izquierda: (-dy, dx) → lat>0 derecha, lat<0 izquierda
+                    const latScl = _mmScl * 0.375;
+                    return { x: p0.x + lat * (dy/len) * latScl,
+                             y: p0.y + lat * (-dx/len) * latScl };
+                };
 
                 trailCtx.clearRect(0,0,MM_W,MM_H);
                 trailCtx.fillStyle='rgba(0,0,0,0.70)';
@@ -881,22 +895,20 @@ class App {
                     trailCtx.closePath(); trailCtx.stroke();
                 }
 
-                // Línea del recorrido real (progreso → posición en mmCircuit)
+                // Línea del recorrido real (con desviación lateral)
                 if (mmCircuit && trailPts.length > 1) {
                     trailCtx.strokeStyle='#06b6d4'; trailCtx.lineWidth=1.5;
                     trailCtx.lineCap='round'; trailCtx.lineJoin='round';
                     trailCtx.beginPath();
-                    trailPts.forEach((prog,i)=>{
-                        const idx=Math.min((prog*mmCircuit.length)|0, mmCircuit.length-1);
-                        const p=mmCircuit[idx];
-                        i===0?trailCtx.moveTo(p.x,p.y):trailCtx.lineTo(p.x,p.y);
+                    trailPts.forEach(([prog, lat], i) => {
+                        const p = mmPtAt(prog, lat);
+                        i===0 ? trailCtx.moveTo(p.x,p.y) : trailCtx.lineTo(p.x,p.y);
                     });
                     trailCtx.stroke();
                 }
 
                 // Punto del auto
-                const tIdx=Math.min((cir.progress*mmCircuit.length)|0, mmCircuit.length-1);
-                const tc=mmCircuit ? mmCircuit[tIdx] : {x:MM_W/2,y:MM_H/2};
+                const tc = mmCircuit ? mmPtAt(cir.progress, cir.lateral) : {x:MM_W/2,y:MM_H/2};
                 trailCtx.shadowColor='#ef4444'; trailCtx.shadowBlur=8;
                 trailCtx.fillStyle='#ef4444';
                 trailCtx.beginPath(); trailCtx.arc(tc.x,tc.y,4,0,Math.PI*2); trailCtx.fill();
