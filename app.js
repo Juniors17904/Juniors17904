@@ -756,6 +756,7 @@ class App {
         const mmCtx = mmCanvas.getContext('2d');
         const MM_W=90, MM_H=120, MM_PAD=10;
         const pistaCfg = window.PISTAS?.[tipoPista];
+        let _mmScl=1, _mmOx=0, _mmOy=0;
         const mmCircuit = (() => {
             if (!pistaCfg?.tramos?.length) return null;
             const pts=[];
@@ -769,8 +770,18 @@ class App {
             const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
             const scl=Math.min((MM_W-MM_PAD*2)/(maxX-minX||1),(MM_H-MM_PAD*2)/(maxY-minY||1));
             const ox=(MM_W-(maxX-minX)*scl)/2-minX*scl, oy=(MM_H-(maxY-minY)*scl)/2-minY*scl;
+            _mmScl=scl; _mmOx=ox; _mmOy=oy;
             return pts.map(([px,py])=>({x:px*scl+ox, y:py*scl+oy}));
         })();
+        // Transforma coordenadas mundo 3D → canvas (mismo espacio que mmCircuit)
+        const RATIO = 1.5/4;
+        const wToC = (wx,wz) => ({ x: wx*RATIO*_mmScl+_mmOx, y: -wz*RATIO*_mmScl+_mmOy });
+
+        // Mapa de recorrido (trail)
+        const trailCanvas = document.getElementById('trail-map');
+        const trailCtx = trailCanvas.getContext('2d');
+        trailCanvas.style.display = 'block';
+        const trailPts = [];
 
         let _dbgLast=performance.now(), _dbgFrames=0, _dbgFps=60;
         const _dbgLoop = () => {
@@ -838,6 +849,53 @@ class App {
                 mmCtx.beginPath(); mmCtx.arc(cp.x,cp.y,4,0,Math.PI*2); mmCtx.fill();
                 mmCtx.shadowBlur=0;
             }
+
+            // Mapa de recorrido (trail)
+            {
+                // Registrar posición actual (cada ~0.5 m aprox)
+                const last = trailPts[trailPts.length-1];
+                const dx = last ? cir.px-last[0] : 999, dz = last ? cir.pz-last[1] : 999;
+                if (dx*dx+dz*dz > 0.25) trailPts.push([cir.px, cir.pz]);
+                if (trailPts.length > 4000) trailPts.shift();
+
+                trailCtx.clearRect(0,0,MM_W,MM_H);
+                trailCtx.fillStyle='rgba(0,0,0,0.70)';
+                trailCtx.roundRect(0,0,MM_W,MM_H,8); trailCtx.fill();
+
+                // Circuito de fondo (muy tenue)
+                if (mmCircuit) {
+                    trailCtx.strokeStyle='#374151'; trailCtx.lineWidth=2.5;
+                    trailCtx.lineCap='round'; trailCtx.lineJoin='round';
+                    trailCtx.beginPath();
+                    mmCircuit.forEach((p,i)=>i===0?trailCtx.moveTo(p.x,p.y):trailCtx.lineTo(p.x,p.y));
+                    trailCtx.closePath(); trailCtx.stroke();
+                }
+
+                // Línea del recorrido real
+                if (trailPts.length > 1) {
+                    trailCtx.strokeStyle='#06b6d4'; trailCtx.lineWidth=1.5;
+                    trailCtx.lineCap='round'; trailCtx.lineJoin='round';
+                    trailCtx.beginPath();
+                    trailPts.forEach(([wx,wz],i)=>{
+                        const c=wToC(wx,wz);
+                        i===0?trailCtx.moveTo(c.x,c.y):trailCtx.lineTo(c.x,c.y);
+                    });
+                    trailCtx.stroke();
+                }
+
+                // Punto del auto
+                const tc=wToC(cir.px,cir.pz);
+                trailCtx.shadowColor='#ef4444'; trailCtx.shadowBlur=8;
+                trailCtx.fillStyle='#ef4444';
+                trailCtx.beginPath(); trailCtx.arc(tc.x,tc.y,4,0,Math.PI*2); trailCtx.fill();
+                trailCtx.shadowBlur=0;
+
+                // Etiqueta RUTA
+                trailCtx.fillStyle='rgba(255,255,255,0.5)';
+                trailCtx.font='7px monospace';
+                trailCtx.fillText('RUTA',3,8);
+            }
+
             requestAnimationFrame(_dbgLoop);
         };
         requestAnimationFrame(_dbgLoop);
@@ -861,6 +919,7 @@ class App {
         document.getElementById('debug-td3d').style.display='none';
         document.getElementById('debug-path').style.display='none';
         document.getElementById('minimap-td3d').style.display='none';
+        document.getElementById('trail-map').style.display='none';
         document.getElementById('btn-toggle-minimap').style.display='none';
         document.getElementById('ctrl-cam-height').style.display='none';
     }
