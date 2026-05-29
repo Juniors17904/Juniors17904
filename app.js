@@ -194,6 +194,7 @@ class App {
 
     // ── Navegación ──────────────────────────────────────────────
     #mostrar(id) {
+        if (id !== 'pantalla-juego') this.#td3dPending = false;
         document.querySelectorAll('.pantalla').forEach(p => {
             p.classList.remove('activa');
             p.style.display = 'none';
@@ -490,12 +491,15 @@ class App {
     #td3dKeyUp = null;
     #td3dTouchHandlers = [];
     #td3dPista = 'ciudad';
+    #td3dPending = false;
 
     #iniciarTestDrive3D(tipoPista = 'ciudad') {
+        this.#td3dPending = true;
         if (!window.TestDrive3D) {
-            setTimeout(() => this.#iniciarTestDrive3D(tipoPista), 150);
+            setTimeout(() => { if (this.#td3dPending) this.#iniciarTestDrive3D(tipoPista); }, 200);
             return;
         }
+        this.#td3dPending = false;
         this.#td3dPista = tipoPista;
         OrientacionManager.saltarCheck = true;
         this.#mostrar('pantalla-juego');
@@ -677,6 +681,7 @@ class App {
     }
 
     #limpiarTestDrive3D() {
+        this.#td3dPending = false;
         if (!this.#td3d) return;
         this.#td3d.detener();
         this.#td3d = null;
