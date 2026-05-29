@@ -41,18 +41,20 @@ const PISTAS = {
         distMeta:  1800,
         nivelFijo: { nombre:'Ciudad', cielo:['#060a14','#0d1b2a'], cesped:['#0a200a','#081808'], asfalto:['#3a3a3a','#2e2e2e'], borde:'#555' },
         // [desde, hasta, curva]  positivo=derecha, negativo=izquierda
-        // Suma total de ángulo ≈ 2π → circuito cerrado
+        // 4 curvas de ~90° cada una → total ≈ 2π → rectángulo cerrado
         tramos: [
-            [0,   75,  0   ],  // recta principal
-            [75,  105, 2.30],  // horquilla 1 derecha (~178°)
-            [105, 130, 0   ],  // recta media
-            [130, 148, -1.5],  // chicane izquierda
-            [148, 166, 1.5 ],  // chicane derecha
-            [166, 196, 0   ],  // recta trasera
-            [196, 226, 2.30],  // horquilla 2 derecha (~178°)
-            [226, 262, 0   ],  // recta de retorno
-            [262, 280, -0.7],  // sweeper izquierda
-            [280, 300, 0.7 ],  // sweeper derecha (cierre)
+            [0,   55,  0   ],  // recta principal (pit straight)
+            [55,  70,  2.33],  // curva 1 derecha (~90°)
+            [70,  115, 0   ],  // recta lateral
+            [115, 130, 2.33],  // curva 2 derecha (~90°)
+            [130, 155, 0   ],  // recta trasera 1
+            [155, 170, -1.5],  // chicane izquierda
+            [170, 185, 1.5 ],  // chicane derecha
+            [185, 210, 0   ],  // recta trasera 2
+            [210, 225, 2.33],  // curva 3 derecha (~90°)
+            [225, 270, 0   ],  // recta lateral
+            [270, 285, 2.33],  // curva 4 derecha (~90°)
+            [285, 300, 0   ],  // final a meta
         ],
         obstFrecuencia: 0.12,
         obstTipos: ['carro','carro','carro','bache','turbo'],
