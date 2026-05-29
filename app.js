@@ -943,31 +943,34 @@ class App {
             return;
         }
 
-        // Puntos de control normalizados (0..1) que forman un circuito cerrado tipo F1
-        const ctrl = [
-            [0.80, 0.12],
-            [0.80, 0.45],
-            [0.70, 0.72],
-            [0.55, 0.85],
-            [0.33, 0.85],
-            [0.15, 0.70],
-            [0.13, 0.50],
-            [0.20, 0.28],
-            [0.38, 0.14],
-            [0.58, 0.12],
-        ];
-        const pad = 24;
-        const sx = px => pad + px * (W - pad * 2);
-        const sy = py => pad + py * (H - pad * 2);
+        // Generar puntos desde los tramos (ahora suman ~2π → circuito cerrado)
+        const puntos = [];
+        let x = 0, y = 0, angle = -Math.PI / 2;
+        for (let i = 0; i < pista.totalSegs; i++) {
+            const tramo = pista.tramos.find(([d, h]) => i >= d && i < h);
+            angle += (tramo ? tramo[2] : 0) * 0.045;
+            x += Math.cos(angle) * 1.5;
+            y += Math.sin(angle) * 1.5;
+            puntos.push([x, y]);
+        }
+        const xs = puntos.map(p => p[0]), ys = puntos.map(p => p[1]);
+        const minX = Math.min(...xs), maxX = Math.max(...xs);
+        const minY = Math.min(...ys), maxY = Math.max(...ys);
+        const pad = 28;
+        const scl = Math.min((W - pad * 2) / (maxX - minX || 1), (H - pad * 2) / (maxY - minY || 1));
+        const ox = (W - (maxX - minX) * scl) / 2 - minX * scl;
+        const oy = (H - (maxY - minY) * scl) / 2 - minY * scl;
+        const sx = px => px * scl + ox;
+        const sy = py => py * scl + oy;
 
-        // Trazo suave por midpoints sobre los puntos de control del circuito
+        // Trazo suave por midpoints (cierra sin puntas incluso con gap mínimo)
         const traceSuave = () => {
-            const n = ctrl.length;
-            const last = ctrl[n - 1], first = ctrl[0];
+            const n = puntos.length;
+            const last = puntos[n - 1], first = puntos[0];
             ctx.moveTo((sx(last[0]) + sx(first[0])) / 2, (sy(last[1]) + sy(first[1])) / 2);
             for (let i = 0; i < n; i++) {
-                const [px0, py0] = ctrl[i];
-                const [px1, py1] = ctrl[(i + 1) % n];
+                const [px0, py0] = puntos[i];
+                const [px1, py1] = puntos[(i + 1) % n];
                 ctx.quadraticCurveTo(sx(px0), sy(py0), (sx(px0) + sx(px1)) / 2, (sy(py0) + sy(py1)) / 2);
             }
             ctx.closePath();
@@ -990,7 +993,7 @@ class App {
         ctx.stroke();
 
         // Línea de salida/meta
-        const [fx, fy] = ctrl[0];
+        const [fx, fy] = puntos[0];
         ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.arc(sx(fx), sy(fy), 5, 0, Math.PI * 2);
