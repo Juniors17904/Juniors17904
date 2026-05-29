@@ -558,28 +558,23 @@ class App {
         const MM_CX = MM_W / 2;
         const MM_PAD = 10;
 
-        // Generar trazado del circuito desde los tramos de la pista
-        const pistaCfg = window.PISTAS?.[this.#td3dPista];
-        const mmCircuit = (() => {
-            if (!pistaCfg?.tramos?.length) return null;
-            const pts = [];
-            let x = 0, y = 0, angle = -Math.PI / 2;
-            for (let i = 0; i < pistaCfg.totalSegs; i++) {
-                const tramo = pistaCfg.tramos.find(([d, h]) => i >= d && i < h);
-                angle += (tramo ? tramo[2] : 0) * 0.045;
-                x -= Math.cos(angle) * 1.5;
-                y += Math.sin(angle) * 1.5;
-                pts.push([x, y]);
-            }
-            // Escalar a minimap
-            const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
-            const minX = Math.min(...xs), maxX = Math.max(...xs);
-            const minY = Math.min(...ys), maxY = Math.max(...ys);
-            const scl = Math.min((MM_W - MM_PAD*2) / (maxX-minX||1), (MM_H - MM_PAD*2) / (maxY-minY||1));
-            const ox = (MM_W - (maxX-minX)*scl) / 2 - minX*scl;
-            const oy = (MM_H - (maxY-minY)*scl) / 2 - minY*scl;
-            return pts.map(([px, py]) => ({ x: px*scl+ox, y: py*scl+oy }));
-        })();
+        // Test drive: pista recta — sin circuito de referencia
+        const mmCircuit = null;
+
+        // Recorrido (trail) del test drive
+        const trailCanvas = document.getElementById('trail-map');
+        const trailBtn    = document.getElementById('btn-toggle-trail');
+        const trailCtx    = trailCanvas.getContext('2d');
+        let trailVisible  = true;
+        let trailPts      = [];
+        trailCanvas.style.display = 'block';
+        trailBtn.style.display    = 'block';
+        trailBtn.textContent = 'RECORRIDO';
+        trailBtn.onclick = () => {
+            trailVisible = !trailVisible;
+            trailCanvas.style.display = trailVisible ? 'block' : 'none';
+            trailBtn.textContent = trailVisible ? 'RECORRIDO' : 'RECORRIDO ✕';
+        };
 
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
@@ -622,38 +617,56 @@ class App {
             document.getElementById('dbg-f-steer').textContent  = ph.steer;
             document.getElementById('dbg-f-maxfwd').textContent = ph.maxFwd;
             document.getElementById('dbg-f-maxrev').textContent = ph.maxRev;
-            // Minimapa
+            // Minimapa — pista recta
             if (mmVisible) {
                 mmCtx.clearRect(0, 0, MM_W, MM_H);
                 mmCtx.fillStyle = 'rgba(0,0,0,0.70)';
                 mmCtx.roundRect(0, 0, MM_W, MM_H, 8); mmCtx.fill();
-                if (mmCircuit) {
-                    // trazado del circuito desde los tramos
-                    mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 2.5;
-                    mmCtx.lineCap = 'round'; mmCtx.lineJoin = 'round';
-                    mmCtx.beginPath();
-                    mmCircuit.forEach((p, i) => i === 0 ? mmCtx.moveTo(p.x, p.y) : mmCtx.lineTo(p.x, p.y));
-                    mmCtx.closePath(); mmCtx.stroke();
-                    // marca de meta — inicio del circuito
-                    mmCtx.fillStyle = '#f59e0b';
-                    mmCtx.fillRect(mmCircuit[0].x - 5, mmCircuit[0].y - 1, 10, 2);
-                    // punto del auto — progreso en el circuito
-                    const prog = ((td.pz + 950) / 1900) * mmCircuit.length | 0;
-                    const cp = mmCircuit[Math.min(prog, mmCircuit.length - 1)];
-                    mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
-                    mmCtx.fillStyle = '#ef4444';
-                    mmCtx.beginPath(); mmCtx.arc(cp.x, cp.y, 4, 0, Math.PI * 2); mmCtx.fill();
-                    mmCtx.shadowBlur = 0;
-                } else {
-                    // pista recta (sin tramos definidos)
-                    mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 3; mmCtx.lineCap = 'round';
-                    mmCtx.beginPath(); mmCtx.moveTo(MM_CX, MM_PAD); mmCtx.lineTo(MM_CX, MM_H - MM_PAD); mmCtx.stroke();
-                    const py = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
-                    mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
-                    mmCtx.fillStyle = '#ef4444';
-                    mmCtx.beginPath(); mmCtx.arc(MM_CX, py, 4, 0, Math.PI * 2); mmCtx.fill();
-                    mmCtx.shadowBlur = 0;
+                mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 3; mmCtx.lineCap = 'round';
+                mmCtx.beginPath(); mmCtx.moveTo(MM_CX, MM_PAD); mmCtx.lineTo(MM_CX, MM_H - MM_PAD); mmCtx.stroke();
+                const mmPy = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
+                const mmPx = MM_CX + (td.px / 3.8) * (MM_W * 0.15);
+                mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
+                mmCtx.fillStyle = '#ef4444';
+                mmCtx.beginPath(); mmCtx.arc(mmPx, mmPy, 4, 0, Math.PI * 2); mmCtx.fill();
+                mmCtx.shadowBlur = 0;
+            }
+
+            // Recorrido (trail) — trayectoria real en la recta
+            if (trailVisible) {
+                const lastTp = trailPts[trailPts.length - 1];
+                const ddx = lastTp ? td.px - lastTp[0] : 999;
+                const ddz = lastTp ? td.pz - lastTp[1] : 999;
+                if (ddx*ddx + ddz*ddz > 0.04) trailPts.push([td.px, td.pz]);
+                if (trailPts.length > 3000) trailPts.shift();
+
+                trailCtx.clearRect(0, 0, MM_W, MM_H);
+                trailCtx.fillStyle = 'rgba(0,0,0,0.70)';
+                trailCtx.roundRect(0, 0, MM_W, MM_H, 8); trailCtx.fill();
+                // carretera de fondo
+                trailCtx.strokeStyle = '#374151'; trailCtx.lineWidth = 10; trailCtx.lineCap = 'round';
+                trailCtx.beginPath(); trailCtx.moveTo(MM_CX, MM_PAD); trailCtx.lineTo(MM_CX, MM_H - MM_PAD); trailCtx.stroke();
+                // trail real
+                if (trailPts.length > 1) {
+                    trailCtx.strokeStyle = '#06b6d4'; trailCtx.lineWidth = 1.5; trailCtx.lineCap = 'round'; trailCtx.lineJoin = 'round';
+                    trailCtx.beginPath();
+                    trailPts.forEach(([wx, wz], i) => {
+                        const tx = MM_CX + (wx / 3.8) * (MM_W * 0.15);
+                        const ty = MM_PAD + (1 - (wz + 950) / 1900) * (MM_H - MM_PAD * 2);
+                        i === 0 ? trailCtx.moveTo(tx, ty) : trailCtx.lineTo(tx, ty);
+                    });
+                    trailCtx.stroke();
                 }
+                // punto del auto
+                const tpx = MM_CX + (td.px / 3.8) * (MM_W * 0.15);
+                const tpy = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
+                trailCtx.shadowColor = '#ef4444'; trailCtx.shadowBlur = 8;
+                trailCtx.fillStyle = '#ef4444';
+                trailCtx.beginPath(); trailCtx.arc(tpx, tpy, 4, 0, Math.PI * 2); trailCtx.fill();
+                trailCtx.shadowBlur = 0;
+                trailCtx.fillStyle = 'rgba(255,255,255,0.5)';
+                trailCtx.font = '7px monospace';
+                trailCtx.fillText('RUTA', 3, 8);
             }
 
             requestAnimationFrame(_dbgLoop);
