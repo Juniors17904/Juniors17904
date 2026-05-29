@@ -647,9 +647,7 @@ class App {
                 trailCtx.clearRect(0, 0, MM_W, MM_H);
                 trailCtx.fillStyle = 'rgba(0,0,0,0.70)';
                 trailCtx.roundRect(0, 0, MM_W, MM_H, 8); trailCtx.fill();
-                // carretera de fondo
-                trailCtx.strokeStyle = '#374151'; trailCtx.lineWidth = 10; trailCtx.lineCap = 'round';
-                trailCtx.beginPath(); trailCtx.moveTo(MM_CX, MM_PAD); trailCtx.lineTo(MM_CX, MM_H - MM_PAD); trailCtx.stroke();
+                // carretera de fondo (oculta)
                 // trail real
                 if (trailPts.length > 1) {
                     trailCtx.strokeStyle = '#06b6d4'; trailCtx.lineWidth = 1.5; trailCtx.lineCap = 'round'; trailCtx.lineJoin = 'round';
