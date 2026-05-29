@@ -61,7 +61,7 @@ class TestDrive3D {
     #renderer = null; #scene = null; #camera = null;
     #canvas; #carGroup = null; #raf = 0; #sun = null;
     #resizeHandler = null;
-    #px = 0; #pz = 0; #rotY = 0; #speed = 0;
+    #px = -2; #pz = 0; #rotY = 0; #speed = 0;
     #accel = 0; #maxSpeed = 0; #carLean = 0;
     #camRotY = 0;
     #leanGroup = null;
