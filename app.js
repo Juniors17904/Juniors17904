@@ -793,6 +793,33 @@ class App {
         };
         const trailPts = [];
 
+        // Circuito en coordenadas mundo 3D (para fondo del trail canvas)
+        const worldCircuit = (() => {
+            if (!pistaCfg?.tramos?.length) return null;
+            const pts = [];
+            let wx=0, wz=0, wa=0;
+            for (let i=0; i<pistaCfg.totalSegs; i++) {
+                const tr=pistaCfg.tramos.find(([d,h])=>i>=d&&i<h);
+                wa += (tr?tr[2]:0)*0.045;
+                wx += Math.sin(wa)*4; wz += Math.cos(wa)*4;
+                pts.push([wx, wz]);
+            }
+            return pts;
+        })();
+        // Escala fija del trail canvas (basada en bounding box del circuito)
+        const _buildTrailScale = () => {
+            if (!worldCircuit) return null;
+            const wxs=worldCircuit.map(p=>p[0]), wzs=worldCircuit.map(p=>p[1]);
+            const minX=Math.min(...wxs)-8, maxX=Math.max(...wxs)+8;
+            const minZ=Math.min(...wzs)-8, maxZ=Math.max(...wzs)+8;
+            const scl=Math.min((MM_W-MM_PAD*2)/(maxX-minX),(MM_H-MM_PAD*2)/(maxZ-minZ));
+            const ox=(MM_W-(maxX-minX)*scl)/2-minX*scl;
+            const oz=(MM_H-(maxZ-minZ)*scl)/2+maxZ*scl;
+            return { scl, ox, oz };
+        };
+        const _ts = _buildTrailScale();
+        const wToT = _ts ? (wx,wz) => ({ x: wx*_ts.scl+_ts.ox, y: -wz*_ts.scl+_ts.oz }) : null;
+
         let _dbgLast=performance.now(), _dbgFrames=0, _dbgFps=60;
         const _dbgLoop = () => {
             if (!this.#cir3d) return;
@@ -860,55 +887,38 @@ class App {
                 mmCtx.shadowBlur=0;
             }
 
-            // Mapa de recorrido (trail)
+            // Mapa de recorrido (trail) — coordenadas mundo 3D reales
             if (trailVisible) {
-                // Registrar [progress, lateral] cada pequeño avance
+                // Registrar posición real del auto cada ~0.5m
                 const lastPt = trailPts[trailPts.length-1];
-                if (!lastPt || Math.abs(cir.progress - lastPt[0]) > 0.0003)
-                    trailPts.push([cir.progress, cir.lateral]);
+                const ddx = lastPt ? cir.px-lastPt[0] : 999, ddz = lastPt ? cir.pz-lastPt[1] : 999;
+                if (ddx*ddx+ddz*ddz > 0.25) trailPts.push([cir.px, cir.pz]);
                 if (trailPts.length > 4000) trailPts.shift();
-
-                // Convierte [progress, lateral] → canvas {x, y}
-                // usando la posición en mmCircuit + offset perpendicular al trazado
-                const mmPtAt = (prog, lat) => {
-                    const n = mmCircuit.length;
-                    const i = Math.min((prog * n)|0, n - 2);
-                    const p0 = mmCircuit[i], p1 = mmCircuit[i + 1];
-                    const dx = p1.x - p0.x, dy = p1.y - p0.y;
-                    const len = Math.sqrt(dx*dx + dy*dy) || 1;
-                    // normal izquierda: (-dy, dx) → lat>0 derecha, lat<0 izquierda
-                    const latScl = _mmScl * 0.375;
-                    return { x: p0.x + lat * (dy/len) * latScl,
-                             y: p0.y + lat * (-dx/len) * latScl };
-                };
 
                 trailCtx.clearRect(0,0,MM_W,MM_H);
                 trailCtx.fillStyle='rgba(0,0,0,0.70)';
                 trailCtx.roundRect(0,0,MM_W,MM_H,8); trailCtx.fill();
 
-                // Circuito de fondo (muy tenue)
-                if (mmCircuit) {
+                // Circuito de fondo en coords mundo (muy tenue)
+                if (worldCircuit && wToT) {
                     trailCtx.strokeStyle='#374151'; trailCtx.lineWidth=2.5;
                     trailCtx.lineCap='round'; trailCtx.lineJoin='round';
                     trailCtx.beginPath();
-                    mmCircuit.forEach((p,i)=>i===0?trailCtx.moveTo(p.x,p.y):trailCtx.lineTo(p.x,p.y));
+                    worldCircuit.forEach(([wx,wz],i)=>{ const p=wToT(wx,wz); i===0?trailCtx.moveTo(p.x,p.y):trailCtx.lineTo(p.x,p.y); });
                     trailCtx.closePath(); trailCtx.stroke();
                 }
 
-                // Línea del recorrido real (con desviación lateral)
-                if (mmCircuit && trailPts.length > 1) {
+                // Línea del recorrido real
+                if (wToT && trailPts.length > 1) {
                     trailCtx.strokeStyle='#06b6d4'; trailCtx.lineWidth=1.5;
                     trailCtx.lineCap='round'; trailCtx.lineJoin='round';
                     trailCtx.beginPath();
-                    trailPts.forEach(([prog, lat], i) => {
-                        const p = mmPtAt(prog, lat);
-                        i===0 ? trailCtx.moveTo(p.x,p.y) : trailCtx.lineTo(p.x,p.y);
-                    });
+                    trailPts.forEach(([wx,wz],i)=>{ const p=wToT(wx,wz); i===0?trailCtx.moveTo(p.x,p.y):trailCtx.lineTo(p.x,p.y); });
                     trailCtx.stroke();
                 }
 
                 // Punto del auto
-                const tc = mmCircuit ? mmPtAt(cir.progress, cir.lateral) : {x:MM_W/2,y:MM_H/2};
+                const tc = wToT ? wToT(cir.px, cir.pz) : {x:MM_W/2,y:MM_H/2};
                 trailCtx.shadowColor='#ef4444'; trailCtx.shadowBlur=8;
                 trailCtx.fillStyle='#ef4444';
                 trailCtx.beginPath(); trailCtx.arc(tc.x,tc.y,4,0,Math.PI*2); trailCtx.fill();
