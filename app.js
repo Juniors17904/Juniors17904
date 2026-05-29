@@ -505,11 +505,12 @@ class App {
         this.#mostrar('pantalla-juego');
 
         document.getElementById('canvas-carro-3d').style.display = 'none';
+        document.getElementById('canvas-td3d').style.display = 'block';
         document.getElementById('ctrl-botones').style.display = 'flex';
         document.getElementById('ctrl-accel').style.display = 'flex';
         document.getElementById('btn-exit-td3d').style.display = 'flex';
 
-        const canvas = document.getElementById('canvas-juego');
+        const canvas = document.getElementById('canvas-td3d');
         const td = new window.TestDrive3D(canvas);
         this.#td3d = td;
         td.cargar(this.#estado.tipoAuto, this.#estado.color);
@@ -695,6 +696,7 @@ class App {
         }
         this.#td3dTouchHandlers = [];
         OrientacionManager.saltarCheck = false;
+        document.getElementById('canvas-td3d').style.display = 'none';
         document.getElementById('canvas-carro-3d').style.display = '';
         document.getElementById('ctrl-accel').style.display = 'none';
         document.getElementById('btn-exit-td3d').style.display = 'none';
