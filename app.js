@@ -852,10 +852,10 @@ class App {
 
             // Mapa de recorrido (trail)
             {
-                // Registrar posición actual (cada ~0.5 m aprox)
-                const last = trailPts[trailPts.length-1];
-                const dx = last ? cir.px-last[0] : 999, dz = last ? cir.pz-last[1] : 999;
-                if (dx*dx+dz*dz > 0.25) trailPts.push([cir.px, cir.pz]);
+                // Registrar progreso actual (0..1) cada pequeño avance
+                const lastProg = trailPts[trailPts.length-1];
+                if (lastProg === undefined || Math.abs(cir.progress - lastProg) > 0.0003)
+                    trailPts.push(cir.progress);
                 if (trailPts.length > 4000) trailPts.shift();
 
                 trailCtx.clearRect(0,0,MM_W,MM_H);
@@ -871,20 +871,22 @@ class App {
                     trailCtx.closePath(); trailCtx.stroke();
                 }
 
-                // Línea del recorrido real
-                if (trailPts.length > 1) {
+                // Línea del recorrido real (progreso → posición en mmCircuit)
+                if (mmCircuit && trailPts.length > 1) {
                     trailCtx.strokeStyle='#06b6d4'; trailCtx.lineWidth=1.5;
                     trailCtx.lineCap='round'; trailCtx.lineJoin='round';
                     trailCtx.beginPath();
-                    trailPts.forEach(([wx,wz],i)=>{
-                        const c=wToC(wx,wz);
-                        i===0?trailCtx.moveTo(c.x,c.y):trailCtx.lineTo(c.x,c.y);
+                    trailPts.forEach((prog,i)=>{
+                        const idx=Math.min((prog*mmCircuit.length)|0, mmCircuit.length-1);
+                        const p=mmCircuit[idx];
+                        i===0?trailCtx.moveTo(p.x,p.y):trailCtx.lineTo(p.x,p.y);
                     });
                     trailCtx.stroke();
                 }
 
                 // Punto del auto
-                const tc=wToC(cir.px,cir.pz);
+                const tIdx=Math.min((cir.progress*mmCircuit.length)|0, mmCircuit.length-1);
+                const tc=mmCircuit ? mmCircuit[tIdx] : {x:MM_W/2,y:MM_H/2};
                 trailCtx.shadowColor='#ef4444'; trailCtx.shadowBlur=8;
                 trailCtx.fillStyle='#ef4444';
                 trailCtx.beginPath(); trailCtx.arc(tc.x,tc.y,4,0,Math.PI*2); trailCtx.fill();
