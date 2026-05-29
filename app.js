@@ -628,7 +628,7 @@ class App {
                 mmCtx.roundRect(0, 0, MM_W, MM_H, 8); mmCtx.fill();
                 mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 3; mmCtx.lineCap = 'round';
                 mmCtx.beginPath(); mmCtx.moveTo(MM_CX, MM_PAD); mmCtx.lineTo(MM_CX, MM_H - MM_PAD); mmCtx.stroke();
-                const mmPy = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
+                const mmPy = MM_H - MM_PAD - (td.pz / 950) * (MM_H - MM_PAD * 2);
                 const mmPx = MM_CX;
                 mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
                 mmCtx.fillStyle = '#ef4444';
@@ -655,15 +655,15 @@ class App {
                     trailCtx.strokeStyle = '#06b6d4'; trailCtx.lineWidth = 1.5; trailCtx.lineCap = 'round'; trailCtx.lineJoin = 'round';
                     trailCtx.beginPath();
                     trailPts.forEach(([wx, wz], i) => {
-                        const tx = MM_CX + (wx / 3.8) * (MM_W * 0.15);
-                        const ty = MM_PAD + (1 - (wz + 950) / 1900) * (MM_H - MM_PAD * 2);
+                        const tx = MM_CX + (-wx / 3.8) * (MM_W * 0.15);
+                        const ty = MM_H - MM_PAD - (wz / 950) * (MM_H - MM_PAD * 2);
                         i === 0 ? trailCtx.moveTo(tx, ty) : trailCtx.lineTo(tx, ty);
                     });
                     trailCtx.stroke();
                 }
                 // punto del auto
-                const tpx = MM_CX + (td.px / 3.8) * (MM_W * 0.15);
-                const tpy = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
+                const tpx = MM_CX + (-td.px / 3.8) * (MM_W * 0.15);
+                const tpy = MM_H - MM_PAD - (td.pz / 950) * (MM_H - MM_PAD * 2);
                 trailCtx.shadowColor = '#ef4444'; trailCtx.shadowBlur = 8;
                 trailCtx.fillStyle = '#ef4444';
                 trailCtx.beginPath(); trailCtx.arc(tpx, tpy, 4, 0, Math.PI * 2); trailCtx.fill();
