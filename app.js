@@ -793,19 +793,8 @@ class App {
         };
         const trailPts = [];
 
-        // Circuito en coordenadas mundo 3D (para fondo del trail canvas)
-        const worldCircuit = (() => {
-            if (!pistaCfg?.tramos?.length) return null;
-            const pts = [];
-            let wx=0, wz=0, wa=0;
-            for (let i=0; i<pistaCfg.totalSegs; i++) {
-                const tr=pistaCfg.tramos.find(([d,h])=>i>=d&&i<h);
-                wa += (tr?tr[2]:0)*0.045;
-                wx += Math.sin(wa)*4; wz += Math.cos(wa)*4;
-                pts.push([wx, wz]);
-            }
-            return pts;
-        })();
+        // Circuito en coordenadas mundo 3D — puntos reales de la CatmullRom
+        const worldCircuit = cir.pathSamples(300).map(p => [p.x, p.z]);
         // Escala fija del trail canvas (basada en bounding box del circuito)
         const _buildTrailScale = () => {
             if (!worldCircuit) return null;

@@ -94,6 +94,7 @@ class Circuito3D {
     get pathPos()  { return this.#posAt(this.#progress); }
     get lateral()  { return this.#lateral; }
     get pathLen()  { return this.#pathLen; }
+    pathSamples(n) { return Array.from({length:n},(_,i)=>this.#posAt(i/n)); }
 
     constructor(canvas, tipoPista = 'ciudad') {
         this.#canvas = canvas;
