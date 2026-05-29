@@ -147,7 +147,8 @@ class Circuito3D {
             z += Math.cos(angle) * paso;
             pts.push({ x, z, angle });
         }
-        pts.push(pts[0]); // cerrar loop
+        const last = pts[pts.length - 1];
+        pts.push({ x: pts[0].x, z: pts[0].z, angle: last.angle }); // cerrar loop sin flip de ángulo
         this.#pathPts = pts;
 
         let total = 0;
@@ -201,8 +202,13 @@ class Circuito3D {
         // Perpendicular en XZ para cada punto de la curva suavizada
         const _perp = i => {
             const a = cp[i], b = cp[(i + 1) % cp.length];
-            const tx = b.x - a.x, tz = b.z - a.z;
-            const L  = Math.sqrt(tx*tx + tz*tz) || 1;
+            let tx = b.x - a.x, tz = b.z - a.z;
+            let L  = Math.sqrt(tx*tx + tz*tz);
+            if (L < 0.0001) {
+                const prev = cp[(i - 1 + cp.length) % cp.length];
+                tx = a.x - prev.x; tz = a.z - prev.z;
+                L = Math.sqrt(tx*tx + tz*tz) || 1;
+            }
             return { px: -tz/L, pz: tx/L };
         };
 
