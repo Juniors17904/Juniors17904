@@ -629,7 +629,7 @@ class App {
                 mmCtx.strokeStyle = '#6b7280'; mmCtx.lineWidth = 3; mmCtx.lineCap = 'round';
                 mmCtx.beginPath(); mmCtx.moveTo(MM_CX, MM_PAD); mmCtx.lineTo(MM_CX, MM_H - MM_PAD); mmCtx.stroke();
                 const mmPy = MM_PAD + (1 - (td.pz + 950) / 1900) * (MM_H - MM_PAD * 2);
-                const mmPx = MM_CX + (td.px / 3.8) * (MM_W * 0.15);
+                const mmPx = MM_CX;
                 mmCtx.shadowColor = '#ef4444'; mmCtx.shadowBlur = 8;
                 mmCtx.fillStyle = '#ef4444';
                 mmCtx.beginPath(); mmCtx.arc(mmPx, mmPy, 4, 0, Math.PI * 2); mmCtx.fill();
