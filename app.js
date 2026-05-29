@@ -806,6 +806,9 @@ class App {
             document.getElementById('dbg-f-maxfwd').textContent= ph.maxFwd;
             document.getElementById('dbg-f-maxrev').textContent= ph.maxRev;
             // Panel PATH
+            const totalKm = (cir.pathLen / 1000).toFixed(2);
+            document.getElementById('dbg-total').textContent = totalKm;
+            document.getElementById('dbg-recor').textContent = (cir.progress * cir.pathLen / 1000).toFixed(3);
             const pp  = cir.pathPos;
             const off = Math.sqrt((cir.px-pp.x)**2 + (cir.pz-pp.z)**2);
             const seg = (cir.progress * pistaCfg.totalSegs) | 0;

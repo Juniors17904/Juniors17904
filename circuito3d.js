@@ -93,6 +93,7 @@ class Circuito3D {
     get physics()  { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
     get pathPos()  { return this.#posAt(this.#progress); }
     get lateral()  { return this.#lateral; }
+    get pathLen()  { return this.#pathLen; }
 
     constructor(canvas, tipoPista = 'ciudad') {
         this.#canvas = canvas;
