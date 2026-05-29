@@ -492,6 +492,10 @@ class App {
     #td3dPista = 'ciudad';
 
     #iniciarTestDrive3D(tipoPista = 'ciudad') {
+        if (!window.TestDrive3D) {
+            setTimeout(() => this.#iniciarTestDrive3D(tipoPista), 150);
+            return;
+        }
         this.#td3dPista = tipoPista;
         OrientacionManager.saltarCheck = true;
         this.#mostrar('pantalla-juego');
@@ -706,6 +710,10 @@ class App {
     #cir3dTouchHandlers = [];
 
     #iniciarCircuito3D(tipoPista = 'ciudad') {
+        if (!window.Circuito3D) {
+            setTimeout(() => this.#iniciarCircuito3D(tipoPista), 150);
+            return;
+        }
         OrientacionManager.saltarCheck = true;
         const canvas = document.getElementById('canvas-juego');
         canvas.style.display = 'block';
