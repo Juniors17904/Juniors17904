@@ -892,6 +892,8 @@ class App {
         let mapasAreaVisible = true;
         btnToggleMapas.onclick = () => {
             mapasAreaVisible = !mapasAreaVisible;
+            mmVisible    = mapasAreaVisible;
+            trailVisible = mapasAreaVisible;
             mmCanvas.style.display    = mapasAreaVisible ? 'block' : 'none';
             trailCanvas.style.display = mapasAreaVisible ? 'block' : 'none';
             btnToggleMapas.textContent = mapasAreaVisible ? 'MAPAS' : 'MAPAS ✕';
@@ -990,6 +992,8 @@ class App {
         const _ts = _buildTrailScale();
         const wToT = _ts ? (wx,wz) => ({ x: -wx*_ts.scl+_ts.ox, y: -wz*_ts.scl+_ts.oz }) : null;
 
+        let mmVisible = true;
+        let trailVisible = true;
         let _dbgLast=performance.now(), _dbgFrames=0, _dbgFps=60;
         const _dbgLoop = () => {
             if (!this.#cir3d) return;
