@@ -687,6 +687,7 @@ class App {
         this.#limpiarCircuito3D();
         const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
         hide('canvas-td3d');
+        hide('canvas-cir3d');
         hide('titulo-td3d');
         hide('titulo-cir3d');
         hide('btn-exit-td3d');
@@ -745,7 +746,7 @@ class App {
         }
         this.#limpiarPantallaJuego();
         OrientacionManager.saltarCheck = true;
-        const canvas = document.getElementById('canvas-juego');
+        const canvas = document.getElementById('canvas-cir3d');
         canvas.style.display = 'block';
         canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -1021,6 +1022,7 @@ class App {
         }
         this.#cir3dTouchHandlers=[];
         OrientacionManager.saltarCheck=false;
+        document.getElementById('canvas-cir3d').style.display='none';
         document.getElementById('canvas-carro-3d').style.display='';
         document.getElementById('titulo-cir3d').style.display='none';
         document.getElementById('ctrl-accel').style.display='none';
