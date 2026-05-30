@@ -195,7 +195,7 @@ class CircuitoUrbano {
         this.#scene.add(grass);
 
         const DIV = 800;
-        const cp  = curve.getPoints(DIV).slice(0, DIV); // sin punto duplicado al cierre
+        const cp  = curve.getPoints(DIV); // DIV+1 puntos, cp[DIV]=cp[0] para cerrar el loop
 
         const _perp = i => {
             const a = cp[i], b = cp[(i + 1) % cp.length];
@@ -232,7 +232,7 @@ class CircuitoUrbano {
         };
 
         const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
-        const road = new THREE.Mesh(_ribbon(-4, 4, 0, 0, DIV - 1), roadMat);
+        const road = new THREE.Mesh(_ribbon(-4, 4, 0, 0, DIV), roadMat);
         road.receiveShadow = true;
         this.#scene.add(road);
 
@@ -243,8 +243,8 @@ class CircuitoUrbano {
 
         const _buildCurbs = (lo, ro) => {
             const rPos=[], rNor=[], rIdx=[], wPos=[], wNor=[], wIdx=[];
-            for (let b = 0; b * BAND < DIV; b++) {
-                const i0 = b * BAND, i1 = Math.min((b+1)*BAND, DIV - 1);
+            for (let b = 0; b * BAND <= DIV; b++) {
+                const i0 = b * BAND, i1 = Math.min((b+1)*BAND, DIV);
                 const pos = b%2===0 ? rPos : wPos;
                 const nor = b%2===0 ? rNor : wNor;
                 const idx = b%2===0 ? rIdx : wIdx;
@@ -276,8 +276,8 @@ class CircuitoUrbano {
 
         const dashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const DASH = 10, GAP = 10;
-        for (let i = 0; i < DIV - 1; i += DASH+GAP) {
-            this.#scene.add(new THREE.Mesh(_ribbon(-0.12, 0.12, 0.005, i, Math.min(i+DASH, DIV - 1)), dashMat));
+        for (let i = 0; i < DIV; i += DASH+GAP) {
+            this.#scene.add(new THREE.Mesh(_ribbon(-0.12, 0.12, 0.005, i, Math.min(i+DASH, DIV)), dashMat));
         }
 
         const finMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
