@@ -408,6 +408,7 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     justify-content: space-between;
     padding: 0 24px 20px;
     pointer-events: none;
+    z-index: 20;
 }
 
 .btn-dir {
