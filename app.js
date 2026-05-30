@@ -701,6 +701,8 @@ class App {
         hide('trail-map');
         hide('btn-toggle-minimap');
         hide('btn-toggle-trail');
+        hide('btn-toggle-datos');
+        hide('btn-toggle-mapas');
         hide('btn-cam-aerea');
         document.getElementById('canvas-carro-3d').style.display = '';
     }
@@ -824,6 +826,30 @@ class App {
             const activa = cir.toggleCamaraAerea();
             btnCamAerea.textContent = activa ? 'CHASE' : 'CAM↑';
             cir.accelInput = 0; cir.steerInput = 0;
+        };
+
+        // Botón toggle paneles de datos
+        const btnToggleDatos = document.getElementById('btn-toggle-datos');
+        btnToggleDatos.style.display = 'block';
+        let datosVisible = true;
+        btnToggleDatos.onclick = () => {
+            datosVisible = !datosVisible;
+            document.getElementById('debug-td3d').style.display = datosVisible ? 'flex' : 'none';
+            document.getElementById('debug-path').style.display = datosVisible ? 'block' : 'none';
+            btnToggleDatos.textContent = datosVisible ? 'DATOS' : 'DATOS ✕';
+        };
+
+        // Botón toggle mapas (minimapa + recorrido)
+        const btnToggleMapas = document.getElementById('btn-toggle-mapas');
+        btnToggleMapas.style.display = 'block';
+        let mapasAreaVisible = true;
+        btnToggleMapas.onclick = () => {
+            mapasAreaVisible = !mapasAreaVisible;
+            document.getElementById('btn-toggle-minimap').style.display = mapasAreaVisible ? 'block' : 'none';
+            document.getElementById('btn-toggle-trail').style.display   = mapasAreaVisible ? 'block' : 'none';
+            document.getElementById('minimap-td3d').style.display = (mapasAreaVisible && mmVisible)   ? 'block' : 'none';
+            document.getElementById('trail-map').style.display    = (mapasAreaVisible && trailVisible) ? 'block' : 'none';
+            btnToggleMapas.textContent = mapasAreaVisible ? 'MAPAS' : 'MAPAS ✕';
         };
 
         // Debug overlay
@@ -1028,6 +1054,8 @@ class App {
         document.getElementById('ctrl-accel').style.display='none';
         document.getElementById('btn-exit-cir3d').style.display='none';
         document.getElementById('btn-cam-aerea').style.display='none';
+        document.getElementById('btn-toggle-datos').style.display='none';
+        document.getElementById('btn-toggle-mapas').style.display='none';
         document.getElementById('debug-td3d').style.display='none';
         document.getElementById('debug-path').style.display='none';
         document.getElementById('minimap-td3d').style.display='none';
