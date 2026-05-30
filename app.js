@@ -740,6 +740,8 @@ class App {
     #cir3dKeyDown = null;
     #cir3dKeyUp   = null;
     #cir3dTouchHandlers = [];
+    #cir3dCanvasTouchStart = null;
+    #cir3dCanvasTouchMove  = null;
 
     #iniciarCircuito3D(tipoPista = 'ciudad') {
         if (!window.CircuitoUrbano) {
@@ -786,6 +788,27 @@ class App {
         };
         window.addEventListener('keydown', this.#cir3dKeyDown);
         window.addEventListener('keyup',   this.#cir3dKeyUp);
+
+        // Drag con el dedo para mover la cámara aérea
+        {
+            let prevX = 0, prevY = 0;
+            this.#cir3dCanvasTouchStart = e => {
+                if (!cir.camAereaActiva) return;
+                prevX = e.touches[0].clientX;
+                prevY = e.touches[0].clientY;
+            };
+            this.#cir3dCanvasTouchMove = e => {
+                if (!cir.camAereaActiva || !cir.camAerea) return;
+                e.preventDefault();
+                const t = e.touches[0];
+                const scale = cir.camAerea.h / 300;
+                cir.camAerea.pan((prevX - t.clientX) * scale, (prevY - t.clientY) * scale);
+                prevX = t.clientX;
+                prevY = t.clientY;
+            };
+            canvas.addEventListener('touchstart', this.#cir3dCanvasTouchStart, {passive: true});
+            canvas.addEventListener('touchmove',  this.#cir3dCanvasTouchMove,  {passive: false});
+        }
 
         document.getElementById('ctrl-botones').style.display = 'flex';
         document.getElementById('ctrl-accel').style.display   = 'flex';
@@ -1069,6 +1092,13 @@ class App {
             el.removeEventListener('touchend',onEnd);
         }
         this.#cir3dTouchHandlers=[];
+        if (this.#cir3dCanvasTouchStart) {
+            const _c = document.getElementById('canvas-cir3d');
+            _c.removeEventListener('touchstart', this.#cir3dCanvasTouchStart);
+            _c.removeEventListener('touchmove',  this.#cir3dCanvasTouchMove);
+            this.#cir3dCanvasTouchStart = null;
+            this.#cir3dCanvasTouchMove  = null;
+        }
         OrientacionManager.saltarCheck=false;
         // Restaurar pointer-events de los mapas para que TestDrive3D pueda usarlos
         const _mmC = document.getElementById('minimap-td3d');

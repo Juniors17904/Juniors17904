@@ -131,6 +131,10 @@ class CamaraAerea {
         this.#aplicar();
     }
 
+    get h() { return this.#h; }
+
+    pan(dx, dz) { this.#x += dx; this.#z += dz; this.#aplicar(); }
+
     resize(aspect) {
         this.#cam.aspect = aspect;
         this.#cam.updateProjectionMatrix();
