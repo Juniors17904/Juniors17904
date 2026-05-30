@@ -819,10 +819,10 @@ class App {
         // Botón cámara aérea
         const btnCamAerea = document.getElementById('btn-cam-aerea');
         btnCamAerea.style.display = 'block';
-        btnCamAerea.textContent = '🗺';
+        btnCamAerea.textContent = 'CAM↑';
         btnCamAerea.onclick = () => {
             const activa = cir.toggleCamaraAerea();
-            btnCamAerea.textContent = activa ? '🚗' : '🗺';
+            btnCamAerea.textContent = activa ? 'CHASE' : 'CAM↑';
             cir.accelInput = 0; cir.steerInput = 0;
         };
 
