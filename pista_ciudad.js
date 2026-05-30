@@ -188,6 +188,7 @@ class CircuitoUrbano {
     get pathLen()      { return this.#ruta.longitud; }
     get camAereaActiva() { return this.#camAereaActiva; }
     get camAerea()     { return this.#camAerea; }
+    get contextLost()  { return this.#renderer?.getContext()?.isContextLost() ?? true; }
     pathSamples(n) { return this.#ruta.muestras(n); }
 
     toggleCamaraAerea() {

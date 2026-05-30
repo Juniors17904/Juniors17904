@@ -737,6 +737,8 @@ class App {
 
     // ── Circuito 3D (pista con curvas) ──────────────────────────
     #cir3d = null;
+    #cir3dTipoPista = 'ciudad';
+    #cir3dVisibilityHandler = null;
     #cir3dKeyDown = null;
     #cir3dKeyUp   = null;
     #cir3dTouchHandlers = [];
@@ -748,8 +750,20 @@ class App {
             setTimeout(() => this.#iniciarCircuito3D(tipoPista), 150);
             return;
         }
+        this.#cir3dTipoPista = tipoPista;
         this.#limpiarPantallaJuego();
         OrientacionManager.saltarCheck = true;
+
+        // Detectar pérdida de contexto WebGL al desbloquear pantalla
+        this.#cir3dVisibilityHandler = () => {
+            if (!document.hidden && this.#cir3d?.contextLost) {
+                const pista = this.#cir3dTipoPista;
+                this.#limpiarCircuito3D();
+                this.#iniciarCircuito3D(pista);
+            }
+        };
+        document.addEventListener('visibilitychange', this.#cir3dVisibilityHandler);
+
         const canvas = document.getElementById('canvas-cir3d');
         canvas.style.display = 'block';
         canvas.width  = window.innerWidth;
@@ -1111,6 +1125,10 @@ class App {
 
     #limpiarCircuito3D() {
         if (!this.#cir3d) return;
+        if (this.#cir3dVisibilityHandler) {
+            document.removeEventListener('visibilitychange', this.#cir3dVisibilityHandler);
+            this.#cir3dVisibilityHandler = null;
+        }
         this.#cir3d.detener(); this.#cir3d=null;
         if (this.#cir3dKeyDown) window.removeEventListener('keydown',this.#cir3dKeyDown);
         if (this.#cir3dKeyUp)   window.removeEventListener('keyup',  this.#cir3dKeyUp);
