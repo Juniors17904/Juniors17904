@@ -55,6 +55,64 @@ function _centerGroup(group, targetDim) {
 }
 
 // ================================================================
+// CLASS: Ruta — recorrido cerrado del circuito (puntos + longitud)
+// ================================================================
+class Ruta {
+    #puntos   = [];   // {x, z, angle}[]
+    #segs     = [];   // longitud de cada segmento
+    #longitud = 0;
+
+    get longitud() { return this.#longitud; }
+    get puntos()   { return this.#puntos; }
+    get inicio()   { return this.#puntos[0]; }
+
+    construir(tramos, totalSegs) {
+        const paso = 4;
+        let x = 0, z = 0, angle = 0;
+        const pts = [{ x, z, angle }];
+        for (let i = 0; i < totalSegs; i++) {
+            const tr = tramos.find(([d, h]) => i >= d && i < h);
+            angle += (tr ? tr[2] : 0) * 0.045;
+            x += Math.sin(angle) * paso;
+            z += Math.cos(angle) * paso;
+            pts.push({ x, z, angle });
+        }
+        const last = pts[pts.length - 1];
+        pts.push({ x: pts[0].x, z: pts[0].z, angle: last.angle });
+        this.#puntos = pts;
+
+        let total = 0;
+        for (let i = 0; i < pts.length - 1; i++) {
+            const dx = pts[i+1].x - pts[i].x, dz = pts[i+1].z - pts[i].z;
+            const d  = Math.sqrt(dx*dx + dz*dz);
+            this.#segs.push(d); total += d;
+        }
+        this.#longitud = total;
+    }
+
+    posicionEn(prog) {
+        let t = ((prog % 1) + 1) % 1 * this.#longitud;
+        const p = this.#puntos;
+        for (let i = 0; i < this.#segs.length; i++) {
+            if (t <= this.#segs[i]) {
+                const f = t / this.#segs[i];
+                return {
+                    x:     p[i].x + f * (p[i+1].x - p[i].x),
+                    z:     p[i].z + f * (p[i+1].z - p[i].z),
+                    angle: p[i].angle + f * (p[i+1].angle - p[i].angle),
+                };
+            }
+            t -= this.#segs[i];
+        }
+        return p[0];
+    }
+
+    muestras(n) {
+        return Array.from({ length: n }, (_, i) => this.posicionEn(i / n));
+    }
+}
+
+// ================================================================
 // CLASS: Circuito3D — pista 3D con curvas reales desde tramos
 // ================================================================
 class Circuito3D {
@@ -63,14 +121,11 @@ class Circuito3D {
     #carGroup = null; #leanGroup = null; #wheels = [];
     #resizeHandler = null;
 
-    // Path
-    #pathPts  = [];   // {x, z, angle}[]  — un punto por segmento
-    #pathLen  = 0;
-    #segLens  = [];
+    #ruta = new Ruta();
 
     // Estado del auto
-    #progress = 0;    // 0..1 a lo largo del circuito
-    #lateral  = 0;    // desplazamiento lateral dentro de la pista (-3.5..3.5)
+    #progress = 0;
+    #lateral  = 0;
     #speed    = 0;
     #accel    = 0;
     #maxSpeed = 0;
@@ -91,19 +146,19 @@ class Circuito3D {
     get pz()       { return this.#pz; }
     get camRotY()  { return this.#rotY; }
     get physics()  { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
-    get pathPos()  { return this.#posAt(this.#progress); }
+    get pathPos()  { return this.#ruta.posicionEn(this.#progress); }
     get lateral()  { return this.#lateral; }
-    get pathLen()  { return this.#pathLen; }
-    pathSamples(n) { return Array.from({length:n},(_,i)=>this.#posAt(i/n)); }
+    get pathLen()  { return this.#ruta.longitud; }
+    pathSamples(n) { return this.#ruta.muestras(n); }
 
     constructor(canvas, tipoPista = 'ciudad') {
         this.#canvas = canvas;
         this.#initScene();
-        this.#genPath(tipoPista);
+        this.#cargarRuta(tipoPista);
         this.#buildRoad();
     }
 
-    // ── Escena (igual que TestDrive3D) ───────────────────────────
+    // ── Escena ───────────────────────────────────────────────────
     #initScene() {
         const W = window.innerWidth, H = window.innerHeight;
         this.#renderer = new THREE.WebGLRenderer({ canvas: this.#canvas, antialias: true });
@@ -133,57 +188,20 @@ class Circuito3D {
         this.#scene.add(fill);
     }
 
-    // ── Generar path desde tramos ────────────────────────────────
-    #genPath(tipoPista) {
+    // ── Cargar ruta desde la pista ───────────────────────────────
+    #cargarRuta(tipoPista) {
         const pista = window.PISTAS?.[tipoPista];
         if (!pista?.tramos) return;
-        const paso = 4;
-        let x = 0, z = 0, angle = 0;
-        const pts = [{ x, z, angle }];
-        for (let i = 0; i < pista.totalSegs; i++) {
-            const tr = pista.tramos.find(([d, h]) => i >= d && i < h);
-            angle += (tr ? tr[2] : 0) * 0.045;
-            x += Math.sin(angle) * paso;
-            z += Math.cos(angle) * paso;
-            pts.push({ x, z, angle });
-        }
-        const last = pts[pts.length - 1];
-        pts.push({ x: pts[0].x, z: pts[0].z, angle: last.angle }); // cerrar loop sin flip de ángulo
-        this.#pathPts = pts;
-
-        let total = 0;
-        for (let i = 0; i < pts.length - 1; i++) {
-            const dx = pts[i+1].x - pts[i].x, dz = pts[i+1].z - pts[i].z;
-            const d = Math.sqrt(dx*dx + dz*dz);
-            this.#segLens.push(d); total += d;
-        }
-        this.#pathLen = total;
-        this.#px = pts[0].x; this.#pz = pts[0].z; this.#rotY = pts[0].angle;
+        this.#ruta.construir(pista.tramos, pista.totalSegs);
+        const inicio = this.#ruta.inicio;
+        this.#px = inicio.x; this.#pz = inicio.z; this.#rotY = inicio.angle;
     }
 
-    #posAt(prog) {
-        let t = ((prog % 1) + 1) % 1 * this.#pathLen;
-        const p = this.#pathPts;
-        for (let i = 0; i < this.#segLens.length; i++) {
-            if (t <= this.#segLens[i]) {
-                const f = t / this.#segLens[i];
-                return {
-                    x:     p[i].x + f * (p[i+1].x - p[i].x),
-                    z:     p[i].z + f * (p[i+1].z - p[i].z),
-                    angle: p[i].angle + f * (p[i+1].angle - p[i].angle),
-                };
-            }
-            t -= this.#segLens[i];
-        }
-        return p[0];
-    }
-
-    // ── Construir pista curva ─────────────────────────────────────
+    // ── Construir pista curva ────────────────────────────────────
     #buildRoad() {
-        const pts = this.#pathPts;
+        const pts = this.#ruta.puntos;
         if (pts.length < 2) return;
 
-        // Pasto base
         const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
         const grass = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), grassMat);
         grass.rotation.x = -Math.PI / 2;
@@ -191,7 +209,6 @@ class Circuito3D {
         grass.receiveShadow = true;
         this.#scene.add(grass);
 
-        // CatmullRomCurve3 — curva cerrada y suave desde los puntos del path
         const curve = new THREE.CatmullRomCurve3(
             pts.slice(0, -1).map(p => new THREE.Vector3(p.x, 0, p.z)),
             true
@@ -199,7 +216,6 @@ class Circuito3D {
         const DIV = Math.max(pts.length * 3, 600);
         const cp  = curve.getPoints(DIV);
 
-        // Perpendicular en XZ para cada punto de la curva suavizada
         const _perp = i => {
             const a = cp[i], b = cp[(i + 1) % cp.length];
             let tx = b.x - a.x, tz = b.z - a.z;
@@ -212,7 +228,6 @@ class Circuito3D {
             return { px: -tz/L, pz: tx/L };
         };
 
-        // Geometría ribbon continua entre dos offsets laterales
         const _ribbon = (lo, ro, y, i0, i1) => {
             const pos = [], nor = [], uv = [], idx = [];
             for (let i = i0; i <= i1; i++) {
@@ -235,13 +250,11 @@ class Circuito3D {
             return g;
         };
 
-        // Asfalto: una sola geometría continua (cero gaps en curvas)
         const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
         const road = new THREE.Mesh(_ribbon(-4, 4, 0, 0, DIV), roadMat);
         road.receiveShadow = true;
         this.#scene.add(road);
 
-        // Bordillos alternados: 4 meshes (rojo/blanco × izq/der), cada uno agrupa sus bandas
         const curbW  = 0.7;
         const BAND   = 10;
         const redMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.7, side: THREE.DoubleSide });
@@ -277,22 +290,20 @@ class Circuito3D {
             if (rPos.length) this.#scene.add(new THREE.Mesh(_geo(rPos,rNor,rIdx), redMat));
             if (wPos.length) this.#scene.add(new THREE.Mesh(_geo(wPos,wNor,wIdx), whtMat));
         };
-        _buildCurbs(-4-curbW, -4);  // bordillo izquierdo
-        _buildCurbs(4, 4+curbW);    // bordillo derecho
+        _buildCurbs(-4-curbW, -4);
+        _buildCurbs(4, 4+curbW);
 
-        // Línea central (dashes)
         const dashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const DASH = 10, GAP = 10;
         for (let i = 0; i < DIV; i += DASH+GAP) {
             this.#scene.add(new THREE.Mesh(_ribbon(-0.12, 0.12, 0.005, i, Math.min(i+DASH, DIV)), dashMat));
         }
 
-        // Línea de meta (blanco al inicio de la curva)
         const finMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         this.#scene.add(new THREE.Mesh(_ribbon(-4, 4, 0.015, 0, 5), finMat));
     }
 
-    // ── Cargar auto (igual que TestDrive3D) ─────────────────────
+    // ── Cargar auto ──────────────────────────────────────────────
     async cargar(tipo, color) {
         try {
             const gltf = await _loadGLTF();
@@ -350,7 +361,7 @@ class Circuito3D {
         this.#renderer.render(this.#scene, this.#camera);
     }
 
-    // ── Física: avanza por el path + offset lateral para girar ──
+    // ── Física ───────────────────────────────────────────────────
     #updatePhysics() {
         const MAX_FWD = 0.74, MAX_REV = 0.28, ACCEL = 0.006, BRAKE = 0.026, DRAG = 0.009;
         const prev = this.#speed;
@@ -366,12 +377,11 @@ class Circuito3D {
         this.#accel = this.#speed - prev;
         if (Math.abs(this.#speed) > this.#maxSpeed) this.#maxSpeed = Math.abs(this.#speed);
 
-        if (this.#pathLen > 0) {
-            this.#progress = ((this.#progress + this.#speed / this.#pathLen) % 1 + 1) % 1;
-            const p = this.#posAt(this.#progress);
-            // Offset lateral (steer mueve izq/der dentro de la pista)
+        if (this.#ruta.longitud > 0) {
+            this.#progress = ((this.#progress + this.#speed / this.#ruta.longitud) % 1 + 1) % 1;
+            const p = this.#ruta.posicionEn(this.#progress);
             this.#lateral = Math.max(-3.5, Math.min(3.5, this.#lateral + this.steerInput * 0.015));
-            this.#lateral *= 0.98; // vuelve al centro suavemente
+            this.#lateral *= 0.98;
             const perpX = Math.cos(p.angle), perpZ = -Math.sin(p.angle);
             this.#px   = p.x + perpX * this.#lateral;
             this.#pz   = p.z + perpZ * this.#lateral;
@@ -389,7 +399,7 @@ class Circuito3D {
         for (const w of this.#wheels) w.rotation.x += this.#speed * 6;
     }
 
-    // ── Cámara chase (igual que TestDrive3D original) ────────────
+    // ── Cámara chase ─────────────────────────────────────────────
     #updateCamera() {
         const D = 7;
         const cx = this.#px - Math.sin(this.#rotY) * D;
