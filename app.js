@@ -757,10 +757,19 @@ class App {
         // Detectar pérdida de contexto WebGL al desbloquear pantalla
         this.#cir3dVisibilityHandler = () => {
             if (!document.hidden && this.#cir3d?.contextLost) {
-                ToastManager.mostrar('Contexto GPU perdido — reiniciando circuito...', 'warn');
+                ToastManager.mostrar('Contexto GPU perdido — recuperando...', 'warn');
                 const pista = this.#cir3dTipoPista;
-                this.#limpiarCircuito3D();
-                this.#iniciarCircuito3D(pista);
+                // Esperar 1s: Three.js intenta restaurar el contexto solo.
+                // Si después sigue perdido, limpiar y reiniciar con delay adicional.
+                setTimeout(() => {
+                    if (!this.#cir3d || this.#cir3d.contextLost) {
+                        this.#limpiarCircuito3D();
+                        setTimeout(() => {
+                            ToastManager.mostrar('Reiniciando circuito...', 'warn');
+                            this.#iniciarCircuito3D(pista);
+                        }, 500);
+                    }
+                }, 1000);
             }
         };
         document.addEventListener('visibilitychange', this.#cir3dVisibilityHandler);
