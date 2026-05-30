@@ -161,12 +161,13 @@ class CircuitoUrbano {
     #camAereaActiva = false;
 
     // Estado del auto
-    #progress = 0;
-    #lateral  = 0;
-    #speed    = 0;
-    #accel    = 0;
-    #maxSpeed = 0;
-    #carLean  = 0;
+    #progress   = 0;
+    #lateral    = 0;
+    #speed      = 0;
+    #accel      = 0;
+    #maxSpeed   = 0;
+    #carLean    = 0;
+    #camLateral = 0;
     #px = 0; #pz = 0; #rotY = 0;
 
     accelInput = 0;
@@ -437,8 +438,9 @@ class CircuitoUrbano {
         if (this.#ruta.longitud > 0) {
             this.#progress = ((this.#progress + this.#speed / this.#ruta.longitud) % 1 + 1) % 1;
             const p = this.#ruta.posicionEn(this.#progress);
-            this.#lateral = Math.max(-3.5, Math.min(3.5, this.#lateral + this.steerInput * 0.015));
-            this.#lateral *= 0.98;
+            this.#lateral = Math.max(-3.5, Math.min(3.5, this.#lateral + this.steerInput * 0.028));
+            this.#lateral *= 0.95;
+            this.#camLateral += (this.steerInput * 2.8 - this.#camLateral) * 0.07;
             const perpX = Math.cos(p.angle), perpZ = -Math.sin(p.angle);
             this.#px   = p.x + perpX * this.#lateral;
             this.#pz   = p.z + perpZ * this.#lateral;
@@ -458,14 +460,20 @@ class CircuitoUrbano {
 
     // ── Cámara chase ─────────────────────────────────────────────
     #updateCamera() {
-        const D = 7;
-        const cx = this.#px - Math.sin(this.#rotY) * D;
-        const cz = this.#pz - Math.cos(this.#rotY) * D;
+        const D    = 7;
+        const sinY = Math.sin(this.#rotY);
+        const cosY = Math.cos(this.#rotY);
+        // vector perpendicular al frente del auto (hacia la derecha del auto)
+        const perpX = cosY;
+        const perpZ = -sinY;
+        const side  = this.#camLateral;
+        const cx = this.#px - sinY * D + perpX * side * 0.35;
+        const cz = this.#pz - cosY * D + perpZ * side * 0.35;
         this.#camera.position.set(cx, this.camHeight, cz);
         this.#camera.lookAt(
-            this.#px + Math.sin(this.#rotY) * 4,
+            this.#px + sinY * 4 + perpX * side * 0.9,
             0.6,
-            this.#pz + Math.cos(this.#rotY) * 4
+            this.#pz + cosY * 4 + perpZ * side * 0.9
         );
     }
 }
