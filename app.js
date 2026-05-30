@@ -845,10 +845,8 @@ class App {
         let mapasAreaVisible = true;
         btnToggleMapas.onclick = () => {
             mapasAreaVisible = !mapasAreaVisible;
-            document.getElementById('btn-toggle-minimap').style.display = mapasAreaVisible ? 'block' : 'none';
-            document.getElementById('btn-toggle-trail').style.display   = mapasAreaVisible ? 'block' : 'none';
-            document.getElementById('minimap-td3d').style.display = (mapasAreaVisible && mmVisible)   ? 'block' : 'none';
-            document.getElementById('trail-map').style.display    = (mapasAreaVisible && trailVisible) ? 'block' : 'none';
+            mmCanvas.style.display    = mapasAreaVisible ? 'block' : 'none';
+            trailCanvas.style.display = mapasAreaVisible ? 'block' : 'none';
             btnToggleMapas.textContent = mapasAreaVisible ? 'MAPAS' : 'MAPAS ✕';
         };
 
@@ -858,15 +856,27 @@ class App {
 
         // Minimapa — trazado desde tramos
         const mmCanvas = document.getElementById('minimap-td3d');
-        const mmBtn    = document.getElementById('btn-toggle-minimap');
-        let   mmVisible = true;
         mmCanvas.style.display = 'block';
-        mmBtn.style.display    = 'block';
-        mmBtn.onclick = () => {
-            mmVisible = !mmVisible;
-            mmCanvas.style.display = mmVisible ? 'block' : 'none';
-            mmBtn.textContent = mmVisible ? 'MINIMAPA' : 'MINIMAPA ✕';
-        };
+        mmCanvas.style.pointerEvents = 'auto';
+        mmCanvas.style.cursor = 'grab';
+        // Drag con el dedo
+        {
+            let sx, sy, ox, oy;
+            mmCanvas.addEventListener('touchstart', e => {
+                const t = e.touches[0];
+                sx = t.clientX; sy = t.clientY;
+                ox = mmCanvas.offsetLeft; oy = mmCanvas.offsetTop;
+                e.stopPropagation();
+            }, {passive:true});
+            mmCanvas.addEventListener('touchmove', e => {
+                e.preventDefault(); e.stopPropagation();
+                const t = e.touches[0];
+                mmCanvas.style.left   = (ox + t.clientX - sx) + 'px';
+                mmCanvas.style.top    = (oy + t.clientY - sy) + 'px';
+                mmCanvas.style.right  = 'auto';
+                mmCanvas.style.bottom = 'auto';
+            }, {passive:false});
+        }
         const mmCtx = mmCanvas.getContext('2d');
         const MM_W=90, MM_H=120, MM_PAD=10;
         const pistaCfg = window.PISTAS?.[tipoPista];
@@ -893,16 +903,28 @@ class App {
 
         // Mapa de recorrido (trail)
         const trailCanvas = document.getElementById('trail-map');
-        const trailBtn    = document.getElementById('btn-toggle-trail');
         const trailCtx = trailCanvas.getContext('2d');
-        let trailVisible = true;
         trailCanvas.style.display = 'block';
-        trailBtn.style.display    = 'block';
-        trailBtn.onclick = () => {
-            trailVisible = !trailVisible;
-            trailCanvas.style.display = trailVisible ? 'block' : 'none';
-            trailBtn.textContent = trailVisible ? 'RECORRIDO' : 'RECORRIDO ✕';
-        };
+        trailCanvas.style.pointerEvents = 'auto';
+        trailCanvas.style.cursor = 'grab';
+        // Drag con el dedo
+        {
+            let sx, sy, ox, oy;
+            trailCanvas.addEventListener('touchstart', e => {
+                const t = e.touches[0];
+                sx = t.clientX; sy = t.clientY;
+                ox = trailCanvas.offsetLeft; oy = trailCanvas.offsetTop;
+                e.stopPropagation();
+            }, {passive:true});
+            trailCanvas.addEventListener('touchmove', e => {
+                e.preventDefault(); e.stopPropagation();
+                const t = e.touches[0];
+                trailCanvas.style.left   = (ox + t.clientX - sx) + 'px';
+                trailCanvas.style.top    = (oy + t.clientY - sy) + 'px';
+                trailCanvas.style.right  = 'auto';
+                trailCanvas.style.bottom = 'auto';
+            }, {passive:false});
+        }
         const trailPts = [];
 
         // Circuito en coordenadas mundo 3D — puntos reales de la CatmullRom
@@ -1048,6 +1070,11 @@ class App {
         }
         this.#cir3dTouchHandlers=[];
         OrientacionManager.saltarCheck=false;
+        // Restaurar pointer-events de los mapas para que TestDrive3D pueda usarlos
+        const _mmC = document.getElementById('minimap-td3d');
+        const _trC = document.getElementById('trail-map');
+        if (_mmC) { _mmC.style.pointerEvents='none'; _mmC.style.cursor=''; }
+        if (_trC) { _trC.style.pointerEvents='none'; _trC.style.cursor=''; }
         document.getElementById('canvas-cir3d').style.display='none';
         document.getElementById('canvas-carro-3d').style.display='';
         document.getElementById('titulo-cir3d').style.display='none';
