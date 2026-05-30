@@ -14,5 +14,8 @@
 - Ante cualquier duda, preguntar antes de programar
 
 ## Git
-- Desarrollar siempre en la rama: `claude/system-overview-Z6Zik`
-- Nunca hacer push a otra rama sin permiso explícito
+- Desarrollar en la rama `claude/system-overview-Z6Zik`
+- **SIEMPRE** al terminar cada cambio: hacer merge a `main` y push a `main`
+- El sitio se sirve desde `main` (Vercel apunta a `main`)
+- Flujo obligatorio después de cada commit: `git checkout main && git merge claude/system-overview-Z6Zik && git push origin main`
+- Nunca dejar cambios solo en la rama de desarrollo sin mergear a main
