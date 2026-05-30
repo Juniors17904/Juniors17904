@@ -848,6 +848,7 @@ class App {
         btnCamAerea.onclick = () => {
             const activa = cir.toggleCamaraAerea();
             btnCamAerea.textContent = activa ? 'CHASE' : 'CAM↑';
+            document.getElementById('ctrl-botones').style.display = activa ? 'none' : 'flex';
             cir.accelInput = 0; cir.steerInput = 0;
         };
 
