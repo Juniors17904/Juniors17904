@@ -41,20 +41,23 @@ const PISTAS = {
         distMeta:  1800,
         nivelFijo: { nombre:'Ciudad', cielo:['#060a14','#0d1b2a'], cesped:['#0a200a','#081808'], asfalto:['#3a3a3a','#2e2e2e'], borde:'#555' },
         // [desde, hasta, curva]  positivo=derecha, negativo=izquierda
-        // 4 curvas de ~90° cada una → total ≈ 2π → rectángulo cerrado
+        // 2 chicanes simétricas (pit+back) que se cancelan en X → circuito cierra exactamente
+        // 4 curvas exactas a 90° (2.3271 = π/2 / (15×0.045))
         tramos: [
-            [0,   55,  0   ],  // recta principal (pit straight)
-            [55,  70,  2.33],  // curva 1 derecha (~90°)
-            [70,  115, 0   ],  // recta lateral
-            [115, 130, 2.33],  // curva 2 derecha (~90°)
-            [130, 155, 0   ],  // recta trasera 1
-            [155, 170, -1.5],  // chicane izquierda
-            [170, 185, 1.5 ],  // chicane derecha
-            [185, 210, 0   ],  // recta trasera 2
-            [210, 225, 2.33],  // curva 3 derecha (~90°)
-            [225, 270, 0   ],  // recta lateral
-            [270, 285, 2.33],  // curva 4 derecha (~90°)
-            [285, 300, 0   ],  // final a meta
+            [0,   25,  0      ],  // pit straight
+            [25,  40,  -1.5   ],  // pit chicane izq
+            [40,  55,  1.5    ],  // pit chicane der
+            [55,  80,  0      ],  // pit straight 2
+            [80,  95,  2.3271 ],  // curva 1 derecha (90°)
+            [95,  135, 0      ],  // recta lateral
+            [135, 150, 2.3271 ],  // curva 2 derecha (90°)
+            [150, 175, 0      ],  // recta trasera 1
+            [175, 190, -1.5   ],  // chicane izquierda
+            [190, 205, 1.5    ],  // chicane derecha
+            [205, 230, 0      ],  // recta trasera 2
+            [230, 245, 2.3271 ],  // curva 3 derecha (90°)
+            [245, 285, 0      ],  // recta lateral
+            [285, 300, 2.3271 ],  // curva 4 derecha (90°)
         ],
         obstFrecuencia: 0.12,
         obstTipos: ['carro','carro','carro','bache','turbo'],
