@@ -501,10 +501,10 @@ class App {
         }
         this.#td3dPending = false;
         this.#td3dPista = tipoPista;
+        this.#limpiarPantallaJuego();
         OrientacionManager.saltarCheck = true;
         this.#mostrar('pantalla-juego');
 
-        document.getElementById('canvas-carro-3d').style.display = 'none';
         document.getElementById('canvas-td3d').style.display = 'block';
         document.getElementById('titulo-td3d').style.display = 'block';
         document.getElementById('ctrl-botones').style.display = 'flex';
@@ -682,6 +682,27 @@ class App {
         requestAnimationFrame(_dbgLoop);
     }
 
+    #limpiarPantallaJuego() {
+        this.#limpiarTestDrive3D();
+        this.#limpiarCircuito3D();
+        const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+        hide('canvas-td3d');
+        hide('titulo-td3d');
+        hide('titulo-cir3d');
+        hide('btn-exit-td3d');
+        hide('btn-exit-cir3d');
+        hide('ctrl-botones');
+        hide('ctrl-accel');
+        hide('ctrl-cam-height');
+        hide('debug-td3d');
+        hide('debug-path');
+        hide('minimap-td3d');
+        hide('trail-map');
+        hide('btn-toggle-minimap');
+        hide('btn-toggle-trail');
+        document.getElementById('canvas-carro-3d').style.display = '';
+    }
+
     #limpiarTestDrive3D() {
         this.#td3dPending = false;
         if (!this.#td3d) return;
@@ -721,6 +742,7 @@ class App {
             setTimeout(() => this.#iniciarCircuito3D(tipoPista), 150);
             return;
         }
+        this.#limpiarPantallaJuego();
         OrientacionManager.saltarCheck = true;
         const canvas = document.getElementById('canvas-juego');
         canvas.style.display = 'block';
