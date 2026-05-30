@@ -58,14 +58,14 @@ function _centerGroup(group, targetDim) {
 // CLASS: Ruta — recorrido cerrado del circuito (curva suavizada)
 // ================================================================
 class Ruta {
-    #curve    = null;
-    #longitud = 0;
+    #curve        = null;
+    #longitud     = 0;
+    #anguloInicio = 0;
 
     get longitud() { return this.#longitud; }
     get inicio()   {
         const p = this.#curve.getPoint(0);
-        const d = this.#curve.getTangent(0);
-        return { x: p.x, z: p.z, angle: Math.atan2(d.x, d.z) };
+        return { x: p.x, z: p.z, angle: this.#anguloInicio };
     }
     get curve()    { return this.#curve; }
 
@@ -79,6 +79,7 @@ class Ruta {
             x += Math.sin(angle) * paso;
             z += Math.cos(angle) * paso;
             pts.push(new THREE.Vector3(x, 0, z));
+            if (i === 0) this.#anguloInicio = angle;
         }
         this.#curve    = new THREE.CatmullRomCurve3(pts, true);
         this.#longitud = this.#curve.getLength();
