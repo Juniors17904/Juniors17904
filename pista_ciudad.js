@@ -113,9 +113,9 @@ class Ruta {
 }
 
 // ================================================================
-// CLASS: Circuito3D — pista 3D con curvas reales desde tramos
+// CLASS: CircuitoUrbano — pista 3D con curvas reales desde tramos
 // ================================================================
-class Circuito3D {
+class CircuitoUrbano {
     #renderer = null; #scene = null; #camera = null;
     #canvas; #raf = 0; #sun = null;
     #carGroup = null; #leanGroup = null; #wheels = [];
@@ -308,7 +308,7 @@ class Circuito3D {
         try {
             const gltf = await _loadGLTF();
             this.#setCar(gltf, tipo, color);
-        } catch(e) { console.error('Circuito3D:', e); }
+        } catch(e) { console.error('CircuitoUrbano:', e); }
     }
 
     #setCar(gltf, tipo, color) {
@@ -413,4 +413,4 @@ class Circuito3D {
     }
 }
 
-window.Circuito3D = Circuito3D;
+window.CircuitoUrbano = CircuitoUrbano;

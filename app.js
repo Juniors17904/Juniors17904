@@ -717,7 +717,7 @@ class App {
     #cir3dTouchHandlers = [];
 
     #iniciarCircuito3D(tipoPista = 'ciudad') {
-        if (!window.Circuito3D) {
+        if (!window.CircuitoUrbano) {
             setTimeout(() => this.#iniciarCircuito3D(tipoPista), 150);
             return;
         }
@@ -730,7 +730,7 @@ class App {
         document.getElementById('titulo-cir3d').style.display = 'block';
         document.getElementById('btn-exit-cir3d').style.display = 'block';
 
-        const cir = new window.Circuito3D(canvas, tipoPista);
+        const cir = new window.CircuitoUrbano(canvas, tipoPista);
         this.#cir3d = cir;
         cir.cargar(this.#estado.tipoAuto, this.#estado.color);
         cir.iniciar();
