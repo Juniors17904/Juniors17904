@@ -128,11 +128,92 @@
     <!-- Pantalla: Juego -->
     <div id="pantalla-juego" class="pantalla">
         <canvas id="canvas-juego"></canvas>
+        <canvas id="canvas-td3d" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:10"></canvas>
         <canvas id="canvas-carro-3d" width="240" height="160"></canvas>
+        <button id="btn-exit-td3d" class="btn-tuerca" style="top:16px;left:16px;display:none">←</button>
+        <button id="btn-exit-cir3d" class="btn-tuerca" style="top:16px;left:16px;display:none">←</button>
+        <button id="btn-cam-aerea" class="btn-tuerca" style="top:16px;left:56px;display:none">🗺</button>
+        <div id="titulo-td3d" style="display:none;position:fixed;bottom:135px;left:50%;transform:translateX(-50%);z-index:250;font:bold 13px 'Orbitron',monospace;color:#fff;letter-spacing:2px;text-shadow:0 0 10px #7c3aed;pointer-events:none">TEST DRIVE 3D</div>
+        <div id="titulo-cir3d" style="display:none;position:fixed;bottom:135px;left:50%;transform:translateX(-50%);z-index:250;font:bold 13px 'Orbitron',monospace;color:#fff;letter-spacing:2px;text-shadow:0 0 10px #7c3aed;pointer-events:none">CIRCUITO URBANO</div>
+
+        <!-- Slider altura de cámara (solo Test Drive 3D) -->
+        <div id="ctrl-cam-height" style="display:none;position:absolute;right:14px;top:50%;transform:translateY(-50%);flex-direction:column;align-items:center;gap:6px;z-index:150">
+            <span style="font:10px monospace;color:rgba(255,255,255,0.7)">▲</span>
+            <input id="slider-cam-height" type="range" orient="vertical"
+                   min="0.4" max="5.0" step="0.05" value="2.8"
+                   style="-webkit-appearance:slider-vertical;writing-mode:bt-lr;width:34px;height:160px;cursor:pointer;opacity:0.85;accent-color:#7c3aed">
+            <span style="font:10px monospace;color:rgba(255,255,255,0.7)">▼</span>
+        </div>
+
+        <div id="debug-td3d" style="display:none;position:absolute;top:0;left:0;background:rgba(0,0,0,0.72);color:#e0e0e0;font:8px/1.55 monospace;padding:4px 6px;z-index:200;pointer-events:none;backdrop-filter:blur(3px)">
+            <div style="display:flex;gap:6px">
+                <!-- AUTO -->
+                <div style="flex:1;border-right:1px solid rgba(255,255,255,0.15);padding-right:5px">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">AUTO</div>
+                    <div>VEL <span id="dbg-vel">0.000</span> · <span id="dbg-kmh">0</span> km/h</div>
+                    <div>ACEL <span id="dbg-acel">+0.0000</span></div>
+                    <div>MAX <span id="dbg-vmax">0.000</span></div>
+                    <div><span id="dbg-iacel">NEUTRO</span></div>
+                    <div><span id="dbg-idir">RECTO</span></div>
+                    <div>EJE X <span id="dbg-rotx">0.0</span>°</div>
+                    <div>EJE Y <span id="dbg-rumbo">0.0</span>°</div>
+                    <div>EJE Z <span id="dbg-rotz">0.0</span>°</div>
+                </div>
+                <!-- PISTA -->
+                <div style="flex:1;border-right:1px solid rgba(255,255,255,0.15);padding-right:5px">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">PISTA</div>
+                    <div>X <span id="dbg-px">0.00</span></div>
+                    <div>Z <span id="dbg-pz">0.00</span></div>
+                    <div>FPS <span id="dbg-fps">--</span></div>
+                </div>
+                <!-- CÁMARA -->
+                <div style="flex:1;border-right:1px solid rgba(255,255,255,0.15);padding-right:5px">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">CÁMARA</div>
+                    <div>ALTURA <span id="dbg-camh">2.80</span> m</div>
+                    <div>ROT <span id="dbg-cam-roty">0.0</span>°</div>
+                    <div>DIST <span id="dbg-cam-dist">7</span> m</div>
+                </div>
+                <!-- FÍSICAS -->
+                <div style="flex:1">
+                    <div style="color:#7dd3fc;font-weight:bold;letter-spacing:1px;margin-bottom:1px">FÍSICAS</div>
+                    <div>ACEL <span id="dbg-f-accel">-</span></div>
+                    <div>FREN <span id="dbg-f-brake">-</span></div>
+                    <div>DRAG <span id="dbg-f-drag">-</span></div>
+                    <div>GIRO <span id="dbg-f-steer">-</span></div>
+                    <div>MAX+ <span id="dbg-f-maxfwd">-</span></div>
+                    <div>MAX- <span id="dbg-f-maxrev">-</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel verificación PATH (solo Circuito3D) -->
+        <div id="debug-path" style="display:none;position:absolute;top:0;right:0;background:rgba(0,0,0,0.72);color:#e0e0e0;font:8px/1.55 monospace;padding:4px 6px;z-index:200;pointer-events:none;backdrop-filter:blur(3px)">
+            <div style="color:#86efac;font-weight:bold;letter-spacing:1px;margin-bottom:1px">PATH</div>
+            <div>TOTAL <span id="dbg-total">--</span> km</div>
+            <div>RECOR <span id="dbg-recor">0.000</span> km</div>
+            <div>SEG <span id="dbg-seg">--</span></div>
+            <div>CURVA <span id="dbg-curva">0.0</span></div>
+            <div>PATH X <span id="dbg-path-x">0.0</span></div>
+            <div>PATH Z <span id="dbg-path-z">0.0</span></div>
+            <div>OFF <span id="dbg-off">0.00</span> m</div>
+            <div>LAT <span id="dbg-lat">0.00</span> m</div>
+        </div>
+
+        <!-- Minimapa Test Drive 3D -->
+        <canvas id="minimap-td3d" width="90" height="120" style="display:none;position:absolute;top:140px;left:8px;z-index:200;border-radius:8px;pointer-events:none"></canvas>
+        <button id="btn-toggle-minimap" style="display:none;position:absolute;top:264px;left:8px;z-index:201;background:rgba(0,0,0,0.55);color:#e0e0e0;border:1px solid rgba(255,255,255,0.2);border-radius:5px;font:9px monospace;padding:3px 6px;cursor:pointer">MINIMAPA</button>
+
+        <!-- Mapa de recorrido (trail) -->
+        <canvas id="trail-map" width="90" height="120" style="display:none;position:absolute;top:140px;left:104px;z-index:200;border-radius:8px;pointer-events:none"></canvas>
+        <button id="btn-toggle-trail" style="display:none;position:absolute;top:264px;left:104px;z-index:201;background:rgba(0,0,0,0.55);color:#e0e0e0;border:1px solid rgba(255,255,255,0.2);border-radius:5px;font:9px monospace;padding:3px 6px;cursor:pointer">RECORRIDO</button>
 
         <!-- Controles botones -->
         <div id="ctrl-botones" class="ctrl-overlay" style="display:none">
             <button id="btn-izq" class="btn-dir">◀</button>
+            <div id="ctrl-accel" style="display:none;flex-direction:column;gap:8px">
+                <button id="btn-gas" class="btn-dir">▲</button>
+                <button id="btn-rev" class="btn-dir">▼</button>
+            </div>
             <button id="btn-der" class="btn-dir">▶</button>
         </div>
 
@@ -159,6 +240,21 @@
                 <span class="ajuste-txt">Verificar giroscopio</span>
                 <span class="ajuste-arrow">›</span>
             </button>
+            <button id="btn-ir-pista" class="ajuste-item">
+                <span class="ajuste-icono">🛣️</span>
+                <span class="ajuste-txt">Diseño de pista</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
+            <button id="btn-test-drive" class="ajuste-item">
+                <span class="ajuste-icono">🏎️</span>
+                <span class="ajuste-txt">Test Drive</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
+            <button id="btn-test-drive-3d" class="ajuste-item">
+                <span class="ajuste-icono">🌐</span>
+                <span class="ajuste-txt">Test Drive 3D</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
         </div>
     </div>
 
@@ -181,6 +277,73 @@
             </div>
         </div>
         <div id="giro-estado" class="giro-estado">Esperando datos...</div>
+    </div>
+
+    <!-- Pantalla: Diseño de pista -->
+    <div id="pantalla-pista" class="pantalla">
+        <button id="btn-volver-pista" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:22px;margin-bottom:24px">PISTAS</div>
+        <div class="pista-lista">
+            <div class="pista-card sel" data-pista="ciudad">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#0d1b2a,#1b3a4b)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Circuito Urbano</span>
+                    <span class="pista-desc">Ciudad de noche · Curvas técnicas</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+            <div class="pista-card" data-pista="desierto">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#c97d00,#f5d060)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Autopista Solar</span>
+                    <span class="pista-desc">Desierto al mediodía · Recta veloz</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+            <div class="pista-card" data-pista="montana">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#1a2c40,#253c55)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Cañón Rojo</span>
+                    <span class="pista-desc">Montaña nocturna · Curvas cerradas</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+            <div class="pista-card" data-pista="costa">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#0a4a6e,#06b6d4)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Costa Neón</span>
+                    <span class="pista-desc">Bahía al atardecer · Viento marino</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+            <div class="pista-card" data-pista="volcan">
+                <div class="pista-preview" style="background:linear-gradient(135deg,#4a0a0a,#ef4444)">
+                    <div class="pista-road"></div>
+                </div>
+                <div class="pista-info">
+                    <span class="pista-nombre">Valle del Volcán</span>
+                    <span class="pista-desc">Lava y ceniza · Máxima dificultad</span>
+                </div>
+                <span class="ajuste-arrow">›</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pantalla: Detalle de pista -->
+    <div id="pantalla-detalle-pista" class="pantalla">
+        <button id="btn-volver-detalle-pista" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:18px;margin-bottom:6px" id="detalle-pista-nombre">Circuito Urbano</div>
+        <div class="detalle-pista-desc" id="detalle-pista-desc">Ciudad de noche · Curvas técnicas</div>
+        <canvas id="canvas-mapa-pista" width="320" height="260"></canvas>
+        <button id="btn-seleccionar-pista" class="btn-neon btn-compacto" style="margin-top:16px">Entrar</button>
     </div>
 
     <!-- Pantalla: Garage (selección de carro) -->
@@ -262,6 +425,8 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module" src="viewer3d.js"></script>
+    <script type="module" src="testdrive3d.js"></script>
+    <script type="module" src="pista_ciudad.js"></script>
     <script src="garage.js"></script>
     <script src="supabase-client.js"></script>
     <script src="game.js"></script>
