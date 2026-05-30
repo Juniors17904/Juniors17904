@@ -789,22 +789,42 @@ class App {
         window.addEventListener('keydown', this.#cir3dKeyDown);
         window.addEventListener('keyup',   this.#cir3dKeyUp);
 
-        // Drag con el dedo para mover la cámara aérea
+        // Drag 1 dedo = pan, 2 dedos = zoom (pinch)
         {
             let prevX = 0, prevY = 0;
+            let pinchDist = 0, pinchH = 0, wasPinching = false;
+            const getDist = t => {
+                const dx = t[0].clientX - t[1].clientX;
+                const dy = t[0].clientY - t[1].clientY;
+                return Math.sqrt(dx * dx + dy * dy);
+            };
             this.#cir3dCanvasTouchStart = e => {
                 if (!cir.camAereaActiva) return;
-                prevX = e.touches[0].clientX;
-                prevY = e.touches[0].clientY;
+                if (e.touches.length === 2) {
+                    pinchDist = getDist(e.touches);
+                    pinchH    = cir.camAerea.h;
+                } else {
+                    prevX = e.touches[0].clientX;
+                    prevY = e.touches[0].clientY;
+                }
             };
             this.#cir3dCanvasTouchMove = e => {
                 if (!cir.camAereaActiva || !cir.camAerea) return;
                 e.preventDefault();
-                const t = e.touches[0];
-                const scale = cir.camAerea.h / 300;
-                cir.camAerea.pan((prevX - t.clientX) * scale, (prevY - t.clientY) * scale);
-                prevX = t.clientX;
-                prevY = t.clientY;
+                if (e.touches.length === 2) {
+                    wasPinching = true;
+                    cir.camAerea.h = pinchH * (pinchDist / getDist(e.touches));
+                } else if (e.touches.length === 1) {
+                    const t = e.touches[0];
+                    if (wasPinching) {
+                        wasPinching = false;
+                        prevX = t.clientX; prevY = t.clientY;
+                    } else {
+                        const scale = cir.camAerea.h / 300;
+                        cir.camAerea.pan((prevX - t.clientX) * scale, (prevY - t.clientY) * scale);
+                        prevX = t.clientX; prevY = t.clientY;
+                    }
+                }
             };
             canvas.addEventListener('touchstart', this.#cir3dCanvasTouchStart, {passive: true});
             canvas.addEventListener('touchmove',  this.#cir3dCanvasTouchMove,  {passive: false});

@@ -132,6 +132,7 @@ class CamaraAerea {
     }
 
     get h() { return this.#h; }
+    set h(val) { this.#h = Math.max(10, Math.min(300, val)); this.#aplicar(); }
 
     pan(dx, dz) { this.#x += dx; this.#z += dz; this.#aplicar(); }
 
