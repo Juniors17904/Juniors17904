@@ -757,6 +757,7 @@ class App {
         // Detectar pérdida de contexto WebGL al desbloquear pantalla
         this.#cir3dVisibilityHandler = () => {
             if (!document.hidden && this.#cir3d?.contextLost) {
+                ToastManager.mostrar('Contexto GPU perdido — reiniciando circuito...', 'warn');
                 const pista = this.#cir3dTipoPista;
                 this.#limpiarCircuito3D();
                 this.#iniciarCircuito3D(pista);
