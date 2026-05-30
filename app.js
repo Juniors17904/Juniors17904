@@ -851,28 +851,6 @@ class App {
             cir.accelInput = 0; cir.steerInput = 0;
         };
 
-        // Botón toggle paneles de datos
-        const btnToggleDatos = document.getElementById('btn-toggle-datos');
-        btnToggleDatos.style.display = 'block';
-        let datosVisible = true;
-        btnToggleDatos.onclick = () => {
-            datosVisible = !datosVisible;
-            document.getElementById('debug-td3d').style.display = datosVisible ? 'flex' : 'none';
-            document.getElementById('debug-path').style.display = datosVisible ? 'block' : 'none';
-            btnToggleDatos.textContent = datosVisible ? 'DATOS' : 'DATOS ✕';
-        };
-
-        // Botón toggle mapas (minimapa + recorrido)
-        const btnToggleMapas = document.getElementById('btn-toggle-mapas');
-        btnToggleMapas.style.display = 'block';
-        let mapasAreaVisible = true;
-        btnToggleMapas.onclick = () => {
-            mapasAreaVisible = !mapasAreaVisible;
-            mmCanvas.style.display    = mapasAreaVisible ? 'block' : 'none';
-            trailCanvas.style.display = mapasAreaVisible ? 'block' : 'none';
-            btnToggleMapas.textContent = mapasAreaVisible ? 'MAPAS' : 'MAPAS ✕';
-        };
-
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
         document.getElementById('debug-path').style.display = 'block';

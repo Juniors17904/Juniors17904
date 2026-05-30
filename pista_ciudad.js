@@ -194,8 +194,10 @@ class CircuitoUrbano {
         if (this.#camAereaActiva) {
             if (!this.#camAerea) this.#camAerea = new CamaraAerea(this.#camera.aspect);
             this.#camAerea.activar(this.#px, this.#pz);
+            this.#scene.fog = null;
         } else {
             if (this.#camAerea) { this.#camAerea.moveX = 0; this.#camAerea.moveZ = 0; }
+            this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
         }
         return this.#camAereaActiva;
     }
