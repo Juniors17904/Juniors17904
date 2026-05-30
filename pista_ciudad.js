@@ -55,56 +55,40 @@ function _centerGroup(group, targetDim) {
 }
 
 // ================================================================
-// CLASS: Ruta — recorrido cerrado del circuito (puntos + longitud)
+// CLASS: Ruta — recorrido cerrado del circuito (curva suavizada)
 // ================================================================
 class Ruta {
-    #puntos   = [];   // {x, z, angle}[]
-    #segs     = [];   // longitud de cada segmento
+    #curve    = null;
     #longitud = 0;
 
     get longitud() { return this.#longitud; }
-    get puntos()   { return this.#puntos; }
-    get inicio()   { return this.#puntos[0]; }
+    get inicio()   {
+        const p = this.#curve.getPoint(0);
+        const d = this.#curve.getTangent(0);
+        return { x: p.x, z: p.z, angle: Math.atan2(d.x, d.z) };
+    }
+    get curve()    { return this.#curve; }
 
     construir(tramos, totalSegs) {
         const paso = 4;
         let x = 0, z = 0, angle = 0;
-        const pts = [{ x, z, angle }];
+        const pts = [];
         for (let i = 0; i < totalSegs; i++) {
             const tr = tramos.find(([d, h]) => i >= d && i < h);
             angle += (tr ? tr[2] : 0) * 0.045;
             x += Math.sin(angle) * paso;
             z += Math.cos(angle) * paso;
-            pts.push({ x, z, angle });
+            pts.push(new THREE.Vector3(x, 0, z));
         }
-        const last = pts[pts.length - 1];
-        pts.push({ x: pts[0].x, z: pts[0].z, angle: last.angle });
-        this.#puntos = pts;
-
-        let total = 0;
-        for (let i = 0; i < pts.length - 1; i++) {
-            const dx = pts[i+1].x - pts[i].x, dz = pts[i+1].z - pts[i].z;
-            const d  = Math.sqrt(dx*dx + dz*dz);
-            this.#segs.push(d); total += d;
-        }
-        this.#longitud = total;
+        this.#curve    = new THREE.CatmullRomCurve3(pts, true);
+        this.#longitud = this.#curve.getLength();
     }
 
     posicionEn(prog) {
-        let t = ((prog % 1) + 1) % 1 * this.#longitud;
-        const p = this.#puntos;
-        for (let i = 0; i < this.#segs.length; i++) {
-            if (t <= this.#segs[i]) {
-                const f = t / this.#segs[i];
-                return {
-                    x:     p[i].x + f * (p[i+1].x - p[i].x),
-                    z:     p[i].z + f * (p[i+1].z - p[i].z),
-                    angle: p[i].angle + f * (p[i+1].angle - p[i].angle),
-                };
-            }
-            t -= this.#segs[i];
-        }
-        return p[0];
+        const t = ((prog % 1) + 1) % 1;
+        const p = this.#curve.getPoint(t);
+        const d = this.#curve.getTangent(t);
+        return { x: p.x, z: p.z, angle: Math.atan2(d.x, d.z) };
     }
 
     muestras(n) {
@@ -199,8 +183,8 @@ class CircuitoUrbano {
 
     // ── Construir pista curva ────────────────────────────────────
     #buildRoad() {
-        const pts = this.#ruta.puntos;
-        if (pts.length < 2) return;
+        const curve = this.#ruta.curve;
+        if (!curve) return;
 
         const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
         const grass = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), grassMat);
@@ -209,12 +193,8 @@ class CircuitoUrbano {
         grass.receiveShadow = true;
         this.#scene.add(grass);
 
-        const curve = new THREE.CatmullRomCurve3(
-            pts.slice(0, -1).map(p => new THREE.Vector3(p.x, 0, p.z)),
-            true
-        );
-        const DIV = Math.max(pts.length * 3, 600);
-        const cp  = curve.getPoints(DIV);
+        const DIV = 800;
+        const cp  = curve.getPoints(DIV).slice(0, DIV); // sin punto duplicado al cierre
 
         const _perp = i => {
             const a = cp[i], b = cp[(i + 1) % cp.length];
