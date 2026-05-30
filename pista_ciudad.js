@@ -98,6 +98,51 @@ class Ruta {
 }
 
 // ================================================================
+// CLASS: CamaraAerea — vista cenital (bird's eye view) con teclas
+// ================================================================
+class CamaraAerea {
+    #cam;
+    #x = 0; #z = 0; #h = 80;
+    #spd = 2.5;
+
+    moveX = 0;
+    moveZ = 0;
+
+    constructor(aspect) {
+        this.#cam = new THREE.PerspectiveCamera(60, aspect, 0.5, 3000);
+        this.#cam.up.set(0, 0, -1);
+    }
+
+    get camera() { return this.#cam; }
+
+    activar(x, z) {
+        this.#x = x; this.#z = z;
+        this.#aplicar();
+    }
+
+    setAltura(sliderVal) {
+        this.#h = sliderVal * 25;
+        this.#aplicar();
+    }
+
+    actualizar() {
+        this.#x += this.moveX * this.#spd;
+        this.#z += this.moveZ * this.#spd;
+        this.#aplicar();
+    }
+
+    resize(aspect) {
+        this.#cam.aspect = aspect;
+        this.#cam.updateProjectionMatrix();
+    }
+
+    #aplicar() {
+        this.#cam.position.set(this.#x, this.#h, this.#z);
+        this.#cam.lookAt(this.#x, 0, this.#z);
+    }
+}
+
+// ================================================================
 // CLASS: CircuitoUrbano — pista 3D con curvas reales desde tramos
 // ================================================================
 class CircuitoUrbano {
@@ -107,6 +152,8 @@ class CircuitoUrbano {
     #resizeHandler = null;
 
     #ruta = new Ruta();
+    #camAerea = null;
+    #camAereaActiva = false;
 
     // Estado del auto
     #progress = 0;
@@ -129,12 +176,27 @@ class CircuitoUrbano {
     get rotZ()     { return this.#carLean; }
     get px()       { return this.#px; }
     get pz()       { return this.#pz; }
-    get camRotY()  { return this.#rotY; }
-    get physics()  { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
-    get pathPos()  { return this.#ruta.posicionEn(this.#progress); }
-    get lateral()  { return this.#lateral; }
-    get pathLen()  { return this.#ruta.longitud; }
+    get camRotY()      { return this.#rotY; }
+    get physics()      { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
+    get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
+    get lateral()      { return this.#lateral; }
+    get pathLen()      { return this.#ruta.longitud; }
+    get camAereaActiva() { return this.#camAereaActiva; }
+    get camAerea()     { return this.#camAerea; }
     pathSamples(n) { return this.#ruta.muestras(n); }
+
+    toggleCamaraAerea() {
+        this.#camAereaActiva = !this.#camAereaActiva;
+        if (this.#camAereaActiva) {
+            if (!this.#camAerea) this.#camAerea = new CamaraAerea(this.#camera.aspect);
+            this.#camAerea.activar(this.#px, this.#pz);
+        } else {
+            if (this.#camAerea) { this.#camAerea.moveX = 0; this.#camAerea.moveZ = 0; }
+        }
+        return this.#camAereaActiva;
+    }
+
+    setCamAereaAltura(sliderVal) { this.#camAerea?.setAltura(sliderVal); }
 
     constructor(canvas, tipoPista = 'ciudad') {
         this.#canvas = canvas;
@@ -315,6 +377,7 @@ class CircuitoUrbano {
                 this.#canvas.width = W; this.#canvas.height = H;
                 this.#camera.aspect = W / H;
                 this.#camera.updateProjectionMatrix();
+                this.#camAerea?.resize(W / H);
                 this.#renderer?.setSize(W, H, false);
             };
             window.addEventListener('resize', this.#resizeHandler);
@@ -334,12 +397,17 @@ class CircuitoUrbano {
 
     #tick() {
         this.#raf = requestAnimationFrame(() => this.#tick());
-        this.#updatePhysics();
-        this.#updateCamera();
+        if (this.#camAereaActiva) {
+            this.#camAerea.actualizar();
+        } else {
+            this.#updatePhysics();
+            this.#updateCamera();
+        }
         this.#sun.position.set(this.#px + 10, 20, this.#pz + 10);
         this.#sun.target.position.set(this.#px, 0, this.#pz);
         this.#sun.target.updateMatrixWorld();
-        this.#renderer.render(this.#scene, this.#camera);
+        const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camera;
+        this.#renderer.render(this.#scene, cam);
     }
 
     // ── Física ───────────────────────────────────────────────────

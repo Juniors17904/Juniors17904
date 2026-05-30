@@ -687,6 +687,7 @@ class App {
         this.#limpiarCircuito3D();
         const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
         hide('canvas-td3d');
+        hide('canvas-cir3d');
         hide('titulo-td3d');
         hide('titulo-cir3d');
         hide('btn-exit-td3d');
@@ -700,6 +701,9 @@ class App {
         hide('trail-map');
         hide('btn-toggle-minimap');
         hide('btn-toggle-trail');
+        hide('btn-toggle-datos');
+        hide('btn-toggle-mapas');
+        hide('btn-cam-aerea');
         document.getElementById('canvas-carro-3d').style.display = '';
     }
 
@@ -744,7 +748,7 @@ class App {
         }
         this.#limpiarPantallaJuego();
         OrientacionManager.saltarCheck = true;
-        const canvas = document.getElementById('canvas-juego');
+        const canvas = document.getElementById('canvas-cir3d');
         canvas.style.display = 'block';
         canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -759,14 +763,26 @@ class App {
         const cirInitRotY = cir.rotY;
 
         this.#cir3dKeyDown = e => {
-            if (e.key==='ArrowUp'   ||e.key==='w') cir.accelInput= 1;
-            if (e.key==='ArrowDown' ||e.key==='s') cir.accelInput=-1;
-            if (e.key==='ArrowLeft' ||e.key==='a') cir.steerInput=-1;
-            if (e.key==='ArrowRight'||e.key==='d') cir.steerInput= 1;
+            if (cir.camAereaActiva && cir.camAerea) {
+                if (e.key==='ArrowLeft' ||e.key==='a') cir.camAerea.moveX=-1;
+                if (e.key==='ArrowRight'||e.key==='d') cir.camAerea.moveX= 1;
+                if (e.key==='ArrowUp'   ||e.key==='w') cir.camAerea.moveZ=-1;
+                if (e.key==='ArrowDown' ||e.key==='s') cir.camAerea.moveZ= 1;
+            } else {
+                if (e.key==='ArrowUp'   ||e.key==='w') cir.accelInput= 1;
+                if (e.key==='ArrowDown' ||e.key==='s') cir.accelInput=-1;
+                if (e.key==='ArrowLeft' ||e.key==='a') cir.steerInput=-1;
+                if (e.key==='ArrowRight'||e.key==='d') cir.steerInput= 1;
+            }
         };
         this.#cir3dKeyUp = e => {
-            if (e.key==='ArrowUp'||e.key==='w'||e.key==='ArrowDown'||e.key==='s') cir.accelInput=0;
-            if (e.key==='ArrowLeft'||e.key==='a'||e.key==='ArrowRight'||e.key==='d') cir.steerInput=0;
+            if (cir.camAereaActiva && cir.camAerea) {
+                if (e.key==='ArrowLeft'||e.key==='a'||e.key==='ArrowRight'||e.key==='d') cir.camAerea.moveX=0;
+                if (e.key==='ArrowUp'||e.key==='w'||e.key==='ArrowDown'||e.key==='s')   cir.camAerea.moveZ=0;
+            } else {
+                if (e.key==='ArrowUp'||e.key==='w'||e.key==='ArrowDown'||e.key==='s') cir.accelInput=0;
+                if (e.key==='ArrowLeft'||e.key==='a'||e.key==='ArrowRight'||e.key==='d') cir.steerInput=0;
+            }
         };
         window.addEventListener('keydown', this.#cir3dKeyDown);
         window.addEventListener('keyup',   this.#cir3dKeyUp);
@@ -780,16 +796,61 @@ class App {
             el.addEventListener('touchend', onEnd);
             this.#cir3dTouchHandlers.push({el, onStart, onEnd});
         };
-        addTouch('btn-gas', ()=>{cir.accelInput= 1;}, ()=>{cir.accelInput=0;});
-        addTouch('btn-rev', ()=>{cir.accelInput=-1;}, ()=>{cir.accelInput=0;});
-        addTouch('btn-izq', ()=>{cir.steerInput=-1;}, ()=>{cir.steerInput=0;});
-        addTouch('btn-der', ()=>{cir.steerInput= 1;}, ()=>{cir.steerInput=0;});
+        addTouch('btn-gas',
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ=-1; else cir.accelInput= 1; },
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ= 0; else cir.accelInput=0; });
+        addTouch('btn-rev',
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ= 1; else cir.accelInput=-1; },
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ= 0; else cir.accelInput=0; });
+        addTouch('btn-izq',
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX=-1; else cir.steerInput=-1; },
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX= 0; else cir.steerInput=0; });
+        addTouch('btn-der',
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX= 1; else cir.steerInput= 1; },
+            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX= 0; else cir.steerInput=0; });
 
         // Slider cámara
         const sliderCam = document.getElementById('slider-cam-height');
         sliderCam.value = '2.8';
         document.getElementById('ctrl-cam-height').style.display = 'flex';
-        sliderCam.addEventListener('input', e => { cir.camHeight = parseFloat(e.target.value); });
+        sliderCam.addEventListener('input', e => {
+            if (cir.camAereaActiva) cir.setCamAereaAltura(parseFloat(e.target.value));
+            else cir.camHeight = parseFloat(e.target.value);
+        });
+
+        // Botón cámara aérea
+        const btnCamAerea = document.getElementById('btn-cam-aerea');
+        btnCamAerea.style.display = 'block';
+        btnCamAerea.textContent = 'CAM↑';
+        btnCamAerea.onclick = () => {
+            const activa = cir.toggleCamaraAerea();
+            btnCamAerea.textContent = activa ? 'CHASE' : 'CAM↑';
+            cir.accelInput = 0; cir.steerInput = 0;
+        };
+
+        // Botón toggle paneles de datos
+        const btnToggleDatos = document.getElementById('btn-toggle-datos');
+        btnToggleDatos.style.display = 'block';
+        let datosVisible = true;
+        btnToggleDatos.onclick = () => {
+            datosVisible = !datosVisible;
+            document.getElementById('debug-td3d').style.display = datosVisible ? 'flex' : 'none';
+            document.getElementById('debug-path').style.display = datosVisible ? 'block' : 'none';
+            btnToggleDatos.textContent = datosVisible ? 'DATOS' : 'DATOS ✕';
+        };
+
+        // Botón toggle mapas (minimapa + recorrido)
+        const btnToggleMapas = document.getElementById('btn-toggle-mapas');
+        btnToggleMapas.style.display = 'block';
+        let mapasAreaVisible = true;
+        btnToggleMapas.onclick = () => {
+            mapasAreaVisible = !mapasAreaVisible;
+            document.getElementById('btn-toggle-minimap').style.display = mapasAreaVisible ? 'block' : 'none';
+            document.getElementById('btn-toggle-trail').style.display   = mapasAreaVisible ? 'block' : 'none';
+            document.getElementById('minimap-td3d').style.display = (mapasAreaVisible && mmVisible)   ? 'block' : 'none';
+            document.getElementById('trail-map').style.display    = (mapasAreaVisible && trailVisible) ? 'block' : 'none';
+            btnToggleMapas.textContent = mapasAreaVisible ? 'MAPAS' : 'MAPAS ✕';
+        };
 
         // Debug overlay
         document.getElementById('debug-td3d').style.display = 'flex';
@@ -987,10 +1048,14 @@ class App {
         }
         this.#cir3dTouchHandlers=[];
         OrientacionManager.saltarCheck=false;
+        document.getElementById('canvas-cir3d').style.display='none';
         document.getElementById('canvas-carro-3d').style.display='';
         document.getElementById('titulo-cir3d').style.display='none';
         document.getElementById('ctrl-accel').style.display='none';
         document.getElementById('btn-exit-cir3d').style.display='none';
+        document.getElementById('btn-cam-aerea').style.display='none';
+        document.getElementById('btn-toggle-datos').style.display='none';
+        document.getElementById('btn-toggle-mapas').style.display='none';
         document.getElementById('debug-td3d').style.display='none';
         document.getElementById('debug-path').style.display='none';
         document.getElementById('minimap-td3d').style.display='none';
