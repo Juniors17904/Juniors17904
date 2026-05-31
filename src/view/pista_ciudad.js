@@ -358,7 +358,7 @@ class CircuitoUrbano {
             const camPos = this.#camaraChase.camera.position;
             if (!this.#camPunto) {
                 this.#camPunto = new THREE.Mesh(
-                    new THREE.SphereGeometry(0.8, 8, 8),
+                    new THREE.SphereGeometry(0.4, 8, 8),
                     new THREE.MeshBasicMaterial({ color: 0x00ffff })
                 );
                 this.#scene.add(this.#camPunto);
