@@ -53,7 +53,6 @@ export class CamaraChase {
 
     actualizar(px, pz, rotY, steerInput = 0) {
         this.#lean += (steerInput * this.leanMax - this.#lean) * this.leanSpeed;
-        this.#cam.rotation.z = -this.#lean;
         const ry   = this.#seguirRotacion ? rotY : 0;
         const sinY = Math.sin(ry);
         const cosY = Math.cos(ry);
@@ -66,6 +65,8 @@ export class CamaraChase {
         } else {
             this.#cam.lookAt(px, 0.6, pz);
         }
+
+        this.#cam.rotation.z -= this.#lean;
 
         this.actualizarIndicador(px, pz);
     }
