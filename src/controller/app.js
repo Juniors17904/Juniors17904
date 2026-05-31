@@ -1126,6 +1126,21 @@ class App {
                 trailCtx.beginPath(); trailCtx.arc(tc.x,tc.y,4,0,Math.PI*2); trailCtx.fill();
                 trailCtx.shadowBlur=0;
 
+                // Línea cámara trasera → auto
+                const chasePos = cir.camaraChasePos;
+                if (chasePos && wToT) {
+                    trailCtx.save();
+                    const cc = wToT(chasePos.x, chasePos.z);
+                    trailCtx.strokeStyle = '#00ffff';
+                    trailCtx.fillStyle   = '#00ffff';
+                    trailCtx.lineWidth   = 1.5;
+                    trailCtx.lineCap     = 'round';
+                    trailCtx.shadowBlur  = 0;
+                    trailCtx.beginPath(); trailCtx.moveTo(cc.x, cc.y); trailCtx.lineTo(tc.x, tc.y); trailCtx.stroke();
+                    trailCtx.beginPath(); trailCtx.arc(cc.x, cc.y, 3, 0, Math.PI*2); trailCtx.fill();
+                    trailCtx.restore();
+                }
+
                 if (cir.camAereaActiva && cir.camAerea && wToT) {
                     const zona = cir.camAerea.zonaVisible;
                     const c = wToT(zona.x, zona.z);
