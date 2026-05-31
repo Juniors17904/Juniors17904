@@ -73,7 +73,7 @@ class CircuitoUrbano {
     #camAerea = null;
     #camAereaActiva = false;
     #mov = null;
-    #dirArrow = null;
+    #dirLine = null;
 
     #progress = 0;
     #lateral  = 0;
@@ -330,7 +330,6 @@ class CircuitoUrbano {
             this.#camaraChase.altura = this.camHeight;
             this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.rotY);
         }
-        if (this.#dirArrow) this.#dirArrow.visible = this.#camAereaActiva;
         this.#sun.position.set(this.#mov.px + 10, 20, this.#mov.pz + 10);
         this.#sun.target.position.set(this.#mov.px, 0, this.#mov.pz);
         this.#sun.target.updateMatrixWorld();
@@ -370,12 +369,16 @@ class CircuitoUrbano {
 
         const dir = new THREE.Vector3(Math.sin(this.#mov.rotY), 0, Math.cos(this.#mov.rotY));
         const origin = new THREE.Vector3(this.#mov.px, 0.5, this.#mov.pz);
-        if (!this.#dirArrow) {
-            this.#dirArrow = new THREE.ArrowHelper(dir, origin, 6, 0xffff00, 1.5, 0.8);
-            this.#scene.add(this.#dirArrow);
+        if (!this.#dirLine) {
+            const geo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, 0, 0),
+                new THREE.Vector3(0, 0, 6),
+            ]);
+            this.#dirLine = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffff00 }));
+            this.#scene.add(this.#dirLine);
         }
-        this.#dirArrow.position.copy(origin);
-        this.#dirArrow.setDirection(dir);
+        this.#dirLine.position.copy(origin);
+        this.#dirLine.lookAt(origin.clone().add(dir));
     }
 
 
