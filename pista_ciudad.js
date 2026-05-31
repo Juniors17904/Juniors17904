@@ -148,6 +148,60 @@ class CamaraAerea {
 }
 
 // ================================================================
+// CLASS: MovimientoLibre — física de conducción libre (reutilizable)
+// ================================================================
+class MovimientoLibre {
+    #px; #pz; #rotY;
+    #speed    = 0;
+    #accel    = 0;
+    #maxSpeed = 0;
+    #carLean  = 0;
+
+    accelInput = 0;
+    steerInput = 0;
+
+    constructor(px = 0, pz = 0, rotY = 0) {
+        this.#px = px; this.#pz = pz; this.#rotY = rotY;
+    }
+
+    get px()       { return this.#px; }
+    get pz()       { return this.#pz; }
+    get rotY()     { return this.#rotY; }
+    get speed()    { return this.#speed; }
+    get accel()    { return this.#accel; }
+    get maxSpeed() { return this.#maxSpeed; }
+    get carLean()  { return this.#carLean; }
+
+    setPosicion(px, pz) { this.#px = px; this.#pz = pz; }
+
+    actualizar() {
+        const MAX_FWD = 0.74, MAX_REV = 0.28, ACCEL = 0.006, BRAKE = 0.026, DRAG = 0.009;
+        const prev = this.#speed;
+
+        if (this.accelInput === 1)
+            this.#speed = Math.min(MAX_FWD, this.#speed + ACCEL);
+        else if (this.accelInput === -1) {
+            if (this.#speed > 0.01) this.#speed = Math.max(0, this.#speed - BRAKE);
+            else                    this.#speed = Math.max(-MAX_REV, this.#speed - ACCEL * 0.6);
+        } else {
+            if (this.#speed > 0) this.#speed = Math.max(0, this.#speed - DRAG);
+            else                 this.#speed = Math.min(0, this.#speed + DRAG);
+        }
+        this.#accel = this.#speed - prev;
+        if (Math.abs(this.#speed) > this.#maxSpeed) this.#maxSpeed = Math.abs(this.#speed);
+
+        if (Math.abs(this.#speed) > 0.005)
+            this.#rotY -= this.steerInput * 0.010 * Math.sign(this.#speed);
+
+        this.#px += Math.sin(this.#rotY) * this.#speed;
+        this.#pz += Math.cos(this.#rotY) * this.#speed;
+
+        const sf = Math.abs(this.#speed) / 0.74;
+        this.#carLean += (-this.steerInput * 0.22 * sf - this.#carLean) * 0.08;
+    }
+}
+
+// ================================================================
 // CLASS: CircuitoUrbano — pista 3D con curvas reales desde tramos
 // ================================================================
 class CircuitoUrbano {
@@ -159,29 +213,24 @@ class CircuitoUrbano {
     #ruta = new Ruta();
     #camAerea = null;
     #camAereaActiva = false;
+    #mov = null;
 
-    // Estado del auto
     #progress = 0;
     #lateral  = 0;
-    #speed    = 0;
-    #accel    = 0;
-    #maxSpeed = 0;
-    #carLean  = 0;
-    #px = 0; #pz = 0; #rotY = 0;
 
     accelInput = 0;
     steerInput = 0;
     camHeight  = 2.8;
 
-    get speed()    { return this.#speed; }
-    get accel()    { return this.#accel; }
-    get maxSpeed() { return this.#maxSpeed; }
+    get speed()    { return this.#mov?.speed    ?? 0; }
+    get accel()    { return this.#mov?.accel    ?? 0; }
+    get maxSpeed() { return this.#mov?.maxSpeed ?? 0; }
     get progress() { return this.#progress; }
-    get rotY()     { return this.#rotY; }
-    get rotZ()     { return this.#carLean; }
-    get px()       { return this.#px; }
-    get pz()       { return this.#pz; }
-    get camRotY()      { return this.#rotY; }
+    get rotY()     { return this.#mov?.rotY     ?? 0; }
+    get rotZ()     { return this.#mov?.carLean  ?? 0; }
+    get px()       { return this.#mov?.px       ?? 0; }
+    get pz()       { return this.#mov?.pz       ?? 0; }
+    get camRotY()      { return this.#mov?.rotY ?? 0; }
     get physics()      { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
     get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
     get lateral()      { return this.#lateral; }
@@ -195,7 +244,7 @@ class CircuitoUrbano {
         this.#camAereaActiva = !this.#camAereaActiva;
         if (this.#camAereaActiva) {
             if (!this.#camAerea) this.#camAerea = new CamaraAerea(this.#camera.aspect);
-            this.#camAerea.activar(this.#px, this.#pz);
+            this.#camAerea.activar(this.#mov.px, this.#mov.pz);
             this.#scene.fog = null;
         } else {
             if (this.#camAerea) { this.#camAerea.moveX = 0; this.#camAerea.moveZ = 0; }
@@ -249,7 +298,7 @@ class CircuitoUrbano {
         if (!pista?.tramos) return;
         this.#ruta.construir(pista.tramos, pista.totalSegs);
         const inicio = this.#ruta.inicio;
-        this.#px = inicio.x; this.#pz = inicio.z; this.#rotY = inicio.angle;
+        this.#mov = new MovimientoLibre(inicio.x, inicio.z, inicio.angle);
     }
 
     // ── Construir pista curva ────────────────────────────────────
@@ -411,8 +460,8 @@ class CircuitoUrbano {
             this.#updatePhysics();
             this.#updateCamera();
         }
-        this.#sun.position.set(this.#px + 10, 20, this.#pz + 10);
-        this.#sun.target.position.set(this.#px, 0, this.#pz);
+        this.#sun.position.set(this.#mov.px + 10, 20, this.#mov.pz + 10);
+        this.#sun.target.position.set(this.#mov.px, 0, this.#mov.pz);
         this.#sun.target.updateMatrixWorld();
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camera;
         this.#renderer.render(this.#scene, cam);
@@ -420,64 +469,48 @@ class CircuitoUrbano {
 
     // ── Física ───────────────────────────────────────────────────
     #updatePhysics() {
-        const MAX_FWD = 0.74, MAX_REV = 0.28, ACCEL = 0.006, BRAKE = 0.026, DRAG = 0.009;
-        const prev = this.#speed;
-
-        if (this.accelInput === 1)       this.#speed = Math.min(MAX_FWD, this.#speed + ACCEL);
-        else if (this.accelInput === -1) {
-            if (this.#speed > 0.01) this.#speed = Math.max(0, this.#speed - BRAKE);
-            else                    this.#speed = Math.max(-MAX_REV, this.#speed - ACCEL * 0.6);
-        } else {
-            if (this.#speed > 0) this.#speed = Math.max(0, this.#speed - DRAG);
-            else                 this.#speed = Math.min(0, this.#speed + DRAG);
-        }
-        this.#accel = this.#speed - prev;
-        if (Math.abs(this.#speed) > this.#maxSpeed) this.#maxSpeed = Math.abs(this.#speed);
+        this.#mov.accelInput = this.accelInput;
+        this.#mov.steerInput = this.steerInput;
+        this.#mov.actualizar();
 
         if (this.#ruta.longitud > 0) {
-            this.#progress = ((this.#progress + this.#speed / this.#ruta.longitud) % 1 + 1) % 1;
+            this.#progress = ((this.#progress + this.#mov.speed / this.#ruta.longitud) % 1 + 1) % 1;
 
-            // Heading libre igual que TestDrive3D
-            if (Math.abs(this.#speed) > 0.005)
-                this.#rotY -= this.steerInput * 0.010 * Math.sign(this.#speed);
-
-            // Movimiento en la dirección que apunta el auto
-            this.#px += Math.sin(this.#rotY) * this.#speed;
-            this.#pz += Math.cos(this.#rotY) * this.#speed;
-
-            // Límite suave: si se aleja más de 3.8 del trazado, empujar de vuelta
+            // Límite suave: empujar de vuelta si se aleja más de 3.8 del trazado
             const p = this.#ruta.posicionEn(this.#progress);
-            const dx = this.#px - p.x, dz = this.#pz - p.z;
+            const dx = this.#mov.px - p.x, dz = this.#mov.pz - p.z;
             const dist = Math.sqrt(dx * dx + dz * dz);
             const perpX = Math.cos(p.angle), perpZ = -Math.sin(p.angle);
             this.#lateral = dx * perpX + dz * perpZ;
             if (dist > 3.8) {
-                this.#px = p.x + (dx / dist) * 3.8 * 0.90;
-                this.#pz = p.z + (dz / dist) * 3.8 * 0.90;
+                this.#mov.setPosicion(
+                    p.x + (dx / dist) * 3.8 * 0.90,
+                    p.z + (dz / dist) * 3.8 * 0.90
+                );
             }
         }
 
-        const sf = Math.abs(this.#speed) / 0.74;
-        this.#carLean += (-this.steerInput * 0.22 * sf - this.#carLean) * 0.08;
-
         if (this.#carGroup) {
-            this.#carGroup.position.set(this.#px, 0, this.#pz);
-            this.#carGroup.rotation.y = this.#rotY;
+            this.#carGroup.position.set(this.#mov.px, 0, this.#mov.pz);
+            this.#carGroup.rotation.y = this.#mov.rotY;
         }
-        if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carLean;
-        for (const w of this.#wheels) w.rotation.x += this.#speed * 6;
+        if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
+        for (const w of this.#wheels) w.rotation.x += this.#mov.speed * 6;
     }
 
     // ── Cámara chase ─────────────────────────────────────────────
     #updateCamera() {
         const D = 7;
-        const cx = this.#px - Math.sin(this.#rotY) * D;
-        const cz = this.#pz - Math.cos(this.#rotY) * D;
-        this.#camera.position.set(cx, this.camHeight, cz);
+        const sinY = Math.sin(this.#mov.rotY), cosY = Math.cos(this.#mov.rotY);
+        this.#camera.position.set(
+            this.#mov.px - sinY * D,
+            this.camHeight,
+            this.#mov.pz - cosY * D
+        );
         this.#camera.lookAt(
-            this.#px + Math.sin(this.#rotY) * 4,
+            this.#mov.px + sinY * 4,
             0.6,
-            this.#pz + Math.cos(this.#rotY) * 4
+            this.#mov.pz + cosY * 4
         );
     }
 }
