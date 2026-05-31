@@ -11,6 +11,7 @@ export class CamaraChase {
     #cam;
     #distancia;
     #seguirRotacion;
+    #indicador = null;
 
     altura = 2.8;
 
@@ -22,6 +23,20 @@ export class CamaraChase {
     }
 
     get camera() { return this.#cam; }
+
+    agregarIndicador(scene) {
+        const geo = new THREE.BufferGeometry().setFromPoints([
+            new THREE.Vector3(0, 0, 0),
+            new THREE.Vector3(0, 0, 0),
+        ]);
+        this.#indicador = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x00ffff }));
+        this.#indicador.visible = false;
+        scene.add(this.#indicador);
+    }
+
+    set indicadorVisible(v) {
+        if (this.#indicador) this.#indicador.visible = v;
+    }
 
     resize(aspect) {
         this.#cam.aspect = aspect;
@@ -40,6 +55,13 @@ export class CamaraChase {
             this.#cam.lookAt(px + sinY * 4, 0.6, pz + cosY * 4);
         } else {
             this.#cam.lookAt(px, 0.6, pz);
+        }
+
+        if (this.#indicador) {
+            const pos = this.#indicador.geometry.attributes.position;
+            pos.setXYZ(0, px, 0.5, pz);
+            pos.setXYZ(1, this.#cam.position.x, 0.5, this.#cam.position.z);
+            pos.needsUpdate = true;
         }
     }
 }

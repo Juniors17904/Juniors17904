@@ -75,7 +75,6 @@ class CircuitoUrbano {
     #mov = null;
     #dirLine  = null;
     #camPunto = null;
-    #camLine  = null;
 
     #progress = 0;
     #lateral  = 0;
@@ -144,6 +143,7 @@ class CircuitoUrbano {
         this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
 
         this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: false });
+        this.#camaraChase.agregarIndicador(this.#scene);
 
         this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
@@ -365,20 +365,7 @@ class CircuitoUrbano {
             }
             this.#camPunto.position.set(camPos.x, 0.5, camPos.z);
             this.#camPunto.visible = this.#camAereaActiva;
-
-            if (!this.#camLine) {
-                const geo = new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(0, 0, 0),
-                    new THREE.Vector3(0, 0, 0),
-                ]);
-                this.#camLine = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x00ffff }));
-                this.#scene.add(this.#camLine);
-            }
-            const pos = this.#camLine.geometry.attributes.position;
-            pos.setXYZ(0, this.#mov.px, 0.5, this.#mov.pz);
-            pos.setXYZ(1, camPos.x, 0.5, camPos.z);
-            pos.needsUpdate = true;
-            this.#camLine.visible = this.#camAereaActiva;
+            this.#camaraChase.indicadorVisible = this.#camAereaActiva;
         }
 
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
