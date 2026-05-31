@@ -91,7 +91,7 @@ class CircuitoUrbano {
     get rotZ()     { return this.#mov?.carLean  ?? 0; }
     get px()       { return this.#mov?.px       ?? 0; }
     get pz()       { return this.#mov?.pz       ?? 0; }
-    get camRotY()      { return this.#mov?.rotY ?? 0; }
+    get camRotY()      { return this.#camaraChase?.camRotY ?? 0; }
     get physics()      { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
     get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
     get lateral()      { return this.#lateral; }
@@ -331,6 +331,7 @@ class CircuitoUrbano {
         this.#raf = requestAnimationFrame(() => this.#tick());
         if (this.#camAereaActiva) {
             this.#camAerea.actualizar();
+            if (this.#mov) this.#camaraChase.actualizarIndicador(this.#mov.px, this.#mov.pz);
         } else {
             this.#updatePhysics();
             this.#camaraChase.altura = this.camHeight;

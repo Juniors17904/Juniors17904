@@ -1045,7 +1045,7 @@ class App {
             document.getElementById('dbg-fps').textContent   = _dbgFps;
             // CÁMARA
             document.getElementById('dbg-camh').textContent      = cir.camHeight.toFixed(2);
-            document.getElementById('dbg-cam-roty').textContent  = (cir.rotY*180/Math.PI|0);
+            document.getElementById('dbg-cam-roty').textContent  = (cir.camRotY*180/Math.PI|0);
             document.getElementById('dbg-cam-dist').textContent  = cir.physics.camDist;
             // FÍSICAS
             const ph=cir.physics;

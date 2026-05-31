@@ -12,8 +12,11 @@ export class CamaraChase {
     #distancia;
     #seguirRotacion;
     #indicador = null;
+    #camAngle  = 0;
 
     altura = 2.8;
+
+    get camRotY() { return this.#camAngle; }
 
     constructor(aspect, { distancia = 7, altura = 2.8, seguirRotacion = true } = {}) {
         this.#cam             = new THREE.PerspectiveCamera(55, aspect, 0.1, 200);
@@ -57,11 +60,16 @@ export class CamaraChase {
             this.#cam.lookAt(px, 0.6, pz);
         }
 
+        this.actualizarIndicador(px, pz);
+    }
+
+    actualizarIndicador(px, pz) {
+        const cx  = this.#cam.position.x, cz = this.#cam.position.z;
+        const dx  = px - cx, dz = pz - cz;
+        const len = Math.sqrt(dx*dx + dz*dz) || 1;
+        this.#camAngle = Math.atan2(dx, dz);
         if (this.#indicador) {
             const pos = this.#indicador.geometry.attributes.position;
-            const cx  = this.#cam.position.x, cz = this.#cam.position.z;
-            const dx  = px - cx, dz = pz - cz;
-            const len = Math.sqrt(dx*dx + dz*dz) || 1;
             pos.setXYZ(0, cx, 0.5, cz);
             pos.setXYZ(1, cx + (dx/len) * 3, 0.5, cz + (dz/len) * 3);
             pos.needsUpdate = true;
