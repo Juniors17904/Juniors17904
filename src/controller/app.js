@@ -1126,17 +1126,24 @@ class App {
                 trailCtx.beginPath(); trailCtx.arc(tc.x,tc.y,4,0,Math.PI*2); trailCtx.fill();
                 trailCtx.shadowBlur=0;
 
-                // Línea cámara trasera → auto
+                // Línea cámara trasera → auto (extendida para ser visible a cualquier escala)
                 const chasePos = cir.camaraChasePos;
                 if (chasePos && wToT) {
                     trailCtx.save();
                     const cc = wToT(chasePos.x, chasePos.z);
+                    const dx = tc.x - cc.x, dy = tc.y - cc.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                    const len  = Math.max(dist, 15);
+                    const nx = dx/dist, ny = dy/dist;
                     trailCtx.strokeStyle = '#00ffff';
                     trailCtx.fillStyle   = '#00ffff';
-                    trailCtx.lineWidth   = 1.5;
+                    trailCtx.lineWidth   = 2;
                     trailCtx.lineCap     = 'round';
                     trailCtx.shadowBlur  = 0;
-                    trailCtx.beginPath(); trailCtx.moveTo(cc.x, cc.y); trailCtx.lineTo(tc.x, tc.y); trailCtx.stroke();
+                    trailCtx.beginPath();
+                    trailCtx.moveTo(cc.x, cc.y);
+                    trailCtx.lineTo(cc.x + nx*len, cc.y + ny*len);
+                    trailCtx.stroke();
                     trailCtx.beginPath(); trailCtx.arc(cc.x, cc.y, 3, 0, Math.PI*2); trailCtx.fill();
                     trailCtx.restore();
                 }
