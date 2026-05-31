@@ -13,8 +13,11 @@ export class CamaraChase {
     #seguirRotacion;
     #indicador = null;
     #camAngle  = 0;
+    #lean      = 0;
 
-    altura = 2.8;
+    altura    = 2.8;
+    leanMax   = 0.08;
+    leanSpeed = 0.06;
 
     get camRotY() { return this.#camAngle; }
 
@@ -46,7 +49,9 @@ export class CamaraChase {
         this.#cam.updateProjectionMatrix();
     }
 
-    actualizar(px, pz, rotY) {
+    actualizar(px, pz, rotY, steerInput = 0) {
+        this.#lean += (steerInput * this.leanMax - this.#lean) * this.leanSpeed;
+        this.#cam.rotation.z = -this.#lean;
         const ry   = this.#seguirRotacion ? rotY : 0;
         const sinY = Math.sin(ry);
         const cosY = Math.cos(ry);

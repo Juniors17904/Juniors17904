@@ -338,7 +338,7 @@ class CircuitoUrbano {
         } else {
             this.#updatePhysics();
             this.#camaraChase.altura = this.camHeight;
-            this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.rotY);
+            this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.rotY, this.steerInput);
         }
         this.#sun.position.set(this.#mov.px + 10, 20, this.#mov.pz + 10);
         this.#sun.target.position.set(this.#mov.px, 0, this.#mov.pz);
