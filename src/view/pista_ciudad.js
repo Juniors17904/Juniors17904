@@ -74,6 +74,7 @@ class CircuitoUrbano {
     #camAereaActiva = false;
     #mov = null;
     #dirLine = null;
+    #camPunto = null;
 
     #progress = 0;
     #lateral  = 0;
@@ -380,6 +381,17 @@ class CircuitoUrbano {
         this.#dirLine.position.copy(origin);
         this.#dirLine.lookAt(origin.clone().add(dir));
         this.#dirLine.visible = this.#camAereaActiva;
+
+        const camPos = this.#camaraChase.camera.position;
+        if (!this.#camPunto) {
+            this.#camPunto = new THREE.Mesh(
+                new THREE.SphereGeometry(0.8, 8, 8),
+                new THREE.MeshBasicMaterial({ color: 0x00ffff })
+            );
+            this.#scene.add(this.#camPunto);
+        }
+        this.#camPunto.position.set(camPos.x, 0.5, camPos.z);
+        this.#camPunto.visible = this.#camAereaActiva;
     }
 
 
