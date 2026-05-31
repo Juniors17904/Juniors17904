@@ -379,6 +379,7 @@ class CircuitoUrbano {
         }
         this.#dirLine.position.copy(origin);
         this.#dirLine.lookAt(origin.clone().add(dir));
+        this.#dirLine.visible = this.#camAereaActiva;
     }
 
 
