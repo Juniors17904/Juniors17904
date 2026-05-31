@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 let _glbPromise = null;
 function _loadGLTF() {
     if (!_glbPromise)
-        _glbPromise = new GLTFLoader().loadAsync('models/vehicles_pack.glb');
+        _glbPromise = new GLTFLoader().loadAsync('src/assets/models/vehicles_pack.glb');
     return _glbPromise;
 }
 

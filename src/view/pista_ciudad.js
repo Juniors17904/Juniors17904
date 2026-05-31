@@ -7,7 +7,7 @@ import { Ruta, MovimientoLibre } from '../model/model_fisica.js';
 let _glbPromise = null;
 function _loadGLTF() {
     if (!_glbPromise)
-        _glbPromise = new GLTFLoader().loadAsync('models/vehicles_pack.glb');
+        _glbPromise = new GLTFLoader().loadAsync('src/assets/models/vehicles_pack.glb');
     return _glbPromise;
 }
 
