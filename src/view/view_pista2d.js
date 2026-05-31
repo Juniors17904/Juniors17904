@@ -1,6 +1,6 @@
 'use strict';
 
-// VIEW — render pseudo-3D: RenderPista, RenderAuto, HUD
+// VIEW — render pseudo-3D: RenderPista, RenderAuto, PantallaJuego
 // Depende de model.js y pista.js cargados antes.
 const CFG     = window.CFG;
 const NIVELES = window.NIVELES;
@@ -172,9 +172,9 @@ class RenderAuto {
 }
 
 // ================================================================
-// CLASE: HUD — velocímetro, turbos, progreso, minimapa
+// CLASE: PantallaJuego — velocímetro, turbos, progreso, minimapa
 // ================================================================
-class HUD {
+class PantallaJuego {
     #minimap = new Minimap();
 
     setCircuito(pistaCfg) { this.#minimap.setCircuito(pistaCfg); }
@@ -189,7 +189,7 @@ class HUD {
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
             window.__modelErrors.push('[HUD.dibujar] ' + e.message);
-            console.error('[HUD.dibujar]', e);
+            console.error('[PantallaJuego.dibujar]', e);
         }
     }
 
@@ -269,7 +269,7 @@ class HUD {
 
 window.RenderPista = RenderPista;
 window.RenderAuto  = RenderAuto;
-window.HUD         = HUD;
+window.PantallaJuego = PantallaJuego;
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

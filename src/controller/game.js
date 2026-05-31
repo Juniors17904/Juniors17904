@@ -9,7 +9,7 @@ const Pista    = window.Pista;
 // View
 const RenderPista = window.RenderPista;
 const RenderAuto  = window.RenderAuto;
-const HUD         = window.HUD;
+const PantallaJuego = window.PantallaJuego;
 
 // ================================================================
 // CLASE: Controles (teclado, botones, timón, giroscopio)
@@ -191,7 +191,7 @@ class Juego {
         this.#esTestDrive = pistaCfg?.esTestDrive ?? false;
 
         this.#carro     = new Carro2D(color, this.#distMeta);
-        this.#hud       = new HUD();
+        this.#hud       = new PantallaJuego();
         this.#hud.setCircuito(pistaCfg);
         this.#controles = new Controles(tipoControl, this.#carro);
 
