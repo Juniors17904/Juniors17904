@@ -73,6 +73,7 @@ class CircuitoUrbano {
     #camAerea = null;
     #camAereaActiva = false;
     #mov = null;
+    #dirArrow = null;
 
     #progress = 0;
     #lateral  = 0;
@@ -365,6 +366,15 @@ class CircuitoUrbano {
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
         for (const w of this.#wheels) w.rotation.x += this.#mov.speed * 6;
+
+        const dir = new THREE.Vector3(Math.sin(this.#mov.rotY), 0, Math.cos(this.#mov.rotY));
+        const origin = new THREE.Vector3(this.#mov.px, 0.5, this.#mov.pz);
+        if (!this.#dirArrow) {
+            this.#dirArrow = new THREE.ArrowHelper(dir, origin, 6, 0xffff00, 1.5, 0.8);
+            this.#scene.add(this.#dirArrow);
+        }
+        this.#dirArrow.position.copy(origin);
+        this.#dirArrow.setDirection(dir);
     }
 
 
