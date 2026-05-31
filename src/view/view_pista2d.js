@@ -1,70 +1,28 @@
 'use strict';
 
-// VIEW — clases de render pseudo-3D (Segmento, Carretera, HUD)
-// Depende de model.js (CFG, NIVELES, PISTAS) cargado antes.
-const CFG    = window.CFG;
+// VIEW — render pseudo-3D: RenderPista, RenderAuto, HUD
+// Depende de model.js y pista.js cargados antes.
+const CFG     = window.CFG;
 const NIVELES = window.NIVELES;
-const PISTAS  = window.PISTAS;
 
 try {
 
 // ================================================================
-// CLASE: Segmento de pista
+// CLASE: RenderPista — dibuja la pista pseudo-3D en canvas 2D
 // ================================================================
-class Segmento {
-    constructor(index, curva, nivel) {
-        this.index = index;
-        this.curva = curva;
-        this.nivel = nivel;
-        this.obstaculos = [];
-    }
-}
+class RenderPista {
+    #pista;
 
-// ================================================================
-// CLASE: Carretera  (genera y renderiza la pista pseudo-3D)
-// ================================================================
-class Carretera {
-    #segmentos = [];
-    #totalSegs;
-    #nivelFijo = null;
-
-    constructor(tipoPista) {
-        this.pista = PISTAS[tipoPista] || null;
-        this.#totalSegs = this.pista ? this.pista.totalSegs : CFG.TOTAL_SEGS;
-        this.#nivelFijo = this.pista ? this.pista.nivelFijo : null;
-        this.#generarPista();
-    }
-
-    #generarPista() {
-        const N = this.#totalSegs;
-        const p = this.pista;
-        for (let i = 0; i < N; i++) {
-            let nivelActual, curva;
-            if (p) {
-                nivelActual = p.nivelFijo;
-                const tramo = p.tramos.find(([d, h]) => i >= d && i < h);
-                curva = tramo ? tramo[2] : 0;
-            } else {
-                nivelActual = NIVELES.reduce((prev, nv) =>
-                    (i * CFG.SEG_LARGO < nv.desde) ? prev : nv, NIVELES[0]);
-                const bloque = Math.floor(i / 40);
-                curva = bloque % 3 === 1 ? 0.8 : bloque % 3 === 2 ? -0.6 : 0;
-            }
-            this.#segmentos.push(new Segmento(i, curva, nivelActual));
-        }
-    }
-
-    obtenerSeg(pos) {
-        const idx = Math.floor(pos / CFG.SEG_LARGO) % this.#totalSegs;
-        return this.#segmentos[idx < 0 ? idx + this.#totalSegs : idx];
+    constructor(pista) {
+        this.#pista = pista;
     }
 
     dibujar(ctx, W, H, posicion, camX) {
         try {
-            const HY = H * CFG.HORIZONTE;
+            const HY        = H * CFG.HORIZONTE;
             const halfRoadW = (W * CFG.ROAD_W) / 2;
-            const seg0 = this.obtenerSeg(posicion);
-            const nv = this.#nivelParaPos(posicion);
+            const nv        = this.#pista.nivelParaPos(posicion);
+
             const skyGrad = ctx.createLinearGradient(0, 0, 0, HY);
             skyGrad.addColorStop(0, nv.cielo[0]);
             skyGrad.addColorStop(1, nv.cielo[1]);
@@ -74,21 +32,21 @@ class Carretera {
             const tiras = [];
             let cx = 0, dcx = 0;
             for (let i = 0; i < CFG.STRIPS; i++) {
-                const t = 1 - i / CFG.STRIPS;
-                const seg = this.obtenerSeg(posicion + i * CFG.SEG_LARGO * 0.6);
+                const t   = 1 - i / CFG.STRIPS;
+                const seg = this.#pista.obtenerSeg(posicion + i * CFG.SEG_LARGO * 0.6);
                 dcx += seg.curva * 0.4;
-                cx += dcx;
+                cx  += dcx;
                 tiras.push({ t, seg, cx: cx * t * 0.015 });
             }
 
             for (let i = CFG.STRIPS - 2; i >= 0; i--) {
-                const t1 = tiras[i].t, t2 = tiras[i + 1].t;
+                const t1 = tiras[i].t,     t2 = tiras[i + 1].t;
                 const y1 = HY + t1 * (H - HY), y2 = HY + t2 * (H - HY);
                 const w1 = t1 * halfRoadW, w2 = t2 * halfRoadW;
-                const cx1 = W / 2 + tiras[i].cx - camX * t1 * W * 0.28;
+                const cx1 = W / 2 + tiras[i].cx     - camX * t1 * W * 0.28;
                 const cx2 = W / 2 + tiras[i + 1].cx - camX * t2 * W * 0.28;
                 const seg = tiras[i].seg;
-                const nv = seg.nivel;
+                const nv  = seg.nivel;
                 const alt = seg.index % 2 === 0;
 
                 ctx.fillStyle = alt ? nv.cesped[0] : nv.cesped[1];
@@ -103,12 +61,12 @@ class Carretera {
                 const bw1 = w1 * 0.07, bw2 = w2 * 0.07;
                 ctx.fillStyle = nv.borde;
                 ctx.beginPath();
-                ctx.moveTo(cx1 - w1, y1); ctx.lineTo(cx1 - w1 + bw1, y1);
+                ctx.moveTo(cx1 - w1, y1);       ctx.lineTo(cx1 - w1 + bw1, y1);
                 ctx.lineTo(cx2 - w2 + bw2, y2); ctx.lineTo(cx2 - w2, y2);
                 ctx.closePath(); ctx.fill();
                 ctx.beginPath();
                 ctx.moveTo(cx1 + w1 - bw1, y1); ctx.lineTo(cx1 + w1, y1);
-                ctx.lineTo(cx2 + w2, y2); ctx.lineTo(cx2 + w2 - bw2, y2);
+                ctx.lineTo(cx2 + w2, y2);        ctx.lineTo(cx2 + w2 - bw2, y2);
                 ctx.closePath(); ctx.fill();
 
                 if (alt) {
@@ -119,25 +77,25 @@ class Carretera {
                     ctx.lineTo(cx2 + dw2, y2); ctx.lineTo(cx2 - dw2, y2);
                     ctx.closePath(); ctx.fill();
                 }
+
                 seg.obstaculos.forEach(ob => {
                     this.#dibujarObstaculo(ctx, ob, cx1, y1, w1, cx2, y2, w2, i);
                 });
             }
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
-            window.__modelErrors.push('[Carretera.dibujar] ' + e.message);
-            console.error('[Carretera.dibujar]', e);
+            window.__modelErrors.push('[RenderPista.dibujar] ' + e.message);
+            console.error('[RenderPista.dibujar]', e);
         }
     }
 
     #dibujarObstaculo(ctx, ob, cx1, y1, w1, cx2, y2, w2, stripIdx) {
         if (stripIdx > CFG.STRIPS - 5) return;
-        const scale = (1 - stripIdx / CFG.STRIPS);
         const carW = w1 * 0.38;
         const carH = carW * 1.6;
         const offX = ob.carril * w1 * 0.55;
-        const x = cx1 + offX - carW / 2;
-        const y = y1 - carH;
+        const x    = cx1 + offX - carW / 2;
+        const y    = y1 - carH;
 
         if (ob.tipo === 'turbo') {
             ctx.fillStyle = '#f59e0b';
@@ -175,47 +133,54 @@ class Carretera {
     }
 
     #colorMasBrillante(hex, amount) {
-        const num = parseInt(hex.replace('#',''), 16);
-        const r = Math.min(255, (num >> 16) + amount);
-        const g = Math.min(255, ((num >> 8) & 0xff) + amount);
-        const b = Math.min(255, (num & 0xff) + amount);
+        const num = parseInt(hex.replace('#', ''), 16);
+        const r   = Math.min(255, (num >> 16) + amount);
+        const g   = Math.min(255, ((num >> 8) & 0xff) + amount);
+        const b   = Math.min(255, (num & 0xff) + amount);
         return `rgb(${r},${g},${b})`;
     }
-
-    #nivelParaPos(pos) {
-        if (this.#nivelFijo) return this.#nivelFijo;
-        const dist = pos * CFG.SEG_LARGO;
-        return NIVELES.reduce((prev, nv) => (dist >= nv.desde ? nv : prev), NIVELES[0]);
-    }
-
-    detectarColision(posicion, camX) {
-        for (let i = 0; i < 8; i++) {
-            const seg = this.obtenerSeg(posicion + i * CFG.SEG_LARGO * 0.3);
-            for (const ob of seg.obstaculos) {
-                const obX = ob.carril * 0.33;
-                if (Math.abs(camX - obX) < 0.18) {
-                    const hit = ob.tipo;
-                    if (hit !== 'turbo') seg.obstaculos = seg.obstaculos.filter(o => o !== ob);
-                    return hit;
-                }
-            }
-        }
-        return null;
-    }
-
-    fueraDePista(camX) { return Math.abs(camX) > 0.55; }
 }
 
 // ================================================================
-// CLASE: HUD (velocímetro, turbos, progreso, minimapa)
+// CLASE: RenderAuto — dibuja sombra y glow del carro en canvas 2D
+// ================================================================
+class RenderAuto {
+    static dibujar(ctx, W, H, carro) {
+        const cx   = W / 2;
+        const by   = H * 0.93;
+        const carW = W * 0.12;
+        const carH = carW * 1.7;
+
+        ctx.save();
+        ctx.translate(cx, by - carH / 2);
+        ctx.rotate(carro.tilt * 0.15);
+
+        ctx.fillStyle = 'rgba(0,0,0,0.30)';
+        ctx.beginPath();
+        ctx.ellipse(0, carH * 0.52, carW * 0.7, carH * 0.10, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (carro.turboActivo) {
+            ctx.fillStyle = `rgba(251,191,36,${0.5 + Math.sin(Date.now() * 0.015) * 0.3})`;
+            ctx.beginPath();
+            ctx.ellipse(0, carH * 0.52, carW * 0.4, carH * 0.22, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+}
+
+// ================================================================
+// CLASE: HUD — velocímetro, turbos, progreso, minimapa
 // ================================================================
 class HUD {
     #mmPts = null; #mmSegs = null; #mmLen = 0; #mmNivel = '';
 
     dibujar(ctx, W, H, carro, oponenteProgreso, nombreOponente, nivel) {
         try {
-            this.#dibujarVelocimetro(ctx, W, H, carro.velocidad / CFG.VEL_MAX);
-            this.#dibujarTurbos(ctx, W, H, carro.turbosLeft, carro.turboActivo);
+            this.#dibujarVelocimetro(ctx, W, H, carro.velocidad / carro.velMaxBase);
+            this.#dibujarTurbos(ctx, W, H, carro.turbosLeft, carro.turboActivo, carro.turboMax);
             this.#dibujarProgreso(ctx, W, H, carro.progreso, oponenteProgreso, nombreOponente);
             if (carro.turboActivo) this.#dibujarTurboFX(ctx, W, H);
             this.#dibujarMinimap(ctx, carro, oponenteProgreso, nivel);
@@ -250,10 +215,10 @@ class HUD {
         ctx.restore();
     }
 
-    #dibujarTurbos(ctx, W, H, cantidad, activo) {
+    #dibujarTurbos(ctx, W, H, cantidad, activo, turboMax) {
         const startX = 16, y = H - 24;
         ctx.save();
-        for (let i = 0; i < CFG.TURBO_MAX; i++) {
+        for (let i = 0; i < turboMax; i++) {
             const tiene = i < cantidad;
             ctx.globalAlpha = tiene ? 1 : 0.25;
             ctx.fillStyle = activo && tiene ? '#fbbf24' : '#f59e0b';
@@ -317,15 +282,15 @@ class HUD {
         const minX = Math.min(...xs), maxX = Math.max(...xs);
         const minY = Math.min(...ys), maxY = Math.max(...ys);
         const pad = 6;
-        const scl = Math.min((w - pad*2) / (maxX-minX||1), (h - pad*2) / (maxY-minY||1));
-        const ox = x0 + (w - (maxX-minX)*scl) / 2 - minX*scl;
-        const oy = y0 + (h - (maxY-minY)*scl) / 2 - minY*scl;
-        this.#mmPts = raw.map(([x, y]) => ({ x: x*scl+ox, y: y*scl+oy }));
+        const scl = Math.min((w - pad * 2) / (maxX - minX || 1), (h - pad * 2) / (maxY - minY || 1));
+        const ox = x0 + (w - (maxX - minX) * scl) / 2 - minX * scl;
+        const oy = y0 + (h - (maxY - minY) * scl) / 2 - minY * scl;
+        this.#mmPts = raw.map(([x, y]) => ({ x: x * scl + ox, y: y * scl + oy }));
         this.#mmSegs = []; this.#mmLen = 0;
         for (let i = 0; i < this.#mmPts.length - 1; i++) {
-            const dx = this.#mmPts[i+1].x - this.#mmPts[i].x;
-            const dy = this.#mmPts[i+1].y - this.#mmPts[i].y;
-            const len = Math.sqrt(dx*dx + dy*dy);
+            const dx = this.#mmPts[i + 1].x - this.#mmPts[i].x;
+            const dy = this.#mmPts[i + 1].y - this.#mmPts[i].y;
+            const len = Math.sqrt(dx * dx + dy * dy);
             this.#mmSegs.push(len); this.#mmLen += len;
         }
     }
@@ -335,7 +300,7 @@ class HUD {
         for (let i = 0; i < this.#mmSegs.length; i++) {
             if (t <= this.#mmSegs[i]) {
                 const f = t / this.#mmSegs[i];
-                return { x: this.#mmPts[i].x + f * (this.#mmPts[i+1].x - this.#mmPts[i].x), y: this.#mmPts[i].y + f * (this.#mmPts[i+1].y - this.#mmPts[i].y) };
+                return { x: this.#mmPts[i].x + f * (this.#mmPts[i + 1].x - this.#mmPts[i].x), y: this.#mmPts[i].y + f * (this.#mmPts[i + 1].y - this.#mmPts[i].y) };
             }
             t -= this.#mmSegs[i];
         }
@@ -347,7 +312,7 @@ class HUD {
         ctx.beginPath();
         ctx.moveTo((pts[0].x + pts[1].x) / 2, (pts[0].y + pts[1].y) / 2);
         for (let i = 1; i < N; i++) {
-            const mx = (pts[i].x + pts[i+1].x) / 2, my = (pts[i].y + pts[i+1].y) / 2;
+            const mx = (pts[i].x + pts[i + 1].x) / 2, my = (pts[i].y + pts[i + 1].y) / 2;
             ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
         }
         ctx.quadraticCurveTo(pts[N].x, pts[N].y, (pts[0].x + pts[1].x) / 2, (pts[0].y + pts[1].y) / 2);
@@ -386,9 +351,9 @@ class HUD {
     }
 }
 
-window.Segmento  = Segmento;
-window.Carretera = Carretera;
-window.HUD       = HUD;
+window.RenderPista = RenderPista;
+window.RenderAuto  = RenderAuto;
+window.HUD         = HUD;
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];
