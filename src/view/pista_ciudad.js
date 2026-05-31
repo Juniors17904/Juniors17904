@@ -136,7 +136,7 @@ class CircuitoUrbano {
         this.#scene.background = new THREE.Color(0x4a9eca);
         this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
 
-        this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
+        this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: false });
 
         this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
