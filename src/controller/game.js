@@ -192,6 +192,7 @@ class Juego {
 
         this.#carro     = new Carro2D(color, this.#distMeta);
         this.#hud       = new HUD();
+        this.#hud.setCircuito(pistaCfg);
         this.#controles = new Controles(tipoControl, this.#carro);
 
         const c3d = document.getElementById('canvas-carro-3d');

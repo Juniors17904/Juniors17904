@@ -176,6 +176,12 @@ class RenderAuto {
 // ================================================================
 class HUD {
     #mmPts = null; #mmSegs = null; #mmLen = 0; #mmNivel = '';
+    #pistaCfg = null;
+
+    setCircuito(pistaCfg) {
+        this.#pistaCfg = pistaCfg || null;
+        this.#mmPts = null;
+    }
 
     dibujar(ctx, W, H, carro, oponenteProgreso, nombreOponente, nivel) {
         try {
@@ -266,7 +272,7 @@ class HUD {
     #buildMinimap(nivel) {
         if (this.#mmPts && this.#mmNivel === nivel) return;
         this.#mmNivel = nivel;
-        const pista = window.PISTAS?.[nivel];
+        const pista = this.#pistaCfg;
         const x0 = 11, y0 = 20, w = 100, h = 63;
         const raw = [];
         let px = 0, py = 0, angle = -Math.PI / 2;
