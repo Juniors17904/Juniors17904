@@ -92,7 +92,9 @@ class CircuitoUrbano {
     get rotZ()     { return this.#mov?.carLean  ?? 0; }
     get px()       { return this.#mov?.px       ?? 0; }
     get pz()       { return this.#mov?.pz       ?? 0; }
+    get camRotX()      { return this.#camaraChase?.camRotX ?? 0; }
     get camRotY()      { return this.#camaraChase?.camRotY ?? 0; }
+    get camRotZ()      { return this.#camaraChase?.camRotZ ?? 0; }
     get physics()      { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
     get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
     get lateral()      { return this.#lateral; }

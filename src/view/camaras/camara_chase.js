@@ -20,6 +20,8 @@ export class CamaraChase {
     leanSpeed = 0.06;
 
     get camRotY() { return this.#camAngle; }
+    get camRotX() { return this.#cam.rotation.x; }
+    get camRotZ() { return this.#lean; }
 
     constructor(aspect, { distancia = 7, altura = 2.8, seguirRotacion = true } = {}) {
         this.#cam             = new THREE.PerspectiveCamera(55, aspect, 0.1, 200);
