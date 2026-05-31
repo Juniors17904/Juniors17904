@@ -1,7 +1,8 @@
 'use strict';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { Ruta, MovimientoLibre } from '../model/model_fisica.js';
+import { Ruta } from '../model/model_fisica.js';
+import { Carro } from '../model/carros/carro.js';
 
 // ── Helpers (igual que viewer3d.js) ─────────────────────────────
 let _glbPromise = null;
@@ -207,7 +208,7 @@ class CircuitoUrbano {
             }
             this.#ruta.construir(pista.tramos, pista.totalSegs);
             const inicio = this.#ruta.inicio;
-            this.#mov = new MovimientoLibre(inicio.x, inicio.z, inicio.angle);
+            this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
             window.__modelErrors.push('[pista_ciudad] ' + e.message);

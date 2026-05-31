@@ -1,6 +1,7 @@
 'use strict';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { Carro } from '../model/carros/carro.js';
 
 // ── Helpers ──────────────────────────────────────────────────────
 let _glbPromise = null;
@@ -61,8 +62,7 @@ class TestDrive3D {
     #renderer = null; #scene = null; #camera = null;
     #canvas; #carGroup = null; #raf = 0; #sun = null;
     #resizeHandler = null;
-    #px = -2; #pz = 0; #rotY = 0; #speed = 0;
-    #accel = 0; #maxSpeed = 0; #carLean = 0;
+    #carro = null;
     #camRotY = 0;
     #leanGroup = null;
     #wheels = [];
@@ -71,20 +71,21 @@ class TestDrive3D {
     steerInput = 0;
     camHeight  = 2.8;
 
-    get speed()    { return this.#speed; }
-    get accel()    { return this.#accel; }
-    get maxSpeed() { return this.#maxSpeed; }
+    get speed()    { return this.#carro?.speed    ?? 0; }
+    get accel()    { return this.#carro?.accel    ?? 0; }
+    get maxSpeed() { return this.#carro?.maxSpeed ?? 0; }
     get camRotY()  { return this.#camRotY; }
     get physics()  { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
-    get px()       { return this.#px; }
-    get pz()       { return this.#pz; }
-    get rotY()     { return this.#rotY; }
-    get rotZ()     { return this.#carLean; }
+    get px()       { return this.#carro?.px       ?? -2; }
+    get pz()       { return this.#carro?.pz       ?? 0; }
+    get rotY()     { return this.#carro?.rotY     ?? 0; }
+    get rotZ()     { return this.#carro?.carLean  ?? 0; }
 
     constructor(canvas) {
         this.#canvas = canvas;
         this.#canvas.width  = window.innerWidth;
         this.#canvas.height = window.innerHeight;
+        this.#carro = new Carro(-2, 0, 0);
         this.#init();
     }
 
@@ -360,60 +361,38 @@ class TestDrive3D {
         this.#raf = requestAnimationFrame(() => this.#tick());
         this.#updatePhysics();
         this.#updateCamera();
-        this.#sun.position.set(this.#px + 10, 20, this.#pz + 10);
-        this.#sun.target.position.set(this.#px, 0, this.#pz);
+        this.#sun.position.set(this.#carro.px + 10, 20, this.#carro.pz + 10);
+        this.#sun.target.position.set(this.#carro.px, 0, this.#carro.pz);
         this.#sun.target.updateMatrixWorld();
         this.#renderer.render(this.#scene, this.#camera);
     }
 
     #updatePhysics() {
-        const MAX_FWD = 0.74, MAX_REV = 0.28;
-        const ACCEL = 0.006, BRAKE = 0.026, DRAG = 0.009, STEER = 0.010;
-        const prevSpeed = this.#speed;
+        this.#carro.accelInput = this.accelInput;
+        this.#carro.steerInput = this.steerInput;
+        this.#carro.actualizar();
 
-        if (this.accelInput === 1) {
-            this.#speed = Math.min(MAX_FWD, this.#speed + ACCEL);
-        } else if (this.accelInput === -1) {
-            if (this.#speed > 0.01) this.#speed = Math.max(0, this.#speed - BRAKE);
-            else this.#speed = Math.max(-MAX_REV, this.#speed - ACCEL * 0.6);
-        } else {
-            if (this.#speed > 0) this.#speed = Math.max(0, this.#speed - DRAG);
-            else                 this.#speed = Math.min(0, this.#speed + DRAG);
-        }
-
-        if (Math.abs(this.#speed) > 0.005)
-            this.#rotY -= this.steerInput * STEER * Math.sign(this.#speed);
-
-        this.#pz += Math.cos(this.#rotY) * this.#speed;
-        this.#px += Math.sin(this.#rotY) * this.#speed;
-
-        this.#accel = this.#speed - prevSpeed;
-        if (Math.abs(this.#speed) > this.#maxSpeed) this.#maxSpeed = Math.abs(this.#speed);
-
-        if (Math.abs(this.#px) > 3.8) this.#px *= 0.90;
-        if (this.#pz >  950) this.#pz -= 1900;
-        if (this.#pz < -950) this.#pz += 1900;
+        const px = this.#carro.px, pz = this.#carro.pz;
+        if (Math.abs(px) > 3.8)  this.#carro.setPosicion(px * 0.90, pz);
+        if (this.#carro.pz >  950) this.#carro.setPosicion(this.#carro.px, this.#carro.pz - 1900);
+        if (this.#carro.pz < -950) this.#carro.setPosicion(this.#carro.px, this.#carro.pz + 1900);
 
         if (this.#carGroup) {
-            this.#carGroup.position.set(this.#px, 0, this.#pz);
-            this.#carGroup.rotation.y = this.#rotY;
+            this.#carGroup.position.set(this.#carro.px, 0, this.#carro.pz);
+            this.#carGroup.rotation.y = this.#carro.rotY;
         }
+        if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carro.carLean;
 
-        const speedFactor = Math.abs(this.#speed) / 0.74;
-        const targetLean = -this.steerInput * 0.22 * speedFactor;
-        this.#carLean += (targetLean - this.#carLean) * 0.08;
-        if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carLean;
-
-        const spin = this.#speed * 6;
+        const spin = this.#carro.speed * 6;
         for (const w of this.#wheels) w.rotation.x += spin;
     }
 
     #updateCamera() {
         const D = 7;
-        const cx = this.#px - Math.sin(this.#camRotY) * D;
-        const cz = this.#pz - Math.cos(this.#camRotY) * D;
+        const cx = this.#carro.px - Math.sin(this.#camRotY) * D;
+        const cz = this.#carro.pz - Math.cos(this.#camRotY) * D;
         this.#camera.position.set(cx, this.camHeight, cz);
-        this.#camera.lookAt(this.#px, 0.6, this.#pz);
+        this.#camera.lookAt(this.#carro.px, 0.6, this.#carro.pz);
     }
 }
 
