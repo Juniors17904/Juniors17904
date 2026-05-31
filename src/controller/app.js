@@ -793,6 +793,11 @@ class App {
         const cirInitRotY = cir.rotY;
 
         this.#cir3dKeyDown = e => {
+            if (e.key === 'm' || e.key === 'M') {
+                const libre = cir.toggleMovimientoLibre();
+                btnMovLibre.textContent = libre ? 'LIBRE' : 'PATH';
+                btnMovLibre.style.color = libre ? '#34d399' : '#a78bfa';
+            }
             if (cir.camAereaActiva && cir.camAerea) {
                 if (e.key==='ArrowLeft' ||e.key==='a') cir.camAerea.moveX=-1;
                 if (e.key==='ArrowRight'||e.key==='d') cir.camAerea.moveX= 1;
@@ -901,6 +906,15 @@ class App {
             document.getElementById('btn-toggle-mapas').style.display     = activa ? 'none'  : 'block';
             document.getElementById('ctrl-cam-height').style.display      = activa ? 'none'  : 'flex';
             cir.accelInput = 0; cir.steerInput = 0;
+        };
+
+        // Botón toggle movimiento libre / path
+        const btnMovLibre = document.getElementById('btn-mov-libre');
+        btnMovLibre.style.display = 'block';
+        btnMovLibre.onclick = () => {
+            const libre = cir.toggleMovimientoLibre();
+            btnMovLibre.textContent = libre ? 'LIBRE' : 'PATH';
+            btnMovLibre.style.color = libre ? '#34d399' : '#a78bfa';
         };
 
         // Botón toggle paneles de datos
@@ -1183,6 +1197,7 @@ class App {
         document.getElementById('btn-cam-aerea').style.display='none';
         document.getElementById('btn-toggle-datos').style.display='none';
         document.getElementById('btn-toggle-mapas').style.display='none';
+        document.getElementById('btn-mov-libre').style.display='none';
         document.getElementById('debug-td3d').style.display='none';
         document.getElementById('debug-path').style.display='none';
         document.getElementById('minimap-td3d').style.display='none';

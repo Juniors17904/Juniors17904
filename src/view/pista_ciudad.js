@@ -76,8 +76,9 @@ class CircuitoUrbano {
     #dirLine  = null;
     #camPunto = null;
 
-    #progress = 0;
-    #lateral  = 0;
+    #progress        = 0;
+    #lateral         = 0;
+    #movimientoLibre = false;
 
     accelInput = 0;
     steerInput = 0;
@@ -96,8 +97,10 @@ class CircuitoUrbano {
     get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
     get lateral()      { return this.#lateral; }
     get pathLen()      { return this.#ruta.longitud; }
-    get camAereaActiva() { return this.#camAereaActiva; }
-    get camAerea()       { return this.#camAerea; }
+    get camAereaActiva()    { return this.#camAereaActiva; }
+    get camAerea()          { return this.#camAerea; }
+    get movimientoLibre()   { return this.#movimientoLibre; }
+    toggleMovimientoLibre() { this.#movimientoLibre = !this.#movimientoLibre; return this.#movimientoLibre; }
     get camaraChasePos() {
         const p = this.#camaraChase?.camera?.position;
         return p ? { x: p.x, z: p.z } : null;
@@ -379,7 +382,7 @@ class CircuitoUrbano {
         this.#mov.steerInput = this.steerInput;
         this.#mov.actualizar();
 
-        if (this.#ruta.longitud > 0) {
+        if (!this.#movimientoLibre && this.#ruta.longitud > 0) {
             this.#progress = ((this.#progress + this.#mov.speed / this.#ruta.longitud) % 1 + 1) % 1;
 
             // Límite suave: empujar de vuelta si se aleja más de 3.8 del trazado
