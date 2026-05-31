@@ -84,6 +84,10 @@ class ToastManager {
         }, 4000);
     }
 }
+window.ToastManager = ToastManager;
+// Mostrar errores acumulados antes de que ToastManager existiera
+(window.__modelErrors || []).forEach(msg => ToastManager.mostrar(msg, 'error'));
+window.__modelErrors = [];
 
 // ================================================================
 // CLASS: OrientacionManager — forzar/detectar landscape

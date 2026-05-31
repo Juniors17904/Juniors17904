@@ -1,77 +1,9 @@
 'use strict';
 
-// ================================================================
-// CONFIGURACIÓN GLOBAL
-// ================================================================
-const CFG = {
-    HORIZONTE:      0.40,   // fracción vertical del canvas donde está el horizonte
-    ROAD_W:         0.86,   // ancho de carretera en la parte inferior (fracción del ancho)
-    STRIPS:         140,    // tiras de carretera a dibujar
-    SEG_LARGO:      0.5,    // longitud de un segmento (unidades de posición)
-    TOTAL_SEGS:     400,    // cuántos segmentos distintos tiene la pista (loop)
-    VEL_MAX:        0.10,   // velocidad máxima (pos/frame)
-    VEL_ACC:        0.0012, // aceleración
-    VEL_FRENO:      0.006,  // frenado al chocar / soltar
-    VEL_FRICCION:   0.0015, // desaceleración natural
-    GIRO_VEL:       0.06,   // velocidad de giro de la cámara
-    GIRO_RETURN:    0.05,   // velocidad de retorno al centro
-    GIRO_MAX:       0.12,   // máximo offset lateral de cámara
-    TURBO_DUR:      3000,   // ms que dura un turbo
-    TURBO_MULT:     1.75,   // multiplicador de velocidad con turbo
-    TURBO_MAX:      3,      // máx turbos en inventario
-    DIST_META:      2000,   // distancia total de la carrera
-    SYNC_MS:        80,     // cada cuánto ms sincronizar multijugador
-};
-
-const NIVELES = [
-    { nombre: 'Ciudad',      desde: 0,    cielo: ['#0d1b2a','#1b3a4b'], cesped: ['#1a5c1a','#174d17'], asfalto: ['#484848','#3d3d3d'], borde: '#888' },
-    { nombre: 'Atardecer',   desde: 400,  cielo: ['#b34700','#e8762a'], cesped: ['#8a6010','#7a5210'], asfalto: ['#585040','#4a4030'], borde: '#aa9060' },
-    { nombre: 'Desierto',    desde: 800,  cielo: ['#c97d00','#f5d060'], cesped: ['#c8881a','#b07010'], asfalto: ['#b0906a','#9a7a55'], borde: '#d4b080' },
-    { nombre: 'Montaña',     desde: 1200, cielo: ['#1a2c40','#253c55'], cesped: ['#255a20','#1d4a18'], asfalto: ['#404040','#353535'], borde: '#707070' },
-    { nombre: 'Noche',       desde: 1600, cielo: ['#060610','#0a0a20'], cesped: ['#0a1f0a','#080f08'], asfalto: ['#282828','#202020'], borde: '#404040' },
-];
-
-// ================================================================
-// DEFINICIÓN DE PISTAS
-// ================================================================
-const PISTAS = {
-    ciudad: {
-        nombre:    'Circuito Urbano',
-        totalSegs: 300,
-        distMeta:  1800,
-        nivelFijo: { nombre:'Ciudad', cielo:['#060a14','#0d1b2a'], cesped:['#0a200a','#081808'], asfalto:['#3a3a3a','#2e2e2e'], borde:'#555' },
-        // [desde, hasta, curva]  positivo=derecha, negativo=izquierda
-        // 2 chicanes simétricas (pit+back) que se cancelan en X → circuito cierra exactamente
-        // 4 curvas exactas a 90° (2.3271 = π/2 / (15×0.045))
-        tramos: [
-            [0,   25,  0      ],  // pit straight
-            [25,  40,  -1.5   ],  // pit chicane izq
-            [40,  55,  1.5    ],  // pit chicane der
-            [55,  80,  0      ],  // pit straight 2
-            [80,  95,  2.3271 ],  // curva 1 derecha (90°)
-            [95,  135, 0      ],  // recta lateral
-            [135, 150, 2.3271 ],  // curva 2 derecha (90°)
-            [150, 175, 0      ],  // recta trasera 1
-            [175, 190, -1.5   ],  // chicane izquierda
-            [190, 205, 1.5    ],  // chicane derecha
-            [205, 230, 0      ],  // recta trasera 2
-            [230, 245, 2.3271 ],  // curva 3 derecha (90°)
-            [245, 285, 0      ],  // recta lateral
-            [285, 300, 2.3271 ],  // curva 4 derecha (90°)
-        ],
-        obstFrecuencia: 0.12,
-        obstTipos: ['carro','carro','carro','bache','turbo'],
-        coloresTrafico: ['#ef4444','#3b82f6','#eab308','#6b7280','#f97316'],
-    },
-    testdrive: {
-        nombre: 'Test Drive',
-        totalSegs: 80,
-        distMeta: Infinity,
-        nivelFijo: { nombre:'Test', cielo:['#0d1b2a','#1b3a4b'], cesped:['#1a5c1a','#174d17'], asfalto:['#484848','#3d3d3d'], borde:'#888' },
-        tramos: [],
-        esTestDrive: true,
-    },
-};
+// Datos del modelo — definidos en model.js, cargado antes que este archivo
+const CFG    = window.CFG;
+const NIVELES = window.NIVELES;
+const PISTAS  = window.PISTAS;
 
 // ================================================================
 // CLASE: Segmento de pista
@@ -1029,6 +961,4 @@ class Juego {
     get carro() { return this.#carro; }
 }
 
-// Exponer para uso desde app.js
-window.Juego   = Juego;
-window.PISTAS  = PISTAS;
+window.Juego = Juego;

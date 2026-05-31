@@ -294,11 +294,21 @@ class CircuitoUrbano {
 
     // ── Cargar ruta desde la pista ───────────────────────────────
     #cargarRuta(tipoPista) {
-        const pista = window.PISTAS?.[tipoPista];
-        if (!pista?.tramos) return;
-        this.#ruta.construir(pista.tramos, pista.totalSegs);
-        const inicio = this.#ruta.inicio;
-        this.#mov = new MovimientoLibre(inicio.x, inicio.z, inicio.angle);
+        try {
+            const pista = window.PISTAS?.[tipoPista];
+            if (!pista?.tramos) {
+                window.__modelErrors = window.__modelErrors || [];
+                window.__modelErrors.push(`[pista_ciudad] PISTAS.${tipoPista} no encontrado — ¿cargó model.js?`);
+                return;
+            }
+            this.#ruta.construir(pista.tramos, pista.totalSegs);
+            const inicio = this.#ruta.inicio;
+            this.#mov = new MovimientoLibre(inicio.x, inicio.z, inicio.angle);
+        } catch (e) {
+            window.__modelErrors = window.__modelErrors || [];
+            window.__modelErrors.push('[pista_ciudad] ' + e.message);
+            console.error('[pista_ciudad.js #cargarRuta]', e);
+        }
     }
 
     // ── Construir pista curva ────────────────────────────────────
