@@ -346,7 +346,7 @@ class CircuitoUrbano {
             if (!this.#dirLine) {
                 const geo = new THREE.BufferGeometry().setFromPoints([
                     new THREE.Vector3(0, 0, 0),
-                    new THREE.Vector3(0, 0, 6),
+                    new THREE.Vector3(0, 0, 3),
                 ]);
                 this.#dirLine = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffff00 }));
                 this.#scene.add(this.#dirLine);
