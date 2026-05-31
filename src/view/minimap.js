@@ -12,13 +12,22 @@ class Minimap {
     #mmLen    = 0;
     #mmNivel  = '';
     #pistaCfg = null;
+    #scl = 1; #ox = 0; #oy = 0;
 
     setCircuito(pistaCfg) {
         this.#pistaCfg = pistaCfg || null;
         this.#mmPts    = null;
     }
 
-    dibujar(ctx, carro, oponenteProgreso, nivel) {
+    worldToScreen(worldX, worldZ) {
+        if (!this.#mmPts) return null;
+        return {
+            x: -worldX * 0.375 * this.#scl + this.#ox,
+            y: -worldZ * 0.375 * this.#scl + this.#oy,
+        };
+    }
+
+    dibujar(ctx, carro, oponenteProgreso, nivel, zonaVisible = null) {
         this.#buildMinimap(nivel);
         if (!this.#mmPts?.length) return;
         const pts = this.#mmPts;
@@ -51,6 +60,19 @@ class Minimap {
             ctx.beginPath(); ctx.arc(op.x, op.y, 4, 0, Math.PI * 2); ctx.fill();
             ctx.shadowBlur = 0;
         }
+        if (zonaVisible) {
+            const c = this.worldToScreen(zonaVisible.x, zonaVisible.z);
+            if (c) {
+                const r = zonaVisible.radio * 0.375 * this.#scl;
+                ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+                ctx.lineWidth = 1.5;
+                ctx.setLineDash([3, 2]);
+                ctx.beginPath();
+                ctx.rect(c.x - r, c.y - r, r * 2, r * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
         ctx.restore();
     }
 
@@ -77,6 +99,7 @@ class Minimap {
         const scl = Math.min((w - pad * 2) / (maxX - minX || 1), (h - pad * 2) / (maxY - minY || 1));
         const ox  = x0 + (w - (maxX - minX) * scl) / 2 - minX * scl;
         const oy  = y0 + (h - (maxY - minY) * scl) / 2 - minY * scl;
+        this.#scl = scl; this.#ox = ox; this.#oy = oy;
         this.#mmPts  = raw.map(([x, y]) => ({ x: x * scl + ox, y: y * scl + oy }));
         this.#mmSegs = []; this.#mmLen = 0;
         for (let i = 0; i < this.#mmPts.length - 1; i++) {

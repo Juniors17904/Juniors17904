@@ -78,6 +78,9 @@ class CircuitoUrbano {
 
     #progress = 0;
     #lateral  = 0;
+    #colorCarro    = '#a78bfa';
+    #minimap       = null;
+    #canvasMinimap = null;
 
     accelInput = 0;
     steerInput = 0;
@@ -165,6 +168,16 @@ class CircuitoUrbano {
             this.#ruta.construir(pista.tramos, pista.totalSegs);
             const inicio = this.#ruta.inicio;
             this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
+            if (window.Minimap) {
+                this.#minimap = new window.Minimap();
+                this.#minimap.setCircuito(pista);
+                this.#canvasMinimap = document.getElementById('minimap-td3d');
+                if (this.#canvasMinimap) {
+                    this.#canvasMinimap.width  = 128;
+                    this.#canvasMinimap.height = 96;
+                    this.#canvasMinimap.style.display = 'block';
+                }
+            }
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
             window.__modelErrors.push('[pista_ciudad] ' + e.message);
@@ -277,6 +290,7 @@ class CircuitoUrbano {
     // ── Cargar auto ──────────────────────────────────────────────
     async cargar(tipo, color) {
         try {
+            this.#colorCarro = color;
             const gltf = await _loadGLTF();
             this.#setCar(gltf, tipo, color);
         } catch(e) { console.error('CircuitoUrbano:', e); }
@@ -319,6 +333,7 @@ class CircuitoUrbano {
             window.removeEventListener('resize', this.#resizeHandler);
             this.#resizeHandler = null;
         }
+        if (this.#canvasMinimap) { this.#canvasMinimap.style.display = 'none'; }
         this.#renderer?.dispose(); this.#renderer = null;
     }
 
@@ -364,6 +379,13 @@ class CircuitoUrbano {
 
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
         this.#renderer.render(this.#scene, cam);
+
+        if (this.#minimap && this.#canvasMinimap) {
+            const ctx2 = this.#canvasMinimap.getContext('2d');
+            ctx2.clearRect(0, 0, 128, 96);
+            const zona = (this.#camAereaActiva && this.#camAerea) ? this.#camAerea.zonaVisible : null;
+            this.#minimap.dibujar(ctx2, { progreso: this.#progress, color: this.#colorCarro }, null, 'Ciudad', zona);
+        }
     }
 
     // ── Física ───────────────────────────────────────────────────
