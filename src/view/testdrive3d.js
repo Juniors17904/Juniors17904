@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Carro } from '../model/carros/carro.js';
+import { CamaraChase } from './camaras/camara_chase.js';
 
 // ── Helpers ──────────────────────────────────────────────────────
 let _glbPromise = null;
@@ -59,11 +60,10 @@ function _centerGroup(group, targetDim) {
 // CLASS: TestDrive3D — pista recta 3D con cámara chase
 // ================================================================
 class TestDrive3D {
-    #renderer = null; #scene = null; #camera = null;
+    #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #carGroup = null; #raf = 0; #sun = null;
     #resizeHandler = null;
     #carro = null;
-    #camRotY = 0;
     #leanGroup = null;
     #wheels = [];
 
@@ -74,7 +74,7 @@ class TestDrive3D {
     get speed()    { return this.#carro?.speed    ?? 0; }
     get accel()    { return this.#carro?.accel    ?? 0; }
     get maxSpeed() { return this.#carro?.maxSpeed ?? 0; }
-    get camRotY()  { return this.#camRotY; }
+    get camRotY()  { return 0; }
     get physics()  { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
     get px()       { return this.#carro?.px       ?? -2; }
     get pz()       { return this.#carro?.pz       ?? 0; }
@@ -102,8 +102,7 @@ class TestDrive3D {
                 const W = window.innerWidth, H = window.innerHeight;
                 this.#canvas.width = W;
                 this.#canvas.height = H;
-                this.#camera.aspect = W / H;
-                this.#camera.updateProjectionMatrix();
+                this.#camaraChase.resize(W / H);
                 this.#renderer?.setSize(W, H, false);
             };
             window.addEventListener('resize', this.#resizeHandler);
@@ -132,7 +131,7 @@ class TestDrive3D {
         this.#scene.background = new THREE.Color(0x4a9eca);
         this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
 
-        this.#camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 200);
+        this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: false });
 
         this.#renderer = new THREE.WebGLRenderer({ canvas: this.#canvas, antialias: true });
         this.#renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -360,11 +359,12 @@ class TestDrive3D {
     #tick() {
         this.#raf = requestAnimationFrame(() => this.#tick());
         this.#updatePhysics();
-        this.#updateCamera();
+        this.#camaraChase.altura = this.camHeight;
+        this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, 0);
         this.#sun.position.set(this.#carro.px + 10, 20, this.#carro.pz + 10);
         this.#sun.target.position.set(this.#carro.px, 0, this.#carro.pz);
         this.#sun.target.updateMatrixWorld();
-        this.#renderer.render(this.#scene, this.#camera);
+        this.#renderer.render(this.#scene, this.#camaraChase.camera);
     }
 
     #updatePhysics() {
@@ -387,13 +387,7 @@ class TestDrive3D {
         for (const w of this.#wheels) w.rotation.x += spin;
     }
 
-    #updateCamera() {
-        const D = 7;
-        const cx = this.#carro.px - Math.sin(this.#camRotY) * D;
-        const cz = this.#carro.pz - Math.cos(this.#camRotY) * D;
-        this.#camera.position.set(cx, this.camHeight, cz);
-        this.#camera.lookAt(this.#carro.px, 0.6, this.#carro.pz);
-    }
+
 }
 
 window.TestDrive3D = TestDrive3D;

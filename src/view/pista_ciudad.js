@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Ruta } from '../model/model_fisica.js';
 import { Carro } from '../model/carros/carro.js';
+import { CamaraChase } from './camaras/camara_chase.js';
 
 // ── Helpers (igual que viewer3d.js) ─────────────────────────────
 let _glbPromise = null;
@@ -110,7 +111,7 @@ class CamaraAerea {
 // CLASS: CircuitoUrbano — pista 3D con curvas reales desde tramos
 // ================================================================
 class CircuitoUrbano {
-    #renderer = null; #scene = null; #camera = null;
+    #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #raf = 0; #sun = null;
     #carGroup = null; #leanGroup = null; #wheels = [];
     #resizeHandler = null;
@@ -148,7 +149,7 @@ class CircuitoUrbano {
     toggleCamaraAerea() {
         this.#camAereaActiva = !this.#camAereaActiva;
         if (this.#camAereaActiva) {
-            if (!this.#camAerea) this.#camAerea = new CamaraAerea(this.#camera.aspect);
+            if (!this.#camAerea) this.#camAerea = new CamaraAerea(this.#camaraChase.camera.aspect);
             this.#camAerea.activar(this.#mov.px, this.#mov.pz);
             this.#scene.fog = null;
         } else {
@@ -182,7 +183,7 @@ class CircuitoUrbano {
         this.#scene.background = new THREE.Color(0x4a9eca);
         this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
 
-        this.#camera = new THREE.PerspectiveCamera(55, W / H, 0.1, 200);
+        this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
 
         this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
@@ -347,8 +348,7 @@ class CircuitoUrbano {
             this.#resizeHandler = () => {
                 const W = window.innerWidth, H = window.innerHeight;
                 this.#canvas.width = W; this.#canvas.height = H;
-                this.#camera.aspect = W / H;
-                this.#camera.updateProjectionMatrix();
+                this.#camaraChase.resize(W / H);
                 this.#camAerea?.resize(W / H);
                 this.#renderer?.setSize(W, H, false);
             };
@@ -373,12 +373,13 @@ class CircuitoUrbano {
             this.#camAerea.actualizar();
         } else {
             this.#updatePhysics();
-            this.#updateCamera();
+            this.#camaraChase.altura = this.camHeight;
+            this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.rotY);
         }
         this.#sun.position.set(this.#mov.px + 10, 20, this.#mov.pz + 10);
         this.#sun.target.position.set(this.#mov.px, 0, this.#mov.pz);
         this.#sun.target.updateMatrixWorld();
-        const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camera;
+        const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
         this.#renderer.render(this.#scene, cam);
     }
 
@@ -413,21 +414,7 @@ class CircuitoUrbano {
         for (const w of this.#wheels) w.rotation.x += this.#mov.speed * 6;
     }
 
-    // ── Cámara chase ─────────────────────────────────────────────
-    #updateCamera() {
-        const D = 7;
-        const sinY = Math.sin(this.#mov.rotY), cosY = Math.cos(this.#mov.rotY);
-        this.#camera.position.set(
-            this.#mov.px - sinY * D,
-            this.camHeight,
-            this.#mov.pz - cosY * D
-        );
-        this.#camera.lookAt(
-            this.#mov.px + sinY * 4,
-            0.6,
-            this.#mov.pz + cosY * 4
-        );
-    }
+
 }
 
 window.CircuitoUrbano = CircuitoUrbano;
