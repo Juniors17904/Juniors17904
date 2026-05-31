@@ -31,7 +31,7 @@ export class CamaraAerea {
     }
 
     actualizar() {
-        this.#x += this.moveX * this.#spd;
+        this.#x -= this.moveX * this.#spd;
         this.#z += this.moveZ * this.#spd;
         this.#aplicar();
     }
@@ -39,7 +39,7 @@ export class CamaraAerea {
     get h() { return this.#h; }
     set h(val) { this.#h = Math.max(10, Math.min(300, val)); this.#aplicar(); }
 
-    pan(dx, dz) { this.#x += dx; this.#z += dz; this.#aplicar(); }
+    pan(dx, dz) { this.#x -= dx; this.#z += dz; this.#aplicar(); }
 
     resize(aspect) {
         this.#cam.aspect = aspect;
