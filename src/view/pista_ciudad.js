@@ -97,11 +97,7 @@ class CircuitoUrbano {
     get lateral()      { return this.#lateral; }
     get pathLen()      { return this.#ruta.longitud; }
     get camAereaActiva() { return this.#camAereaActiva; }
-    get camAerea()       { return this.#camAerea; }
-    get camaraChasePos() {
-        const p = this.#camaraChase?.camera?.position;
-        return p ? { x: p.x, z: p.z } : null;
-    }
+    get camAerea()     { return this.#camAerea; }
     get contextLost()  { return this.#renderer?.getContext()?.isContextLost() ?? true; }
     pathSamples(n) { return this.#ruta.muestras(n); }
 
