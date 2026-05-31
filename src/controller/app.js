@@ -1126,25 +1126,26 @@ class App {
                 trailCtx.beginPath(); trailCtx.arc(tc.x,tc.y,4,0,Math.PI*2); trailCtx.fill();
                 trailCtx.shadowBlur=0;
 
-                // Línea cámara trasera → auto (extendida para ser visible a cualquier escala)
-                const chasePos = cir.camaraChasePos;
-                if (chasePos && wToT) {
+                // Línea cámara trasera → auto (calculada directo desde física del carro)
+                if (wToT) {
                     trailCtx.save();
-                    const cc = wToT(chasePos.x, chasePos.z);
-                    const dx = tc.x - cc.x, dy = tc.y - cc.y;
+                    const D   = 7;
+                    const ry  = cir.rotY;
+                    const cc  = wToT(cir.px - Math.sin(ry)*D, cir.pz - Math.cos(ry)*D);
+                    const dx  = tc.x - cc.x, dy = tc.y - cc.y;
                     const dist = Math.sqrt(dx*dx + dy*dy) || 1;
                     const len  = Math.max(dist, 15);
-                    const nx = dx/dist, ny = dy/dist;
                     trailCtx.strokeStyle = '#00ffff';
                     trailCtx.fillStyle   = '#00ffff';
                     trailCtx.lineWidth   = 2;
                     trailCtx.lineCap     = 'round';
-                    trailCtx.shadowBlur  = 0;
+                    trailCtx.shadowColor = '#00ffff';
+                    trailCtx.shadowBlur  = 6;
                     trailCtx.beginPath();
                     trailCtx.moveTo(cc.x, cc.y);
-                    trailCtx.lineTo(cc.x + nx*len, cc.y + ny*len);
+                    trailCtx.lineTo(cc.x + (dx/dist)*len, cc.y + (dy/dist)*len);
                     trailCtx.stroke();
-                    trailCtx.beginPath(); trailCtx.arc(cc.x, cc.y, 3, 0, Math.PI*2); trailCtx.fill();
+                    trailCtx.beginPath(); trailCtx.arc(cc.x, cc.y, 4, 0, Math.PI*2); trailCtx.fill();
                     trailCtx.restore();
                 }
 
