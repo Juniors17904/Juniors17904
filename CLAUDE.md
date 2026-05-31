@@ -13,7 +13,14 @@
 - Si el usuario dice "no toques el código" → parar inmediatamente, solo texto
 - Ante cualquier duda, preguntar antes de programar
 
-## Sugerencias al final de cada respuesta
+## Arquitectura — Programación Orientada a Objetos (POO)
+- TODO el código nuevo debe seguir POO: clases, objetos, atributos y métodos bien definidos
+- Cada clase tiene UNA responsabilidad clara (no mezclar lógica de física con lógica de vista)
+- Los datos internos van como privados (`#campo`), solo se exponen públicamente los que otros objetos necesitan leer
+- Antes de agregar código suelto, preguntar: ¿a qué clase pertenece esto?
+- Respetar la separación MVC: Model (datos/física), View (dibujo/cámaras), Controller (lógica de juego)
+
+
 - Al terminar cada respuesta, hacer 1 a 3 preguntas cortas a modo de sugerencia sobre qué podría querer hacer el usuario a continuación
 - Las preguntas deben ser relevantes al contexto actual del proyecto
 - Formularlas como opciones concretas, no genéricas
