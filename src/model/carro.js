@@ -1,15 +1,14 @@
 'use strict';
 
-// MODEL — Auto del jugador: estado, física y variantes por tipo
+// MODEL — Carro2D: auto de la carrera pseudo-2D
 // Depende de model.js (CFG) cargado antes.
 
 try {
 const CFG = window.CFG;
 
-class Carro {
+class Carro2D {
     #tilt = 0;
 
-    // Constantes de física — subclases pueden sobreescribir en su constructor
     velMaxBase = CFG.VEL_MAX;
     velAcc     = CFG.VEL_ACC;
     velFreno   = CFG.VEL_FRENO;
@@ -72,7 +71,7 @@ class Carro {
             if (this.velocidad > this.velMax) this.velMax = this.velocidad;
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
-            window.__modelErrors.push('[Carro.update] ' + e.message);
+            window.__modelErrors.push('[Carro2D.update] ' + e.message);
         }
     }
 
@@ -80,54 +79,7 @@ class Carro {
     get tilt()     { return this.#tilt; }
 }
 
-// Variante: rápido, menos turbos, cada turbo dura más
-class CarroDeportivo extends Carro {
-    constructor(color, distMeta) {
-        super(color, distMeta);
-        this.velMaxBase = CFG.VEL_MAX * 1.25;
-        this.velAcc     = CFG.VEL_ACC * 1.20;
-        this.turboMax   = 2;
-        this.turboDur   = CFG.TURBO_DUR * 1.5;
-        this.turbosLeft = 2;
-    }
-}
-
-// Variante: más lento, más turbos
-class CarroSUV extends Carro {
-    constructor(color, distMeta) {
-        super(color, distMeta);
-        this.velMaxBase = CFG.VEL_MAX * 0.80;
-        this.velAcc     = CFG.VEL_ACC * 0.85;
-        this.turboMax   = 5;
-        this.turbosLeft = 5;
-    }
-}
-
-// Variante: aceleración brutal, velocidad media
-class CarroMuscle extends Carro {
-    constructor(color, distMeta) {
-        super(color, distMeta);
-        this.velMaxBase = CFG.VEL_MAX * 1.10;
-        this.velAcc     = CFG.VEL_ACC * 1.60;
-        this.turboMax   = 3;
-        this.turbosLeft = 3;
-    }
-}
-
-function crearCarro(tipo, color, distMeta) {
-    switch (tipo) {
-        case 'deportivo': return new CarroDeportivo(color, distMeta);
-        case 'suv':       return new CarroSUV(color, distMeta);
-        case 'muscle':    return new CarroMuscle(color, distMeta);
-        default:          return new Carro(color, distMeta);
-    }
-}
-
-window.Carro          = Carro;
-window.CarroDeportivo = CarroDeportivo;
-window.CarroSUV       = CarroSUV;
-window.CarroMuscle    = CarroMuscle;
-window.crearCarro     = crearCarro;
+window.Carro2D = Carro2D;
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

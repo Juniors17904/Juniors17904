@@ -4,7 +4,7 @@
 const CFG      = window.CFG;
 const NIVELES  = window.NIVELES;
 const PISTAS   = window.PISTAS;
-const crearCarro = window.crearCarro;
+const Carro2D  = window.Carro2D;
 const Pista    = window.Pista;
 // View
 const RenderPista = window.RenderPista;
@@ -190,7 +190,7 @@ class Juego {
         this.#distMeta    = pistaCfg ? pistaCfg.distMeta : CFG.DIST_META;
         this.#esTestDrive = pistaCfg?.esTestDrive ?? false;
 
-        this.#carro     = crearCarro(tipoAuto, color, this.#distMeta);
+        this.#carro     = new Carro2D(color, this.#distMeta);
         this.#hud       = new HUD();
         this.#controles = new Controles(tipoControl, this.#carro);
 
