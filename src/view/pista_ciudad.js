@@ -1,7 +1,7 @@
 'use strict';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { Ruta, MovimientoLibre } from './model_fisica.js';
+import { Ruta, MovimientoLibre } from '../model/model_fisica.js';
 
 // ── Helpers (igual que viewer3d.js) ─────────────────────────────
 let _glbPromise = null;
