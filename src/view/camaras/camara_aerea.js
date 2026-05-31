@@ -15,7 +15,7 @@ export class CamaraAerea {
 
     constructor(aspect) {
         this.#cam = new THREE.PerspectiveCamera(60, aspect, 0.5, 3000);
-        this.#cam.up.set(0, 0, -1);
+        this.#cam.up.set(0, 0, 1);
     }
 
     get camera() { return this.#cam; }
