@@ -131,7 +131,7 @@ class TestDrive3D {
         this.#scene.background = new THREE.Color(0x4a9eca);
         this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
 
-        this.#camaraChase = new CamaraChase(W / H, { sigueCarro: true });
+        this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
 
         this.#renderer = new THREE.WebGLRenderer({ canvas: this.#canvas, antialias: true });
         this.#renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
