@@ -1087,6 +1087,15 @@ class App {
                 mmCtx.fillStyle='#ef4444';
                 mmCtx.beginPath(); mmCtx.arc(cp.x,cp.y,4,0,Math.PI*2); mmCtx.fill();
                 mmCtx.shadowBlur=0;
+                if (cir.camAereaActiva && cir.camAerea) {
+                    const zona = cir.camAerea.zonaVisible;
+                    const c = wToC(zona.x, zona.z);
+                    const r = zona.radio * RATIO * _mmScl;
+                    mmCtx.strokeStyle='rgba(255,255,255,0.6)'; mmCtx.lineWidth=1.5;
+                    mmCtx.setLineDash([3,2]);
+                    mmCtx.beginPath(); mmCtx.rect(c.x-r, c.y-r, r*2, r*2); mmCtx.stroke();
+                    mmCtx.setLineDash([]);
+                }
             }
 
             // Mapa de recorrido (trail) — coordenadas mundo 3D reales
