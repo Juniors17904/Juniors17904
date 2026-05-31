@@ -436,13 +436,25 @@ class CircuitoUrbano {
 
         if (this.#ruta.longitud > 0) {
             this.#progress = ((this.#progress + this.#speed / this.#ruta.longitud) % 1 + 1) % 1;
+
+            // Heading libre igual que TestDrive3D
+            if (Math.abs(this.#speed) > 0.005)
+                this.#rotY -= this.steerInput * 0.010 * Math.sign(this.#speed);
+
+            // Movimiento en la dirección que apunta el auto
+            this.#px += Math.sin(this.#rotY) * this.#speed;
+            this.#pz += Math.cos(this.#rotY) * this.#speed;
+
+            // Límite suave: si se aleja más de 3.8 del trazado, empujar de vuelta
             const p = this.#ruta.posicionEn(this.#progress);
-            this.#lateral = Math.max(-3.5, Math.min(3.5, this.#lateral + this.steerInput * 0.015));
-            this.#lateral *= 0.98;
+            const dx = this.#px - p.x, dz = this.#pz - p.z;
+            const dist = Math.sqrt(dx * dx + dz * dz);
             const perpX = Math.cos(p.angle), perpZ = -Math.sin(p.angle);
-            this.#px   = p.x + perpX * this.#lateral;
-            this.#pz   = p.z + perpZ * this.#lateral;
-            this.#rotY = p.angle;
+            this.#lateral = dx * perpX + dz * perpZ;
+            if (dist > 3.8) {
+                this.#px = p.x + (dx / dist) * 3.8 * 0.90;
+                this.#pz = p.z + (dz / dist) * 3.8 * 0.90;
+            }
         }
 
         const sf = Math.abs(this.#speed) / 0.74;
