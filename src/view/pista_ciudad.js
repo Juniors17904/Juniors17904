@@ -334,6 +334,34 @@ class CircuitoUrbano {
         this.#sun.position.set(this.#mov.px + 10, 20, this.#mov.pz + 10);
         this.#sun.target.position.set(this.#mov.px, 0, this.#mov.pz);
         this.#sun.target.updateMatrixWorld();
+
+        if (this.#mov) {
+            const dir    = new THREE.Vector3(Math.sin(this.#mov.rotY), 0, Math.cos(this.#mov.rotY));
+            const origin = new THREE.Vector3(this.#mov.px, 0.5, this.#mov.pz);
+            if (!this.#dirLine) {
+                const geo = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0, 0, 0),
+                    new THREE.Vector3(0, 0, 6),
+                ]);
+                this.#dirLine = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffff00 }));
+                this.#scene.add(this.#dirLine);
+            }
+            this.#dirLine.position.copy(origin);
+            this.#dirLine.lookAt(origin.clone().add(dir));
+            this.#dirLine.visible = this.#camAereaActiva;
+
+            const camPos = this.#camaraChase.camera.position;
+            if (!this.#camPunto) {
+                this.#camPunto = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.8, 8, 8),
+                    new THREE.MeshBasicMaterial({ color: 0x00ffff })
+                );
+                this.#scene.add(this.#camPunto);
+            }
+            this.#camPunto.position.set(camPos.x, 0.5, camPos.z);
+            this.#camPunto.visible = this.#camAereaActiva;
+        }
+
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
         this.#renderer.render(this.#scene, cam);
     }
@@ -367,31 +395,6 @@ class CircuitoUrbano {
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
         for (const w of this.#wheels) w.rotation.x += this.#mov.speed * 6;
-
-        const dir = new THREE.Vector3(Math.sin(this.#mov.rotY), 0, Math.cos(this.#mov.rotY));
-        const origin = new THREE.Vector3(this.#mov.px, 0.5, this.#mov.pz);
-        if (!this.#dirLine) {
-            const geo = new THREE.BufferGeometry().setFromPoints([
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(0, 0, 6),
-            ]);
-            this.#dirLine = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0xffff00 }));
-            this.#scene.add(this.#dirLine);
-        }
-        this.#dirLine.position.copy(origin);
-        this.#dirLine.lookAt(origin.clone().add(dir));
-        this.#dirLine.visible = this.#camAereaActiva;
-
-        const camPos = this.#camaraChase.camera.position;
-        if (!this.#camPunto) {
-            this.#camPunto = new THREE.Mesh(
-                new THREE.SphereGeometry(0.8, 8, 8),
-                new THREE.MeshBasicMaterial({ color: 0x00ffff })
-            );
-            this.#scene.add(this.#camPunto);
-        }
-        this.#camPunto.position.set(camPos.x, 0.5, camPos.z);
-        this.#camPunto.visible = this.#camAereaActiva;
     }
 
 
