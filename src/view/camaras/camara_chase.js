@@ -59,9 +59,11 @@ export class CamaraChase {
 
         if (this.#indicador) {
             const pos = this.#indicador.geometry.attributes.position;
-            const t   = 0.4;
-            pos.setXYZ(0, px, 0.5, pz);
-            pos.setXYZ(1, px + (this.#cam.position.x - px) * t, 0.5, pz + (this.#cam.position.z - pz) * t);
+            const cx  = this.#cam.position.x, cz = this.#cam.position.z;
+            const dx  = px - cx, dz = pz - cz;
+            const len = Math.sqrt(dx*dx + dz*dz) || 1;
+            pos.setXYZ(0, cx, 0.5, cz);
+            pos.setXYZ(1, cx + (dx/len) * 3, 0.5, cz + (dz/len) * 3);
             pos.needsUpdate = true;
         }
     }
