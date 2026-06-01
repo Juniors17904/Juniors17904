@@ -863,19 +863,20 @@ class App {
             canvas.addEventListener('touchmove',  this.#cir3dCanvasTouchMove,  {passive: false});
         }
 
-        // Timón táctil + auto-gas (opción C)
+        // Timón táctil + botones ACEL / FRENO
         const timon = new window.TimonControl('canvas-timon');
-        cir.accelInput = 1;
         document.getElementById('ctrl-timon').style.display = 'flex';
 
-        const btnFreno    = document.getElementById('btn-freno');
-        const _frenoStart = () => { cir.accelInput = -1; };
-        const _frenoEnd   = () => { cir.accelInput =  1; };
-        btnFreno.addEventListener('touchstart',  _frenoStart, { passive: true });
-        btnFreno.addEventListener('touchend',    _frenoEnd);
-        btnFreno.addEventListener('touchcancel', _frenoEnd);
-        btnFreno.addEventListener('mousedown',   _frenoStart);
-        btnFreno.addEventListener('mouseup',     _frenoEnd);
+        const _wireTiemonBtn = (id, valStart, valEnd) => {
+            const el = document.getElementById(id);
+            el.addEventListener('touchstart',  () => { cir.accelInput = valStart; }, { passive: true });
+            el.addEventListener('touchend',    () => { cir.accelInput = valEnd; });
+            el.addEventListener('touchcancel', () => { cir.accelInput = valEnd; });
+            el.addEventListener('mousedown',   () => { cir.accelInput = valStart; });
+            el.addEventListener('mouseup',     () => { cir.accelInput = valEnd; });
+        };
+        _wireTiemonBtn('btn-acelerar',  1, 0);
+        _wireTiemonBtn('btn-freno',    -1, 0);
 
         let _timonRaf = 0;
         const _timonLoop = () => {
