@@ -363,7 +363,7 @@ class CircuitoUrbano {
             if (!this.#camPunto) {
                 this.#camPunto = new THREE.Mesh(
                     new THREE.SphereGeometry(0.4, 8, 8),
-                    new THREE.MeshBasicMaterial({ color: 0x00ffff })
+                    new THREE.MeshBasicMaterial({ color: 0x00ffff, depthTest: false })
                 );
                 this.#scene.add(this.#camPunto);
             }
