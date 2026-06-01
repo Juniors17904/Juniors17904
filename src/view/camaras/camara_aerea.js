@@ -30,7 +30,8 @@ export class CamaraAerea {
         this.#aplicar();
     }
 
-    actualizar() {
+    actualizar(px = null, pz = null) {
+        if (px !== null) { this.#x = px; this.#z = pz; }
         this.#x -= this.moveX * this.#spd;
         this.#z += this.moveZ * this.#spd;
         this.#aplicar();

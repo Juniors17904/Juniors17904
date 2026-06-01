@@ -336,7 +336,7 @@ class CircuitoUrbano {
         this.#raf = requestAnimationFrame(() => this.#tick());
         this.#updatePhysics();
         if (this.#camAereaActiva) {
-            this.#camAerea.actualizar();
+            this.#camAerea.actualizar(this.#mov.px, this.#mov.pz);
             this.#camaraChase.actualizarIndicador(this.#mov.px, this.#mov.pz);
         } else {
             this.#camaraChase.altura = this.camHeight;
