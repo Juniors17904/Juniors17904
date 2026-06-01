@@ -865,7 +865,9 @@ class App {
 
         // Timón táctil + botones ACEL / FRENO
         const timon = new window.TimonControl('canvas-timon');
-        document.getElementById('ctrl-timon').style.display = 'flex';
+        document.getElementById('ctrl-timon').style.display   = 'flex';
+        document.getElementById('ctrl-botones').style.display  = 'none';
+        document.getElementById('ctrl-accel').style.display    = 'none';
 
         const _wireTiemonBtn = (id, valStart, valEnd) => {
             const el = document.getElementById(id);
