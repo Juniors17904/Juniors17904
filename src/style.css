@@ -432,10 +432,6 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 
 #timon-wrap {
     pointer-events: all;
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
 }
 
 /* =============================================

@@ -14,12 +14,16 @@
 - Ante cualquier duda, preguntar antes de programar
 
 ## Arquitectura — Programación Orientada a Objetos (POO) ⚠️ REGLA CRÍTICA
-- TODO el código nuevo debe seguir POO: clases, objetos, atributos y métodos bien definidos
+- **TODO el código nuevo DEBE seguir POO y MVC. Sin excepción.**
+- **MVC obligatorio**:
+  - **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`). Sin lógica de vista.
+  - **View** → dibujo, cámaras, controles UI (`CamaraChase`, `TimonControl`, `Minimap`). Sin lógica de negocio.
+  - **Controller** → orquesta Model y View (`app.js`, `game.js`). Sin física ni dibujo directo.
+- **POO obligatorio**: cada funcionalidad nueva va en una clase con responsabilidad única
 - **CADA CLASE DEBE TENER SENTIDO PROPIO**: sus atributos y métodos deben pertenecer naturalmente a ella. Si un atributo describe o representa a otra clase, DEBE vivir en esa clase, no en otra.
 - Cada clase tiene UNA responsabilidad clara (no mezclar lógica de física con lógica de vista)
 - Los datos internos van como privados (`#campo`), solo se exponen públicamente los que otros objetos necesitan leer
 - Antes de agregar código suelto, preguntar: ¿a qué clase pertenece esto?
-- Respetar la separación MVC: Model (datos/física), View (dibujo/cámaras), Controller (lógica de juego)
 - NUNCA poner en una clase atributos o lógica que pertenezcan a otra clase
 
 

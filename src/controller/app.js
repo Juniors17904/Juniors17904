@@ -863,8 +863,26 @@ class App {
             canvas.addEventListener('touchmove',  this.#cir3dCanvasTouchMove,  {passive: false});
         }
 
-        document.getElementById('ctrl-botones').style.display = 'flex';
-        document.getElementById('ctrl-accel').style.display   = 'flex';
+        // Timón táctil + auto-gas (opción C)
+        const timon = new window.TimonControl('canvas-timon');
+        cir.accelInput = 1;
+        document.getElementById('ctrl-timon').style.display = 'flex';
+
+        const btnFreno    = document.getElementById('btn-freno');
+        const _frenoStart = () => { cir.accelInput = -1; };
+        const _frenoEnd   = () => { cir.accelInput =  1; };
+        btnFreno.addEventListener('touchstart',  _frenoStart, { passive: true });
+        btnFreno.addEventListener('touchend',    _frenoEnd);
+        btnFreno.addEventListener('touchcancel', _frenoEnd);
+        btnFreno.addEventListener('mousedown',   _frenoStart);
+        btnFreno.addEventListener('mouseup',     _frenoEnd);
+
+        let _timonRaf = 0;
+        const _timonLoop = () => {
+            _timonRaf = requestAnimationFrame(_timonLoop);
+            if (!cir.camAereaActiva) cir.steerInput = timon.steerInput;
+        };
+        _timonLoop();
 
         const addTouch = (id, onStart, onEnd) => {
             const el = document.getElementById(id);
@@ -872,18 +890,6 @@ class App {
             el.addEventListener('touchend', onEnd);
             this.#cir3dTouchHandlers.push({el, onStart, onEnd});
         };
-        addTouch('btn-gas',
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ=-1; else cir.accelInput= 1; },
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ= 0; else cir.accelInput=0; });
-        addTouch('btn-rev',
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ= 1; else cir.accelInput=-1; },
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveZ= 0; else cir.accelInput=0; });
-        addTouch('btn-izq',
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX=-1; else cir.steerInput=-1; },
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX= 0; else cir.steerInput=0; });
-        addTouch('btn-der',
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX= 1; else cir.steerInput= 1; },
-            ()=>{ if(cir.camAereaActiva&&cir.camAerea) cir.camAerea.moveX= 0; else cir.steerInput=0; });
 
         // Slider cámara
         const sliderCam = document.getElementById('slider-cam-height');
@@ -1200,6 +1206,9 @@ class App {
         document.getElementById('btn-toggle-datos').style.display='none';
         document.getElementById('btn-toggle-mapas').style.display='none';
         document.getElementById('btn-mov-libre').style.display='none';
+        document.getElementById('ctrl-timon').style.display='none';
+        if (typeof timon !== 'undefined') timon.destroy();
+        cancelAnimationFrame(_timonRaf);
         document.getElementById('debug-td3d').style.display='none';
         document.getElementById('debug-path').style.display='none';
         document.getElementById('minimap-td3d').style.display='none';
