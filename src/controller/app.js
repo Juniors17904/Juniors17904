@@ -883,7 +883,7 @@ class App {
         let _timonRaf = 0;
         const _timonLoop = () => {
             _timonRaf = requestAnimationFrame(_timonLoop);
-            if (!cir.camAereaActiva) cir.steerInput = timon.steerInput;
+            cir.steerInput = timon.steerInput;
         };
         _timonLoop();
 
