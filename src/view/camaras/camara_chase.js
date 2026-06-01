@@ -71,7 +71,7 @@ export class CamaraChase {
             this.#cam.lookAt(px, 0.6, pz);
         }
 
-        this.#cam.rotation.z -= this.#lean;
+        this.#cam.rotation.y -= this.#lean;
 
         this.actualizarIndicador(px, pz);
     }
