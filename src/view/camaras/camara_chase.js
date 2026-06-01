@@ -13,13 +13,17 @@ export class CamaraChase {
     #seguirRotacion;
     #indicador = null;
     #camAngle  = 0;
+    #carRotY   = 0;
     #lean      = 0;
 
     altura    = 2.8;
     leanMax   = 0.08;
     leanSpeed = 0.06;
 
-    get camRotY() { return this.#camAngle; }
+    get camRotY() {
+        let a = this.#camAngle - this.#carRotY;
+        return ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+    }
     get camRotX() { return this.#cam.rotation.x; }
     get camRotZ() { return this.#lean; }
 
@@ -52,6 +56,7 @@ export class CamaraChase {
     }
 
     actualizar(px, pz, rotY, steerInput = 0) {
+        this.#carRotY = rotY;
         this.#lean += (steerInput * this.leanMax - this.#lean) * this.leanSpeed;
         const ry   = this.#seguirRotacion ? rotY : 0;
         const sinY = Math.sin(ry);
