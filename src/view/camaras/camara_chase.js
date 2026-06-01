@@ -17,7 +17,7 @@ export class CamaraChase {
     #lean      = 0;
 
     altura    = 2.8;
-    leanMax   = 0.08;
+    leanMax   = 0.5;    // ángulo máximo de órbita alrededor del auto (~28°)
     leanSpeed = 0.06;
 
     get camRotY() {
@@ -60,20 +60,13 @@ export class CamaraChase {
     actualizar(px, pz, rotY, steerInput = 0) {
         this.#carRotY = rotY;
         this.#lean += (steerInput * this.leanMax - this.#lean) * this.leanSpeed;
-        const ry   = this.#seguirRotacion ? rotY : 0;
-        const sinY = Math.sin(ry);
-        const cosY = Math.cos(ry);
-        const D    = this.#distancia;
+        const orbit = this.#seguirRotacion ? rotY + this.#lean : this.#lean;
+        const sinY  = Math.sin(orbit);
+        const cosY  = Math.cos(orbit);
+        const D     = this.#distancia;
 
         this.#cam.position.set(px - sinY * D, this.altura, pz - cosY * D);
-
-        if (this.#seguirRotacion) {
-            this.#cam.lookAt(px + sinY * 4, 0.6, pz + cosY * 4);
-        } else {
-            this.#cam.lookAt(px, 0.6, pz);
-        }
-
-        this.#cam.rotation.y -= this.#lean;
+        this.#cam.lookAt(px, 0.6, pz);
 
         this.actualizarIndicador(px, pz);
     }
