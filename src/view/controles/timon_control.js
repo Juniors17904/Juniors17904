@@ -13,10 +13,10 @@ class TimonControl {
     #angle           = 0;
     #targetAngle     = 0;
     #touchId         = null;
-    #startTouchAngle = 0;
+    #startX          = 0;
     #startWheelAngle = 0;
-    #cx = 0; #cy = 0;
     #maxAngle        = Math.PI / 3;
+    #sensitivity     = 80;   // píxeles para llegar al máximo
     #raf             = 0;
     #mouseDown       = false;
 
@@ -35,18 +35,9 @@ class TimonControl {
         this.#raf = 0;
     }
 
-    #center() {
-        const r = this.#canvas.getBoundingClientRect();
-        this.#cx = r.left + r.width  / 2;
-        this.#cy = r.top  + r.height / 2;
-    }
-
-    #getAngle(x, y) {
-        return Math.atan2(y - this.#cy, x - this.#cx);
-    }
-
-    #applyDelta(rawAngle) {
-        const target = this.#startWheelAngle + (rawAngle - this.#startTouchAngle);
+    #applyX(x) {
+        const dx     = x - this.#startX;
+        const target = this.#startWheelAngle + (dx / this.#sensitivity) * this.#maxAngle;
         this.#targetAngle = Math.max(-this.#maxAngle, Math.min(this.#maxAngle, target));
         this.#steerInput  = this.#targetAngle / this.#maxAngle;
     }
@@ -64,8 +55,8 @@ class TimonControl {
         c.addEventListener('touchmove',   e => { e.preventDefault(); this.#onTouchMove(e);  }, { passive: false });
         c.addEventListener('touchend',    e => this.#reset());
         c.addEventListener('touchcancel', e => this.#reset());
-        c.addEventListener('mousedown',   e => { this.#center(); this.#mouseDown = true; this.#startTouchAngle = this.#getAngle(e.clientX, e.clientY); this.#startWheelAngle = this.#angle; });
-        window.addEventListener('mousemove', e => { if (this.#mouseDown) this.#applyDelta(this.#getAngle(e.clientX, e.clientY)); });
+        c.addEventListener('mousedown',   e => { this.#mouseDown = true; this.#startX = e.clientX; this.#startWheelAngle = this.#angle; });
+        window.addEventListener('mousemove', e => { if (this.#mouseDown) this.#applyX(e.clientX); });
         window.addEventListener('mouseup',   () => this.#reset());
     }
 
@@ -74,14 +65,14 @@ class TimonControl {
         const t = e.changedTouches[0];
         this.#center();
         this.#touchId         = t.identifier;
-        this.#startTouchAngle = this.#getAngle(t.clientX, t.clientY);
+        this.#startX          = t.clientX;
         this.#startWheelAngle = this.#angle;
     }
 
     #onTouchMove(e) {
         if (this.#touchId === null) return;
         const t = Array.from(e.changedTouches).find(tt => tt.identifier === this.#touchId);
-        if (t) this.#applyDelta(this.#getAngle(t.clientX, t.clientY));
+        if (t) this.#applyX(t.clientX);
     }
 
     #loop() {
