@@ -1,4 +1,4 @@
-const CACHE = 'turbo-race-v4';
+const CACHE = 'turbo-race-v5';
 
 self.addEventListener('install', e => {
     self.skipWaiting();
