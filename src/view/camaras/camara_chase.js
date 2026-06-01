@@ -85,7 +85,7 @@ export class CamaraChase {
         if (this.#indicador) {
             const dir = new THREE.Vector3();
             this.#cam.getWorldDirection(dir);
-            const L   = 12;
+            const L   = 5;
             const pos = this.#indicador.geometry.attributes.position;
             pos.setXYZ(0, cx, 0.5, cz);
             pos.setXYZ(1, cx + dir.x * L, 0.5, cz + dir.z * L);
