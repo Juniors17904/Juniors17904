@@ -42,7 +42,8 @@ export class CamaraChase {
             new THREE.Vector3(0, 0, 0),
         ]);
         this.#indicador = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: 0x00ffff, depthTest: false }));
-        this.#indicador.renderOrder = 999;
+        this.#indicador.renderOrder    = 999;
+        this.#indicador.frustumCulled  = false;
         this.#indicador.visible = false;
         scene.add(this.#indicador);
     }
