@@ -79,14 +79,16 @@ export class CamaraChase {
     }
 
     actualizarIndicador(px, pz) {
-        const cx  = this.#cam.position.x, cz = this.#cam.position.z;
-        const dx  = px - cx, dz = pz - cz;
-        const len = Math.sqrt(dx*dx + dz*dz) || 1;
+        const cx = this.#cam.position.x, cz = this.#cam.position.z;
+        const dx = px - cx, dz = pz - cz;
         this.#camAngle = Math.atan2(dx, dz);
         if (this.#indicador) {
+            const dir = new THREE.Vector3();
+            this.#cam.getWorldDirection(dir);
+            const L   = 12;
             const pos = this.#indicador.geometry.attributes.position;
             pos.setXYZ(0, cx, 0.5, cz);
-            pos.setXYZ(1, px, 0.5, pz);
+            pos.setXYZ(1, cx + dir.x * L, 0.5, cz + dir.z * L);
             pos.needsUpdate = true;
         }
     }
