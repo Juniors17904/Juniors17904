@@ -9,15 +9,16 @@ try {
 class TimonControl {
     #canvas;
     #ctx;
-    #steerInput  = 0;
-    #angle       = 0;
-    #targetAngle = 0;
-    #touchId     = null;
-    #startAngle  = 0;
+    #steerInput      = 0;
+    #angle           = 0;
+    #targetAngle     = 0;
+    #touchId         = null;
+    #startTouchAngle = 0;
+    #startWheelAngle = 0;
     #cx = 0; #cy = 0;
-    #maxAngle    = Math.PI / 3;
-    #raf         = 0;
-    #mouseDown   = false;
+    #maxAngle        = Math.PI / 3;
+    #raf             = 0;
+    #mouseDown       = false;
 
     get steerInput() { return this.#steerInput; }
     get isActive()   { return this.#touchId !== null || this.#mouseDown; }
@@ -45,8 +46,8 @@ class TimonControl {
     }
 
     #applyDelta(rawAngle) {
-        const delta = rawAngle - this.#startAngle;
-        this.#targetAngle = Math.max(-this.#maxAngle, Math.min(this.#maxAngle, delta));
+        const target = this.#startWheelAngle + (rawAngle - this.#startTouchAngle);
+        this.#targetAngle = Math.max(-this.#maxAngle, Math.min(this.#maxAngle, target));
         this.#steerInput  = this.#targetAngle / this.#maxAngle;
     }
 
@@ -63,7 +64,7 @@ class TimonControl {
         c.addEventListener('touchmove',   e => { e.preventDefault(); this.#onTouchMove(e);  }, { passive: false });
         c.addEventListener('touchend',    e => this.#reset());
         c.addEventListener('touchcancel', e => this.#reset());
-        c.addEventListener('mousedown',   e => { this.#center(); this.#mouseDown = true; this.#startAngle = this.#getAngle(e.clientX, e.clientY) - this.#angle; });
+        c.addEventListener('mousedown',   e => { this.#center(); this.#mouseDown = true; this.#startTouchAngle = this.#getAngle(e.clientX, e.clientY); this.#startWheelAngle = this.#angle; });
         window.addEventListener('mousemove', e => { if (this.#mouseDown) this.#applyDelta(this.#getAngle(e.clientX, e.clientY)); });
         window.addEventListener('mouseup',   () => this.#reset());
     }
@@ -72,8 +73,9 @@ class TimonControl {
         if (this.#touchId !== null) return;
         const t = e.changedTouches[0];
         this.#center();
-        this.#touchId    = t.identifier;
-        this.#startAngle = this.#getAngle(t.clientX, t.clientY) - this.#angle;
+        this.#touchId         = t.identifier;
+        this.#startTouchAngle = this.#getAngle(t.clientX, t.clientY);
+        this.#startWheelAngle = this.#angle;
     }
 
     #onTouchMove(e) {
