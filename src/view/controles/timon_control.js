@@ -63,7 +63,6 @@ class TimonControl {
     #onTouchStart(e) {
         if (this.#touchId !== null) return;
         const t = e.changedTouches[0];
-        this.#center();
         this.#touchId         = t.identifier;
         this.#startX          = t.clientX;
         this.#startWheelAngle = this.#angle;
