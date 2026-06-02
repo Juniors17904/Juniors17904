@@ -340,6 +340,11 @@ class App {
             document.querySelectorAll('.pista-card').forEach(c => c.classList.remove('sel'));
             card.classList.add('sel');
             this.#estado.pista = card.dataset.pista;
+            // Cada circuito tiene su timón predeterminado: ciudad → Clásico (0)
+            const timonDePista = { ciudad: 0 };
+            if (timonDePista[card.dataset.pista] !== undefined) {
+                this.#estado.timonModelo = timonDePista[card.dataset.pista];
+            }
             document.getElementById('detalle-pista-nombre').textContent =
                 card.querySelector('.pista-nombre').textContent;
             document.getElementById('detalle-pista-desc').textContent =

@@ -13,15 +13,50 @@
 - Si el usuario dice "no toques el código" → parar inmediatamente, solo texto
 - Ante cualquier duda, preguntar antes de programar
 
-## Arquitectura — Programación Orientada a Objetos (POO) ⚠️ REGLA CRÍTICA
-- **TODO el código nuevo DEBE seguir POO y MVC. Sin excepción.**
-- **MVC obligatorio**:
-  - **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`). Sin lógica de vista.
-  - **View** → dibujo, cámaras, controles UI (`CamaraChase`, `TimonControl`, `Minimap`). Sin lógica de negocio.
-  - **Controller** → orquesta Model y View (`app.js`, `game.js`). Sin física ni dibujo directo.
-- **POO obligatorio**: cada funcionalidad nueva va en una clase con responsabilidad única
-- **CADA CLASE DEBE TENER SENTIDO PROPIO**: sus atributos y métodos deben pertenecer naturalmente a ella. Si un atributo describe o representa a otra clase, DEBE vivir en esa clase, no en otra.
-- Cada clase tiene UNA responsabilidad clara (no mezclar lógica de física con lógica de vista)
+## ⚠️ ARQUITECTURA POO — REGLA ABSOLUTA E INNEGOCIABLE ⚠️
+
+### TODO lo que se cree DEBE ser una clase. Sin excepciones. Sin atajos.
+
+- **PROHIBIDO**: funciones sueltas, objetos literales como sustituto de instancias, métodos estáticos cuando la entidad tiene identidad propia, números o strings para representar entidades del juego
+- **OBLIGATORIO**: cada entidad nueva del juego es una clase instanciable con sus propios atributos y métodos
+
+### Regla de oro — ¿Cómo sé si necesita ser una clase?
+> Si la entidad tiene nombre propio, comportamiento y puede existir en múltiples variantes → **ES UNA CLASE**
+> Ejemplos: `TimonClasico`, `TimonF1`, `PistaUrbana`, `CarroDeportivo`, `PowerUpTurbo`
+
+### MVC obligatorio
+- **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`, `TimonClasico`). Sin lógica de vista.
+- **View** → dibujo, cámaras, controles UI (`CamaraChase`, `TimonControl`, `Minimap`). Sin lógica de negocio.
+- **Controller** → orquesta Model y View (`app.js`, `game.js`). Sin física ni dibujo directo.
+
+### POO obligatorio — checklist antes de escribir cualquier código nuevo
+1. ¿Tiene nombre propio? → clase con ese nombre
+2. ¿Tiene datos internos? → campos privados `#campo`
+3. ¿Tiene comportamiento? → métodos de instancia (no estáticos)
+4. ¿Hay variantes del mismo concepto? → subclases o clases separadas que comparten interfaz
+5. ¿Solo se expone lo necesario? → getters para lo que otros necesitan leer
+
+### Ejemplos correctos vs incorrectos
+
+```javascript
+// ❌ MAL — número como modelo de timón
+TimonRenderer.dibujar(ctx, S, 2); // ¿qué es 2?
+
+// ✅ BIEN — objeto con identidad propia
+const timon = new TimonF1();
+timon.dibujar(ctx, S);
+
+// ❌ MAL — switch/case con lógica de dibujo mezclada
+switch(modelo) { case 'f1': drawF1Lines(ctx); break; }
+
+// ✅ BIEN — cada clase se dibuja a sí misma
+class TimonF1 { dibujar(ctx, S) { /* lógica F1 aquí */ } }
+```
+
+### CADA CLASE DEBE TENER SENTIDO PROPIO
+- Sus atributos y métodos deben pertenecer naturalmente a ella
+- Si un atributo describe a otra clase, DEBE vivir en esa clase
+- Cada clase tiene UNA responsabilidad clara
 - Los datos internos van como privados (`#campo`), solo se exponen públicamente los que otros objetos necesitan leer
 - Antes de agregar código suelto, preguntar: ¿a qué clase pertenece esto?
 - NUNCA poner en una clase atributos o lógica que pertenezcan a otra clase

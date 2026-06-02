@@ -2,30 +2,16 @@
 try {
 
 // ================================================================
-// VIEW — TimonRenderer
-// Dibuja los 4 modelos de timón en un canvas 2D.
-// MVC: lógica pura de vista — sin estado ni input.
-// Llamar con ctx ya trasladado al centro del canvas.
+// VIEW — Modelos de Timón (POO)
+// Cada modelo es una clase independiente con responsabilidad única:
+// dibujarse a sí mismo. TimonRenderer los orquesta.
+// MVC: lógica pura de vista — sin estado de juego ni input.
 // ================================================================
-class TimonRenderer {
 
-    static MODELOS = ['Clásico', 'Deportivo', 'F1', 'Vintage'];
+class TimonClasico {
+    get nombre() { return 'Clásico'; }
 
-    static dibujar(ctx, S, modelo) {
-        ctx.save();
-        ctx.lineCap  = 'round';
-        ctx.lineJoin = 'round';
-        switch (modelo) {
-            case 1:  TimonRenderer.#deportivo(ctx, S); break;
-            case 2:  TimonRenderer.#f1(ctx, S);        break;
-            case 3:  TimonRenderer.#vintage(ctx, S);   break;
-            default: TimonRenderer.#clasico(ctx, S);   break;
-        }
-        ctx.restore();
-    }
-
-    // ── Clásico ── 3 radios equidistantes, llanta gris
-    static #clasico(ctx, S) {
+    dibujar(ctx, S) {
         const r    = S * 0.40;
         const rimW = S * 0.068;
         const hubR = S * 0.085;
@@ -56,9 +42,12 @@ class TimonRenderer {
         ctx.fillStyle = 'rgba(255,255,255,0.18)';
         ctx.fill();
     }
+}
 
-    // ── Deportivo ── llanta violeta con grip lateral, radio superior destacado
-    static #deportivo(ctx, S) {
+class TimonDeportivo {
+    get nombre() { return 'Deportivo'; }
+
+    dibujar(ctx, S) {
         const r    = S * 0.40;
         const rimW = S * 0.076;
         const hubR = S * 0.092;
@@ -107,9 +96,12 @@ class TimonRenderer {
         ctx.fillStyle = '#c4b5fd';
         ctx.fill();
     }
+}
 
-    // ── F1 ── fondo plano, radios en T, botonera con botones
-    static #f1(ctx, S) {
+class TimonF1 {
+    get nombre() { return 'F1'; }
+
+    dibujar(ctx, S) {
         const r     = S * 0.38;
         const rimW  = S * 0.058;
         const hubR  = S * 0.075;
@@ -165,9 +157,12 @@ class TimonRenderer {
             ctx.fill();
         });
     }
+}
 
-    // ── Vintage ── llanta delgada marrón, radios en X, bocín dorado
-    static #vintage(ctx, S) {
+class TimonVintage {
+    get nombre() { return 'Vintage'; }
+
+    dibujar(ctx, S) {
         const r    = S * 0.42;
         const rimW = S * 0.038;
         const hubR = S * 0.07;
@@ -217,7 +212,38 @@ class TimonRenderer {
     }
 }
 
-window.TimonRenderer = TimonRenderer;
+// ================================================================
+// VIEW — TimonRenderer
+// Orquesta los 4 modelos de timón. Cada modelo es una clase propia.
+// ================================================================
+class TimonRenderer {
+    static MODELOS = [
+        new TimonClasico(),
+        new TimonDeportivo(),
+        new TimonF1(),
+        new TimonVintage(),
+    ];
+
+    static dibujar(ctx, S, indice) {
+        const modelo = TimonRenderer.MODELOS[indice];
+        if (!modelo) return;
+        ctx.save();
+        ctx.lineCap  = 'round';
+        ctx.lineJoin = 'round';
+        modelo.dibujar(ctx, S);
+        ctx.restore();
+    }
+
+    static nombre(indice) {
+        return TimonRenderer.MODELOS[indice]?.nombre ?? '';
+    }
+}
+
+window.TimonClasico   = TimonClasico;
+window.TimonDeportivo = TimonDeportivo;
+window.TimonF1        = TimonF1;
+window.TimonVintage   = TimonVintage;
+window.TimonRenderer  = TimonRenderer;
 
 } catch(e) {
     window.__modelErrors = window.__modelErrors || [];
