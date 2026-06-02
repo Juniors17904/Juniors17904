@@ -511,6 +511,45 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 .btn-tuerca:hover { background: rgba(124,58,237,0.4); box-shadow: 0 0 20px rgba(124,58,237,0.7); }
 
 /* =============================================
+   DISEÑO DE TIMÓN — grid de 4 modelos
+   ============================================= */
+.timon-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: min(92vw, 360px);
+}
+.timon-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    background: rgba(10,10,30,0.88);
+    border: 2px solid rgba(124,58,237,0.35);
+    border-radius: 14px;
+    padding: 16px 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.timon-card:hover {
+    border-color: var(--neon-v);
+    box-shadow: 0 0 14px rgba(124,58,237,0.45);
+}
+.timon-card.sel {
+    border-color: var(--neon-v);
+    background: rgba(124,58,237,0.18);
+    box-shadow: 0 0 20px rgba(124,58,237,0.6);
+}
+.timon-preview { background: transparent; display: block; }
+.timon-nombre {
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.8);
+    text-transform: uppercase;
+}
+
+/* =============================================
    CONTROLES GUIDE
    ============================================= */
 .controles-modos {

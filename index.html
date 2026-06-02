@@ -482,6 +482,30 @@
         </div>
     </div>
 
+    <!-- Pantalla: Diseño de timón -->
+    <div id="pantalla-timon-diseno" class="pantalla">
+        <button id="btn-volver-timon-diseno" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:20px;margin-bottom:24px">ELIGE TU TIMÓN</div>
+        <div class="timon-grid">
+            <div class="timon-card" data-modelo="0">
+                <canvas class="timon-preview" width="110" height="110"></canvas>
+                <span class="timon-nombre">Clásico</span>
+            </div>
+            <div class="timon-card" data-modelo="1">
+                <canvas class="timon-preview" width="110" height="110"></canvas>
+                <span class="timon-nombre">Deportivo</span>
+            </div>
+            <div class="timon-card" data-modelo="2">
+                <canvas class="timon-preview" width="110" height="110"></canvas>
+                <span class="timon-nombre">F1</span>
+            </div>
+            <div class="timon-card" data-modelo="3">
+                <canvas class="timon-preview" width="110" height="110"></canvas>
+                <span class="timon-nombre">Vintage</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Pantalla: Resultado -->
     <div id="pantalla-resultado" class="pantalla">
         <div class="resultado-card">
@@ -521,6 +545,7 @@
     <script src="src/model/pistas/testdrive.js"></script>
     <script src="src/model/carros/carro2d.js"></script>
     <script src="src/model/pista.js"></script>
+    <script src="src/view/controles/timon_renderer.js"></script>
     <script src="src/view/controles/timon_control.js"></script>
     <script src="src/view/minimap.js"></script>
     <script src="src/view/view_pista2d.js"></script>

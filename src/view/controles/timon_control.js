@@ -9,8 +9,7 @@ try {
 class TimonControl {
     #canvas;
     #ctx;
-    #img         = new Image();
-    #imgReady    = false;
+    #modelo          = 0;
     #steerInput      = 0;
     #angle           = 0;
     #targetAngle     = 0;
@@ -18,18 +17,17 @@ class TimonControl {
     #startX          = 0;
     #startWheelAngle = 0;
     #maxAngle        = Math.PI / 3;
-    #sensitivity     = 80;   // píxeles para llegar al máximo
+    #sensitivity     = 80;
     #raf             = 0;
     #mouseDown       = false;
 
     get steerInput() { return this.#steerInput; }
     get isActive()   { return this.#touchId !== null || this.#mouseDown; }
 
-    constructor(canvasId) {
-        this.#canvas   = document.getElementById(canvasId);
-        this.#ctx      = this.#canvas.getContext('2d');
-        this.#img.onload = () => { this.#imgReady = true; };
-        this.#img.src    = 'src/assets/timon-icon.png';
+    constructor(canvasId, modelo = 0) {
+        this.#canvas = document.getElementById(canvasId);
+        this.#ctx    = this.#canvas.getContext('2d');
+        this.#modelo = modelo;
         this.#setup();
         this.#loop();
     }
@@ -90,19 +88,10 @@ class TimonControl {
         const S   = Math.min(W, H);
 
         ctx.clearRect(0, 0, W, H);
-        if (!this.#imgReady) return;
-
         ctx.save();
         ctx.translate(W / 2, H / 2);
         ctx.rotate(this.#angle);
-
-        ctx.drawImage(this.#img, -S / 2, -S / 2, S, S);
-
-        // tiñe negro → gris conservando la transparencia
-        ctx.globalCompositeOperation = 'source-atop';
-        ctx.fillStyle = 'rgba(160,160,160,0.92)';
-        ctx.fillRect(-S / 2, -S / 2, S, S);
-
+        window.TimonRenderer.dibujar(ctx, S, this.#modelo);
         ctx.restore();
     }
 }

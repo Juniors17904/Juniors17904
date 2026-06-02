@@ -168,6 +168,7 @@ class App {
         nombre: 'Jugador',
         color: '#ef4444',
         control: 'botones',
+        timonModelo: 0,
         modoSolo: true,
         tipoAuto: 'deportivo',
         pista: 'ciudad',
@@ -235,9 +236,25 @@ class App {
         document.getElementById('control-tabs').addEventListener('click', e => {
             const btn = e.target.closest('.tab-btn');
             if (!btn) return;
+            if (btn.dataset.ctrl === 'timon') {
+                this.#dibujarPreviewsTimon();
+                this.#mostrar('pantalla-timon-diseno');
+                return;
+            }
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sel'));
             btn.classList.add('sel');
             this.#estado.control = btn.dataset.ctrl;
+        });
+
+        document.getElementById('btn-volver-timon-diseno').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
+        document.querySelectorAll('.timon-card').forEach(card => {
+            card.addEventListener('click', () => {
+                this.#estado.timonModelo = parseInt(card.dataset.modelo);
+                this.#estado.control     = 'timon';
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sel'));
+                document.querySelector('[data-ctrl="timon"]').classList.add('sel');
+                this.#mostrar('pantalla-inicio');
+            });
         });
 
         document.getElementById('btn-solo').addEventListener('click', () => {
@@ -427,6 +444,21 @@ class App {
                 setTimeout(() => this.#iniciarJuego(), 300);
             }
         }, 900);
+    }
+
+    // ── Timón: dibuja previews de los 4 modelos ──────────────────
+    #dibujarPreviewsTimon() {
+        document.querySelectorAll('.timon-card').forEach((card, i) => {
+            const canvas = card.querySelector('.timon-preview');
+            const ctx    = canvas.getContext('2d');
+            const S      = Math.min(canvas.width, canvas.height);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            window.TimonRenderer.dibujar(ctx, S, i);
+            ctx.restore();
+            card.classList.toggle('sel', i === this.#estado.timonModelo);
+        });
     }
 
     // ── Juego ────────────────────────────────────────────────────
@@ -866,7 +898,7 @@ class App {
         }
 
         // Timón táctil + botones ACEL / FRENO
-        const timon = new window.TimonControl('canvas-timon');
+        const timon = new window.TimonControl('canvas-timon', this.#estado.timonModelo);
         document.getElementById('ctrl-timon').style.display   = 'flex';
         document.getElementById('ctrl-botones').style.display  = 'none';
         document.getElementById('ctrl-accel').style.display    = 'none';
