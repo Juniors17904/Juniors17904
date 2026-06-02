@@ -360,7 +360,7 @@ class TestDrive3D {
         this.#raf = requestAnimationFrame(() => this.#tick());
         this.#updatePhysics();
         this.#camaraChase.altura = this.camHeight;
-        this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, this.#carro.velAngle);
+        this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, 0);
         this.#sun.position.set(this.#carro.px + 10, 20, this.#carro.pz + 10);
         this.#sun.target.position.set(this.#carro.px, 0, this.#carro.pz);
         this.#sun.target.updateMatrixWorld();
