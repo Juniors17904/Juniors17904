@@ -66,7 +66,6 @@ class TestDrive3D {
     #carro = null;
     #leanGroup = null;
     #wheels = [];
-    #yawVisual = 0;
 
     accelInput = 0;
     steerInput = 0;
@@ -361,7 +360,7 @@ class TestDrive3D {
         this.#raf = requestAnimationFrame(() => this.#tick());
         this.#updatePhysics();
         this.#camaraChase.altura = this.camHeight;
-        this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, 0);
+        this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, this.#carro.velAngle);
         this.#sun.position.set(this.#carro.px + 10, 20, this.#carro.pz + 10);
         this.#sun.target.position.set(this.#carro.px, 0, this.#carro.pz);
         this.#sun.target.updateMatrixWorld();
@@ -379,9 +378,8 @@ class TestDrive3D {
         if (this.#carro.pz < -950) this.#carro.setPosicion(this.#carro.px, this.#carro.pz + 1900);
 
         if (this.#carGroup) {
-            this.#yawVisual += (this.steerInput * 0.28 - this.#yawVisual) * 0.06;
             this.#carGroup.position.set(this.#carro.px, 0, this.#carro.pz);
-            this.#carGroup.rotation.y = this.#carro.rotY + this.#yawVisual;
+            this.#carGroup.rotation.y = this.#carro.rotY;
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carro.carLean;
 

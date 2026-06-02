@@ -31,19 +31,24 @@ export class Carro {
     #accelVal   = 0;
     #maxSpeed   = 0;
     #carLean    = 0;
+    #velAngle   = 0;
+    #driftAngle = 0;
     #turboTimer = 0;
 
     constructor(px = 0, pz = 0, rotY = 0) {
         this.#px = px; this.#pz = pz; this.#rotY = rotY;
+        this.#velAngle = rotY;
     }
 
-    get px()       { return this.#px; }
-    get pz()       { return this.#pz; }
-    get rotY()     { return this.#rotY; }
-    get speed()    { return this.#speed; }
-    get accel()    { return this.#accelVal; }
-    get maxSpeed() { return this.#maxSpeed; }
-    get carLean()  { return this.#carLean; }
+    get px()         { return this.#px; }
+    get pz()         { return this.#pz; }
+    get rotY()       { return this.#rotY; }
+    get velAngle()   { return this.#velAngle; }
+    get driftAngle() { return this.#driftAngle; }
+    get speed()      { return this.#speed; }
+    get accel()      { return this.#accelVal; }
+    get maxSpeed()   { return this.#maxSpeed; }
+    get carLean()    { return this.#carLean; }
 
     setPosicion(px, pz) { this.#px = px; this.#pz = pz; }
 
@@ -80,10 +85,15 @@ export class Carro {
         if (Math.abs(this.#speed) > 0.005)
             this.#rotY -= this.steerInput * this.steerConst * Math.sign(this.#speed);
 
-        this.#px += Math.sin(this.#rotY) * this.#speed;
-        this.#pz += Math.cos(this.#rotY) * this.#speed;
-
+        // Derrape: velAngle sigue a rotY con lag proporcional a velocidad y giro
         const sf = Math.abs(this.#speed) / this.maxFwd;
+        const grip = 1 - sf * Math.abs(this.steerInput) * 0.65;
+        this.#velAngle += (this.#rotY - this.#velAngle) * Math.max(0.18, grip);
+        this.#driftAngle = this.#rotY - this.#velAngle;
+
+        this.#px += Math.sin(this.#velAngle) * this.#speed;
+        this.#pz += Math.cos(this.#velAngle) * this.#speed;
+
         this.#carLean += (-this.steerInput * 0.22 * sf - this.#carLean) * 0.08;
     }
 }

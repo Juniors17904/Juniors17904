@@ -68,7 +68,6 @@ class CircuitoUrbano {
     #canvas; #raf = 0; #sun = null;
     #carGroup = null; #leanGroup = null; #wheels = [];
     #resizeHandler = null;
-    #yawVisual = 0;
 
     #ruta = new Ruta();
     #camAerea = null;
@@ -337,7 +336,7 @@ class CircuitoUrbano {
         this.#raf = requestAnimationFrame(() => this.#tick());
         this.#updatePhysics();
         this.#camaraChase.altura = this.camHeight;
-        this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.rotY, this.steerInput);
+        this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.steerInput);
         if (this.#camAereaActiva) {
             this.#camAerea.actualizar(this.#mov.px, this.#mov.pz);
         }
@@ -401,9 +400,8 @@ class CircuitoUrbano {
         }
 
         if (this.#carGroup) {
-            this.#yawVisual += (this.steerInput * 0.28 - this.#yawVisual) * 0.06;
             this.#carGroup.position.set(this.#mov.px, 0, this.#mov.pz);
-            this.#carGroup.rotation.y = this.#mov.rotY + this.#yawVisual;
+            this.#carGroup.rotation.y = this.#mov.rotY;
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
         for (const w of this.#wheels) w.rotation.x += this.#mov.speed * 6;
