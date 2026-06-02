@@ -645,6 +645,24 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     letter-spacing: 1px;
     text-align: center;
 }
+.btn-disenar-timon {
+    margin-top: 6px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 2px solid var(--neon-v);
+    background: rgba(124,58,237,0.18);
+    color: #c4b5fd;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-disenar-timon:hover {
+    background: rgba(124,58,237,0.4);
+    box-shadow: 0 0 14px rgba(124,58,237,0.5);
+    color: #fff;
+}
 
 /* =============================================
    AJUSTES

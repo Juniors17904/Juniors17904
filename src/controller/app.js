@@ -175,7 +175,8 @@ class App {
         juego: null,
     };
 
-    #backNav = false;
+    #backNav     = false;
+    #timonOrigen = 'pantalla-inicio';
 
     constructor() {
         OrientacionManager.iniciarListeners();
@@ -237,6 +238,7 @@ class App {
             const btn = e.target.closest('.tab-btn');
             if (!btn) return;
             if (btn.dataset.ctrl === 'timon') {
+                this.#timonOrigen = 'pantalla-inicio';
                 this.#dibujarPreviewsTimon();
                 this.#mostrar('pantalla-timon-diseno');
                 return;
@@ -246,7 +248,12 @@ class App {
             this.#estado.control = btn.dataset.ctrl;
         });
 
-        document.getElementById('btn-volver-timon-diseno').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
+        document.getElementById('btn-volver-timon-diseno').addEventListener('click', () => this.#mostrar(this.#timonOrigen));
+        document.getElementById('btn-disenar-timon').addEventListener('click', () => {
+            this.#timonOrigen = 'pantalla-controles';
+            this.#dibujarPreviewsTimon();
+            this.#mostrar('pantalla-timon-diseno');
+        });
         document.querySelectorAll('.timon-card').forEach(card => {
             card.addEventListener('click', () => {
                 this.#estado.timonModelo = parseInt(card.dataset.modelo);
