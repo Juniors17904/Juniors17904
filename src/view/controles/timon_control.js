@@ -84,27 +84,26 @@ class TimonControl {
         const ctx = this.#ctx;
         const W   = this.#canvas.width, H = this.#canvas.height;
         const R   = Math.min(W, H) * 0.42;
-        const ri  = R * 0.65;
-        const rh  = R * 0.18;
-        const col = 'rgba(124,58,237,0.95)';
+        const ri  = R * 0.58;   // inner rim (anillo grueso como el ícono)
+        const rh  = R * 0.17;   // hub
 
         ctx.clearRect(0, 0, W, H);
         ctx.save();
         ctx.translate(W / 2, H / 2);
         ctx.rotate(this.#angle);
-        ctx.fillStyle = col;
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
 
-        // aro (anillo exterior)
+        // aro exterior
         ctx.beginPath();
         ctx.arc(0, 0, R,  0, Math.PI * 2, false);
         ctx.arc(0, 0, ri, 0, Math.PI * 2, true);
         ctx.fill('evenodd');
 
-        // 3 rayos: top ancho, bottom-izq y bottom-der angostos
+        // 3 rayos (top muy ancho, dos inferiores angostos — igual al ícono)
         const rayos = [
-            [-Math.PI / 2,                    Math.PI / 3  ],
-            [-Math.PI / 2 + 2 * Math.PI / 3, Math.PI / 6  ],
-            [-Math.PI / 2 - 2 * Math.PI / 3, Math.PI / 6  ],
+            [-Math.PI / 2,                    Math.PI * 0.44],  // top ~80°
+            [-Math.PI / 2 + 2 * Math.PI / 3, Math.PI * 0.14],  // bottom-right ~25°
+            [-Math.PI / 2 - 2 * Math.PI / 3, Math.PI * 0.14],  // bottom-left ~25°
         ];
         for (const [center, half] of rayos) {
             ctx.beginPath();
@@ -114,15 +113,9 @@ class TimonControl {
             ctx.fill();
         }
 
-        // centro (hub)
+        // hub central
         ctx.beginPath();
         ctx.arc(0, 0, rh, 0, Math.PI * 2);
-        ctx.fill();
-
-        // punto indicador arriba
-        ctx.beginPath();
-        ctx.arc(0, -R * 0.85, R * 0.05, 0, Math.PI * 2);
-        ctx.fillStyle = '#fff';
         ctx.fill();
 
         ctx.restore();
