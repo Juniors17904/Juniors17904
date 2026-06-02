@@ -36,6 +36,8 @@
     <div id="pantalla-inicio" class="pantalla activa">
         <!-- Botón tuerca garage -->
         <button id="btn-garage" class="btn-tuerca">⚙</button>
+        <!-- Botón controles (botones y pedales) -->
+        <button id="btn-controles" class="btn-tuerca" style="right:72px">🎮</button>
         <!-- Botón recargar -->
         <button onclick="location.reload()" class="btn-tuerca" style="left:16px;right:auto">↺</button>
 
@@ -405,6 +407,75 @@
             <div class="color-btn" data-color="#f0f0f0" style="background:#f0f0f0"></div>
         </div>
         <button id="btn-seleccionar-carro" class="btn-neon btn-compacto">Seleccionar ✓</button>
+    </div>
+
+    <!-- Pantalla: Controles (botones y pedales) -->
+    <div id="pantalla-controles" class="pantalla">
+        <button id="btn-volver-controles" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:20px;margin-bottom:20px">CONTROLES</div>
+        <div class="controles-modos">
+
+            <!-- Modo Botones -->
+            <div class="ctrl-card">
+                <div class="ctrl-card-titulo">🕹️ Botones</div>
+                <div class="ctrl-diagram">
+                    <div class="ctrl-diag-row">
+                        <div class="ctrl-tecla">◀</div>
+                        <div class="ctrl-tecla-lbl">GIRAR</div>
+                        <div class="ctrl-tecla">▶</div>
+                    </div>
+                    <div class="ctrl-diag-pedales">
+                        <div class="ctrl-pedal gas">
+                            <span class="pedal-icono">▲</span>
+                            <span class="pedal-lbl">GAS</span>
+                        </div>
+                        <div class="ctrl-pedal freno">
+                            <span class="pedal-icono">▼</span>
+                            <span class="pedal-lbl">FRENO</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modo Timón -->
+            <div class="ctrl-card">
+                <div class="ctrl-card-titulo">🎡 Timón</div>
+                <div class="ctrl-diagram">
+                    <div class="ctrl-diag-row" style="gap:24px">
+                        <div class="ctrl-timon-visual">⊙</div>
+                        <div class="ctrl-diag-pedales">
+                            <div class="ctrl-pedal gas">
+                                <span class="pedal-icono">▲</span>
+                                <span class="pedal-lbl">ACEL</span>
+                            </div>
+                            <div class="ctrl-pedal freno">
+                                <span class="pedal-icono">▼</span>
+                                <span class="pedal-lbl">FRENO</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ctrl-diag-desc">Desliza el timón izquierda/derecha</div>
+                </div>
+            </div>
+
+            <!-- Modo Giroscopio -->
+            <div class="ctrl-card">
+                <div class="ctrl-card-titulo">📱 Giroscopio</div>
+                <div class="ctrl-diagram">
+                    <div class="ctrl-diag-row" style="gap:24px">
+                        <div class="ctrl-timon-visual" style="font-size:32px">⟲</div>
+                        <div class="ctrl-diag-pedales">
+                            <div class="ctrl-pedal gas">
+                                <span class="pedal-icono">▲</span>
+                                <span class="pedal-lbl">GAS</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ctrl-diag-desc">Inclina el dispositivo para girar</div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <!-- Pantalla: Resultado -->
