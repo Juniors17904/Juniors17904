@@ -9,6 +9,8 @@ try {
 class TimonControl {
     #canvas;
     #ctx;
+    #img         = new Image();
+    #imgReady    = false;
     #steerInput      = 0;
     #angle           = 0;
     #targetAngle     = 0;
@@ -24,8 +26,10 @@ class TimonControl {
     get isActive()   { return this.#touchId !== null || this.#mouseDown; }
 
     constructor(canvasId) {
-        this.#canvas = document.getElementById(canvasId);
-        this.#ctx    = this.#canvas.getContext('2d');
+        this.#canvas   = document.getElementById(canvasId);
+        this.#ctx      = this.#canvas.getContext('2d');
+        this.#img.onload = () => { this.#imgReady = true; };
+        this.#img.src    = 'src/assets/timon-icon.png';
         this.#setup();
         this.#loop();
     }
@@ -83,41 +87,15 @@ class TimonControl {
     #draw() {
         const ctx = this.#ctx;
         const W   = this.#canvas.width, H = this.#canvas.height;
-        const R   = Math.min(W, H) * 0.42;
-        const ri  = R * 0.58;   // inner rim (anillo grueso como el ícono)
-        const rh  = R * 0.17;   // hub
+        const S   = Math.min(W, H);
 
         ctx.clearRect(0, 0, W, H);
+        if (!this.#imgReady) return;
+
         ctx.save();
         ctx.translate(W / 2, H / 2);
         ctx.rotate(this.#angle);
-        ctx.fillStyle = 'rgba(255,255,255,0.92)';
-
-        // aro exterior
-        ctx.beginPath();
-        ctx.arc(0, 0, R,  0, Math.PI * 2, false);
-        ctx.arc(0, 0, ri, 0, Math.PI * 2, true);
-        ctx.fill('evenodd');
-
-        // 3 rayos (top muy ancho, dos inferiores angostos — igual al ícono)
-        const rayos = [
-            [-Math.PI / 2,                    Math.PI * 0.44],  // top ~80°
-            [-Math.PI / 2 + 2 * Math.PI / 3, Math.PI * 0.14],  // bottom-right ~25°
-            [-Math.PI / 2 - 2 * Math.PI / 3, Math.PI * 0.14],  // bottom-left ~25°
-        ];
-        for (const [center, half] of rayos) {
-            ctx.beginPath();
-            ctx.arc(0, 0, ri, center - half, center + half);
-            ctx.arc(0, 0, rh, center + half, center - half, true);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        // hub central
-        ctx.beginPath();
-        ctx.arc(0, 0, rh, 0, Math.PI * 2);
-        ctx.fill();
-
+        ctx.drawImage(this.#img, -S / 2, -S / 2, S, S);
         ctx.restore();
     }
 }
