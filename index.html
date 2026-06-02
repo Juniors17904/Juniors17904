@@ -36,8 +36,6 @@
     <div id="pantalla-inicio" class="pantalla activa">
         <!-- Botón tuerca garage -->
         <button id="btn-garage" class="btn-tuerca">⚙</button>
-        <!-- Botón controles (botones y pedales) -->
-        <button id="btn-controles" class="btn-tuerca" style="right:72px">🎮</button>
         <!-- Botón recargar -->
         <button onclick="location.reload()" class="btn-tuerca" style="left:16px;right:auto">↺</button>
 
@@ -269,6 +267,11 @@
                 <span class="ajuste-txt">Test Drive 3D</span>
                 <span class="ajuste-arrow">›</span>
             </button>
+            <button id="btn-ir-controles" class="ajuste-item">
+                <span class="ajuste-icono">🎮</span>
+                <span class="ajuste-txt">Diseño de botones y pedales</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
         </div>
     </div>
 
@@ -412,6 +415,7 @@
     <!-- Pantalla: Controles (botones y pedales) -->
     <div id="pantalla-controles" class="pantalla">
         <button id="btn-volver-controles" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <!-- vuelve a ajustes, no a inicio -->
         <div class="titulo-logo" style="font-size:20px;margin-bottom:20px">CONTROLES</div>
         <div class="controles-modos">
 

@@ -286,8 +286,8 @@ class App {
 
         document.getElementById('btn-garage').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-ajustes').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
-        document.getElementById('btn-controles').addEventListener('click', () => this.#mostrar('pantalla-controles'));
-        document.getElementById('btn-volver-controles').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
+        document.getElementById('btn-ir-controles').addEventListener('click', () => this.#mostrar('pantalla-controles'));
+        document.getElementById('btn-volver-controles').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-ir-garage').addEventListener('click', () => {
             this.#mostrar('pantalla-garage');
             Garage.iniciar(this.#estado, id => this.#mostrar(id));
