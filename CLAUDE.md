@@ -4,7 +4,8 @@
 - Responder SIEMPRE en español en el texto de respuesta (lo que ve el usuario)
 - El razonamiento interno (proceso de pensamiento) también en español
 - Las descripciones de herramientas y comandos también en español
-- Solo se permite inglés en: nombres de variables, funciones, y código fuente donde ya existe convención en inglés
+- **TODO el código fuente en español**: nombres de clases, archivos, métodos y atributos en español
+- Solo se permite inglés en: APIs externas (Three.js, Supabase), nombres de librerías, acrónimos universales (HUD, SUV, F1)
 
 ## Reglas de código — CRÍTICAS
 - NUNCA modificar, editar, crear ni borrar código sin que el usuario use palabras de acción explícitas:
@@ -20,31 +21,51 @@
 - **PROHIBIDO**: funciones sueltas, objetos literales como sustituto de instancias, métodos estáticos cuando la entidad tiene identidad propia, números o strings para representar entidades del juego
 - **OBLIGATORIO**: cada entidad nueva del juego es una clase instanciable con sus propios atributos y métodos
 
+### Una clase = un archivo. Sin excepciones.
+- **CADA CLASE VIVE EN SU PROPIO ARCHIVO**
+- El nombre del archivo debe coincidir con el nombre de la clase en snake_case español
+- Ejemplos: `TimonClasico` → `timon_clasico.js`, `CamaraSeguimiento` → `camara_seguimiento.js`
+- **PROHIBIDO** definir más de una clase por archivo
+
+### Nombres en español obligatorio
+- Clases: `ControlTimon`, `CamaraSeguimiento`, `GestorAlertas`, `RenderizadorTimon`
+- Archivos: `control_timon.js`, `camara_seguimiento.js`, `gestor_alertas.js`
+- Métodos y atributos: `actualizar()`, `dibujar()`, `#velocidad`, `#angulo`
+- **PROHIBIDO** nombres en inglés para entidades del proyecto
+
 ### Regla de oro — ¿Cómo sé si necesita ser una clase?
 > Si la entidad tiene nombre propio, comportamiento y puede existir en múltiples variantes → **ES UNA CLASE**
 > Ejemplos: `TimonClasico`, `TimonF1`, `PistaUrbana`, `CarroDeportivo`, `PowerUpTurbo`
 
 ### MVC obligatorio
-- **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`, `TimonClasico`). Sin lógica de vista.
-- **View** → dibujo, cámaras, controles UI (`CamaraChase`, `TimonControl`, `Minimap`). Sin lógica de negocio.
-- **Controller** → orquesta Model y View (`app.js`, `game.js`). Sin física ni dibujo directo.
+- **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`). Sin lógica de vista.
+- **View** → dibujo, cámaras, controles UI (`CamaraSeguimiento`, `ControlTimon`, `Minimapa`). Sin lógica de negocio.
+- **Controller** → orquesta Model y View (`aplicacion.js`, `juego.js`). Sin física ni dibujo directo.
 
 ### POO obligatorio — checklist antes de escribir cualquier código nuevo
-1. ¿Tiene nombre propio? → clase con ese nombre
+1. ¿Tiene nombre propio? → clase con ese nombre en español
 2. ¿Tiene datos internos? → campos privados `#campo`
 3. ¿Tiene comportamiento? → métodos de instancia (no estáticos)
 4. ¿Hay variantes del mismo concepto? → subclases o clases separadas que comparten interfaz
 5. ¿Solo se expone lo necesario? → getters para lo que otros necesitan leer
+6. ¿Está en su propio archivo? → si no, moverla antes de continuar
 
 ### Ejemplos correctos vs incorrectos
 
 ```javascript
-// ❌ MAL — número como modelo de timón
-TimonRenderer.dibujar(ctx, S, 2); // ¿qué es 2?
+// ❌ MAL — múltiples clases en un archivo
+// carro.js contiene: Carro, CarroDeportivo, CarroSUV
 
-// ✅ BIEN — objeto con identidad propia
-const timon = new TimonF1();
-timon.dibujar(ctx, S);
+// ✅ BIEN — cada clase en su archivo
+// carro.js → class Carro
+// carro_deportivo.js → class CarroDeportivo
+// carro_suv.js → class CarroSUV
+
+// ❌ MAL — nombre en inglés
+class TimonRenderer { }   // archivo: timon_renderer.js
+
+// ✅ BIEN — nombre en español
+class RenderizadorTimon { }   // archivo: renderizador_timon.js
 
 // ❌ MAL — switch/case con lógica de dibujo mezclada
 switch(modelo) { case 'f1': drawF1Lines(ctx); break; }
