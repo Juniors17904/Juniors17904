@@ -95,7 +95,14 @@ class TimonControl {
         ctx.save();
         ctx.translate(W / 2, H / 2);
         ctx.rotate(this.#angle);
+
         ctx.drawImage(this.#img, -S / 2, -S / 2, S, S);
+
+        // tiñe negro → gris conservando la transparencia
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.fillStyle = 'rgba(160,160,160,0.92)';
+        ctx.fillRect(-S / 2, -S / 2, S, S);
+
         ctx.restore();
     }
 }
