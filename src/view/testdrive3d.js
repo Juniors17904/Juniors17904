@@ -66,6 +66,7 @@ class TestDrive3D {
     #carro = null;
     #leanGroup = null;
     #wheels = [];
+    #yawVisual = 0;
 
     accelInput = 0;
     steerInput = 0;
@@ -378,8 +379,9 @@ class TestDrive3D {
         if (this.#carro.pz < -950) this.#carro.setPosicion(this.#carro.px, this.#carro.pz + 1900);
 
         if (this.#carGroup) {
+            this.#yawVisual += (this.steerInput * 0.28 - this.#yawVisual) * 0.06;
             this.#carGroup.position.set(this.#carro.px, 0, this.#carro.pz);
-            this.#carGroup.rotation.y = this.#carro.rotY;
+            this.#carGroup.rotation.y = this.#carro.rotY + this.#yawVisual;
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carro.carLean;
 
