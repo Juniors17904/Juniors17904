@@ -1,21 +1,12 @@
 'use strict';
 
 // MODEL — Pista pseudo-3D: segmentos, colisiones, límites
-// Depende de model.js (CFG, NIVELES, PISTAS) cargado antes.
+// Depende de model.js (CFG, NIVELES, PISTAS) y segmento.js cargados antes.
 
 try {
 const CFG     = window.CFG;
 const NIVELES = window.NIVELES;
 const PISTAS  = window.PISTAS;
-
-class Segmento {
-    constructor(index, curva, nivel) {
-        this.index     = index;
-        this.curva     = curva;
-        this.nivel     = nivel;
-        this.obstaculos = [];
-    }
-}
 
 class Pista {
     #segmentos = [];

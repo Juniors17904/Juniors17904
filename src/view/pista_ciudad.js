@@ -1,9 +1,9 @@
 'use strict';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { Ruta } from '../model/model_fisica.js';
+import { Ruta } from '../model/ruta.js';
 import { Carro } from '../model/carros/carro.js';
-import { CamaraChase } from './camaras/camara_chase.js';
+import { CamaraSeguimiento as CamaraChase } from './camaras/camara_seguimiento.js';
 import { CamaraAerea } from './camaras/camara_aerea.js';
 
 // ── Helpers (igual que viewer3d.js) ─────────────────────────────

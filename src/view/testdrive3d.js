@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Carro } from '../model/carros/carro.js';
-import { CamaraChase } from './camaras/camara_chase.js';
+import { CamaraSeguimiento as CamaraChase } from './camaras/camara_seguimiento.js';
 
 // ── Helpers ──────────────────────────────────────────────────────
 let _glbPromise = null;
@@ -390,4 +390,6 @@ class TestDrive3D {
 
 }
 
+window.ManejoLibre3D = TestDrive3D;
+// Alias de compatibilidad
 window.TestDrive3D = TestDrive3D;

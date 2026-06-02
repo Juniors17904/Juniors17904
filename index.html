@@ -536,21 +536,41 @@
       }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Módulos ES (Three.js, pistas 3D) -->
     <script type="module" src="src/view/viewer3d.js"></script>
     <script type="module" src="src/view/testdrive3d.js"></script>
     <script type="module" src="src/view/pista_ciudad.js"></script>
-    <script src="src/controller/garage.js"></script>
+
+    <!-- Scripts globales (window.*) — en orden de dependencia -->
     <script src="src/services/supabase-client.js"></script>
     <script src="src/model/model.js"></script>
     <script src="src/model/pistas/ciudad.js"></script>
     <script src="src/model/pistas/testdrive.js"></script>
     <script src="src/model/carros/carro2d.js"></script>
+    <script src="src/model/segmento.js"></script>
     <script src="src/model/pista.js"></script>
-    <script src="src/view/controles/timon_renderer.js"></script>
-    <script src="src/view/controles/timon_control.js"></script>
-    <script src="src/view/minimap.js"></script>
-    <script src="src/view/view_pista2d.js"></script>
-    <script src="src/controller/game.js"></script>
-    <script src="src/controller/app.js"></script>
+
+    <!-- View: timones -->
+    <script src="src/view/controles/timon_clasico.js"></script>
+    <script src="src/view/controles/timon_deportivo.js"></script>
+    <script src="src/view/controles/timon_f1.js"></script>
+    <script src="src/view/controles/timon_retro.js"></script>
+    <script src="src/view/controles/renderizador_timon.js"></script>
+    <script src="src/view/controles/control_timon.js"></script>
+
+    <!-- View: minimapa y pista 2D -->
+    <script src="src/view/minimapa.js"></script>
+    <script src="src/view/renderizador_pista.js"></script>
+    <script src="src/view/renderizador_auto.js"></script>
+    <script src="src/view/pantalla_juego.js"></script>
+
+    <!-- Controller -->
+    <script src="src/controller/probador_giroscopio.js"></script>
+    <script src="src/controller/gestor_alertas.js"></script>
+    <script src="src/controller/gestor_orientacion.js"></script>
+    <script src="src/controller/garaje.js"></script>
+    <script src="src/controller/controles.js"></script>
+    <script src="src/controller/juego.js"></script>
+    <script src="src/controller/aplicacion.js"></script>
 </body>
 </html>

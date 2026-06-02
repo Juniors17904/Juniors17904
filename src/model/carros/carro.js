@@ -2,7 +2,7 @@
 
 // ================================================================
 // MODEL — Carro 3D (física de movimiento libre)
-// Reemplaza MovimientoLibre para los modos 3D (TestDrive3D, CircuitoUrbano).
+// Reemplaza MovimientoLibre para los modos 3D (ManejoLibre3D, CircuitoUrbano).
 // Misma interfaz pública que MovimientoLibre + turbo.
 // ================================================================
 
@@ -120,7 +120,7 @@ export class CarroSUV extends Carro {
     }
 }
 
-export class CarroMuscle extends Carro {
+export class CarroMusculo extends Carro {
     constructor(px = 0, pz = 0, rotY = 0) {
         super(px, pz, rotY);
         this.maxFwd    = 1.00;
