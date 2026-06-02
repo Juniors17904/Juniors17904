@@ -84,39 +84,44 @@ class TimonControl {
         const ctx = this.#ctx;
         const W   = this.#canvas.width, H = this.#canvas.height;
         const R   = Math.min(W, H) * 0.42;
+        const ri  = R * 0.65;
+        const rh  = R * 0.18;
+        const col = 'rgba(124,58,237,0.95)';
+
         ctx.clearRect(0, 0, W, H);
         ctx.save();
         ctx.translate(W / 2, H / 2);
         ctx.rotate(this.#angle);
+        ctx.fillStyle = col;
 
-        // aro
+        // aro (anillo exterior)
         ctx.beginPath();
-        ctx.arc(0, 0, R, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(124,58,237,0.9)';
-        ctx.lineWidth   = R * 0.13;
-        ctx.stroke();
+        ctx.arc(0, 0, R,  0, Math.PI * 2, false);
+        ctx.arc(0, 0, ri, 0, Math.PI * 2, true);
+        ctx.fill('evenodd');
 
-        // rayos (3)
-        for (let i = 0; i < 3; i++) {
-            const a = (i * 2 * Math.PI) / 3;
+        // 3 rayos: top ancho, bottom-izq y bottom-der angostos
+        const rayos = [
+            [-Math.PI / 2,                    Math.PI / 3  ],
+            [-Math.PI / 2 + 2 * Math.PI / 3, Math.PI / 6  ],
+            [-Math.PI / 2 - 2 * Math.PI / 3, Math.PI / 6  ],
+        ];
+        for (const [center, half] of rayos) {
             ctx.beginPath();
-            ctx.moveTo(Math.cos(a) * R * 0.82, Math.sin(a) * R * 0.82);
-            ctx.lineTo(Math.cos(a) * R * 0.20, Math.sin(a) * R * 0.20);
-            ctx.strokeStyle = 'rgba(167,139,250,0.85)';
-            ctx.lineWidth   = R * 0.07;
-            ctx.lineCap     = 'round';
-            ctx.stroke();
+            ctx.arc(0, 0, ri, center - half, center + half);
+            ctx.arc(0, 0, rh, center + half, center - half, true);
+            ctx.closePath();
+            ctx.fill();
         }
 
-        // centro
+        // centro (hub)
         ctx.beginPath();
-        ctx.arc(0, 0, R * 0.20, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(124,58,237,0.9)';
+        ctx.arc(0, 0, rh, 0, Math.PI * 2);
         ctx.fill();
 
-        // punto indicador (arriba)
+        // punto indicador arriba
         ctx.beginPath();
-        ctx.arc(0, -R * 0.87, R * 0.07, 0, Math.PI * 2);
+        ctx.arc(0, -R * 0.85, R * 0.05, 0, Math.PI * 2);
         ctx.fillStyle = '#fff';
         ctx.fill();
 
