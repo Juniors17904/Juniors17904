@@ -58,16 +58,18 @@ export class CamaraChase {
     }
 
     actualizar(px, pz, rotY, steerInput = 0) {
-        // DESACTIVADO — reactivar cuando se indique
-        // this.#carRotY = rotY;
+        this.#carRotY = rotY;
+        // LEAN DESACTIVADO — reactivar cuando se indique
         // this.#lean += (steerInput * this.leanMax - this.#lean) * this.leanSpeed;
-        // const orbit = this.#seguirRotacion ? rotY + this.#lean : this.#lean;
-        // const sinY  = Math.sin(orbit);
-        // const cosY  = Math.cos(orbit);
-        // const D     = this.#distancia;
-        // this.#cam.position.set(px - sinY * D, this.altura, pz - cosY * D);
-        // this.#cam.lookAt(px, 0.6, pz);
-        // this.actualizarIndicador(px, pz);
+        const orbit = this.#seguirRotacion ? rotY : 0;
+        const sinY  = Math.sin(orbit);
+        const cosY  = Math.cos(orbit);
+        const D     = this.#distancia;
+
+        this.#cam.position.set(px - sinY * D, this.altura, pz - cosY * D);
+        this.#cam.lookAt(px, 0.6, pz);
+
+        this.actualizarIndicador(px, pz);
     }
 
     actualizarIndicador(px, pz) {
