@@ -65,7 +65,7 @@ function _centerGroup(group, targetDim) {
 // ================================================================
 class CircuitoUrbano {
     #renderer = null; #scene = null; #camaraChase = null;
-    #canvas; #raf = 0; #sun = null;
+    #canvas; #hudCanvas = null; #hudCtx = null; #raf = 0; #sun = null;
     #carGroup = null; #leanGroup = null; #wheels = [];
     #resizeHandler = null;
 
@@ -126,11 +126,15 @@ class CircuitoUrbano {
     setCamAereaAltura(sliderVal) { this.#camAerea?.setAltura(sliderVal); }
 
     constructor(canvas, tipoPista = 'ciudad') {
-        this.#canvas = canvas;
+        this.#canvas    = canvas;
+        this.#hudCanvas = document.getElementById('canvas-hud-cir3d');
+        this.#hudCtx    = this.#hudCanvas?.getContext('2d') ?? null;
         this.#initScene();
         this.#cargarRuta(tipoPista);
         this.#buildRoad();
     }
+
+    setVelocimetroModelo(n) { if (this.#mov) this.#mov.velocimetroModelo = n; }
 
     // ── Escena ───────────────────────────────────────────────────
     #initScene() {
@@ -313,6 +317,7 @@ class CircuitoUrbano {
             this.#resizeHandler = () => {
                 const W = window.innerWidth, H = window.innerHeight;
                 this.#canvas.width = W; this.#canvas.height = H;
+                if (this.#hudCanvas) { this.#hudCanvas.width = W; this.#hudCanvas.height = H; }
                 this.#camaraChase.resize(W / H);
                 this.#camAerea?.resize(W / H);
                 this.#renderer?.setSize(W, H, false);
@@ -374,6 +379,16 @@ class CircuitoUrbano {
 
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
         this.#renderer.render(this.#scene, cam);
+        this.#dibujarHUD();
+    }
+
+    #dibujarHUD() {
+        if (!this.#hudCtx || !this.#mov || !window.RenderizadorVelocimetro) return;
+        const W = this.#hudCanvas.width, H = this.#hudCanvas.height;
+        this.#hudCtx.clearRect(0, 0, W, H);
+        const fraccion = Math.min(1, Math.abs(this.#mov.speed) / this.#mov.maxFwd);
+        const cx = W - 70, cy = H - 70, r = 50;
+        window.RenderizadorVelocimetro.dibujar(this.#hudCtx, cx, cy, r, fraccion, this.#mov.velocimetroModelo);
     }
 
     // ── Física ───────────────────────────────────────────────────

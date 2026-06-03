@@ -4,7 +4,7 @@ try {
 // ================================================================
 // CLASE: VelocimetroClasico — estilo neon cyan con aguja blanca
 // ================================================================
-class VelocimetroClasico {
+class VelocimetroClasico extends Velocimetro {
     get nombre() { return 'Clásico'; }
 
     dibujar(ctx, cx, cy, r, fraccion) {

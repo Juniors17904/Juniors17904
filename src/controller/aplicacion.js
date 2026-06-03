@@ -689,6 +689,10 @@ class Aplicacion {
         canvas.style.display = 'block';
         canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
+        const hudCir = document.getElementById('canvas-hud-cir3d');
+        hudCir.style.display = 'block';
+        hudCir.width  = window.innerWidth;
+        hudCir.height = window.innerHeight;
         document.getElementById('canvas-carro-3d').style.display = 'none';
         document.getElementById('titulo-cir3d').style.display = 'block';
         document.getElementById('btn-exit-cir3d').style.display = 'block';
@@ -696,6 +700,7 @@ class Aplicacion {
         const cir = new window.CircuitoUrbano(canvas, tipoPista);
         this.#cir3d = cir;
         cir.cargar(this.#estado.tipoAuto, this.#estado.color);
+        cir.setVelocimetroModelo(this.#estado.velocimetroModelo);
         cir.iniciar();
         const cirInitRotY = cir.rotY;
 
@@ -1073,6 +1078,7 @@ class Aplicacion {
         if (_mmC) { _mmC.style.pointerEvents='none'; _mmC.style.cursor=''; }
         if (_trC) { _trC.style.pointerEvents='none'; _trC.style.cursor=''; }
         document.getElementById('canvas-cir3d').style.display='none';
+        document.getElementById('canvas-hud-cir3d').style.display='none';
         document.getElementById('canvas-carro-3d').style.display='';
         document.getElementById('titulo-cir3d').style.display='none';
         document.getElementById('ctrl-accel').style.display='none';

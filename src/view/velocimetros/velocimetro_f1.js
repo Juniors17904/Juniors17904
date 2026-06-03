@@ -4,7 +4,7 @@ try {
 // ================================================================
 // CLASE: VelocimetroF1 — segmentos LED estilo Fórmula 1
 // ================================================================
-class VelocimetroF1 {
+class VelocimetroF1 extends Velocimetro {
     get nombre() { return 'F1'; }
 
     dibujar(ctx, cx, cy, r, fraccion) {

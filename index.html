@@ -130,6 +130,7 @@
         <canvas id="canvas-juego"></canvas>
         <canvas id="canvas-td3d" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:10"></canvas>
         <canvas id="canvas-cir3d" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:10"></canvas>
+        <canvas id="canvas-hud-cir3d" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:11;pointer-events:none"></canvas>
         <canvas id="canvas-carro-3d" width="240" height="160"></canvas>
         <button id="btn-exit-td3d" class="btn-tuerca" style="top:16px;left:16px;display:none">←</button>
         <button id="btn-exit-cir3d" class="btn-tuerca" style="top:16px;left:16px;display:none">←</button>
@@ -588,6 +589,7 @@
     <script src="src/view/controles/control_timon.js"></script>
 
     <!-- View: velocímetros -->
+    <script src="src/view/velocimetros/velocimetro.js"></script>
     <script src="src/view/velocimetros/velocimetro_clasico.js"></script>
     <script src="src/view/velocimetros/velocimetro_deportivo.js"></script>
     <script src="src/view/velocimetros/velocimetro_f1.js"></script>

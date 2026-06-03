@@ -4,7 +4,7 @@ try {
 // ================================================================
 // CLASE: VelocimetroRetro — ámbar/dorado con marcas de escala
 // ================================================================
-class VelocimetroRetro {
+class VelocimetroRetro extends Velocimetro {
     get nombre() { return 'Retro'; }
 
     dibujar(ctx, cx, cy, r, fraccion) {

@@ -27,28 +27,31 @@ export class Carro {
     steerInput = 0;
 
     #px; #pz; #rotY;
-    #speed      = 0;
-    #accelVal   = 0;
-    #maxSpeed   = 0;
-    #carLean    = 0;
-    #velAngle   = 0;
-    #driftAngle = 0;
-    #turboTimer = 0;
+    #speed           = 0;
+    #accelVal        = 0;
+    #maxSpeed        = 0;
+    #carLean         = 0;
+    #velAngle        = 0;
+    #driftAngle      = 0;
+    #turboTimer      = 0;
+    #velocimetroModelo = 2;  // F1 por defecto
 
     constructor(px = 0, pz = 0, rotY = 0) {
         this.#px = px; this.#pz = pz; this.#rotY = rotY;
         this.#velAngle = rotY;
     }
 
-    get px()         { return this.#px; }
-    get pz()         { return this.#pz; }
-    get rotY()       { return this.#rotY; }
-    get velAngle()   { return this.#velAngle; }
-    get driftAngle() { return this.#driftAngle; }
-    get speed()      { return this.#speed; }
-    get accel()      { return this.#accelVal; }
-    get maxSpeed()   { return this.#maxSpeed; }
-    get carLean()    { return this.#carLean; }
+    get px()               { return this.#px; }
+    get pz()               { return this.#pz; }
+    get rotY()             { return this.#rotY; }
+    get velAngle()         { return this.#velAngle; }
+    get driftAngle()       { return this.#driftAngle; }
+    get speed()            { return this.#speed; }
+    get accel()            { return this.#accelVal; }
+    get maxSpeed()         { return this.#maxSpeed; }
+    get carLean()          { return this.#carLean; }
+    get velocimetroModelo()          { return this.#velocimetroModelo; }
+    set velocimetroModelo(v)         { this.#velocimetroModelo = v ?? 2; }
 
     setPosicion(px, pz) { this.#px = px; this.#pz = pz; }
 

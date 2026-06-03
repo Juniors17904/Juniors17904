@@ -4,7 +4,7 @@ try {
 // ================================================================
 // CLASE: VelocimetroDeportivo — agresivo rojo/naranja con marcas
 // ================================================================
-class VelocimetroDeportivo {
+class VelocimetroDeportivo extends Velocimetro {
     get nombre() { return 'Deportivo'; }
 
     dibujar(ctx, cx, cy, r, fraccion) {
