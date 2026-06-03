@@ -9,14 +9,16 @@ class Aplicacion {
         color: '#ef4444',
         control: 'botones',
         timonModelo: 0,
+        velocimetroModelo: 0,
         modoSolo: true,
         tipoAuto: 'deportivo',
         pista: 'ciudad',
         juego: null,
     };
 
-    #backNav     = false;
-    #timonOrigen = 'pantalla-inicio';
+    #backNav            = false;
+    #timonOrigen        = 'pantalla-inicio';
+    #velocimetroOrigen  = 'pantalla-ajustes';
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -101,6 +103,21 @@ class Aplicacion {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sel'));
                 document.querySelector('[data-ctrl="timon"]').classList.add('sel');
                 this.#mostrar('pantalla-inicio');
+            });
+        });
+
+        document.getElementById('btn-ir-velocimetro').addEventListener('click', () => {
+            this.#velocimetroOrigen = 'pantalla-ajustes';
+            this.#dibujarPreviewsVelocimetro();
+            this.#mostrar('pantalla-velocimetro-diseno');
+        });
+        document.getElementById('btn-volver-velocimetro-diseno').addEventListener('click', () => this.#mostrar(this.#velocimetroOrigen));
+        document.querySelectorAll('.velocimetro-card').forEach(card => {
+            card.addEventListener('click', () => {
+                this.#estado.velocimetroModelo = parseInt(card.dataset.modelo);
+                document.querySelectorAll('.velocimetro-card').forEach(c => c.classList.remove('sel'));
+                card.classList.add('sel');
+                this.#mostrar(this.#velocimetroOrigen);
             });
         });
 
@@ -298,6 +315,19 @@ class Aplicacion {
         }, 900);
     }
 
+    // ── Velocímetro: dibuja previews de los 4 modelos ────────────
+    #dibujarPreviewsVelocimetro() {
+        document.querySelectorAll('.velocimetro-card').forEach((card, i) => {
+            const canvas = card.querySelector('.velocimetro-preview');
+            const ctx    = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2, cy = canvas.height / 2, r = canvas.width * 0.38;
+            window.RenderizadorVelocimetro.dibujar(ctx, cx, cy, r, 0.62, i);
+            card.querySelector('.velocimetro-nombre').textContent = window.RenderizadorVelocimetro.nombre(i);
+            card.classList.toggle('sel', i === this.#estado.velocimetroModelo);
+        });
+    }
+
     // ── Timón: dibuja previews de los 4 modelos ──────────────────
     #dibujarPreviewsTimon() {
         document.querySelectorAll('.timon-card').forEach((card, i) => {
@@ -324,7 +354,7 @@ class Aplicacion {
                 ? document.getElementById('nombre-j2').textContent
                 : document.getElementById('nombre-j1').textContent);
 
-        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, this.#estado.pista);
+        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, this.#estado.pista, this.#estado.velocimetroModelo);
 
         window.onCarreraTerminada = (tiempoMs, velMax) => {
             if (!this.#estado.modoSolo && window.multiJugador) window.multiJugador.reportarGanador();

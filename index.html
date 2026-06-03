@@ -272,6 +272,11 @@
                 <span class="ajuste-txt">Diseño de botones y pedales</span>
                 <span class="ajuste-arrow">›</span>
             </button>
+            <button id="btn-ir-velocimetro" class="ajuste-item">
+                <span class="ajuste-icono">🏁</span>
+                <span class="ajuste-txt">Velocímetro</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
         </div>
     </div>
 
@@ -507,6 +512,30 @@
         </div>
     </div>
 
+    <!-- Pantalla: Diseño de velocímetro -->
+    <div id="pantalla-velocimetro-diseno" class="pantalla">
+        <button id="btn-volver-velocimetro-diseno" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:20px;margin-bottom:24px">ELIGE TU VELOCÍMETRO</div>
+        <div class="timon-grid">
+            <div class="velocimetro-card timon-card" data-modelo="0">
+                <canvas class="velocimetro-preview" width="110" height="110"></canvas>
+                <span class="velocimetro-nombre timon-nombre">Clásico</span>
+            </div>
+            <div class="velocimetro-card timon-card" data-modelo="1">
+                <canvas class="velocimetro-preview" width="110" height="110"></canvas>
+                <span class="velocimetro-nombre timon-nombre">Deportivo</span>
+            </div>
+            <div class="velocimetro-card timon-card" data-modelo="2">
+                <canvas class="velocimetro-preview" width="110" height="110"></canvas>
+                <span class="velocimetro-nombre timon-nombre">F1</span>
+            </div>
+            <div class="velocimetro-card timon-card" data-modelo="3">
+                <canvas class="velocimetro-preview" width="110" height="110"></canvas>
+                <span class="velocimetro-nombre timon-nombre">Retro</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Pantalla: Resultado -->
     <div id="pantalla-resultado" class="pantalla">
         <div class="resultado-card">
@@ -557,6 +586,13 @@
     <script src="src/view/controles/timon_retro.js"></script>
     <script src="src/view/controles/renderizador_timon.js"></script>
     <script src="src/view/controles/control_timon.js"></script>
+
+    <!-- View: velocímetros -->
+    <script src="src/view/velocimetros/velocimetro_clasico.js"></script>
+    <script src="src/view/velocimetros/velocimetro_deportivo.js"></script>
+    <script src="src/view/velocimetros/velocimetro_f1.js"></script>
+    <script src="src/view/velocimetros/velocimetro_retro.js"></script>
+    <script src="src/view/velocimetros/renderizador_velocimetro.js"></script>
 
     <!-- View: minimapa y pista 2D -->
     <script src="src/view/minimapa.js"></script>

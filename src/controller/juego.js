@@ -33,7 +33,7 @@ class Juego {
     #visor3d      = null;
     #distMeta     = CFG.DIST_META;
 
-    constructor(color, tipoControl, tipoAuto = 'deportivo', tipoPista = null) {
+    constructor(color, tipoControl, tipoAuto = 'deportivo', tipoPista = null, velocimetroModelo = 0) {
         this.#canvas = document.getElementById('canvas-juego');
         this.#ctx    = this.#canvas.getContext('2d');
 
@@ -47,6 +47,7 @@ class Juego {
         this.#carro     = new Carro2D(color, this.#distMeta);
         this.#hud       = new PantallaJuego();
         this.#hud.setCircuito(pistaCfg);
+        this.#hud.setVelocimetroModelo(velocimetroModelo);
         this.#controles = new Controles(tipoControl, this.#carro);
 
         const c3d = document.getElementById('canvas-carro-3d');
