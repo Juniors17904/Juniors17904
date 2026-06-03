@@ -101,35 +101,6 @@ export class Carro {
     }
 }
 
-export class CarroDeportivo extends Carro {
-    constructor(px = 0, pz = 0, rotY = 0) {
-        super(px, pz, rotY);
-        this.maxFwd    = 0.92;
-        this.accelConst = 0.007;
-        this.steerConst = 0.012;
-        this.turboMax    = 2;
-        this.turbosLeft  = 2;
-    }
-}
-
-export class CarroSUV extends Carro {
-    constructor(px = 0, pz = 0, rotY = 0) {
-        super(px, pz, rotY);
-        this.maxFwd    = 0.60;
-        this.accelConst = 0.005;
-        this.dragConst  = 0.010;
-        this.turboMax    = 4;
-        this.turbosLeft  = 4;
-    }
-}
-
-export class CarroMusculo extends Carro {
-    constructor(px = 0, pz = 0, rotY = 0) {
-        super(px, pz, rotY);
-        this.maxFwd    = 1.00;
-        this.accelConst = 0.009;
-        this.steerConst = 0.007;
-        this.turboMax    = 2;
-        this.turbosLeft  = 2;
-    }
-}
+// CarroDeportivo → carro_deportivo.js
+// CarroSUV       → carro_suv.js
+// CarroMusculo   → carro_musculo.js

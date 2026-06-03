@@ -1,69 +1,15 @@
 'use strict';
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Ruta } from '../model/ruta.js';
 import { Carro } from '../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from './camaras/camara_seguimiento.js';
 import { CamaraAerea } from './camaras/camara_aerea.js';
-
-// ── Helpers (igual que viewer3d.js) ─────────────────────────────
-let _glbPromise = null;
-function _loadGLTF() {
-    if (!_glbPromise)
-        _glbPromise = new GLTFLoader().loadAsync('src/assets/models/vehicles_pack.glb');
-    return _glbPromise;
-}
-
-const _MAPA = {
-    deportivo: 'Sports', suv: 'SUV', muscle: 'Muscle',
-    formula: 'Roadster', pickup: 'Pickup', clasico: 'Limousine',
-};
-
-function _esCarroceria(name) {
-    const l = name.toLowerCase();
-    return l.includes('body') && !l.includes('black') && !l.includes('white');
-}
-
-function _buildGroup(gltf, tipo, color) {
-    const prefix = _MAPA[tipo] ?? 'Sports';
-    const group  = new THREE.Group();
-    const names  = [
-        prefix,
-        `${prefix}_wheel_front_right`, `${prefix}_wheel_front_left`,
-        `${prefix}_wheel_rear_right`,  `${prefix}_wheel_rear_left`,
-    ];
-    for (const n of names) {
-        const nodo = gltf.scene.getObjectByName(n);
-        if (!nodo) continue;
-        const clone = nodo.clone();
-        clone.traverse(child => {
-            if (!child.isMesh) return;
-            child.material = child.material.clone();
-            child.castShadow = true;
-            child.receiveShadow = true;
-            if (_esCarroceria(child.name)) child.material.color.set(color);
-        });
-        group.add(clone);
-    }
-    return group;
-}
-
-function _centerGroup(group, targetDim) {
-    const box  = new THREE.Box3().setFromObject(group);
-    const size = box.getSize(new THREE.Vector3());
-    group.scale.setScalar(targetDim / Math.max(size.x, size.z));
-    const box2   = new THREE.Box3().setFromObject(group);
-    const center = box2.getCenter(new THREE.Vector3());
-    group.position.set(-center.x, -box2.min.y, -center.z);
-    return box2;
-}
-
-
+import { VisorBase } from './visor_base.js';
 
 // ================================================================
 // CLASS: CircuitoUrbano — pista 3D con curvas reales desde tramos
 // ================================================================
-class CircuitoUrbano {
+class CircuitoUrbano extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #hudCanvas = null; #hudCtx = null; #raf = 0; #sun = null;
     #carGroup = null; #leanGroup = null; #wheels = [];
@@ -126,6 +72,7 @@ class CircuitoUrbano {
     setCamAereaAltura(sliderVal) { this.#camAerea?.setAltura(sliderVal); }
 
     constructor(canvas, tipoPista = 'ciudad') {
+        super();
         this.#canvas    = canvas;
         this.#hudCanvas = document.getElementById('canvas-hud-cir3d');
         this.#hudCtx    = this.#hudCanvas?.getContext('2d') ?? null;
@@ -291,20 +238,20 @@ class CircuitoUrbano {
     // ── Cargar auto ──────────────────────────────────────────────
     async cargar(tipo, color) {
         try {
-            const gltf = await _loadGLTF();
+            const gltf = await VisorBase.cargarGLTF();
             this.#setCar(gltf, tipo, color);
         } catch(e) { console.error('CircuitoUrbano:', e); }
     }
 
     #setCar(gltf, tipo, color) {
         if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
-        const inner = _buildGroup(gltf, tipo, color);
-        _centerGroup(inner, 2.6);
+        const inner = VisorBase.construirGrupo(gltf, tipo, color);
+        VisorBase.centrarGrupo(inner, 2.6);
         const lean = new THREE.Group(); lean.add(inner); this.#leanGroup = lean;
         const outer = new THREE.Group(); outer.add(lean);
         this.#scene.add(outer); this.#carGroup = outer;
         this.#wheels = [];
-        const prefix = _MAPA[tipo] ?? 'Sports';
+        const prefix = VisorBase.MAPA[tipo] ?? 'Sports';
         for (const w of ['front_right', 'front_left', 'rear_right', 'rear_left']) {
             const node = inner.getObjectByName(`${prefix}_wheel_${w}`);
             if (node) this.#wheels.push(node);

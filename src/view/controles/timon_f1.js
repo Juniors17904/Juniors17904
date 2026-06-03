@@ -5,7 +5,7 @@ try {
 // VIEW — TimonF1
 // Timón estilo Fórmula 1 con barra inferior recta y azul cian.
 // ================================================================
-class TimonF1 {
+class TimonF1 extends Timon {
     get nombre() { return 'F1'; }
 
     dibujar(ctx, S) {

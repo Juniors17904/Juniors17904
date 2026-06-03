@@ -5,7 +5,7 @@ try {
 // VIEW — TimonClasico
 // Timón clásico de 3 radios. Se dibuja a sí mismo.
 // ================================================================
-class TimonClasico {
+class TimonClasico extends Timon {
     get nombre() { return 'Clásico'; }
 
     dibujar(ctx, S) {

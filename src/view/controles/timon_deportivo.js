@@ -5,7 +5,7 @@ try {
 // VIEW — TimonDeportivo
 // Timón deportivo con aro negro y radios en morado/gris.
 // ================================================================
-class TimonDeportivo {
+class TimonDeportivo extends Timon {
     get nombre() { return 'Deportivo'; }
 
     dibujar(ctx, S) {

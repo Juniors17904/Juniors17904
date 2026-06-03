@@ -5,7 +5,7 @@ try {
 // VIEW — TimonRetro  (antes TimonVintage)
 // Timón retro de madera con aro marrón y hub dorado.
 // ================================================================
-class TimonRetro {
+class TimonRetro extends Timon {
     get nombre() { return 'Retro'; }
 
     dibujar(ctx, S) {
