@@ -87,8 +87,8 @@ export class Carro {
 
         // Derrape: velAngle sigue a rotY con lag proporcional a velocidad y giro
         const sf = Math.abs(this.#speed) / this.maxFwd;
-        const grip = 1 - sf * Math.abs(this.steerInput) * 0.65;
-        this.#velAngle += (this.#rotY - this.#velAngle) * Math.max(0.18, grip);
+        const grip = 1 - sf * Math.abs(this.steerInput) * 0.92;
+        this.#velAngle += (this.#rotY - this.#velAngle) * Math.max(0.04, grip);
         this.#driftAngle = this.#rotY - this.#velAngle;
 
         this.#px += Math.sin(this.#velAngle) * this.#speed;
