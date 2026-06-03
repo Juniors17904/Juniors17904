@@ -202,6 +202,11 @@ class Aplicacion {
             if (timonDePista[card.dataset.pista] !== undefined) {
                 this.#estado.timonModelo = timonDePista[card.dataset.pista];
             }
+            // Cada circuito tiene su velocímetro predeterminado: ciudad → F1 (2)
+            const velocimetroDePista = { ciudad: 2 };
+            if (velocimetroDePista[card.dataset.pista] !== undefined) {
+                this.#estado.velocimetroModelo = velocimetroDePista[card.dataset.pista];
+            }
             document.getElementById('detalle-pista-nombre').textContent =
                 card.querySelector('.pista-nombre').textContent;
             document.getElementById('detalle-pista-desc').textContent =
