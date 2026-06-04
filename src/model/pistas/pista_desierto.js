@@ -5,13 +5,6 @@ try {
 // MODEL — PistaDesierto: circuito en terreno árido y seco
 // ================================================================
 class PistaDesierto extends PistaConfig {
-    #nivelFijo = {
-        nombre: 'Desierto',
-        cielo:  ['#7c4a1e', '#c47a2b'],
-        cesped: ['#8b6914', '#7a5c10'],
-        asfalto:['#c4a44a', '#b8943a'],
-        borde:  '#d4a050',
-    };
     #tramos = [
         [0,   40,  0      ],
         [40,  60,  1.8    ],
@@ -25,14 +18,18 @@ class PistaDesierto extends PistaConfig {
         [280, 300, 1.5    ],
     ];
 
-    get nombre()          { return 'Desierto'; }
+    get nombre()          { return 'Autopista Solar'; }
     get totalSegs()       { return 300; }
     get distMeta()        { return 1800; }
-    get nivelFijo()       { return this.#nivelFijo; }
     get tramos()          { return this.#tramos; }
     get obstFrecuencia()  { return 0.10; }
     get obstTipos()       { return ['bache','bache','carro','turbo']; }
     get coloresTrafico()  { return ['#d4a050','#c47a2b','#8b6914']; }
+
+    get cielo()   { return ['#7c4a1e', '#c47a2b']; }
+    get cesped()  { return ['#8b6914', '#7a5c10']; }
+    get asfalto() { return ['#c4a44a', '#b8943a']; }
+    get borde()   { return '#d4a050'; }
 }
 
 window.PISTAS.desierto = new PistaDesierto();

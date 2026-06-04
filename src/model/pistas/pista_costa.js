@@ -5,13 +5,6 @@ try {
 // MODEL — PistaCosta: circuito costero con curvas suaves
 // ================================================================
 class PistaCosta extends PistaConfig {
-    #nivelFijo = {
-        nombre: 'Costa',
-        cielo:  ['#0a3a6a', '#1a6aaa'],
-        cesped: ['#0a4a2a', '#0a6a3a'],
-        asfalto:['#4a6a8a', '#3a5a7a'],
-        borde:  '#6ab4e8',
-    };
     #tramos = [
         [0,   30,  0      ],
         [30,  50,  1.2    ],
@@ -26,14 +19,18 @@ class PistaCosta extends PistaConfig {
         [290, 300, 0      ],
     ];
 
-    get nombre()          { return 'Costa'; }
+    get nombre()          { return 'Costa Neón'; }
     get totalSegs()       { return 300; }
     get distMeta()        { return 1800; }
-    get nivelFijo()       { return this.#nivelFijo; }
     get tramos()          { return this.#tramos; }
     get obstFrecuencia()  { return 0.09; }
     get obstTipos()       { return ['carro','carro','turbo','bache']; }
     get coloresTrafico()  { return ['#3b82f6','#0ea5e9','#06b6d4','#6b7280']; }
+
+    get cielo()   { return ['#0a3a6a', '#1a6aaa']; }
+    get cesped()  { return ['#0a4a2a', '#0a6a3a']; }
+    get asfalto() { return ['#4a6a8a', '#3a5a7a']; }
+    get borde()   { return '#6ab4e8'; }
 }
 
 window.PISTAS.costa = new PistaCosta();
