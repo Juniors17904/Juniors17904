@@ -306,6 +306,13 @@
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
+                <label class="dg-toggle-fila" for="tog-guia-pista">
+                    <span class="dg-toggle-lbl">Guía de pista</span>
+                    <div class="dg-toggle">
+                        <input type="checkbox" id="tog-guia-pista">
+                        <span class="dg-toggle-slider"></span>
+                    </div>
+                </label>
             </div>
         </div>
 
@@ -677,8 +684,10 @@
     <script src="src/view/velocimetros/velocimetro_retro.js"></script>
     <script src="src/view/velocimetros/renderizador_velocimetro.js"></script>
 
-    <!-- View: minimapa y pista 2D -->
-    <script src="src/view/minimapa.js"></script>
+    <!-- View: minimapas (jerarquía: MinimapBase → subclases) -->
+    <script src="src/view/minimapas/minimapa_base.js"></script>
+    <script src="src/view/minimapas/minimapa_conductor.js"></script>
+    <script src="src/view/minimapas/minimapa_diseno_general.js"></script>
     <script src="src/view/renderizador_pista.js"></script>
     <script src="src/view/renderizador_auto.js"></script>
     <script src="src/view/pantalla_juego.js"></script>
