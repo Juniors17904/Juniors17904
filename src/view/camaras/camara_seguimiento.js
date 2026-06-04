@@ -1,5 +1,6 @@
 'use strict';
 import * as THREE from 'three';
+import { CamaraBase } from './camara_base.js';
 
 // ================================================================
 // VIEW — CamaraSeguimiento  (antes CamaraChase)
@@ -7,8 +8,7 @@ import * as THREE from 'three';
 //   seguirRotacion: true  → gira con el carro, el carro queda fijo en pantalla (Circuito)
 //   seguirRotacion: false → ángulo fijo, el carro se ve rotar en pantalla (Test Drive)
 // ================================================================
-export class CamaraSeguimiento {
-    #cam;
+export class CamaraSeguimiento extends CamaraBase {
     #distancia;
     #seguirRotacion;
     #indicador = null;
@@ -17,24 +17,22 @@ export class CamaraSeguimiento {
     #lean      = 0;
 
     altura    = 2.8;
-    leanMax   = 0.5;    // ángulo máximo de órbita alrededor del auto (~28°)
+    leanMax   = 0.5;
     leanSpeed = 0.06;
 
     get camRotY() {
         let a = this.#camAngle - this.#carRotY;
         return ((a + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
     }
-    get camRotX() { return this.#cam.rotation.x; }
+    get camRotX() { return this.camera.rotation.x; }
     get camRotZ() { return this.#lean; }
 
     constructor(aspect, { distancia = 7, altura = 2.8, seguirRotacion = true } = {}) {
-        this.#cam             = new THREE.PerspectiveCamera(55, aspect, 0.1, 200);
+        super(55, aspect, 0.1, 200);
         this.#distancia       = distancia;
         this.#seguirRotacion  = seguirRotacion;
         this.altura           = altura;
     }
-
-    get camera() { return this.#cam; }
 
     agregarIndicador(scene) {
         const geo = new THREE.BufferGeometry().setFromPoints([
@@ -52,11 +50,6 @@ export class CamaraSeguimiento {
         if (this.#indicador) this.#indicador.visible = v;
     }
 
-    resize(aspect) {
-        this.#cam.aspect = aspect;
-        this.#cam.updateProjectionMatrix();
-    }
-
     actualizar(px, pz, rotY, steerInput = 0) {
         this.#carRotY = rotY;
         const orbit = this.#seguirRotacion ? rotY : 0;
@@ -64,19 +57,19 @@ export class CamaraSeguimiento {
         const cosY  = Math.cos(orbit);
         const D     = this.#distancia;
 
-        this.#cam.position.set(px - sinY * D, this.altura, pz - cosY * D);
-        this.#cam.lookAt(px, 0.6, pz);
+        this.camera.position.set(px - sinY * D, this.altura, pz - cosY * D);
+        this.camera.lookAt(px, 0.6, pz);
 
         this.actualizarIndicador(px, pz);
     }
 
     actualizarIndicador(px, pz) {
-        const cx = this.#cam.position.x, cz = this.#cam.position.z;
+        const cx = this.camera.position.x, cz = this.camera.position.z;
         const dx = px - cx, dz = pz - cz;
         this.#camAngle = Math.atan2(dx, dz);
         if (this.#indicador) {
             const dir = new THREE.Vector3();
-            this.#cam.getWorldDirection(dir);
+            this.camera.getWorldDirection(dir);
             const L   = 5;
             const pos = this.#indicador.geometry.attributes.position;
             pos.setXYZ(0, cx, 0.5, cz);

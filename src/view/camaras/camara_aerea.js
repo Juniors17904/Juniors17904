@@ -1,12 +1,11 @@
 'use strict';
-import * as THREE from 'three';
+import { CamaraBase } from './camara_base.js';
 
 // ================================================================
 // VIEW — CamaraAerea
 // Vista cenital (bird's eye view) con desplazamiento por teclas/pan.
 // ================================================================
-export class CamaraAerea {
-    #cam;
+export class CamaraAerea extends CamaraBase {
     #x = 0; #z = 0; #h = 80;
     #spd = 2.5;
 
@@ -14,11 +13,9 @@ export class CamaraAerea {
     moveZ = 0;
 
     constructor(aspect) {
-        this.#cam = new THREE.PerspectiveCamera(60, aspect, 0.5, 3000);
-        this.#cam.up.set(0, 0, 1);
+        super(60, aspect, 0.5, 3000);
+        this.camera.up.set(0, 0, 1);
     }
-
-    get camera() { return this.#cam; }
 
     activar(x, z) {
         this.#x = x; this.#z = z;
@@ -47,13 +44,8 @@ export class CamaraAerea {
 
     pan(dx, dz) { this.#x -= dx; this.#z -= dz; this.#aplicar(); }
 
-    resize(aspect) {
-        this.#cam.aspect = aspect;
-        this.#cam.updateProjectionMatrix();
-    }
-
     #aplicar() {
-        this.#cam.position.set(this.#x, this.#h, this.#z);
-        this.#cam.lookAt(this.#x, 0, this.#z);
+        this.camera.position.set(this.#x, this.#h, this.#z);
+        this.camera.lookAt(this.#x, 0, this.#z);
     }
 }
