@@ -555,6 +555,63 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 }
 .dg-dropdown-item .dg-item-icono { font-size: 18px; }
 
+/* Toggle fila dentro del dropdown */
+.dg-toggle-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background 0.15s;
+}
+.dg-toggle-fila:hover { background: rgba(124,58,237,0.12); }
+.dg-toggle-lbl {
+    font-family: var(--font);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    color: var(--txt);
+}
+
+/* Switch iOS */
+.dg-toggle { position: relative; width: 44px; height: 26px; flex-shrink: 0; }
+.dg-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.dg-toggle-slider {
+    position: absolute; inset: 0;
+    background: var(--border);
+    border-radius: 26px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.dg-toggle-slider::before {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    left: 3px; top: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+}
+.dg-toggle input:checked + .dg-toggle-slider { background: var(--neon-v); }
+.dg-toggle input:checked + .dg-toggle-slider::before { transform: translateX(18px); }
+
+/* Área verde del mapa */
+.dg-mapa-area {
+    width: min(90vw, 360px);
+    height: min(55vw, 240px);
+    background: #1a4a1a;
+    border-radius: 16px;
+    border: 2px solid #2d7a2d;
+    box-shadow: 0 0 24px rgba(45,122,45,0.35);
+    overflow: hidden;
+    position: relative;
+    margin-top: 24px;
+}
+.dg-mapa-area canvas {
+    width: 100%; height: 100%;
+    display: block;
+}
+
 /* =============================================
    DISEÑO DE TIMÓN — grid de 4 modelos
    ============================================= */
