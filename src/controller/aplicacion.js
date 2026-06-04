@@ -19,6 +19,7 @@ class Aplicacion {
     #backNav            = false;
     #timonOrigen        = 'pantalla-inicio';
     #velocimetroOrigen  = 'pantalla-ajustes';
+    #vistaConduccion    = new VistaConduccion().cargar();
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -169,6 +170,24 @@ class Aplicacion {
         document.getElementById('btn-volver-ajustes').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
         document.getElementById('btn-ir-controles').addEventListener('click', () => this.#mostrar('pantalla-controles'));
         document.getElementById('btn-volver-controles').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+
+        document.getElementById('btn-ir-vista-conduccion').addEventListener('click', () => {
+            this.#sincronizarPantallaVistaConduccion();
+            this.#mostrar('pantalla-vista-conduccion');
+        });
+        document.getElementById('btn-volver-vista-conduccion').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+        document.getElementById('vc-cam-chase').addEventListener('click', () => {
+            this.#vistaConduccion.tipoCamara = 'chase';
+            this.#actualizarSeleccionCamara();
+        });
+        document.getElementById('vc-cam-aerea').addEventListener('click', () => {
+            this.#vistaConduccion.tipoCamara = 'aerea';
+            this.#actualizarSeleccionCamara();
+        });
+        document.getElementById('vc-altura').addEventListener('input', e => {
+            this.#vistaConduccion.alturaCamara = +e.target.value;
+            document.getElementById('vc-altura-val').textContent = (+e.target.value).toFixed(1);
+        });
         document.getElementById('btn-ir-garage').addEventListener('click', () => {
             this.#mostrar('pantalla-garage');
             Garaje.iniciar(this.#estado, id => this.#mostrar(id));
@@ -182,6 +201,24 @@ class Aplicacion {
         document.getElementById('btn-volver-giro').addEventListener('click', () => {
             probadorGiroscopio.detener();
             this.#mostrar('pantalla-ajustes');
+        });
+
+        document.getElementById('btn-ir-vista-conduccion').addEventListener('click', () => {
+            this.#sincronizarPantallaVistaConduccion();
+            this.#mostrar('pantalla-vista-conduccion');
+        });
+        document.getElementById('btn-volver-vista-conduccion').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+        document.getElementById('vc-cam-chase').addEventListener('click', () => {
+            this.#vistaConduccion.tipoCamara = 'chase';
+            this.#actualizarSeleccionCamara();
+        });
+        document.getElementById('vc-cam-aerea').addEventListener('click', () => {
+            this.#vistaConduccion.tipoCamara = 'aerea';
+            this.#actualizarSeleccionCamara();
+        });
+        document.getElementById('vc-altura').addEventListener('input', e => {
+            this.#vistaConduccion.alturaCamara = +e.target.value;
+            document.getElementById('vc-altura-val').textContent = (+e.target.value).toFixed(1);
         });
 
         document.getElementById('btn-ir-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
@@ -695,6 +732,7 @@ class Aplicacion {
 
         const cir = new window.CircuitoUrbano(canvas, tipoPista);
         this.#cir3d = cir;
+        this.#vistaConduccion.aplicarA(cir);
         cir.cargar(this.#estado.tipoAuto, this.#estado.color);
         cir.setVelocimetroModelo(this.#estado.velocimetroModelo);
         cir.iniciar();
@@ -1167,6 +1205,25 @@ class Aplicacion {
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText('S/F', sx(fx) + 8, sy(fy));
+    }
+
+    #sincronizarPantallaVistaConduccion() {
+        const vc = this.#vistaConduccion;
+        document.getElementById('vc-check-chase').textContent = vc.tipoCamara === 'chase' ? '✓' : '';
+        document.getElementById('vc-check-aerea').textContent = vc.tipoCamara === 'aerea' ? '✓' : '';
+        const alturaInput = document.getElementById('vc-altura');
+        alturaInput.value = vc.alturaCamara;
+        document.getElementById('vc-altura-val').textContent = vc.alturaCamara.toFixed(1);
+        document.getElementById('vc-altura-wrap').style.display =
+            vc.tipoCamara === 'chase' ? '' : 'none';
+    }
+
+    #actualizarSeleccionCamara() {
+        const vc = this.#vistaConduccion;
+        document.getElementById('vc-check-chase').textContent = vc.tipoCamara === 'chase' ? '✓' : '';
+        document.getElementById('vc-check-aerea').textContent = vc.tipoCamara === 'aerea' ? '✓' : '';
+        document.getElementById('vc-altura-wrap').style.display =
+            vc.tipoCamara === 'chase' ? '' : 'none';
     }
 }
 
