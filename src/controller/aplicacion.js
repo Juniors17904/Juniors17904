@@ -20,6 +20,7 @@ class Aplicacion {
     #timonOrigen        = 'pantalla-inicio';
     #velocimetroOrigen  = 'pantalla-ajustes';
     #vistaConduccion    = new VistaConduccion().cargar();
+    #minimapaDG         = null;
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -211,12 +212,28 @@ class Aplicacion {
             area.style.display = e.target.checked ? 'block' : 'none';
             if (e.target.checked) {
                 const canvas = document.getElementById('canvas-dg-mapa');
-                canvas.width  = canvas.offsetWidth;
-                canvas.height = canvas.offsetHeight;
+                canvas.width  = canvas.offsetWidth  || 320;
+                canvas.height = canvas.offsetHeight || 240;
+                if (!this.#minimapaDG) {
+                    this.#minimapaDG = new MinimapaDisenoGeneral();
+                }
+                const pistaCfg = window.PISTAS?.[this.#estado.pista];
+                if (pistaCfg) this.#minimapaDG.setCircuito(pistaCfg);
                 const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#1a4a1a';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                this.#minimapaDG.dibujar(ctx, canvas.width, canvas.height);
+            } else {
+                this.#minimapaDG = null;
+                document.getElementById('tog-guia-pista').checked = false;
             }
+        });
+
+        document.getElementById('tog-guia-pista').addEventListener('change', e => {
+            if (!this.#minimapaDG) return;
+            this.#minimapaDG.mostrarGuia = e.target.checked;
+            const canvas = document.getElementById('canvas-dg-mapa');
+            if (!canvas.width || !canvas.height) return;
+            const ctx = canvas.getContext('2d');
+            this.#minimapaDG.dibujar(ctx, canvas.width, canvas.height);
         });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {

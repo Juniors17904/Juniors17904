@@ -140,6 +140,12 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
 | `VisorBase` | `CircuitoUrbano`, `Testdrive3D` | (utilidades Three.js) |
+| `MinimapBase` | `MinimapaConductor`, `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
+
+**Carpetas de jerarquías** — cada familia vive en su propia carpeta:
+- `src/view/controles/` → `ControlEntrada` + subclases + timones
+- `src/view/velocimetros/` → `Velocimetro` + subclases
+- `src/view/minimapas/` → `MinimapBase` + subclases
 
 ### Encapsulamiento — reglas estrictas
 
