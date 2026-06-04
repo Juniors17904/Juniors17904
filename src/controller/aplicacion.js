@@ -199,6 +199,13 @@ class Aplicacion {
 
         document.getElementById('btn-ir-diseno-general').addEventListener('click', () => this.#mostrar('pantalla-diseno-general'));
         document.getElementById('btn-volver-diseno-general').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+        document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
+            e.stopPropagation();
+            document.getElementById('dg-dropdown').classList.toggle('abierto');
+        });
+        document.addEventListener('click', () => {
+            document.getElementById('dg-dropdown').classList.remove('abierto');
+        });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
             this.#vistaConduccion.tipoCamara = 'chase';
