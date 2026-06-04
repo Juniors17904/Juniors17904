@@ -97,6 +97,83 @@ class NivelCiudad extends Nivel {
 5. ¿Solo se expone lo necesario? → getters para lo que otros necesitan leer
 6. ¿Está en su propio archivo? → si no, moverla antes de continuar
 
+---
+
+## 🏗️ HERENCIA Y ENCAPSULAMIENTO — REGLA OBLIGATORIA EN ESTE PROYECTO
+
+### Cuándo crear una superclase (clase padre)
+
+Siempre que existan **dos o más clases que comparten la misma interfaz pública**, deben tener una superclase común.
+
+**Señales de que falta una superclase:**
+- Dos clases tienen los mismos nombres de métodos (`activar`, `destruir`, `dibujar`, `actualizar`)
+- El código que usa esas clases hace `if (tipo === 'x') ... else ...` para decidir cuál instanciar
+- Se repite lógica similar en múltiples clases
+
+```javascript
+// ❌ MAL — sin superclase, el controller decide todo
+if (modo === 'timon') {
+    const t = new ControlTimon(); t.activar(cir);
+} else {
+    const t = new ControlTeclado(); t.activar(cir);
+}
+
+// ✅ BIEN — superclase define la interfaz, subclases la implementan
+class ControlEntrada {           // superclase en su propio archivo
+    activar(circuito) {}
+    destruir() {}
+}
+class ControlTimon   extends ControlEntrada { ... }  // archivo: control_timon.js
+class ControlTeclado extends ControlEntrada { ... }  // archivo: control_teclado.js
+
+// El controller solo conoce la interfaz, no el tipo concreto:
+this.#control = new ControlTimon();
+this.#control.activar(circuito); // funciona igual con cualquier subclase
+```
+
+### Jerarquías activas en el proyecto (NO romper)
+
+| Superclase | Subclases | Interfaz obligatoria |
+|---|---|---|
+| `ControlEntrada` | `ControlTimon`, `ControlTeclado` | `activar(cir)`, `destruir()` |
+| `PistaConfig` | `PistaCiudad`, `PistaDesierto`, … | `nombre`, `tramos`, `totalSegs` |
+| `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
+| `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
+| `VisorBase` | `CircuitoUrbano`, `Testdrive3D` | (utilidades Three.js) |
+
+### Encapsulamiento — reglas estrictas
+
+```javascript
+// ❌ MAL — atributos públicos que otros modifican directo
+class ControlTimon {
+    steerInput = 0;      // cualquiera puede escribir esto
+    circuito   = null;
+}
+
+// ✅ BIEN — privados con # y exposición controlada
+class ControlTimon extends ControlEntrada {
+    #steerInput = 0;     // solo esta clase lo modifica
+    #circuito   = null;
+    // nadie de afuera necesita leerlo → ni getter
+}
+```
+
+**Reglas de encapsulamiento:**
+- Todo estado interno → campo privado `#campo`
+- Solo agregar getter si otra clase necesita **leer** el valor
+- Solo agregar setter si otra clase necesita **escribir** el valor con validación
+- NUNCA exponer campos privados solo por comodidad
+- Si un campo lo escriben muchas clases → rediseñar, probablemente falta encapsulamiento
+
+### Checklist ANTES de agregar cualquier nueva clase al proyecto
+
+1. **¿Ya existe una superclase para esto?** → revisar la tabla de jerarquías de arriba
+2. **¿Comparte interfaz con otra clase?** → si sí, ambas deben extender la misma superclase
+3. **¿Los datos son privados (`#`)?** → si no, hacerlos privados
+4. **¿Cada getter/setter tiene razón de existir?** → si nadie de afuera lo necesita, no lo expongas
+5. **¿La subclase llama `super()` en el constructor?** → obligatorio al extender
+6. **¿El archivo de la superclase se carga ANTES en el HTML?** → el orden de `<script>` importa
+
 ### Ejemplos correctos vs incorrectos
 
 ```javascript
