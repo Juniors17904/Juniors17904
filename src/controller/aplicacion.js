@@ -211,16 +211,21 @@ class Aplicacion {
             const area = document.getElementById('dg-mapa-area');
             area.style.display = e.target.checked ? 'block' : 'none';
             if (e.target.checked) {
-                const canvas = document.getElementById('canvas-dg-mapa');
-                canvas.width  = canvas.offsetWidth  || 320;
-                canvas.height = canvas.offsetHeight || 240;
                 if (!this.#minimapaDG) {
                     this.#minimapaDG = new MinimapaDisenoGeneral();
                 }
-                const pistaCfg = window.PISTAS?.[this.#estado.pista];
+                const pistaCfg = window.PISTAS?.[this.#estado.pista] || window.PISTAS?.['ciudad'];
                 if (pistaCfg) this.#minimapaDG.setCircuito(pistaCfg);
-                const ctx = canvas.getContext('2d');
-                this.#minimapaDG.dibujar(ctx, canvas.width, canvas.height);
+                // rAF garantiza que el canvas tenga dimensiones reales tras el reflow
+                requestAnimationFrame(() => {
+                    const canvas = document.getElementById('canvas-dg-mapa');
+                    canvas.width  = canvas.offsetWidth  || 320;
+                    canvas.height = canvas.offsetHeight || 240;
+                    const guiaActiva = document.getElementById('tog-guia-pista').checked;
+                    if (guiaActiva) this.#minimapaDG.mostrarGuia = true;
+                    const ctx = canvas.getContext('2d');
+                    this.#minimapaDG.dibujar(ctx, canvas.width, canvas.height);
+                });
             } else {
                 this.#minimapaDG = null;
                 document.getElementById('tog-guia-pista').checked = false;
