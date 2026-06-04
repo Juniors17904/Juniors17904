@@ -176,18 +176,6 @@ class Aplicacion {
             this.#mostrar('pantalla-vista-conduccion');
         });
         document.getElementById('btn-volver-vista-conduccion').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
-        document.getElementById('vc-cam-chase').addEventListener('click', () => {
-            this.#vistaConduccion.tipoCamara = 'chase';
-            this.#actualizarSeleccionCamara();
-        });
-        document.getElementById('vc-cam-aerea').addEventListener('click', () => {
-            this.#vistaConduccion.tipoCamara = 'aerea';
-            this.#actualizarSeleccionCamara();
-        });
-        document.getElementById('vc-altura').addEventListener('input', e => {
-            this.#vistaConduccion.alturaCamara = +e.target.value;
-            document.getElementById('vc-altura-val').textContent = (+e.target.value).toFixed(1);
-        });
         document.getElementById('btn-ir-garage').addEventListener('click', () => {
             this.#mostrar('pantalla-garage');
             Garaje.iniciar(this.#estado, id => this.#mostrar(id));
@@ -219,6 +207,14 @@ class Aplicacion {
         document.getElementById('vc-altura').addEventListener('input', e => {
             this.#vistaConduccion.alturaCamara = +e.target.value;
             document.getElementById('vc-altura-val').textContent = (+e.target.value).toFixed(1);
+        });
+        document.getElementById('vc-ctrl-timon').addEventListener('click', () => {
+            this.#vistaConduccion.tipoControl = 'timon';
+            this.#actualizarSeleccionControl();
+        });
+        document.getElementById('vc-ctrl-teclado').addEventListener('click', () => {
+            this.#vistaConduccion.tipoControl = 'teclado';
+            this.#actualizarSeleccionControl();
         });
 
         document.getElementById('btn-ir-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
@@ -732,41 +728,21 @@ class Aplicacion {
 
         const cir = new window.CircuitoUrbano(canvas, tipoPista);
         this.#cir3d = cir;
-        this.#vistaConduccion.aplicarA(cir);
+        this.#vistaConduccion.aplicarA(cir, this.#estado.timonModelo);
         cir.cargar(this.#estado.tipoAuto, this.#estado.color);
         cir.setVelocimetroModelo(this.#estado.velocimetroModelo);
         cir.iniciar();
         const cirInitRotY = cir.rotY;
 
+        // Solo 'm' queda aquí — las teclas de conducción las maneja el ControlEntrada activo
         this.#cir3dKeyDown = e => {
             if (e.key === 'm' || e.key === 'M') {
                 const libre = cir.toggleMovimientoLibre();
                 btnMovLibre.textContent = libre ? 'LIBRE' : 'PATH';
                 btnMovLibre.style.color = libre ? '#34d399' : '#a78bfa';
             }
-            if (cir.camAereaActiva && cir.camAerea) {
-                if (e.key==='ArrowLeft' ||e.key==='a') cir.camAerea.moveX=-1;
-                if (e.key==='ArrowRight'||e.key==='d') cir.camAerea.moveX= 1;
-                if (e.key==='ArrowUp'   ||e.key==='w') cir.camAerea.moveZ=-1;
-                if (e.key==='ArrowDown' ||e.key==='s') cir.camAerea.moveZ= 1;
-            } else {
-                if (e.key==='ArrowUp'   ||e.key==='w') cir.accelInput= 1;
-                if (e.key==='ArrowDown' ||e.key==='s') cir.accelInput=-1;
-                if (e.key==='ArrowLeft' ||e.key==='a') cir.steerInput=-1;
-                if (e.key==='ArrowRight'||e.key==='d') cir.steerInput= 1;
-            }
-        };
-        this.#cir3dKeyUp = e => {
-            if (cir.camAereaActiva && cir.camAerea) {
-                if (e.key==='ArrowLeft'||e.key==='a'||e.key==='ArrowRight'||e.key==='d') cir.camAerea.moveX=0;
-                if (e.key==='ArrowUp'||e.key==='w'||e.key==='ArrowDown'||e.key==='s')   cir.camAerea.moveZ=0;
-            } else {
-                if (e.key==='ArrowUp'||e.key==='w'||e.key==='ArrowDown'||e.key==='s') cir.accelInput=0;
-                if (e.key==='ArrowLeft'||e.key==='a'||e.key==='ArrowRight'||e.key==='d') cir.steerInput=0;
-            }
         };
         window.addEventListener('keydown', this.#cir3dKeyDown);
-        window.addEventListener('keyup',   this.#cir3dKeyUp);
 
         {
             let prevX = 0, prevY = 0;
@@ -807,29 +783,6 @@ class Aplicacion {
             canvas.addEventListener('touchstart', this.#cir3dCanvasTouchStart, {passive: true});
             canvas.addEventListener('touchmove',  this.#cir3dCanvasTouchMove,  {passive: false});
         }
-
-        const timon = new window.ControlTimon('canvas-timon', this.#estado.timonModelo);
-        document.getElementById('ctrl-timon').style.display   = 'flex';
-        document.getElementById('ctrl-botones').style.display  = 'none';
-        document.getElementById('ctrl-accel').style.display    = 'none';
-
-        const _wireTiemonBtn = (id, valStart, valEnd) => {
-            const el = document.getElementById(id);
-            el.addEventListener('touchstart',  () => { cir.accelInput = valStart; }, { passive: true });
-            el.addEventListener('touchend',    () => { cir.accelInput = valEnd; });
-            el.addEventListener('touchcancel', () => { cir.accelInput = valEnd; });
-            el.addEventListener('mousedown',   () => { cir.accelInput = valStart; });
-            el.addEventListener('mouseup',     () => { cir.accelInput = valEnd; });
-        };
-        _wireTiemonBtn('btn-acelerar',  1, 0);
-        _wireTiemonBtn('btn-freno',    -1, 0);
-
-        let _timonRaf = 0;
-        const _timonLoop = () => {
-            _timonRaf = requestAnimationFrame(_timonLoop);
-            cir.steerInput = timon.steerInput;
-        };
-        _timonLoop();
 
         const sliderCam = document.getElementById('slider-cam-height');
         sliderCam.value = '2.8';
@@ -1091,8 +1044,8 @@ class Aplicacion {
             this.#cir3dVisibilityHandler = null;
         }
         this.#cir3d.detener(); this.#cir3d=null;
+        this.#vistaConduccion.destruirControl();
         if (this.#cir3dKeyDown) window.removeEventListener('keydown',this.#cir3dKeyDown);
-        if (this.#cir3dKeyUp)   window.removeEventListener('keyup',  this.#cir3dKeyUp);
         this.#cir3dKeyDown=null; this.#cir3dKeyUp=null;
         for (const {el,onStart,onEnd} of this.#cir3dTouchHandlers) {
             el.removeEventListener('touchstart',onStart);
@@ -1214,16 +1167,22 @@ class Aplicacion {
         const alturaInput = document.getElementById('vc-altura');
         alturaInput.value = vc.alturaCamara;
         document.getElementById('vc-altura-val').textContent = vc.alturaCamara.toFixed(1);
-        document.getElementById('vc-altura-wrap').style.display =
-            vc.tipoCamara === 'chase' ? '' : 'none';
+        document.getElementById('vc-altura-wrap').style.display = vc.tipoCamara === 'chase' ? '' : 'none';
+        document.getElementById('vc-check-ctrl-timon').textContent  = vc.tipoControl === 'timon'   ? '✓' : '';
+        document.getElementById('vc-check-ctrl-teclado').textContent = vc.tipoControl === 'teclado' ? '✓' : '';
     }
 
     #actualizarSeleccionCamara() {
         const vc = this.#vistaConduccion;
         document.getElementById('vc-check-chase').textContent = vc.tipoCamara === 'chase' ? '✓' : '';
         document.getElementById('vc-check-aerea').textContent = vc.tipoCamara === 'aerea' ? '✓' : '';
-        document.getElementById('vc-altura-wrap').style.display =
-            vc.tipoCamara === 'chase' ? '' : 'none';
+        document.getElementById('vc-altura-wrap').style.display = vc.tipoCamara === 'chase' ? '' : 'none';
+    }
+
+    #actualizarSeleccionControl() {
+        const vc = this.#vistaConduccion;
+        document.getElementById('vc-check-ctrl-timon').textContent  = vc.tipoControl === 'timon'   ? '✓' : '';
+        document.getElementById('vc-check-ctrl-teclado').textContent = vc.tipoControl === 'teclado' ? '✓' : '';
     }
 }
 

@@ -307,6 +307,18 @@
             <input type="range" id="vc-altura" min="1" max="8" step="0.1" value="2.8"
                    style="width:100%;margin-top:10px;accent-color:var(--neon-v)">
         </div>
+        <div class="ajustes-menu" style="margin-top:20px">
+            <button id="vc-ctrl-timon" class="ajuste-item">
+                <span class="ajuste-icono">🎮</span>
+                <span class="ajuste-txt">Timón táctil</span>
+                <span id="vc-check-ctrl-timon" class="ajuste-arrow">✓</span>
+            </button>
+            <button id="vc-ctrl-teclado" class="ajuste-item">
+                <span class="ajuste-icono">⌨️</span>
+                <span class="ajuste-txt">Teclado / Flechas</span>
+                <span id="vc-check-ctrl-teclado" class="ajuste-arrow"></span>
+            </button>
+        </div>
     </div>
 
     <!-- Pantalla: Verificar giroscopio -->
@@ -612,6 +624,10 @@
     <script src="src/model/carros/carro2d.js"></script>
     <script src="src/model/segmento.js"></script>
     <script src="src/model/pista.js"></script>
+
+    <!-- View: controles base -->
+    <script src="src/view/controles/control_entrada.js"></script>
+    <script src="src/view/controles/control_teclado.js"></script>
 
     <!-- View: timones -->
     <script src="src/view/controles/timon.js"></script>
