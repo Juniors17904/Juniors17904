@@ -299,8 +299,18 @@
         <div id="dg-hamburgesa-wrap">
             <button id="btn-dg-hamburgesa" class="btn-tuerca">☰</button>
             <div id="dg-dropdown" class="dg-dropdown">
-                <!-- items de configuración se agregan aquí -->
+                <label class="dg-toggle-fila" for="tog-mapa">
+                    <span class="dg-toggle-lbl">Mapa</span>
+                    <div class="dg-toggle">
+                        <input type="checkbox" id="tog-mapa">
+                        <span class="dg-toggle-slider"></span>
+                    </div>
+                </label>
             </div>
+        </div>
+
+        <div id="dg-mapa-area" class="dg-mapa-area" style="display:none">
+            <canvas id="canvas-dg-mapa"></canvas>
         </div>
 
         <div class="titulo-logo" style="font-size:20px;margin-bottom:24px">DISEÑO GENERAL</div>

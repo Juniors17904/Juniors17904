@@ -206,6 +206,18 @@ class Aplicacion {
         document.addEventListener('click', () => {
             document.getElementById('dg-dropdown').classList.remove('abierto');
         });
+        document.getElementById('tog-mapa').addEventListener('change', e => {
+            const area = document.getElementById('dg-mapa-area');
+            area.style.display = e.target.checked ? 'block' : 'none';
+            if (e.target.checked) {
+                const canvas = document.getElementById('canvas-dg-mapa');
+                canvas.width  = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#1a4a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
             this.#vistaConduccion.tipoCamara = 'chase';
