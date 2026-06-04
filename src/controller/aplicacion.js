@@ -196,6 +196,10 @@ class Aplicacion {
             this.#mostrar('pantalla-vista-conduccion');
         });
         document.getElementById('btn-volver-vista-conduccion').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+
+        document.getElementById('btn-ir-diseno-general').addEventListener('click', () => this.#mostrar('pantalla-diseno-general'));
+        document.getElementById('btn-volver-diseno-general').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
             this.#vistaConduccion.tipoCamara = 'chase';
             this.#actualizarSeleccionCamara();
