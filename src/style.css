@@ -511,6 +511,51 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 .btn-tuerca:hover { background: rgba(124,58,237,0.4); box-shadow: 0 0 20px rgba(124,58,237,0.7); }
 
 /* =============================================
+   HAMBURGUESA — menú desplegable Diseño general
+   ============================================= */
+#dg-hamburgesa-wrap {
+    position: absolute;
+    top: 16px; right: 16px;
+    z-index: 20;
+}
+.dg-dropdown {
+    display: none;
+    position: absolute;
+    top: 52px; right: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 8px;
+    min-width: 210px;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.dg-dropdown.abierto { display: flex; }
+.dg-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--txt);
+    font-family: var(--font);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.15s;
+    width: 100%;
+    text-align: left;
+}
+.dg-dropdown-item:hover {
+    background: rgba(124,58,237,0.15);
+    border-color: var(--neon-v);
+}
+.dg-dropdown-item .dg-item-icono { font-size: 18px; }
+
+/* =============================================
    DISEÑO DE TIMÓN — grid de 4 modelos
    ============================================= */
 .timon-grid {
