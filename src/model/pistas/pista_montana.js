@@ -5,13 +5,6 @@ try {
 // MODEL — PistaMontana: circuito de montaña con curvas cerradas
 // ================================================================
 class PistaMontana extends PistaConfig {
-    #nivelFijo = {
-        nombre: 'Montaña',
-        cielo:  ['#1a2a3a', '#2d4a5a'],
-        cesped: ['#1a3a1a', '#2d5a2d'],
-        asfalto:['#5a5a5a', '#4a4a4a'],
-        borde:  '#888',
-    };
     #tramos = [
         [0,   20,  0      ],
         [20,  40,  2.8    ],
@@ -26,14 +19,18 @@ class PistaMontana extends PistaConfig {
         [260, 300, 0      ],
     ];
 
-    get nombre()          { return 'Montaña'; }
+    get nombre()          { return 'Cañón Rojo'; }
     get totalSegs()       { return 300; }
     get distMeta()        { return 1800; }
-    get nivelFijo()       { return this.#nivelFijo; }
     get tramos()          { return this.#tramos; }
     get obstFrecuencia()  { return 0.08; }
     get obstTipos()       { return ['bache','carro','turbo']; }
     get coloresTrafico()  { return ['#6b7280','#4a5568','#718096']; }
+
+    get cielo()   { return ['#1a2a3a', '#2d4a5a']; }
+    get cesped()  { return ['#1a3a1a', '#2d5a2d']; }
+    get asfalto() { return ['#5a5a5a', '#4a4a4a']; }
+    get borde()   { return '#888'; }
 }
 
 window.PISTAS.montana = new PistaMontana();
