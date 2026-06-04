@@ -397,11 +397,7 @@ class Aplicacion {
         // Crea una versión libre de la pista (sin meta, sin fin)
         const base = window.PISTAS?.[tipoPista];
         if (!base) { this.#iniciarTestDrive(); return; }
-        window.PISTAS['__td__'] = {
-            ...base,
-            distMeta: Infinity,
-            esTestDrive: true,
-        };
+        window.PISTAS['__td__'] = new PistaTestDriveLibre(base);
         this.#mostrar('pantalla-juego');
         GestorOrientacion.verificar();
         document.getElementById('ctrl-accel').style.display = 'flex';

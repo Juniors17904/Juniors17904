@@ -37,6 +37,53 @@
 > Si la entidad tiene nombre propio, comportamiento y puede existir en múltiples variantes → **ES UNA CLASE**
 > Ejemplos: `TimonClasico`, `TimonF1`, `PistaUrbana`, `CarroDeportivo`, `PowerUpTurbo`
 
+## 🚨 PROHIBICIÓN ABSOLUTA: OBJETOS LITERALES COMO ENTIDADES 🚨
+
+### NUNCA usar `{ }` para representar una entidad del juego. SIEMPRE una clase.
+
+Este es el error más común y más grave del proyecto. Ocurre cuando se usa un objeto literal como atajo para configuración o datos de una entidad que debería ser una clase.
+
+**¿Cómo detectarlo?** Si el objeto tiene nombre propio (una pista, un nivel, un obstáculo, una configuración específica) → ES UNA CLASE.
+
+```javascript
+// ❌ GRAVÍSIMO — objeto literal como entidad
+window.PISTAS.ciudad = {
+    nombre: 'Circuito Urbano',
+    totalSegs: 300,
+    tramos: [...],
+};
+
+// ✅ CORRECTO — clase instanciable en su propio archivo
+// archivo: pistas/pista_ciudad.js
+class PistaCiudad extends PistaConfig {
+    constructor() {
+        super();
+        this.nombre    = 'Circuito Urbano';
+        this.totalSegs = 300;
+        this.tramos    = [...];
+    }
+}
+
+// ❌ GRAVÍSIMO — configuración como objeto literal
+const nivelConfig = { cielo: '#060a14', cesped: '#0a200a' };
+
+// ✅ CORRECTO — clase con sus datos
+class NivelCiudad extends Nivel {
+    get cielo()  { return '#060a14'; }
+    get cesped() { return '#0a200a'; }
+}
+```
+
+### Checklist ANTES de escribir cualquier `{ }` con datos:
+1. ¿Tiene nombre propio? → ES UNA CLASE
+2. ¿Tiene variantes (ciudad, desierto, montaña)? → ES UNA JERARQUÍA DE CLASES
+3. ¿Se accede por clave string (`PISTAS['ciudad']`)? → ES UNA CLASE registrada en un registro
+4. ¿Tiene más de 2 propiedades? → PROBABLEMENTE ES UNA CLASE
+
+### La única excepción permitida para `{ }`:
+- Parámetros de configuración internos dentro de un método (variables locales temporales)
+- Nunca como propiedad persistente de otra clase ni como `window.X`
+
 ### MVC obligatorio
 - **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`). Sin lógica de vista.
 - **View** → dibujo, cámaras, controles UI (`CamaraSeguimiento`, `ControlTimon`, `Minimapa`). Sin lógica de negocio.
