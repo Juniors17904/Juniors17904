@@ -216,25 +216,24 @@
         <button id="btn-toggle-mapas" style="display:none;position:absolute;bottom:190px;left:72px;z-index:201;background:rgba(10,10,30,0.82);color:#a78bfa;border:1px solid #7c3aed;border-radius:6px;font:bold 9px 'Orbitron',monospace;padding:5px 10px;cursor:pointer;letter-spacing:1px">MAPAS</button>
         <button id="btn-mov-libre" style="display:none;position:absolute;bottom:155px;left:8px;z-index:201;background:rgba(10,10,30,0.82);color:#a78bfa;border:1px solid #7c3aed;border-radius:6px;font:bold 9px 'Orbitron',monospace;padding:5px 10px;cursor:pointer;letter-spacing:1px">PATH</button>
 
-        <!-- Controles botones -->
-        <div id="ctrl-botones" class="ctrl-overlay" style="display:none">
-            <button id="btn-izq" class="btn-dir">◀</button>
-            <div id="ctrl-accel" style="display:none;flex-direction:column;gap:8px">
-                <button id="btn-gas" class="btn-dir">▲</button>
-                <button id="btn-rev" class="btn-dir">▼</button>
-            </div>
-            <button id="btn-der" class="btn-dir">▶</button>
-        </div>
+    </div>
 
-        <!-- Timón -->
-        <div id="ctrl-timon" class="ctrl-overlay" style="display:none">
-            <div id="timon-wrap">
-                <canvas id="canvas-timon" width="160" height="160" style="background:transparent;display:block"></canvas>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:12px;pointer-events:all">
-                <button id="btn-acelerar" class="btn-dir" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">ACEL</button>
-                <button id="btn-freno"    class="btn-dir" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">FRENO</button>
-            </div>
+    <!-- Controles globales (fixed — visibles desde cualquier pantalla) -->
+    <div id="ctrl-botones" class="ctrl-overlay" style="display:none">
+        <button id="btn-izq" class="btn-dir">◀</button>
+        <div id="ctrl-accel" style="display:none;flex-direction:column;gap:8px">
+            <button id="btn-gas" class="btn-dir">▲</button>
+            <button id="btn-rev" class="btn-dir">▼</button>
+        </div>
+        <button id="btn-der" class="btn-dir">▶</button>
+    </div>
+    <div id="ctrl-timon" class="ctrl-overlay" style="display:none">
+        <div id="timon-wrap">
+            <canvas id="canvas-timon" width="160" height="160" style="background:transparent;display:block"></canvas>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;pointer-events:all">
+            <button id="btn-acelerar" class="btn-dir" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">ACEL</button>
+            <button id="btn-freno"    class="btn-dir" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">FRENO</button>
         </div>
     </div>
 
