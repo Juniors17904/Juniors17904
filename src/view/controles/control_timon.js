@@ -37,14 +37,20 @@ class ControlTimon extends ControlEntrada {
         this.#modelo   = modelo;
     }
 
+    mostrarOverlay() {
+        document.getElementById('ctrl-timon').style.display   = 'flex';
+        document.getElementById('ctrl-botones').style.display = 'none';
+        document.getElementById('ctrl-accel').style.display   = 'none';
+    }
+
+    ocultarOverlay() {
+        document.getElementById('ctrl-timon').style.display = 'none';
+    }
+
     activar(circuito) {
         this.#cir    = circuito;
         this.#canvas = document.getElementById(this.#canvasId);
         this.#ctx    = this.#canvas.getContext('2d');
-
-        document.getElementById('ctrl-timon').style.display   = 'flex';
-        document.getElementById('ctrl-botones').style.display = 'none';
-        document.getElementById('ctrl-accel').style.display   = 'none';
 
         this.#setupCanvas();
         this.#wireAcelerador(circuito);
@@ -69,7 +75,7 @@ class ControlTimon extends ControlEntrada {
         }
         this.#aceleradorHandlers = [];
 
-        document.getElementById('ctrl-timon').style.display = 'none';
+        this.ocultarOverlay();
         if (this.#cir) { this.#cir.accelInput = 0; this.#cir.steerInput = 0; }
         this.#cir    = null;
         this.#canvas = null;

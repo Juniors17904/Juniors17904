@@ -229,8 +229,8 @@ class Aplicacion {
             if (this.#visorDG) this.#visorDG.mostrarAuto = e.target.checked;
         });
         document.getElementById('tog-botones').addEventListener('change', e => {
-            document.getElementById('ctrl-botones').style.display = e.target.checked ? 'flex' : 'none';
-            document.getElementById('ctrl-accel').style.display   = e.target.checked ? 'flex' : 'none';
+            if (e.target.checked) this.#vistaConduccion.mostrarOverlay();
+            else                  this.#vistaConduccion.ocultarOverlay();
         });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
@@ -1241,10 +1241,9 @@ class Aplicacion {
         // Activar control (teclado o timón según preferencia)
         this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);
 
-        // Controles táctiles — activar toggle y mostrar
-        document.getElementById('tog-botones').checked        = true;
-        document.getElementById('ctrl-botones').style.display = 'flex';
-        document.getElementById('ctrl-accel').style.display   = 'flex';
+        // Controles táctiles — activar toggle y mostrar el overlay correcto
+        document.getElementById('tog-botones').checked = true;
+        this.#vistaConduccion.mostrarOverlay();
         this.#dgTouchHandlers = [];
         const addTouch = (id, onStart, onEnd) => {
             const el = document.getElementById(id);
@@ -1267,8 +1266,6 @@ class Aplicacion {
             el.removeEventListener('touchend',   onEnd);
         }
         this.#dgTouchHandlers = [];
-        document.getElementById('ctrl-botones').style.display = 'none';
-        document.getElementById('ctrl-accel').style.display   = 'none';
         this.#visorDG.detener();
         this.#visorDG = null;
     }

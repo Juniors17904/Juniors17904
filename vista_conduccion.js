@@ -61,6 +61,14 @@ class VistaConduccion {
         return this;
     }
 
+    mostrarOverlay() {
+        this.#control?.mostrarOverlay();
+    }
+
+    ocultarOverlay() {
+        this.#control?.ocultarOverlay();
+    }
+
     destruirControl() {
         this.#control?.destruir();
         this.#control = null;

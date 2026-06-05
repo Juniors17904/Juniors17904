@@ -9,11 +9,19 @@ class ControlTeclado extends ControlEntrada {
     #keyDown = null;
     #keyUp   = null;
 
-    activar(circuito) {
-        this.#cir = circuito;
+    mostrarOverlay() {
         document.getElementById('ctrl-timon').style.display   = 'none';
+        document.getElementById('ctrl-botones').style.display = 'flex';
+        document.getElementById('ctrl-accel').style.display   = 'flex';
+    }
+
+    ocultarOverlay() {
         document.getElementById('ctrl-botones').style.display = 'none';
         document.getElementById('ctrl-accel').style.display   = 'none';
+    }
+
+    activar(circuito) {
+        this.#cir = circuito;
 
         this.#keyDown = e => {
             if (circuito.camAereaActiva && circuito.camAerea) {

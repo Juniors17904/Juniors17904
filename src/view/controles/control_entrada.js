@@ -6,8 +6,10 @@
 //        Interfaz obligatoria: activar(circuito) y destruir()
 // ================================================================
 class ControlEntrada {
-    activar(circuito) {}
-    destruir() {}
+    activar(circuito)  {}
+    destruir()         {}
+    mostrarOverlay()   {}
+    ocultarOverlay()   {}
 }
 
 window.ControlEntrada = ControlEntrada;
