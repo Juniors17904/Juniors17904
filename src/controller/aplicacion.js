@@ -1303,8 +1303,12 @@ class Aplicacion {
         canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        this.#visorDO = new window.VisorDisenoObjetos(canvas, window.PISTAS['ciudad']);
+        this.#visorDO = new window.VisorDisenoObjetos(canvas);
         this.#visorDO.iniciar();
+
+        document.querySelectorAll('.do-obj-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.#visorDO?.mostrar(btn.dataset.tipo));
+        });
     }
 
     #detenerVisorDO() {
