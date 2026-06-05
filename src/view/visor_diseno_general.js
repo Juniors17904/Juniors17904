@@ -5,6 +5,9 @@ import { Ruta }              from '../model/ruta.js';
 import { Carro }             from '../model/carros/carro.js';
 import { VisorBase }         from './visor_base.js';
 import { CamaraSeguimiento } from './camaras/camara_seguimiento.js';
+import { ArbolEscena }       from './objetos/arbol_escena.js';
+import { PosteEscena }       from './objetos/poste_escena.js';
+import { AvisoEscena }       from './objetos/aviso_escena.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
@@ -21,6 +24,9 @@ class VisorDisenoGeneral extends VisorBase {
     #mov         = null;
     #sol         = null;
     #resizeObs   = null;
+
+    #pista      = null;
+    #objetos    = [];
 
     #meshPasto  = null;
     #grupoPista = null;
@@ -58,11 +64,12 @@ class VisorDisenoGeneral extends VisorBase {
     get mostrarPista() { return this.#mostrarPista; }
     get mostrarAuto()  { return this.#mostrarAuto;  }
 
-    constructor(canvas, tipoPista = 'ciudad') {
+    constructor(canvas, pista) {
         super();
         this.#canvas = canvas;
+        this.#pista  = pista;
         this.#initScene();
-        this.#buildCircuito(tipoPista);
+        this.#buildCircuito();
     }
 
     // ── Escena ───────────────────────────────────────────────────
@@ -112,11 +119,10 @@ class VisorDisenoGeneral extends VisorBase {
     }
 
     // ── Construir circuito ────────────────────────────────────────
-    #buildCircuito(tipoPista) {
-        const pista = window.PISTAS?.[tipoPista];
-        if (!pista?.tramos) return;
+    #buildCircuito() {
+        if (!this.#pista?.tramos) return;
 
-        this.#ruta.construir(pista.tramos, pista.totalSegs);
+        this.#ruta.construir(this.#pista.tramos, this.#pista.totalSegs);
         const curve = this.#ruta.curve;
         if (!curve) return;
 
@@ -225,6 +231,24 @@ class VisorDisenoGeneral extends VisorBase {
         grupoPista.visible = false;
         this.#grupoPista   = grupoPista;
         this.#scene.add(grupoPista);
+
+        // ── Capa 3: decoraciones de la pista ────────────────────
+        for (const dec of this.#pista.decoraciones) {
+            const obj = this.#crearObjeto(dec);
+            if (obj) { obj.construir(this.#scene); this.#objetos.push(obj); }
+        }
+    }
+
+    // ── Fábrica de objetos de escena ─────────────────────────────
+    #crearObjeto({ tipo, prog, lado, dist, escala = 1, texto = '' }) {
+        const pos = this.#ruta.posicionEn(prog);
+        const wx  = pos.x + Math.cos(pos.angle) * dist * lado;
+        const wz  = pos.z - Math.sin(pos.angle) * dist * lado;
+
+        if (tipo === 'arbol') return new ArbolEscena(wx, wz, escala);
+        if (tipo === 'poste') return new PosteEscena(wx, wz);
+        if (tipo === 'aviso') return new AvisoEscena(wx, wz, texto);
+        return null;
     }
 
     // ── Cargar auto ──────────────────────────────────────────────
@@ -255,6 +279,8 @@ class VisorDisenoGeneral extends VisorBase {
         this.#raf = 0;
         this.#resizeObs?.disconnect();
         this.#resizeObs = null;
+        for (const obj of this.#objetos) obj.destruir(this.#scene);
+        this.#objetos = [];
         this.#renderer?.dispose();
         this.#renderer = null;
     }

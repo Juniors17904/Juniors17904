@@ -1234,7 +1234,7 @@ class Aplicacion {
         canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        this.#visorDG = new window.VisorDisenoGeneral(canvas, 'ciudad');
+        this.#visorDG = new window.VisorDisenoGeneral(canvas, window.PISTAS['ciudad']);
         this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visorDG.iniciar();
 

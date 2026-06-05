@@ -13,6 +13,7 @@ class PistaConfig {
     get obstFrecuencia()  { return 0; }
     get obstTipos()       { return []; }
     get coloresTrafico()  { return []; }
+    get decoraciones()    { return []; }
 
     // ── Propiedades visuales del entorno ─────────────────────────
     // Cada subclase sobreescribe estos getters con sus colores propios.
