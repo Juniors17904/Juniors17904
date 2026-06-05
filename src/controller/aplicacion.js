@@ -21,6 +21,7 @@ class Aplicacion {
     #velocimetroOrigen  = 'pantalla-ajustes';
     #vistaConduccion    = new VistaConduccion().cargar();
     #minimapaDG         = null;
+    #animDG             = null;
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -214,31 +215,46 @@ class Aplicacion {
                 if (!this.#minimapaDG) {
                     this.#minimapaDG = new MinimapaDisenoGeneral();
                 }
-                const pistaCfg = window.PISTAS?.[this.#estado.pista] || window.PISTAS?.['ciudad'];
+                // Diseño General siempre previsualiza el Circuito Urbano
+                const pistaCfg = window.PISTAS?.ciudad;
                 if (pistaCfg) this.#minimapaDG.setCircuito(pistaCfg);
-                // rAF garantiza que el canvas tenga dimensiones reales tras el reflow
+                this.#minimapaDG.colorAuto = this.#estado.color;
                 requestAnimationFrame(() => {
                     const canvas = document.getElementById('canvas-dg-mapa');
                     canvas.width  = canvas.offsetWidth  || 320;
                     canvas.height = canvas.offsetHeight || 240;
-                    const guiaActiva = document.getElementById('tog-guia-pista').checked;
-                    if (guiaActiva) this.#minimapaDG.mostrarGuia = true;
+                    if (document.getElementById('tog-guia-pista').checked)
+                        this.#minimapaDG.mostrarGuia = true;
+                    if (document.getElementById('tog-auto').checked)
+                        this.#minimapaDG.mostrarAuto = true;
                     const ctx = canvas.getContext('2d');
                     this.#minimapaDG.dibujar(ctx, canvas.width, canvas.height);
+                    if (this.#minimapaDG.mostrarAuto) this.#iniciarAnimDG();
                 });
             } else {
+                this.#detenerAnimDG();
                 this.#minimapaDG = null;
                 document.getElementById('tog-guia-pista').checked = false;
+                document.getElementById('tog-auto').checked = false;
             }
         });
 
         document.getElementById('tog-guia-pista').addEventListener('change', e => {
             if (!this.#minimapaDG) return;
             this.#minimapaDG.mostrarGuia = e.target.checked;
-            const canvas = document.getElementById('canvas-dg-mapa');
-            if (!canvas.width || !canvas.height) return;
-            const ctx = canvas.getContext('2d');
-            this.#minimapaDG.dibujar(ctx, canvas.width, canvas.height);
+            if (!this.#minimapaDG.mostrarAuto) this.#redibujarDG();
+        });
+
+        document.getElementById('tog-auto').addEventListener('change', e => {
+            if (!this.#minimapaDG) return;
+            this.#minimapaDG.mostrarAuto = e.target.checked;
+            if (e.target.checked) {
+                this.#minimapaDG.colorAuto = this.#estado.color;
+                this.#iniciarAnimDG();
+            } else {
+                this.#detenerAnimDG();
+                this.#redibujarDG();
+            }
         });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
@@ -1228,6 +1244,28 @@ class Aplicacion {
         const vc = this.#vistaConduccion;
         document.getElementById('vc-check-ctrl-timon').textContent  = vc.tipoControl === 'timon'   ? '✓' : '';
         document.getElementById('vc-check-ctrl-teclado').textContent = vc.tipoControl === 'teclado' ? '✓' : '';
+    }
+
+    // ── Animación del minimapa de Diseño General ─────────────────
+    #redibujarDG() {
+        const canvas = document.getElementById('canvas-dg-mapa');
+        if (!canvas.width || !canvas.height || !this.#minimapaDG) return;
+        this.#minimapaDG.dibujar(canvas.getContext('2d'), canvas.width, canvas.height);
+    }
+
+    #iniciarAnimDG() {
+        this.#detenerAnimDG();
+        const loop = () => {
+            if (!this.#minimapaDG?.mostrarAuto) return;
+            this.#minimapaDG.avanzarAuto(0.0004);
+            this.#redibujarDG();
+            this.#animDG = requestAnimationFrame(loop);
+        };
+        this.#animDG = requestAnimationFrame(loop);
+    }
+
+    #detenerAnimDG() {
+        if (this.#animDG) { cancelAnimationFrame(this.#animDG); this.#animDG = null; }
     }
 }
 
