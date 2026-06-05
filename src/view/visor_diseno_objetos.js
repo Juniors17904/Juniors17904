@@ -148,11 +148,22 @@ class VisorDisenoObjetos extends VisorBase {
             if (p.x < minX) minX = p.x; if (p.x > maxX) maxX = p.x;
             if (p.z < minZ) minZ = p.z; if (p.z > maxZ) maxZ = p.z;
         }
-        const cx    = (minX + maxX) / 2;
-        const cz    = (minZ + maxZ) / 2;
-        const rango = Math.max(maxX - minX, maxZ - minZ);
+        const cx     = (minX + maxX) / 2;
+        const cz     = (minZ + maxZ) / 2;
+        const rangoX = maxX - minX;
+        const rangoZ = maxZ - minZ;
+
+        // Calcular altura mínima para que el circuito completo sea visible
+        // considerando el aspect ratio real (modo retrato ≈ 0.46)
+        const aspect   = (this.#canvas.width  || window.innerWidth) /
+                         (this.#canvas.height || window.innerHeight);
+        const tanHalf  = Math.tan(Math.PI / 6); // tan(30°) = FOV 60° / 2
+        const hPorZ    = (rangoZ / 2) / tanHalf;
+        const hPorX    = (rangoX / 2) / (tanHalf * aspect);
+        const h        = Math.max(hPorZ, hPorX) * 1.25; // margen del 25 %
+
         this.#camaraAerea.activar(cx, cz);
-        this.#camaraAerea.h = rango * 0.7;
+        this.#camaraAerea.h = h;
     }
 
     // ── Fábrica de objetos (misma lógica que VisorDisenoGeneral) ─
