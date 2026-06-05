@@ -1,24 +1,25 @@
 'use strict';
 
-import * as THREE      from 'three';
-import { VisorBase }   from './visor_base.js';
-import { ArbolEscena } from './objetos/arbol_escena.js';
-import { PosteEscena } from './objetos/poste_escena.js';
-import { AvisoEscena } from './objetos/aviso_escena.js';
+import * as THREE                from 'three';
+import { VisorBase }             from './visor_base.js';
+import { ControlOrbitaObjeto }   from './controles/control_orbita_objeto.js';
+import { ArbolEscena }           from './objetos/arbol_escena.js';
+import { PosteEscena }           from './objetos/poste_escena.js';
+import { AvisoEscena }           from './objetos/aviso_escena.js';
 
 // ================================================================
 // CLASS: VisorDisenoObjetos — visor 3D de un objeto decorativo.
-//        Muestra el objeto seleccionado (árbol, poste, aviso)
-//        en perspectiva para previsualización.
+//        Permite orbitar (rotar, hacer zoom) con táctil o ratón.
 // ================================================================
 class VisorDisenoObjetos extends VisorBase {
     #canvas;
-    #renderer  = null;
-    #scene     = null;
-    #camera    = null;
-    #raf       = 0;
-    #objeto    = null;
-    #resizeObs = null;
+    #renderer      = null;
+    #scene         = null;
+    #camera        = null;
+    #controlOrbita = null;
+    #raf           = 0;
+    #objeto        = null;
+    #resizeObs     = null;
 
     constructor(canvas) {
         super();
@@ -42,7 +43,9 @@ class VisorDisenoObjetos extends VisorBase {
 
         this.#camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 200);
         this.#camera.position.set(5, 4, 5);
-        this.#camera.lookAt(0, 1.5, 0);
+
+        this.#controlOrbita = new ControlOrbitaObjeto();
+        this.#controlOrbita.activar(this.#camera, this.#canvas);
 
         this.#scene.add(new THREE.AmbientLight(0xffffff, 1.5));
         const sol = new THREE.DirectionalLight(0xfffbe6, 2.0);
@@ -90,6 +93,8 @@ class VisorDisenoObjetos extends VisorBase {
         this.#raf = 0;
         this.#resizeObs?.disconnect();
         this.#resizeObs = null;
+        this.#controlOrbita?.destruir();
+        this.#controlOrbita = null;
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
         this.#renderer?.dispose();
         this.#renderer = null;
@@ -97,6 +102,7 @@ class VisorDisenoObjetos extends VisorBase {
 
     #tick() {
         this.#raf = requestAnimationFrame(() => this.#tick());
+        this.#controlOrbita?.actualizar();
         if (this.#renderer && this.#scene && this.#camera)
             this.#renderer.render(this.#scene, this.#camera);
     }
