@@ -115,13 +115,27 @@ class VisorDisenoGeneral extends VisorBase {
         const xs   = cp.map(p => p.x),   zs   = cp.map(p => p.z);
         const minX = Math.min(...xs),     maxX = Math.max(...xs);
         const minZ = Math.min(...zs),     maxZ = Math.max(...zs);
-        const cx   = (minX + maxX) / 2,  cz   = (minZ + maxZ) / 2;
-        const span = Math.max(maxX - minX, maxZ - minZ);
+        const cx     = (minX + maxX) / 2,  cz = (minZ + maxZ) / 2;
+        const rangoX = maxX - minX,   rangoZ = maxZ - minZ;
 
-        // Vista aérea ligeramente ladeada
-        this.#camera.position.set(cx, span * 0.82, cz + span * 0.50);
+        // Calcular altura de cámara para que el circuito completo encuadre en pantalla
+        // (tanto horizontal como vertical), respetando el aspect ratio del canvas
+        const W      = this.#canvas.width  || window.innerWidth;
+        const H      = this.#canvas.height || window.innerHeight;
+        const aspect = W / H;                          // < 1 en portrait
+        const tanHalfFov = Math.tan(25 * Math.PI / 180); // FOV 50° → half=25°
+        const pad = 1.40;
+        // A altura camH: visible vertical = 2*camH*tanHalfFov, horizontal = 2*camH*tanHalfFov*aspect
+        const camH = Math.max(
+            (rangoZ * pad) / (2 * tanHalfFov),
+            (rangoX * pad) / (2 * tanHalfFov * aspect)
+        );
+        // Pequeño desplazamiento Z para dar sensación 3D sin perder encuadre
+        const zOff = camH * 0.12;
+
+        this.#camera.position.set(cx, camH, cz + zOff);
         this.#camera.lookAt(cx, 0, cz);
-        this.#sol.position.set(cx + 80, 200, cz + 80);
+        this.#sol.position.set(cx + 80, camH * 0.5, cz + 80);
         this.#sol.target.position.set(cx, 0, cz);
         this.#sol.target.updateMatrixWorld();
 
