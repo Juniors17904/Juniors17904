@@ -47,6 +47,16 @@ class Aplicacion {
     // ── Navegación ──────────────────────────────────────────────
     #mostrar(id) {
         if (id !== 'pantalla-juego') this.#td3dPending = false;
+
+        // Limpiar visores al salir de sus pantallas (funciona con botón atrás del SO también)
+        const pantallaActual = document.querySelector('.pantalla.activa')?.id;
+        if (pantallaActual === 'pantalla-diseno-general' && id !== 'pantalla-diseno-general') {
+            this.#detenerVisorDG();
+        }
+        if (pantallaActual === 'pantalla-diseno-objetos' && id !== 'pantalla-diseno-objetos') {
+            this.#detenerVisorDO();
+        }
+
         document.querySelectorAll('.pantalla').forEach(p => {
             p.classList.remove('activa');
             p.style.display = 'none';
@@ -776,6 +786,7 @@ class Aplicacion {
         const cir = new window.CircuitoUrbano(canvas, tipoPista);
         this.#cir3d = cir;
         this.#vistaConduccion.aplicarA(cir, this.#estado.timonModelo);
+        this.#vistaConduccion.mostrarOverlay();
         cir.cargar(this.#estado.tipoAuto, this.#estado.color);
         cir.setVelocimetroModelo(this.#estado.velocimetroModelo);
         cir.iniciar();
