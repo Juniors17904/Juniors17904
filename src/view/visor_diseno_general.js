@@ -1,9 +1,10 @@
 'use strict';
 
 import * as THREE    from 'three';
-import { Ruta }               from '../model/ruta.js';
-import { VisorBase }          from './visor_base.js';
-import { CamaraSeguimiento }  from './camaras/camara_seguimiento.js';
+import { Ruta }              from '../model/ruta.js';
+import { Carro }             from '../model/carros/carro.js';
+import { VisorBase }         from './visor_base.js';
+import { CamaraSeguimiento } from './camaras/camara_seguimiento.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
@@ -12,22 +13,32 @@ import { CamaraSeguimiento }  from './camaras/camara_seguimiento.js';
 // ================================================================
 class VisorDisenoGeneral extends VisorBase {
     #canvas;
-    #renderer     = null;
-    #scene        = null;
-    #camaraChase  = null;
-    #raf          = 0;
-    #ruta         = new Ruta();
-    #sol          = null;
-    #resizeObs    = null;
+    #renderer    = null;
+    #scene       = null;
+    #camaraChase = null;
+    #raf         = 0;
+    #ruta        = new Ruta();
+    #mov         = null;
+    #sol         = null;
+    #resizeObs   = null;
 
-    #meshPasto   = null;   // THREE.Mesh  — plano de pasto
-    #grupoPista  = null;   // THREE.Group — asfalto + bordillos + líneas
-    #carGroup    = null;   // THREE.Group — auto 3D
+    #meshPasto  = null;
+    #grupoPista = null;
+    #carGroup   = null;
+    #leanGroup  = null;
 
     #mostrarPasto = false;
     #mostrarPista = false;
     #mostrarAuto  = false;
-    #progreso     = 0;
+
+    accelInput = 0;
+    steerInput = 0;
+    camHeight  = 2.8;
+
+    // Stubs para compatibilidad con VistaConduccion
+    get camAereaActiva() { return false; }
+    get camAerea()       { return null;  }
+    toggleCamaraAerea()  { return false; }
 
     // ── Setters de visibilidad ────────────────────────────────────
     set mostrarPasto(v) {
@@ -77,10 +88,9 @@ class VisorDisenoGeneral extends VisorBase {
         this.#sol = new THREE.DirectionalLight(0xfffbe6, 2.2);
         this.#sol.castShadow = true;
         this.#sol.shadow.mapSize.set(1024, 1024);
-        this.#sol.shadow.camera.near   =  1;
-        this.#sol.shadow.camera.far    =  60;
-        this.#sol.shadow.camera.left   = this.#sol.shadow.camera.bottom = -15;
-        this.#sol.shadow.camera.right  = this.#sol.shadow.camera.top    =  15;
+        this.#sol.shadow.camera.near = 1; this.#sol.shadow.camera.far = 60;
+        this.#sol.shadow.camera.left = this.#sol.shadow.camera.bottom = -15;
+        this.#sol.shadow.camera.right = this.#sol.shadow.camera.top   =  15;
         this.#scene.add(this.#sol, this.#sol.target);
 
         const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
@@ -109,6 +119,9 @@ class VisorDisenoGeneral extends VisorBase {
         this.#ruta.construir(pista.tramos, pista.totalSegs);
         const curve = this.#ruta.curve;
         if (!curve) return;
+
+        const inicio = this.#ruta.inicio;
+        this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
 
         const DIV = 800;
         const cp  = curve.getPoints(DIV);
@@ -157,7 +170,7 @@ class VisorDisenoGeneral extends VisorBase {
         this.#meshPasto.visible = false;
         this.#scene.add(this.#meshPasto);
 
-        // ── Capa 2: pista (asfalto + bordillos + líneas) ─────────
+        // ── Capa 2: pista ────────────────────────────────────────
         const grupoPista = new THREE.Group();
 
         const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
@@ -165,8 +178,7 @@ class VisorDisenoGeneral extends VisorBase {
         road.receiveShadow = true;
         grupoPista.add(road);
 
-        const curbW  = 0.7;
-        const BAND   = 10;
+        const curbW = 0.7, BAND = 10;
         const redMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.7, side: THREE.DoubleSide });
         const whtMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.7, side: THREE.DoubleSide });
 
@@ -185,7 +197,7 @@ class VisorDisenoGeneral extends VisorBase {
                     pos.push(q.x + px*ro, 0.04, q.z + pz*ro);
                     nor.push(0,1,0, 0,1,0);
                 }
-                for (let j = 0; j < i1 - i0; j++) {
+                for (let j = 0; j < i1-i0; j++) {
                     const a = v0+j*2, b2 = a+1, c = a+2, d = a+3;
                     idx.push(a,c,b2, b2,c,d);
                 }
@@ -223,8 +235,8 @@ class VisorDisenoGeneral extends VisorBase {
             VisorBase.centrarGrupo(inner, 2.6);
 
             if (this.#carGroup) this.#scene.remove(this.#carGroup);
-            const grupo = new THREE.Group();
-            grupo.add(inner);
+            const lean  = new THREE.Group(); lean.add(inner); this.#leanGroup = lean;
+            const grupo = new THREE.Group(); grupo.add(lean);
             grupo.visible = this.#mostrarAuto;
             this.#scene.add(grupo);
             this.#carGroup = grupo;
@@ -250,22 +262,24 @@ class VisorDisenoGeneral extends VisorBase {
     #tick() {
         this.#raf = requestAnimationFrame(() => this.#tick());
 
-        // El auto siempre avanza — la cámara siempre tiene dónde mirar
-        this.#progreso = (this.#progreso + 0.00018) % 1;
-        const pos = this.#ruta.posicionEn(this.#progreso);
+        if (this.#mov) {
+            this.#mov.accelInput = this.accelInput;
+            this.#mov.steerInput = this.steerInput;
+            this.#mov.actualizar();
 
-        if (this.#carGroup) {
-            this.#carGroup.position.set(pos.x, 0, pos.z);
-            this.#carGroup.rotation.y = pos.angle;
+            if (this.#carGroup) {
+                this.#carGroup.position.set(this.#mov.px, 0, this.#mov.pz);
+                this.#carGroup.rotation.y = this.#mov.rotY;
+            }
+            if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
+
+            this.#sol.position.set(this.#mov.px + 10, 20, this.#mov.pz + 10);
+            this.#sol.target.position.set(this.#mov.px, 0, this.#mov.pz);
+            this.#sol.target.updateMatrixWorld();
+
+            this.#camaraChase.altura = this.camHeight;
+            this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.steerInput);
         }
-
-        // Sol sigue al auto
-        this.#sol.position.set(pos.x + 10, 20, pos.z + 10);
-        this.#sol.target.position.set(pos.x, 0, pos.z);
-        this.#sol.target.updateMatrixWorld();
-
-        // Cámara trasera sigue al auto
-        this.#camaraChase.actualizar(pos.x, pos.z, pos.angle, 0);
 
         if (this.#renderer && this.#scene) {
             this.#renderer.render(this.#scene, this.#camaraChase.camera);

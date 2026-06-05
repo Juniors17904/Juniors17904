@@ -21,6 +21,7 @@ class Aplicacion {
     #velocimetroOrigen  = 'pantalla-ajustes';
     #vistaConduccion    = new VistaConduccion().cargar();
     #visorDG            = null;
+    #dgTouchHandlers    = [];
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -1231,10 +1232,37 @@ class Aplicacion {
         this.#visorDG = new window.VisorDisenoGeneral(canvas, 'ciudad');
         this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visorDG.iniciar();
+
+        // Activar control (teclado o timón según preferencia)
+        this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);
+
+        // Controles táctiles
+        document.getElementById('ctrl-botones').style.display = 'flex';
+        document.getElementById('ctrl-accel').style.display   = 'flex';
+        this.#dgTouchHandlers = [];
+        const addTouch = (id, onStart, onEnd) => {
+            const el = document.getElementById(id);
+            el.addEventListener('touchstart', onStart, { passive: true });
+            el.addEventListener('touchend',   onEnd);
+            this.#dgTouchHandlers.push({ el, onStart, onEnd });
+        };
+        const dg = this.#visorDG;
+        addTouch('btn-gas', () => { dg.accelInput =  1; }, () => { dg.accelInput = 0; });
+        addTouch('btn-rev', () => { dg.accelInput = -1; }, () => { dg.accelInput = 0; });
+        addTouch('btn-izq', () => { dg.steerInput = -1; }, () => { dg.steerInput = 0; });
+        addTouch('btn-der', () => { dg.steerInput =  1; }, () => { dg.steerInput = 0; });
     }
 
     #detenerVisorDG() {
         if (!this.#visorDG) return;
+        this.#vistaConduccion.destruirControl();
+        for (const { el, onStart, onEnd } of this.#dgTouchHandlers) {
+            el.removeEventListener('touchstart', onStart);
+            el.removeEventListener('touchend',   onEnd);
+        }
+        this.#dgTouchHandlers = [];
+        document.getElementById('ctrl-botones').style.display = 'none';
+        document.getElementById('ctrl-accel').style.display   = 'none';
         this.#visorDG.detener();
         this.#visorDG = null;
     }
