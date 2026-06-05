@@ -1,22 +1,24 @@
 'use strict';
 
 import * as THREE    from 'three';
-import { Ruta }      from '../model/ruta.js';
-import { VisorBase } from './visor_base.js';
+import { Ruta }               from '../model/ruta.js';
+import { VisorBase }          from './visor_base.js';
+import { CamaraSeguimiento }  from './camaras/camara_seguimiento.js';
 
 // ================================================================
-// CLASS: VisorDisenoGeneral — vista 3D aérea del circuito para la
-//        pantalla Diseño General. Capas activables: pasto → pista → auto
+// CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
+//        para la pantalla Diseño General.
+//        Capas activables: pasto → pista → auto
 // ================================================================
 class VisorDisenoGeneral extends VisorBase {
     #canvas;
-    #renderer    = null;
-    #scene       = null;
-    #camera      = null;
-    #raf         = 0;
-    #ruta        = new Ruta();
-    #sol         = null;
-    #resizeObs   = null;
+    #renderer     = null;
+    #scene        = null;
+    #camaraChase  = null;
+    #raf          = 0;
+    #ruta         = new Ruta();
+    #sol          = null;
+    #resizeObs    = null;
 
     #meshPasto   = null;   // THREE.Mesh  — plano de pasto
     #grupoPista  = null;   // THREE.Group — asfalto + bordillos + líneas
@@ -63,25 +65,26 @@ class VisorDisenoGeneral extends VisorBase {
         this.#renderer.shadowMap.enabled = true;
         this.#renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
         this.#renderer.toneMapping         = THREE.ACESFilmicToneMapping;
-        this.#renderer.toneMappingExposure = 1.3;
+        this.#renderer.toneMappingExposure = 1.4;
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = new THREE.Color(0x060a14);
+        this.#scene.background = new THREE.Color(0x4a9eca);
+        this.#scene.fog        = new THREE.FogExp2(0x4a9eca, 0.018);
 
-        this.#camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 5000);
+        this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
 
-        this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.3));
+        this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sol = new THREE.DirectionalLight(0xfffbe6, 2.2);
         this.#sol.castShadow = true;
         this.#sol.shadow.mapSize.set(1024, 1024);
         this.#sol.shadow.camera.near   =  1;
-        this.#sol.shadow.camera.far    = 600;
-        this.#sol.shadow.camera.left   = this.#sol.shadow.camera.bottom = -300;
-        this.#sol.shadow.camera.right  = this.#sol.shadow.camera.top    =  300;
+        this.#sol.shadow.camera.far    =  60;
+        this.#sol.shadow.camera.left   = this.#sol.shadow.camera.bottom = -15;
+        this.#sol.shadow.camera.right  = this.#sol.shadow.camera.top    =  15;
         this.#scene.add(this.#sol, this.#sol.target);
 
-        const fill = new THREE.DirectionalLight(0xc8e8ff, 0.4);
-        fill.position.set(-50, 40, -30);
+        const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
+        fill.position.set(-5, 4, -3);
         this.#scene.add(fill);
 
         this.#resizeObs = new ResizeObserver(() => this.#resize());
@@ -94,8 +97,7 @@ class VisorDisenoGeneral extends VisorBase {
         if (!W || !H) return;
         this.#canvas.width  = W;
         this.#canvas.height = H;
-        this.#camera.aspect = W / H;
-        this.#camera.updateProjectionMatrix();
+        this.#camaraChase?.resize(W / H);
         this.#renderer?.setSize(W, H, false);
     }
 
@@ -110,46 +112,6 @@ class VisorDisenoGeneral extends VisorBase {
 
         const DIV = 800;
         const cp  = curve.getPoints(DIV);
-
-        // Centrar cámara sobre el circuito
-        const xs   = cp.map(p => p.x),   zs   = cp.map(p => p.z);
-        const minX = Math.min(...xs),     maxX = Math.max(...xs);
-        const minZ = Math.min(...zs),     maxZ = Math.max(...zs);
-        const cx     = (minX + maxX) / 2,  cz = (minZ + maxZ) / 2;
-        const rangoX = maxX - minX,   rangoZ = maxZ - minZ;
-
-        // Calcular altura de cámara para que el circuito completo encuadre en pantalla
-        // (tanto horizontal como vertical), respetando el aspect ratio del canvas
-        const W      = this.#canvas.width  || window.innerWidth;
-        const H      = this.#canvas.height || window.innerHeight;
-        const aspect = W / H;                          // < 1 en portrait
-        const tanHalfFov = Math.tan(25 * Math.PI / 180); // FOV 50° → half=25°
-        const pad = 1.40;
-        // A altura camH: visible vertical = 2*camH*tanHalfFov, horizontal = 2*camH*tanHalfFov*aspect
-        const camH = Math.max(
-            (rangoZ * pad) / (2 * tanHalfFov),
-            (rangoX * pad) / (2 * tanHalfFov * aspect)
-        );
-        // Pequeño desplazamiento Z para dar sensación 3D sin perder encuadre
-        const zOff = camH * 0.12;
-
-        this.#camera.position.set(cx, camH, cz + zOff);
-        this.#camera.lookAt(cx, 0, cz);
-        this.#sol.position.set(cx + 80, camH * 0.5, cz + 80);
-        this.#sol.target.position.set(cx, 0, cz);
-        this.#sol.target.updateMatrixWorld();
-
-        // ── Capa 1: pasto ────────────────────────────────────────
-        const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
-        this.#meshPasto = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), grassMat);
-        this.#meshPasto.rotation.x = -Math.PI / 2;
-        this.#meshPasto.position.y = -0.01;
-        this.#meshPasto.receiveShadow = true;
-        this.#meshPasto.visible = false;
-        this.#scene.add(this.#meshPasto);
-
-        // ── Capa 2: pista (asfalto + bordillos + líneas) ─────────
-        const grupoPista = new THREE.Group();
 
         const _perp = i => {
             const a = cp[i], b = cp[(i + 1) % cp.length];
@@ -185,6 +147,18 @@ class VisorDisenoGeneral extends VisorBase {
             g.setIndex(idx);
             return g;
         };
+
+        // ── Capa 1: pasto ────────────────────────────────────────
+        const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
+        this.#meshPasto = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), grassMat);
+        this.#meshPasto.rotation.x = -Math.PI / 2;
+        this.#meshPasto.position.y = -0.01;
+        this.#meshPasto.receiveShadow = true;
+        this.#meshPasto.visible = false;
+        this.#scene.add(this.#meshPasto);
+
+        // ── Capa 2: pista (asfalto + bordillos + líneas) ─────────
+        const grupoPista = new THREE.Group();
 
         const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
         const road    = new THREE.Mesh(_ribbon(-4, 4, 0, 0, DIV), roadMat);
@@ -252,12 +226,6 @@ class VisorDisenoGeneral extends VisorBase {
             const grupo = new THREE.Group();
             grupo.add(inner);
             grupo.visible = this.#mostrarAuto;
-
-            const inicio = this.#ruta.inicio;
-            if (inicio) {
-                grupo.position.set(inicio.x, 0, inicio.z);
-                grupo.rotation.y = inicio.angle;
-            }
             this.#scene.add(grupo);
             this.#carGroup = grupo;
         } catch (e) {
@@ -282,16 +250,25 @@ class VisorDisenoGeneral extends VisorBase {
     #tick() {
         this.#raf = requestAnimationFrame(() => this.#tick());
 
-        // Auto-animar el auto suavemente por el circuito
-        if (this.#mostrarAuto && this.#carGroup) {
-            this.#progreso = (this.#progreso + 0.00018) % 1;
-            const pos = this.#ruta.posicionEn(this.#progreso);
+        // El auto siempre avanza — la cámara siempre tiene dónde mirar
+        this.#progreso = (this.#progreso + 0.00018) % 1;
+        const pos = this.#ruta.posicionEn(this.#progreso);
+
+        if (this.#carGroup) {
             this.#carGroup.position.set(pos.x, 0, pos.z);
             this.#carGroup.rotation.y = pos.angle;
         }
 
-        if (this.#renderer && this.#scene && this.#camera) {
-            this.#renderer.render(this.#scene, this.#camera);
+        // Sol sigue al auto
+        this.#sol.position.set(pos.x + 10, 20, pos.z + 10);
+        this.#sol.target.position.set(pos.x, 0, pos.z);
+        this.#sol.target.updateMatrixWorld();
+
+        // Cámara trasera sigue al auto
+        this.#camaraChase.actualizar(pos.x, pos.z, pos.angle, 0);
+
+        if (this.#renderer && this.#scene) {
+            this.#renderer.render(this.#scene, this.#camaraChase.camera);
         }
     }
 }
