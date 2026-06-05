@@ -205,9 +205,10 @@ class Aplicacion {
         });
         document.getElementById('btn-volver-diseno-general').addEventListener('click', () => {
             this.#detenerVisorDG();
-            document.getElementById('tog-pasto').checked = false;
-            document.getElementById('tog-pista').checked = false;
-            document.getElementById('tog-auto').checked  = false;
+            document.getElementById('tog-pasto').checked   = false;
+            document.getElementById('tog-pista').checked   = false;
+            document.getElementById('tog-auto').checked    = false;
+            document.getElementById('tog-botones').checked = false;
             this.#mostrar('pantalla-ajustes');
         });
         document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
@@ -226,6 +227,10 @@ class Aplicacion {
         });
         document.getElementById('tog-auto').addEventListener('change', e => {
             if (this.#visorDG) this.#visorDG.mostrarAuto = e.target.checked;
+        });
+        document.getElementById('tog-botones').addEventListener('change', e => {
+            document.getElementById('ctrl-botones').style.display = e.target.checked ? 'flex' : 'none';
+            document.getElementById('ctrl-accel').style.display   = e.target.checked ? 'flex' : 'none';
         });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
@@ -1236,7 +1241,8 @@ class Aplicacion {
         // Activar control (teclado o timón según preferencia)
         this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);
 
-        // Controles táctiles
+        // Controles táctiles — activar toggle y mostrar
+        document.getElementById('tog-botones').checked        = true;
         document.getElementById('ctrl-botones').style.display = 'flex';
         document.getElementById('ctrl-accel').style.display   = 'flex';
         this.#dgTouchHandlers = [];
