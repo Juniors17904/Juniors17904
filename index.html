@@ -293,23 +293,27 @@
 
     <!-- Pantalla: Diseño general -->
     <div id="pantalla-diseno-general" class="pantalla">
-        <button id="btn-volver-diseno-general" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <!-- Canvas 3D — fondo completo -->
+        <canvas id="canvas-dg-visor" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display:block"></canvas>
+
+        <!-- UI superpuesta -->
+        <button id="btn-volver-diseno-general" class="btn-tuerca" style="top:16px;left:16px;z-index:10">←</button>
 
         <!-- Hamburguesa top-right -->
-        <div id="dg-hamburgesa-wrap">
+        <div id="dg-hamburgesa-wrap" style="z-index:10">
             <button id="btn-dg-hamburgesa" class="btn-tuerca">☰</button>
             <div id="dg-dropdown" class="dg-dropdown">
-                <label class="dg-toggle-fila" for="tog-mapa">
-                    <span class="dg-toggle-lbl">Mapa</span>
+                <label class="dg-toggle-fila" for="tog-pasto">
+                    <span class="dg-toggle-lbl">Pasto</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-mapa">
+                        <input type="checkbox" id="tog-pasto">
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
-                <label class="dg-toggle-fila" for="tog-guia-pista">
-                    <span class="dg-toggle-lbl">Guía de pista</span>
+                <label class="dg-toggle-fila" for="tog-pista">
+                    <span class="dg-toggle-lbl">Pista / Vía</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-guia-pista">
+                        <input type="checkbox" id="tog-pista">
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
@@ -321,15 +325,6 @@
                     </div>
                 </label>
             </div>
-        </div>
-
-        <div id="dg-mapa-area" class="dg-mapa-area" style="display:none">
-            <canvas id="canvas-dg-mapa"></canvas>
-        </div>
-
-        <div class="titulo-logo" style="font-size:20px;margin-bottom:24px">DISEÑO GENERAL</div>
-        <div class="ajustes-menu" id="menu-diseno-general">
-            <!-- Opciones se agregarán aquí -->
         </div>
     </div>
     <div id="pantalla-vista-conduccion" class="pantalla">
@@ -655,6 +650,7 @@
     <script type="module" src="src/view/viewer3d.js"></script>
     <script type="module" src="src/view/testdrive3d.js"></script>
     <script type="module" src="src/view/pista_ciudad.js"></script>
+    <script type="module" src="src/view/visor_diseno_general.js"></script>
 
     <!-- Scripts globales (window.*) — en orden de dependencia -->
     <script src="src/services/supabase-client.js"></script>
