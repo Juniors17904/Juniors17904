@@ -20,8 +20,7 @@ class Aplicacion {
     #timonOrigen        = 'pantalla-inicio';
     #velocimetroOrigen  = 'pantalla-ajustes';
     #vistaConduccion    = new VistaConduccion().cargar();
-    #minimapaDG         = null;
-    #animDG             = null;
+    #visorDG            = null;
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -199,8 +198,17 @@ class Aplicacion {
         });
         document.getElementById('btn-volver-vista-conduccion').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
 
-        document.getElementById('btn-ir-diseno-general').addEventListener('click', () => this.#mostrar('pantalla-diseno-general'));
-        document.getElementById('btn-volver-diseno-general').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
+        document.getElementById('btn-ir-diseno-general').addEventListener('click', () => {
+            this.#mostrar('pantalla-diseno-general');
+            this.#iniciarVisorDG();
+        });
+        document.getElementById('btn-volver-diseno-general').addEventListener('click', () => {
+            this.#detenerVisorDG();
+            document.getElementById('tog-pasto').checked = false;
+            document.getElementById('tog-pista').checked = false;
+            document.getElementById('tog-auto').checked  = false;
+            this.#mostrar('pantalla-ajustes');
+        });
         document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
             e.stopPropagation();
             document.getElementById('dg-dropdown').classList.toggle('abierto');
@@ -208,53 +216,15 @@ class Aplicacion {
         document.addEventListener('click', () => {
             document.getElementById('dg-dropdown').classList.remove('abierto');
         });
-        document.getElementById('tog-mapa').addEventListener('change', e => {
-            const area = document.getElementById('dg-mapa-area');
-            area.style.display = e.target.checked ? 'block' : 'none';
-            if (e.target.checked) {
-                if (!this.#minimapaDG) {
-                    this.#minimapaDG = new MinimapaDisenoGeneral();
-                }
-                // Diseño General siempre previsualiza el Circuito Urbano
-                const pistaCfg = window.PISTAS?.ciudad;
-                if (pistaCfg) this.#minimapaDG.setCircuito(pistaCfg);
-                this.#minimapaDG.colorAuto = this.#estado.color;
-                requestAnimationFrame(() => {
-                    const canvas = document.getElementById('canvas-dg-mapa');
-                    canvas.width  = canvas.offsetWidth  || 320;
-                    canvas.height = canvas.offsetHeight || 240;
-                    if (document.getElementById('tog-guia-pista').checked)
-                        this.#minimapaDG.mostrarGuia = true;
-                    if (document.getElementById('tog-auto').checked)
-                        this.#minimapaDG.mostrarAuto = true;
-                    const ctx = canvas.getContext('2d');
-                    this.#minimapaDG.dibujar(ctx, canvas.width, canvas.height);
-                    if (this.#minimapaDG.mostrarAuto) this.#iniciarAnimDG();
-                });
-            } else {
-                this.#detenerAnimDG();
-                this.#minimapaDG = null;
-                document.getElementById('tog-guia-pista').checked = false;
-                document.getElementById('tog-auto').checked = false;
-            }
-        });
 
-        document.getElementById('tog-guia-pista').addEventListener('change', e => {
-            if (!this.#minimapaDG) return;
-            this.#minimapaDG.mostrarGuia = e.target.checked;
-            if (!this.#minimapaDG.mostrarAuto) this.#redibujarDG();
+        document.getElementById('tog-pasto').addEventListener('change', e => {
+            if (this.#visorDG) this.#visorDG.mostrarPasto = e.target.checked;
         });
-
+        document.getElementById('tog-pista').addEventListener('change', e => {
+            if (this.#visorDG) this.#visorDG.mostrarPista = e.target.checked;
+        });
         document.getElementById('tog-auto').addEventListener('change', e => {
-            if (!this.#minimapaDG) return;
-            this.#minimapaDG.mostrarAuto = e.target.checked;
-            if (e.target.checked) {
-                this.#minimapaDG.colorAuto = this.#estado.color;
-                this.#iniciarAnimDG();
-            } else {
-                this.#detenerAnimDG();
-                this.#redibujarDG();
-            }
+            if (this.#visorDG) this.#visorDG.mostrarAuto = e.target.checked;
         });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
@@ -1246,26 +1216,27 @@ class Aplicacion {
         document.getElementById('vc-check-ctrl-teclado').textContent = vc.tipoControl === 'teclado' ? '✓' : '';
     }
 
-    // ── Animación del minimapa de Diseño General ─────────────────
-    #redibujarDG() {
-        const canvas = document.getElementById('canvas-dg-mapa');
-        if (!canvas.width || !canvas.height || !this.#minimapaDG) return;
-        this.#minimapaDG.dibujar(canvas.getContext('2d'), canvas.width, canvas.height);
+    // ── Visor 3D de Diseño General ───────────────────────────────
+    #iniciarVisorDG() {
+        if (!window.VisorDisenoGeneral) {
+            setTimeout(() => this.#iniciarVisorDG(), 200);
+            return;
+        }
+        if (this.#visorDG) return;
+
+        const canvas  = document.getElementById('canvas-dg-visor');
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        this.#visorDG = new window.VisorDisenoGeneral(canvas, 'ciudad');
+        this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
+        this.#visorDG.iniciar();
     }
 
-    #iniciarAnimDG() {
-        this.#detenerAnimDG();
-        const loop = () => {
-            if (!this.#minimapaDG?.mostrarAuto) return;
-            this.#minimapaDG.avanzarAuto(0.0004);
-            this.#redibujarDG();
-            this.#animDG = requestAnimationFrame(loop);
-        };
-        this.#animDG = requestAnimationFrame(loop);
-    }
-
-    #detenerAnimDG() {
-        if (this.#animDG) { cancelAnimationFrame(this.#animDG); this.#animDG = null; }
+    #detenerVisorDG() {
+        if (!this.#visorDG) return;
+        this.#visorDG.detener();
+        this.#visorDG = null;
     }
 }
 
