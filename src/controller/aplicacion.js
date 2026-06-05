@@ -22,6 +22,7 @@ class Aplicacion {
     #vistaConduccion    = new VistaConduccion().cargar();
     #visorDG            = null;
     #dgTouchHandlers    = [];
+    #visorDO            = null;
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -202,6 +203,15 @@ class Aplicacion {
         document.getElementById('btn-ir-diseno-general').addEventListener('click', () => {
             this.#mostrar('pantalla-diseno-general');
             this.#iniciarVisorDG();
+        });
+
+        document.getElementById('btn-ir-diseno-objetos').addEventListener('click', () => {
+            this.#mostrar('pantalla-diseno-objetos');
+            this.#iniciarVisorDO();
+        });
+        document.getElementById('btn-volver-diseno-objetos').addEventListener('click', () => {
+            this.#detenerVisorDO();
+            this.#mostrar('pantalla-ajustes');
         });
         document.getElementById('btn-volver-diseno-general').addEventListener('click', () => {
             this.#detenerVisorDG();
@@ -1268,6 +1278,28 @@ class Aplicacion {
         this.#dgTouchHandlers = [];
         this.#visorDG.detener();
         this.#visorDG = null;
+    }
+
+    // ── Visor 3D de Diseño de Objetos ────────────────────────────
+    #iniciarVisorDO() {
+        if (!window.VisorDisenoObjetos) {
+            setTimeout(() => this.#iniciarVisorDO(), 200);
+            return;
+        }
+        if (this.#visorDO) return;
+
+        const canvas  = document.getElementById('canvas-do-visor');
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        this.#visorDO = new window.VisorDisenoObjetos(canvas, window.PISTAS['ciudad']);
+        this.#visorDO.iniciar();
+    }
+
+    #detenerVisorDO() {
+        if (!this.#visorDO) return;
+        this.#visorDO.detener();
+        this.#visorDO = null;
     }
 }
 

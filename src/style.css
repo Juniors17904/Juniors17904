@@ -595,6 +595,49 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 .dg-toggle input:checked + .dg-toggle-slider { background: var(--neon-v); }
 .dg-toggle input:checked + .dg-toggle-slider::before { transform: translateX(18px); }
 
+/* =============================================
+   DISEÑO DE OBJETOS — catálogo lateral
+   ============================================= */
+#do-catalogo {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 86px;
+    z-index: 10;
+    background: rgba(10,10,30,0.88);
+    border-left: 1px solid var(--neon-v);
+    display: flex;
+    flex-direction: column;
+    padding: 70px 8px 16px;
+    gap: 10px;
+    overflow-y: auto;
+}
+.do-obj-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 10px 4px;
+    border-radius: 10px;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.3);
+    color: #c4b5fd;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.15s;
+    pointer-events: all;
+}
+.do-obj-btn span {
+    font: 600 9px 'Orbitron', monospace;
+    letter-spacing: 0.5px;
+    color: #a78bfa;
+}
+.do-obj-btn:hover, .do-obj-btn.activo {
+    background: rgba(124,58,237,0.38);
+    border-color: var(--neon-v);
+    box-shadow: 0 0 12px rgba(124,58,237,0.55);
+    color: #fff;
+}
+
 /* Área verde del mapa */
 .dg-mapa-area {
     width: min(90vw, 360px);
