@@ -44,7 +44,27 @@ export class ArbolEscena extends ObjetoEscena {
         const caja2 = new THREE.Box3().setFromObject(clon);
         clon.position.y = -caja2.min.y;
 
-        clon.traverse(c => { if (c.isMesh) c.castShadow = true; });
+        clon.traverse(c => {
+            if (!c.isMesh) return;
+
+            // Quitar el suelo plano que viene con el modelo
+            const b = new THREE.Box3().setFromObject(c);
+            const esPlano = (b.max.y - b.min.y) < 0.05;
+            if (esPlano) { c.visible = false; return; }
+
+            c.castShadow = true;
+
+            // Corregir hojas: activar alpha para transparencias
+            const mats = Array.isArray(c.material) ? c.material : [c.material];
+            mats.forEach(mat => {
+                mat.side = THREE.DoubleSide;
+                if (mat.map) {
+                    mat.transparent = true;
+                    mat.alphaTest   = 0.4;
+                }
+            });
+        });
+
         grupo.add(clon);
     }
 }
