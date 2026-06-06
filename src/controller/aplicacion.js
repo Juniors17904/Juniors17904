@@ -229,6 +229,7 @@ class Aplicacion {
             document.getElementById('tog-pista').checked   = false;
             document.getElementById('tog-auto').checked    = false;
             document.getElementById('tog-botones').checked = false;
+            document.getElementById('tog-objetos').checked = false;
             this.#mostrar('pantalla-ajustes');
         });
         document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
@@ -251,6 +252,9 @@ class Aplicacion {
         document.getElementById('tog-botones').addEventListener('change', e => {
             if (e.target.checked) this.#vistaConduccion.mostrarOverlay();
             else                  this.#vistaConduccion.ocultarOverlay();
+        });
+        document.getElementById('tog-objetos').addEventListener('change', e => {
+            if (this.#visorDG) this.#visorDG.mostrarObjetos = e.target.checked;
         });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
@@ -1258,6 +1262,12 @@ class Aplicacion {
         this.#visorDG = new window.VisorDisenoGeneral(canvas, window.PISTAS['ciudad']);
         this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visorDG.iniciar();
+
+        // Sincronizar estado real de los toggles (evita bug de timing)
+        this.#visorDG.mostrarPasto   = document.getElementById('tog-pasto').checked;
+        this.#visorDG.mostrarPista   = document.getElementById('tog-pista').checked;
+        this.#visorDG.mostrarAuto    = document.getElementById('tog-auto').checked;
+        this.#visorDG.mostrarObjetos = document.getElementById('tog-objetos').checked;
 
         // Activar control (teclado o timón según preferencia)
         this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);

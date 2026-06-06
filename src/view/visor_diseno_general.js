@@ -33,9 +33,10 @@ class VisorDisenoGeneral extends VisorBase {
     #carGroup   = null;
     #leanGroup  = null;
 
-    #mostrarPasto = false;
-    #mostrarPista = false;
-    #mostrarAuto  = false;
+    #mostrarPasto   = false;
+    #mostrarPista   = false;
+    #mostrarAuto    = false;
+    #mostrarObjetos = true;
 
     accelInput = 0;
     steerInput = 0;
@@ -60,9 +61,15 @@ class VisorDisenoGeneral extends VisorBase {
         if (this.#carGroup) this.#carGroup.visible = this.#mostrarAuto;
     }
 
-    get mostrarPasto() { return this.#mostrarPasto; }
-    get mostrarPista() { return this.#mostrarPista; }
-    get mostrarAuto()  { return this.#mostrarAuto;  }
+    set mostrarObjetos(v) {
+        this.#mostrarObjetos = !!v;
+        for (const obj of this.#objetos) obj.setVisible(this.#mostrarObjetos);
+    }
+
+    get mostrarPasto()   { return this.#mostrarPasto;   }
+    get mostrarPista()   { return this.#mostrarPista;   }
+    get mostrarAuto()    { return this.#mostrarAuto;    }
+    get mostrarObjetos() { return this.#mostrarObjetos; }
 
     constructor(canvas, pista) {
         super();

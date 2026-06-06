@@ -22,6 +22,8 @@ export class ObjetoEscena {
         scene.add(this.#grupo);
     }
 
+    setVisible(v) { if (this.#grupo) this.#grupo.visible = v; }
+
     destruir(scene) {
         if (!this.#grupo) return;
         scene.remove(this.#grupo);
