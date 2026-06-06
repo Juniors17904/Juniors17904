@@ -79,14 +79,14 @@ class VisorDisenoObjetos extends VisorBase {
     }
 
     // ── Mostrar objeto ───────────────────────────────────────────
-    mostrar(tipo) {
+    async mostrar(tipo) {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
         if (tipo === 'arbol')   this.#objeto = new ArbolEscena(0, 0, 1.4);
         if (tipo === 'poste')   this.#objeto = new PosteEscena(0, 0);
         if (tipo === 'aviso')   this.#objeto = new AvisoEscena(0, 0, 'STOP');
         if (tipo === 'meta')    this.#objeto = new MetaEscena(0, 0);
         if (tipo === 'salida')  this.#objeto = new SalidaEscena(0, 0);
-        this.#objeto?.construir(this.#scene);
+        await this.#objeto?.construir(this.#scene);
     }
 
     // ── Ciclo de vida ────────────────────────────────────────────
