@@ -3,41 +3,46 @@ import * as THREE from 'three';
 import { ObjetoEscena } from './objeto_escena.js';
 
 // ================================================================
-// CLASS: SalidaEscena — semáforo F1 de salida (rojo apagado,
-//        amarillo apagado, verde encendido)
+// CLASS: SalidaEscena — gantry F1 con 5 luces rojas encendidas
 // ================================================================
 export class SalidaEscena extends ObjetoEscena {
     constructor(x, z) { super(x, z); }
 
     _poblar(grupo) {
-        // Poste
-        const poste = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.1, 0.13, 4.5, 8),
-            new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.7 })
+        const matMetal   = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.6 });
+        const matCarcasa = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
+        const matRojo    = new THREE.MeshStandardMaterial({
+            color: 0xff1111, emissive: 0xcc0000, emissiveIntensity: 0.9
+        });
+
+        // Dos postes verticales
+        const geoPoste = new THREE.CylinderGeometry(0.12, 0.15, 5.0, 8);
+        [-4.5, 4.5].forEach(x => {
+            const poste = new THREE.Mesh(geoPoste, matMetal);
+            poste.position.set(x, 2.5, 0);
+            poste.castShadow = true;
+            grupo.add(poste);
+        });
+
+        // Viga horizontal (gantry)
+        const viga = new THREE.Mesh(
+            new THREE.BoxGeometry(9.2, 0.28, 0.28),
+            matMetal
         );
-        poste.position.y = 2.25;
-        poste.castShadow = true;
+        viga.position.set(0, 5.0, 0);
+        grupo.add(viga);
 
-        // Carcasa del semáforo
-        const carcasa = new THREE.Mesh(
-            new THREE.BoxGeometry(0.55, 1.9, 0.45),
-            new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.8 })
-        );
-        carcasa.position.set(0, 5.2, 0);
+        // 5 pods de luz colgando de la viga
+        const posX = [-3.6, -1.8, 0, 1.8, 3.6];
+        const geoPod  = new THREE.BoxGeometry(0.55, 0.55, 0.45);
+        const geoLuz  = new THREE.SphereGeometry(0.18, 12, 8);
 
-        // Luces: roja apagada, amarilla apagada, verde encendida
-        const geoLuz = new THREE.SphereGeometry(0.16, 12, 8);
-        const luzRoja = new THREE.Mesh(geoLuz,
-            new THREE.MeshStandardMaterial({ color: 0x3a0000 }));
-        const luzAmarilla = new THREE.Mesh(geoLuz,
-            new THREE.MeshStandardMaterial({ color: 0x2a2000 }));
-        const luzVerde = new THREE.Mesh(geoLuz,
-            new THREE.MeshStandardMaterial({ color: 0x00ee44, emissive: 0x00aa22, emissiveIntensity: 0.8 }));
-
-        luzRoja.position.set(0, 5.9, 0.23);
-        luzAmarilla.position.set(0, 5.2, 0.23);
-        luzVerde.position.set(0, 4.5, 0.23);
-
-        grupo.add(poste, carcasa, luzRoja, luzAmarilla, luzVerde);
+        posX.forEach(x => {
+            const pod = new THREE.Mesh(geoPod, matCarcasa);
+            pod.position.set(x, 4.58, 0);
+            const luz = new THREE.Mesh(geoLuz, matRojo);
+            luz.position.set(x, 4.58, 0.28);
+            grupo.add(pod, luz);
+        });
     }
 }
