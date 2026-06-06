@@ -48,6 +48,12 @@ class Aplicacion {
     #mostrar(id) {
         if (id !== 'pantalla-juego') this.#td3dPending = false;
 
+        // Limpiar circuito 3D si está activo y navegamos fuera
+        if (this.#cir3d) {
+            this.#limpiarCircuito3D();
+            this.#vistaConduccion.ocultarOverlay();
+        }
+
         // Limpiar visores al salir de sus pantallas (funciona con botón atrás del SO también)
         const pantallaActual = document.querySelector('.pantalla.activa')?.id;
         if (pantallaActual === 'pantalla-diseno-general' && id !== 'pantalla-diseno-general') {
