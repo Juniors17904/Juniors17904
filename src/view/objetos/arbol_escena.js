@@ -41,15 +41,16 @@ export class ArbolEscena extends ObjetoEscena {
         tronco.castShadow = true;
         grupo.add(tronco);
 
-        // Copa: esfera central + 6 satélites de distintos tamaños y verdes
+        // Copa: esfera central + satélites que se afilan hacia arriba
         const copas = [
-            { r: 1.3,  x:  0.0, y: 3.3, z:  0.0, m: 1 },
+            { r: 1.30, x:  0.0, y: 3.3, z:  0.0, m: 1 },
             { r: 0.95, x:  1.1, y: 3.1, z:  0.2, m: 0 },
             { r: 0.90, x: -1.0, y: 3.2, z:  0.4, m: 2 },
             { r: 0.85, x:  0.4, y: 3.1, z:  1.1, m: 0 },
             { r: 0.80, x: -0.3, y: 3.2, z: -1.0, m: 2 },
-            { r: 0.75, x:  0.7, y: 4.0, z:  0.5, m: 1 },
-            { r: 0.70, x: -0.6, y: 3.9, z: -0.4, m: 2 },
+            { r: 0.50, x:  0.4, y: 3.95, z:  0.3, m: 1 },
+            { r: 0.45, x: -0.4, y: 3.85, z: -0.3, m: 2 },
+            { r: 0.28, x:  0.0, y: 4.45, z:  0.0, m: 2 },
         ];
 
         copas.forEach(({ r, x, y, z, m }) => {
@@ -61,5 +62,14 @@ export class ArbolEscena extends ObjetoEscena {
             esfera.castShadow = true;
             grupo.add(esfera);
         });
+
+        // Punta cónica en la cima
+        const punta = new THREE.Mesh(
+            new THREE.ConeGeometry(0.32 * s, 0.85 * s, 6),
+            matCopas[2]
+        );
+        punta.position.y = 5.05 * s;
+        punta.castShadow = true;
+        grupo.add(punta);
     }
 }
