@@ -54,7 +54,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#scene.add(sol);
 
         const suelo = new THREE.Mesh(
-            new THREE.CircleGeometry(6, 32),
+            new THREE.CircleGeometry(3, 32),
             new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 })
         );
         suelo.rotation.x = -Math.PI / 2;
