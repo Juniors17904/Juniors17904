@@ -1,73 +1,70 @@
 'use strict';
-import * as THREE      from 'three';
-import { GLTFLoader }  from 'three/addons/loaders/GLTFLoader.js';
+import * as THREE from 'three';
 import { ObjetoEscena } from './objeto_escena.js';
 
 // ================================================================
-// CLASS: ArbolEscena — árbol maple cargado desde GLB.
-//        Modelo cacheado estáticamente (se carga una sola vez).
+// CLASS: ArbolEscena — árbol de hoja ancha, copa esférica irregular
 // ================================================================
 export class ArbolEscena extends ObjetoEscena {
     #escala;
-    static #promesa = null;
-    static #gltf    = null;
 
     constructor(x, z, escala = 1) {
         super(x, z);
         this.#escala = escala;
     }
 
-    static #cargar() {
-        if (!ArbolEscena.#promesa)
-            ArbolEscena.#promesa = new GLTFLoader()
-                .loadAsync('src/assets/models/maple_tree.glb')
-                .then(gltf => { ArbolEscena.#gltf = gltf; });
-        return ArbolEscena.#promesa;
-    }
-
-    async construir(scene) {
-        await ArbolEscena.#cargar();
-        super.construir(scene);
-    }
-
     _poblar(grupo) {
-        if (!ArbolEscena.#gltf) return;
+        const s = this.#escala;
 
-        const clon = ArbolEscena.#gltf.scene.clone(true);
+        const matTronco = new THREE.MeshStandardMaterial({ color: 0x7a3b1e, roughness: 0.95 });
+        const matRaiz   = new THREE.MeshStandardMaterial({ color: 0x5a2d0c, roughness: 0.95 });
+        const matCopas  = [
+            new THREE.MeshStandardMaterial({ color: 0x266b26, roughness: 0.8 }),
+            new THREE.MeshStandardMaterial({ color: 0x317f31, roughness: 0.8 }),
+            new THREE.MeshStandardMaterial({ color: 0x3e9c3e, roughness: 0.8 }),
+        ];
 
-        // Escalar para que el árbol mida ~4 unidades de alto
-        const caja   = new THREE.Box3().setFromObject(clon);
-        const altura = caja.max.y - caja.min.y;
-        clon.scale.setScalar((4 * this.#escala) / altura);
-
-        // Apoyar la base en Y = 0
-        const caja2 = new THREE.Box3().setFromObject(clon);
-        clon.position.y = -caja2.min.y;
-
-        clon.traverse(c => {
-            if (!c.isMesh) return;
-
-            // Quitar el suelo plano que viene con el modelo
-            const b = new THREE.Box3().setFromObject(c);
-            if ((b.max.y - b.min.y) < 0.05) { c.visible = false; return; }
-
-            c.castShadow = true;
-
-            // Clonar + reparar cada material (sin clone() los cambios no surten efecto)
-            const reparar = mat => {
-                const m      = mat.clone();
-                m.side       = THREE.DoubleSide;
-                m.transparent = true;
-                m.alphaTest  = 0.5;
-                m.needsUpdate = true;
-                return m;
-            };
-
-            c.material = Array.isArray(c.material)
-                ? c.material.map(reparar)
-                : reparar(c.material);
+        // Raíces abultadas en la base
+        [0, (Math.PI * 2) / 3, (Math.PI * 4) / 3].forEach(ang => {
+            const raiz = new THREE.Mesh(new THREE.SphereGeometry(0.42 * s, 6, 5), matRaiz);
+            raiz.scale.set(1, 0.45, 1);
+            raiz.position.set(Math.cos(ang) * 0.48 * s, 0.18 * s, Math.sin(ang) * 0.48 * s);
+            grupo.add(raiz);
         });
 
-        grupo.add(clon);
+        // Tronco grueso y cónico
+        const tronco = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22 * s, 0.52 * s, 2.4 * s, 7),
+            matTronco
+        );
+        tronco.position.y = 1.2 * s;
+        tronco.castShadow = true;
+        grupo.add(tronco);
+
+        // Copa: esferas que se afilan hacia arriba
+        const copas = [
+            { r: 1.30, x:  0.0, y: 3.3, z:  0.0, m: 1 },
+            { r: 0.95, x:  1.1, y: 3.1, z:  0.2, m: 0 },
+            { r: 0.90, x: -1.0, y: 3.2, z:  0.4, m: 2 },
+            { r: 0.85, x:  0.4, y: 3.1, z:  1.1, m: 0 },
+            { r: 0.80, x: -0.3, y: 3.2, z: -1.0, m: 2 },
+            { r: 0.50, x:  0.4, y: 3.95, z:  0.3, m: 1 },
+            { r: 0.45, x: -0.4, y: 3.85, z: -0.3, m: 2 },
+            { r: 0.28, x:  0.0, y: 4.45, z:  0.0, m: 2 },
+        ];
+        copas.forEach(({ r, x, y, z, m }) => {
+            const esfera = new THREE.Mesh(
+                new THREE.SphereGeometry(r * s, 7, 6), matCopas[m]);
+            esfera.position.set(x * s, y * s, z * s);
+            esfera.castShadow = true;
+            grupo.add(esfera);
+        });
+
+        // Punta cónica en la cima
+        const punta = new THREE.Mesh(
+            new THREE.ConeGeometry(0.32 * s, 0.85 * s, 6), matCopas[2]);
+        punta.position.y = 5.05 * s;
+        punta.castShadow = true;
+        grupo.add(punta);
     }
 }
