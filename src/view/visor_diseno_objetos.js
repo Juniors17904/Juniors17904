@@ -6,6 +6,8 @@ import { ControlOrbitaObjeto }   from './controles/control_orbita_objeto.js';
 import { ArbolEscena }           from './objetos/arbol_escena.js';
 import { PosteEscena }           from './objetos/poste_escena.js';
 import { AvisoEscena }           from './objetos/aviso_escena.js';
+import { MetaEscena }            from './objetos/meta_escena.js';
+import { SalidaEscena }          from './objetos/salida_escena.js';
 
 // ================================================================
 // CLASS: VisorDisenoObjetos — visor 3D de un objeto decorativo.
@@ -79,9 +81,11 @@ class VisorDisenoObjetos extends VisorBase {
     // ── Mostrar objeto ───────────────────────────────────────────
     mostrar(tipo) {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
-        if (tipo === 'arbol') this.#objeto = new ArbolEscena(0, 0, 1.4);
-        if (tipo === 'poste') this.#objeto = new PosteEscena(0, 0);
-        if (tipo === 'aviso') this.#objeto = new AvisoEscena(0, 0, 'STOP');
+        if (tipo === 'arbol')   this.#objeto = new ArbolEscena(0, 0, 1.4);
+        if (tipo === 'poste')   this.#objeto = new PosteEscena(0, 0);
+        if (tipo === 'aviso')   this.#objeto = new AvisoEscena(0, 0, 'STOP');
+        if (tipo === 'meta')    this.#objeto = new MetaEscena(0, 0);
+        if (tipo === 'salida')  this.#objeto = new SalidaEscena(0, 0);
         this.#objeto?.construir(this.#scene);
     }
 
