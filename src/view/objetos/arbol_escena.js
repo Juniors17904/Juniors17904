@@ -41,30 +41,22 @@ export class ArbolEscena extends ObjetoEscena {
         tronco.castShadow = true;
         grupo.add(tronco);
 
-        // Copa: esferas que se afilan hacia arriba
-        const copas = [
-            { r: 1.30, x:  0.0, y: 3.3, z:  0.0, m: 1 },
-            { r: 0.95, x:  1.1, y: 3.1, z:  0.2, m: 0 },
-            { r: 0.90, x: -1.0, y: 3.2, z:  0.4, m: 2 },
-            { r: 0.85, x:  0.4, y: 3.1, z:  1.1, m: 0 },
-            { r: 0.80, x: -0.3, y: 3.2, z: -1.0, m: 2 },
-            { r: 0.50, x:  0.4, y: 3.95, z:  0.3, m: 1 },
-            { r: 0.45, x: -0.4, y: 3.85, z: -0.3, m: 2 },
-            { r: 0.28, x:  0.0, y: 4.45, z:  0.0, m: 2 },
-        ];
-        copas.forEach(({ r, x, y, z, m }) => {
+        // Copa: 128 esferas distribuidas en un elipsoide
+        for (let i = 0; i < 128; i++) {
+            const theta = Math.random() * Math.PI * 2;
+            const phi   = Math.acos(2 * Math.random() - 1);
+            const r     = Math.cbrt(Math.random()) * 1.6 * s;
+            const x     = r * Math.sin(phi) * Math.cos(theta);
+            const y     = r * Math.cos(phi) * 0.75;
+            const z     = r * Math.sin(phi) * Math.sin(theta);
+            const radio = (0.18 + Math.random() * 0.28) * s;
             const esfera = new THREE.Mesh(
-                new THREE.SphereGeometry(r * s, 7, 6), matCopas[m]);
-            esfera.position.set(x * s, y * s, z * s);
+                new THREE.SphereGeometry(radio, 5, 4),
+                matCopas[Math.floor(Math.random() * matCopas.length)]
+            );
+            esfera.position.set(x, y + 3.4 * s, z);
             esfera.castShadow = true;
             grupo.add(esfera);
-        });
-
-        // Punta cónica en la cima
-        const punta = new THREE.Mesh(
-            new THREE.ConeGeometry(0.32 * s, 0.85 * s, 6), matCopas[2]);
-        punta.position.y = 5.05 * s;
-        punta.castShadow = true;
-        grupo.add(punta);
+        }
     }
 }
