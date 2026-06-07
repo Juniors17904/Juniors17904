@@ -252,6 +252,7 @@ class Aplicacion {
             document.getElementById('tog-auto').checked    = false;
             document.getElementById('tog-botones').checked = false;
             document.getElementById('tog-objetos').checked = false;
+            document.getElementById('tog-cielo').checked   = true;
             this.#mostrar('pantalla-ajustes');
         });
         document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
@@ -277,6 +278,9 @@ class Aplicacion {
         });
         document.getElementById('tog-objetos').addEventListener('change', e => {
             if (this.#visorDG) this.#visorDG.mostrarObjetos = e.target.checked;
+        });
+        document.getElementById('tog-cielo').addEventListener('change', e => {
+            if (this.#visorDG) this.#visorDG.mostrarCielo = e.target.checked;
         });
 
         document.getElementById('vc-cam-chase').addEventListener('click', () => {
@@ -1300,6 +1304,7 @@ class Aplicacion {
         this.#visorDG.mostrarPista   = document.getElementById('tog-pista').checked;
         this.#visorDG.mostrarAuto    = document.getElementById('tog-auto').checked;
         this.#visorDG.mostrarObjetos = document.getElementById('tog-objetos').checked;
+        this.#visorDG.mostrarCielo   = document.getElementById('tog-cielo').checked;
 
         // Activar control (teclado o timón según preferencia)
         this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);

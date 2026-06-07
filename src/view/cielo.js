@@ -48,6 +48,9 @@ export class Cielo {
         scene.fog = new THREE.FogExp2(this.#colorHorizonte.getHex(), 0.018);
     }
 
+    get visible()  { return this.#malla?.visible ?? false; }
+    set visible(v) { if (this.#malla) this.#malla.visible = !!v; }
+
     // Llamar en cada tick pasando la cámara activa
     actualizar(camara) {
         if (this.#malla && camara) this.#malla.position.copy(camara.position);

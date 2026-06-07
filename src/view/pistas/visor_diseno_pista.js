@@ -38,6 +38,7 @@ class VisorDisenoPista extends VisorBase {
     #mostrarPista   = false;
     #mostrarAuto    = false;
     #mostrarObjetos = true;
+    #mostrarCielo   = true;
 
     accelInput = 0;
     steerInput = 0;
@@ -67,10 +68,24 @@ class VisorDisenoPista extends VisorBase {
         for (const obj of this.#objetos) obj.setVisible(this.#mostrarObjetos);
     }
 
+    set mostrarCielo(v) {
+        this.#mostrarCielo = !!v;
+        if (this.#cielo) this.#cielo.visible = this.#mostrarCielo;
+        if (this.#scene) {
+            if (this.#mostrarCielo) {
+                this.#cielo?.restaurarNiebla(this.#scene);
+            } else {
+                this.#scene.background = null;
+                this.#scene.fog        = null;
+            }
+        }
+    }
+
     get mostrarPasto()   { return this.#mostrarPasto;   }
     get mostrarPista()   { return this.#mostrarPista;   }
     get mostrarAuto()    { return this.#mostrarAuto;    }
     get mostrarObjetos() { return this.#mostrarObjetos; }
+    get mostrarCielo()   { return this.#mostrarCielo;   }
 
     constructor(canvas, pista) {
         super();
