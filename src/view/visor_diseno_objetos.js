@@ -8,6 +8,7 @@ import { PosteEscena }           from './objetos/poste_escena.js';
 import { AvisoEscena }           from './objetos/aviso_escena.js';
 import { MetaEscena }            from './objetos/meta_escena.js';
 import { SalidaEscena }          from './objetos/salida_escena.js';
+import { BarreraEscena }         from './objetos/barrera_escena.js';
 
 // ================================================================
 // CLASS: VisorDisenoObjetos — visor 3D de un objeto decorativo.
@@ -86,6 +87,7 @@ class VisorDisenoObjetos extends VisorBase {
         if (tipo === 'aviso')   this.#objeto = new AvisoEscena(0, 0, 'STOP');
         if (tipo === 'meta')    this.#objeto = new MetaEscena(0, 0);
         if (tipo === 'salida')  this.#objeto = new SalidaEscena(0, 0);
+        if (tipo === 'barrera') this.#objeto = new BarreraEscena(0, 0);
         await this.#objeto?.construir(this.#scene);
     }
 
