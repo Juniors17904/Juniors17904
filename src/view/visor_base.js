@@ -7,7 +7,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // CLASE BASE: VisorBase — utilidades compartidas para todos los visores 3D
 // ================================================================
 
-let _glbPromise = null;
+// Inicia la descarga del modelo al cargar el módulo, no al abrir la pantalla
+let _glbPromise = new GLTFLoader().loadAsync('src/assets/models/vehicles_pack.glb');
 
 export class VisorBase {
     static MAPA = {

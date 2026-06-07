@@ -1310,8 +1310,8 @@ class Aplicacion {
         this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);
 
         // Controles táctiles — activar toggle y mostrar el overlay correcto
-        document.getElementById('tog-botones').checked = true;
-        this.#vistaConduccion.mostrarOverlay();
+        document.getElementById('tog-botones').checked = false;
+        this.#vistaConduccion.ocultarOverlay();
         this.#dgTouchHandlers = [];
         const addTouch = (id, onStart, onEnd) => {
             const el = document.getElementById(id);
