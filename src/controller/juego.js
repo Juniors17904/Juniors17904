@@ -96,7 +96,7 @@ class Juego {
             c.velocidad = Math.max(0, c.velocidad - 0.03);
         } else if (hit === 'turbo') {
             c.activarTurbo();
-            if (c.turbosLeft < c.turboMax) c.turbosLeft = Math.min(c.turboMax, c.turbosLeft + 1);
+            if (c.turbosLeft < c.turboMaximo) c.turbosLeft = Math.min(c.turboMaximo, c.turbosLeft + 1);
         }
 
         const dist = c.posicion * CFG.SEG_LARGO;
