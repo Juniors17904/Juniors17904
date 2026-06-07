@@ -5,9 +5,7 @@ import { Ruta }              from '../model/ruta.js';
 import { Carro }             from '../model/carros/carro.js';
 import { VisorBase }         from './visor_base.js';
 import { CamaraSeguimiento } from './camaras/camara_seguimiento.js';
-import { ArbolEscena }       from './objetos/arbol_escena.js';
-import { PosteEscena }       from './objetos/poste_escena.js';
-import { AvisoEscena }       from './objetos/aviso_escena.js';
+import { FabricaObjetoEscena } from './objetos/fabrica_objeto_escena.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
@@ -246,16 +244,14 @@ class VisorDisenoGeneral extends VisorBase {
         }
     }
 
-    // ── Fábrica de objetos de escena ─────────────────────────────
+    // ── Posición en mundo a partir de datos relativos a la ruta ──
+    #fabrica = new FabricaObjetoEscena();
+
     #crearObjeto({ tipo, prog, lado, dist, escala = 1, texto = '' }) {
         const pos = this.#ruta.posicionEn(prog);
         const wx  = pos.x + Math.cos(pos.angle) * dist * lado;
         const wz  = pos.z - Math.sin(pos.angle) * dist * lado;
-
-        if (tipo === 'arbol') return new ArbolEscena(wx, wz, escala);
-        if (tipo === 'poste') return new PosteEscena(wx, wz);
-        if (tipo === 'aviso') return new AvisoEscena(wx, wz, texto);
-        return null;
+        return this.#fabrica.crear(tipo, wx, wz, { escala, texto });
     }
 
     // ── Cargar auto ──────────────────────────────────────────────

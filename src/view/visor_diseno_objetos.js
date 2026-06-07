@@ -3,17 +3,12 @@
 import * as THREE                from 'three';
 import { VisorBase }             from './visor_base.js';
 import { ControlOrbitaObjeto }   from './controles/control_orbita_objeto.js';
-import { ArbolEscena }           from './objetos/arbol_escena.js';
-import { PosteEscena }           from './objetos/poste_escena.js';
-import { AvisoEscena }           from './objetos/aviso_escena.js';
-import { MetaEscena }            from './objetos/meta_escena.js';
-import { SalidaEscena }          from './objetos/salida_escena.js';
-import { BarreraEscena }         from './objetos/barrera_escena.js';
-import { FlechaCurvaEscena }     from './objetos/flecha_curva_escena.js';
+import { FabricaObjetoEscena }   from './objetos/fabrica_objeto_escena.js';
 
 // ================================================================
 // CLASS: VisorDisenoObjetos — visor 3D de un objeto decorativo.
 //        Permite orbitar (rotar, hacer zoom) con táctil o ratón.
+//        Usa FabricaObjetoEscena — no conoce las subclases concretas.
 // ================================================================
 class VisorDisenoObjetos extends VisorBase {
     #canvas;
@@ -21,6 +16,7 @@ class VisorDisenoObjetos extends VisorBase {
     #scene         = null;
     #camera        = null;
     #controlOrbita = null;
+    #fabrica       = new FabricaObjetoEscena();
     #raf           = 0;
     #objeto        = null;
     #resizeObs     = null;
@@ -83,13 +79,8 @@ class VisorDisenoObjetos extends VisorBase {
     // ── Mostrar objeto ───────────────────────────────────────────
     async mostrar(tipo) {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
-        if (tipo === 'arbol')   this.#objeto = new ArbolEscena(0, 0, 1.4);
-        if (tipo === 'poste')   this.#objeto = new PosteEscena(0, 0);
-        if (tipo === 'aviso')   this.#objeto = new AvisoEscena(0, 0, 'STOP');
-        if (tipo === 'meta')    this.#objeto = new MetaEscena(0, 0);
-        if (tipo === 'salida')  this.#objeto = new SalidaEscena(0, 0);
-        if (tipo === 'barrera') this.#objeto = new BarreraEscena(0, 0);
-        if (tipo === 'flecha')  this.#objeto = new FlechaCurvaEscena(0, 0);
+        this.#objeto = this.#fabrica.crear(tipo, 0, 0,
+            { escala: tipo === 'arbol' ? 1.4 : 1, texto: 'STOP' });
         await this.#objeto?.construir(this.#scene);
     }
 
