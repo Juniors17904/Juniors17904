@@ -48,6 +48,12 @@ class Aplicacion {
     #mostrar(id) {
         if (id !== 'pantalla-juego') this.#td3dPending = false;
 
+        // Ocultar overlays globales al salir del juego
+        if (id !== 'pantalla-juego') {
+            document.getElementById('ctrl-botones').style.display = 'none';
+            document.getElementById('ctrl-accel').style.display   = 'none';
+        }
+
         // Limpiar circuito 3D si está activo y navegamos fuera
         if (this.#cir3d) {
             this.#limpiarCircuito3D();
@@ -180,6 +186,7 @@ class Aplicacion {
             this.#iniciarTestDrive3D();
         });
         document.getElementById('btn-td3d-con-ruta').addEventListener('click', () => {
+            this.#mostrar('pantalla-juego');
             this.#iniciarCircuito3D('ciudad', 'pantalla-td3d-selector');
         });
 
