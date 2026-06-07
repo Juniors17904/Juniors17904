@@ -26,10 +26,11 @@ class ConfigPistaTestDriveLibre extends ConfigPista {
     get borde()   { return this.#base.borde; }
 }
 
-window.PistaTestDriveLibre = PistaTestDriveLibre;
+window.PistaTestDriveLibre = ConfigPistaTestDriveLibre;
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];
-    window.__modelErrors.push('[pistas/pista_testdrive_libre.js] ' + e.message);
-    console.error('[pistas/pista_testdrive_libre.js]', e);
+    window.__modelErrors = window.__modelErrors || [];
+    window.__modelErrors.push('[pistas/config_pista_testdrive_libre.js] ' + e.message);
+    console.error('[pistas/config_pista_testdrive_libre.js]', e);
 }
