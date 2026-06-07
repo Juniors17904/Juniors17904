@@ -227,9 +227,11 @@ class TimonF1 { dibujar(ctx, S) { /* lógica F1 aquí */ } }
 - NUNCA poner en una clase atributos o lógica que pertenezcan a otra clase
 
 
-- Al terminar cada respuesta, hacer 1 a 3 preguntas cortas a modo de sugerencia sobre qué podría querer hacer el usuario a continuación
-- Las preguntas deben ser relevantes al contexto actual del proyecto
-- Formularlas como opciones concretas, no genéricas
+- Al terminar cada respuesta, hacer exactamente 1 pregunta corta a modo de sugerencia sobre qué podría querer hacer el usuario a continuación
+- La pregunta debe ser relevante al contexto actual del proyecto
+- Formularla como opción concreta, no genérica
+
+- Al terminar cada cambio de código, escribir un párrafo breve de conclusión con palabras simples explicando qué se hizo y por qué. Usar ejemplos de código básicos si ayuda a entender. El objetivo es que cualquier persona entienda el cambio sin saber programación avanzada.
 
 - Desarrollar en la rama `claude/system-overview-Z6Zik`
 - **SIEMPRE** al terminar cada cambio: hacer merge a `main` y push a `main`
