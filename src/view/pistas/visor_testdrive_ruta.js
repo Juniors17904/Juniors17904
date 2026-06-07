@@ -342,7 +342,7 @@ class VisorTestdriveRuta extends VisorBase {
         if (!this.#hudCtx || !this.#mov || !window.RenderizadorVelocimetro) return;
         const W = this.#hudCanvas.width, H = this.#hudCanvas.height;
         this.#hudCtx.clearRect(0, 0, W, H);
-        const fraccion = Math.min(1, Math.abs(this.#mov.velocidad) / this.#mov.maxFwd);
+        const fraccion = Math.min(1, Math.abs(this.#mov.velocidad) / this.#mov.velMaxAdelante);
         const cx = W - 70, cy = H - 70, r = 50;
         window.RenderizadorVelocimetro.dibujar(this.#hudCtx, cx, cy, r, fraccion, this.#mov.velocimetroModelo);
     }

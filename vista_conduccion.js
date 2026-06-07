@@ -47,7 +47,7 @@ class VistaConduccion {
 
     aplicarA(circuito, timonModelo = 0) {
         // Cámara
-        circuito.camHeight = this.#alturaCamara;
+        circuito.alturaCamara = this.#alturaCamara;
         const estaAerea = circuito.camAereaActiva;
         if (this.#tipoCamara === 'aerea' && !estaAerea) circuito.toggleCamaraAerea();
         if (this.#tipoCamara === 'chase' &&  estaAerea) circuito.toggleCamaraAerea();

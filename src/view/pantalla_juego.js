@@ -15,7 +15,7 @@ class PantallaJuego {
     dibujar(ctx, W, H, carro, oponenteProgreso, nombreOponente, nivel) {
         try {
             this.#dibujarVelocimetro(ctx, W, H, carro.velocidad / carro.velMaxBase);
-            this.#dibujarTurbos(ctx, W, H, carro.turbosLeft, carro.turboActivo, carro.turboMax);
+            this.#dibujarTurbos(ctx, W, H, carro.turbosLeft, carro.turboActivo, carro.turboMaximo);
             this.#dibujarProgreso(ctx, W, H, carro.progreso, oponenteProgreso, nombreOponente);
             if (carro.turboActivo) this.#dibujarTurboFX(ctx, W, H);
             this.#minimap.dibujar(ctx, carro, oponenteProgreso, nivel);
@@ -31,10 +31,10 @@ class PantallaJuego {
         window.RenderizadorVelocimetro.dibujar(ctx, cx, cy, r, fraccion, this.#velocimetroModelo);
     }
 
-    #dibujarTurbos(ctx, W, H, cantidad, activo, turboMax) {
+    #dibujarTurbos(ctx, W, H, cantidad, activo, totalTurbos) {
         const startX = 16, y = H - 24;
         ctx.save();
-        for (let i = 0; i < turboMax; i++) {
+        for (let i = 0; i < totalTurbos; i++) {
             const tiene = i < cantidad;
             ctx.globalAlpha = tiene ? 1 : 0.25;
             ctx.fillStyle = activo && tiene ? '#fbbf24' : '#f59e0b';
