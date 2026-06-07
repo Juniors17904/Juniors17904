@@ -171,7 +171,16 @@ class Aplicacion {
 
         document.getElementById('btn-test-drive-3d').addEventListener('click', () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
+            this.#mostrar('pantalla-td3d-selector');
+        });
+        document.getElementById('btn-volver-td3d-selector').addEventListener('click', () => {
+            this.#mostrar('pantalla-ajustes');
+        });
+        document.getElementById('btn-td3d-simple').addEventListener('click', () => {
             this.#iniciarTestDrive3D();
+        });
+        document.getElementById('btn-td3d-con-ruta').addEventListener('click', () => {
+            this.#iniciarCircuito3D('ciudad', 'pantalla-td3d-selector');
         });
 
         document.getElementById('btn-exit-td3d').addEventListener('click', () => {
@@ -182,7 +191,7 @@ class Aplicacion {
         document.getElementById('btn-exit-cir3d').addEventListener('click', () => {
             this.#limpiarCircuito3D();
             GestorOrientacion.liberar();
-            this.#mostrar('pantalla-detalle-pista');
+            this.#mostrar(this.#cir3dOrigen);
         });
 
         document.getElementById('btn-garage').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
@@ -289,7 +298,7 @@ class Aplicacion {
         document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
         document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
             this.#mostrar('pantalla-juego');
-            this.#iniciarCircuito3D(this.#estado.pista);
+            this.#iniciarCircuito3D(this.#estado.pista, 'pantalla-detalle-pista');
         });
         document.getElementById('pantalla-pista').addEventListener('click', e => {
             const card = e.target.closest('.pista-card');
@@ -748,6 +757,7 @@ class Aplicacion {
     // ── Circuito 3D (pista con curvas) ──────────────────────────
     #cir3d = null;
     #cir3dTipoPista = 'ciudad';
+    #cir3dOrigen = 'pantalla-detalle-pista';
     #cir3dVisibilityHandler = null;
     #cir3dKeyDown = null;
     #cir3dKeyUp   = null;
@@ -755,12 +765,13 @@ class Aplicacion {
     #cir3dCanvasTouchStart = null;
     #cir3dCanvasTouchMove  = null;
 
-    #iniciarCircuito3D(tipoPista = 'ciudad') {
+    #iniciarCircuito3D(tipoPista = 'ciudad', origen = 'pantalla-detalle-pista') {
         if (!window.VisorJuego) {
-            setTimeout(() => this.#iniciarCircuito3D(tipoPista), 150);
+            setTimeout(() => this.#iniciarCircuito3D(tipoPista, origen), 150);
             return;
         }
         this.#cir3dTipoPista = tipoPista;
+        this.#cir3dOrigen    = origen;
         this.#limpiarPantallaJuego();
         GestorOrientacion.saltarCheck = true;
 
