@@ -809,7 +809,11 @@ class Aplicacion {
         hudCir.width  = window.innerWidth;
         hudCir.height = window.innerHeight;
         document.getElementById('canvas-carro-3d').style.display = 'none';
-        document.getElementById('titulo-cir3d').style.display = 'block';
+        const tituloCir = document.getElementById('titulo-cir3d');
+        tituloCir.textContent = origen === 'pantalla-td3d-selector'
+            ? 'TEST DRIVE 3D · CON RUTA'
+            : 'CIRCUITO URBANO';
+        tituloCir.style.display = 'block';
         document.getElementById('btn-exit-cir3d').style.display = 'block';
 
         const cir = new window.VisorJuego(canvas, tipoPista);
