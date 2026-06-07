@@ -1,7 +1,7 @@
 'use strict';
 
 import * as THREE    from 'three';
-import { RutaSpline } from '../model/ruta_spline.js';
+import { Ruta } from '../model/ruta.js';
 import { Carro }             from '../model/carros/carro.js';
 import { VisorBase }         from './visor_base.js';
 import { CamaraSeguimiento } from './camaras/camara_seguimiento.js';
@@ -18,7 +18,7 @@ class VisorDisenoGeneral extends VisorBase {
     #scene       = null;
     #camaraChase = null;
     #raf         = 0;
-    #ruta        = new RutaSpline();
+    #ruta        = new Ruta();
     #mov         = null;
     #sol         = null;
     #resizeObs   = null;

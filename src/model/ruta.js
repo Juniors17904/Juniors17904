@@ -5,7 +5,7 @@ import * as THREE from 'three';
 // MODEL — Ruta: trazado CatmullRom para pistas 3D
 // ================================================================
 
-export class RutaSpline {
+export class Ruta {
     #curve        = null;
     #longitud     = 0;
     #anguloInicio = 0;

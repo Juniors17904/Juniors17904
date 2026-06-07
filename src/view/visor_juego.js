@@ -1,6 +1,6 @@
 'use strict';
 import * as THREE from 'three';
-import { RutaSpline } from '../model/ruta_spline.js';
+import { Ruta } from '../model/ruta.js';
 import { Carro } from '../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from './camaras/camara_seguimiento.js';
 import { CamaraAerea } from './camaras/camara_aerea.js';
@@ -15,7 +15,7 @@ class VisorJuego extends VisorBase {
     #carGroup = null; #leanGroup = null; #wheels = [];
     #resizeHandler = null;
 
-    #ruta = new RutaSpline();
+    #ruta = new Ruta();
     #camAerea = null;
     #camAereaActiva = false;
     #mov = null;
