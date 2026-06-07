@@ -18,7 +18,7 @@ export class Cielo {
     }
 
     construir(scene) {
-        const radio = 400;
+        const radio = 180;
         const geo = new THREE.SphereGeometry(radio, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
 
         // Gradiente de vértices: horizonte (abajo) → cielo (arriba)
@@ -35,8 +35,9 @@ export class Cielo {
         }
         geo.setAttribute('color', new THREE.Float32BufferAttribute(colArr, 3));
 
-        const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide });
+        const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, depthWrite: false });
         this.#malla = new THREE.Mesh(geo, mat);
+        this.#malla.renderOrder = -1;
         scene.add(this.#malla);
 
         // Fondo y niebla usan el color del horizonte para continuidad visual
