@@ -35,9 +35,10 @@ export class Cielo {
         }
         geo.setAttribute('color', new THREE.Float32BufferAttribute(colArr, 3));
 
-        const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, depthWrite: false });
+        const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, depthWrite: false, depthTest: false });
         this.#malla = new THREE.Mesh(geo, mat);
-        this.#malla.renderOrder = -1;
+        this.#malla.renderOrder    = -1;
+        this.#malla.frustumCulled  = false;
         scene.add(this.#malla);
 
         // Fondo y niebla usan el color del horizonte para continuidad visual
