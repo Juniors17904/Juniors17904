@@ -13,10 +13,10 @@ class ControlTimon extends ControlEntrada {
     #canvas = null;
     #ctx    = null;
     #cir    = null;
-    #raf    = 0;
+    #idAnimacion    = 0;
 
     // Estado del giro
-    #steerInput      = 0;
+    #entradaDireccion      = 0;
     #angle           = 0;
     #targetAngle     = 0;
     #touchId         = null;
@@ -58,8 +58,8 @@ class ControlTimon extends ControlEntrada {
     }
 
     destruir() {
-        cancelAnimationFrame(this.#raf);
-        this.#raf = 0;
+        cancelAnimationFrame(this.#idAnimacion);
+        this.#idAnimacion = 0;
 
         if (this.#accelKeyDown) window.removeEventListener('keydown', this.#accelKeyDown);
         if (this.#accelKeyUp)   window.removeEventListener('keyup',   this.#accelKeyUp);
@@ -76,7 +76,7 @@ class ControlTimon extends ControlEntrada {
         this.#aceleradorHandlers = [];
 
         this.ocultarOverlay();
-        if (this.#cir) { this.#cir.accelInput = 0; this.#cir.steerInput = 0; }
+        if (this.#cir) { this.#cir.entradaAcel = 0; this.#cir.entradaDireccion = 0; }
         this.#cir    = null;
         this.#canvas = null;
         this.#ctx    = null;
@@ -103,9 +103,9 @@ class ControlTimon extends ControlEntrada {
         const addBtn = (id, valStart, valEnd) => {
             const el = document.getElementById(id);
             if (!el) return;
-            const onStart  = () => { cir.accelInput = valStart; };
-            const onEnd    = () => { cir.accelInput = valEnd; };
-            const onCancel = () => { cir.accelInput = valEnd; };
+            const onStart  = () => { cir.entradaAcel = valStart; };
+            const onEnd    = () => { cir.entradaAcel = valEnd; };
+            const onCancel = () => { cir.entradaAcel = valEnd; };
             el.addEventListener('touchstart',  onStart, { passive: true });
             el.addEventListener('touchend',    onEnd);
             el.addEventListener('touchcancel', onCancel);
@@ -124,8 +124,8 @@ class ControlTimon extends ControlEntrada {
                 if (e.key === 'ArrowUp'    || e.key === 'w') cir.camAerea.moveZ = -1;
                 if (e.key === 'ArrowDown'  || e.key === 's') cir.camAerea.moveZ =  1;
             } else {
-                if (e.key === 'ArrowUp'   || e.key === 'w') cir.accelInput =  1;
-                if (e.key === 'ArrowDown' || e.key === 's') cir.accelInput = -1;
+                if (e.key === 'ArrowUp'   || e.key === 'w') cir.entradaAcel =  1;
+                if (e.key === 'ArrowDown' || e.key === 's') cir.entradaAcel = -1;
             }
         };
         this.#accelKeyUp = e => {
@@ -136,7 +136,7 @@ class ControlTimon extends ControlEntrada {
                     e.key === 'ArrowDown'  || e.key === 's') cir.camAerea.moveZ = 0;
             } else {
                 if (e.key === 'ArrowUp'   || e.key === 'w' ||
-                    e.key === 'ArrowDown' || e.key === 's') cir.accelInput = 0;
+                    e.key === 'ArrowDown' || e.key === 's') cir.entradaAcel = 0;
             }
         };
         window.addEventListener('keydown', this.#accelKeyDown);
@@ -148,14 +148,14 @@ class ControlTimon extends ControlEntrada {
         const dx     = x - this.#startX;
         const target = this.#startWheelAngle + (dx / this.#sensitivity) * this.#maxAngle;
         this.#targetAngle = Math.max(-this.#maxAngle, Math.min(this.#maxAngle, target));
-        this.#steerInput  = this.#targetAngle / this.#maxAngle;
+        this.#entradaDireccion  = this.#targetAngle / this.#maxAngle;
     }
 
     #reset() {
         this.#touchId     = null;
         this.#mouseDown   = false;
         this.#targetAngle = 0;
-        this.#steerInput  = 0;
+        this.#entradaDireccion  = 0;
     }
 
     #onTouchStart(e) {
@@ -173,9 +173,9 @@ class ControlTimon extends ControlEntrada {
     }
 
     #loop() {
-        this.#raf = requestAnimationFrame(() => this.#loop());
+        this.#idAnimacion = requestAnimationFrame(() => this.#loop());
         this.#angle += (this.#targetAngle - this.#angle) * 0.18;
-        if (this.#cir) this.#cir.steerInput = this.#steerInput;
+        if (this.#cir) this.#cir.entradaDireccion = this.#entradaDireccion;
         this.#draw();
     }
 

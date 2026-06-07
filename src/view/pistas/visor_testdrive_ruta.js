@@ -12,8 +12,8 @@ import { VisorBase } from '../visor_base.js';
 // ================================================================
 class VisorTestdriveRuta extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
-    #canvas; #hudCanvas = null; #hudCtx = null; #raf = 0; #sun = null;
-    #tickFn = () => this.#tick();
+    #canvas; #hudCanvas = null; #hudCtx = null; #idAnimacion = 0; #sun = null;
+    #funcionAnimacion = () => this.#tick();
     #carGroup = null; #leanGroup = null; #wheels = []; #cielo = null;
     #resizeHandler = null;
 
@@ -28,13 +28,13 @@ class VisorTestdriveRuta extends VisorBase {
     #lateral         = 0;
     #movimientoLibre = false;
 
-    accelInput = 0;
-    steerInput = 0;
-    camHeight  = 2.8;
+    entradaAcel = 0;
+    entradaDireccion = 0;
+    alturaCamara  = 2.8;
 
-    get speed()    { return this.#mov?.speed    ?? 0; }
-    get accel()    { return this.#mov?.accel    ?? 0; }
-    get maxSpeed() { return this.#mov?.maxSpeed ?? 0; }
+    get velocidad()    { return this.#mov?.velocidad    ?? 0; }
+    get aceleracion()    { return this.#mov?.aceleracion    ?? 0; }
+    get velocidadMax() { return this.#mov?.velocidadMax ?? 0; }
     get progress() { return this.#progress; }
     get rotY()     { return this.#mov?.rotY     ?? 0; }
     get rotZ()     { return this.#mov?.carLean  ?? 0; }
@@ -43,7 +43,7 @@ class VisorTestdriveRuta extends VisorBase {
     get camRotX()      { return this.#camaraChase?.camRotX ?? 0; }
     get camRotY()      { return this.#camaraChase?.camRotY ?? 0; }
     get camRotZ()      { return this.#camaraChase?.camRotZ ?? 0; }
-    get physics()      { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
+    get physics()      { return { velMaxAdelante:0.74, velMaxReversa:0.28, constAceleracion:0.006, constFreno:0.026, constArrastre:0.009, constDireccion:0.010, camDist:7 }; }
     get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
     get lateral()      { return this.#lateral; }
     get pathLen()      { return this.#ruta.longitud; }
@@ -267,7 +267,7 @@ class VisorTestdriveRuta extends VisorBase {
 
     // ── Loop principal ───────────────────────────────────────────
     iniciar() {
-        if (!this.#raf) {
+        if (!this.#idAnimacion) {
             this.#resizeHandler = () => {
                 const W = window.innerWidth, H = window.innerHeight;
                 this.#canvas.width = W; this.#canvas.height = H;
@@ -283,7 +283,7 @@ class VisorTestdriveRuta extends VisorBase {
     }
 
     detener() {
-        cancelAnimationFrame(this.#raf); this.#raf = 0;
+        cancelAnimationFrame(this.#idAnimacion); this.#idAnimacion = 0;
         if (this.#resizeHandler) {
             window.removeEventListener('resize', this.#resizeHandler);
             this.#resizeHandler = null;
@@ -293,10 +293,10 @@ class VisorTestdriveRuta extends VisorBase {
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(this.#tickFn);
+        this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
         this.#updatePhysics();
-        this.#camaraChase.altura = this.camHeight;
-        this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.steerInput);
+        this.#camaraChase.altura = this.alturaCamara;
+        this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.entradaDireccion);
         if (this.#camAereaActiva) {
             this.#camAerea.actualizar(this.#mov.px, this.#mov.pz);
         }
@@ -342,19 +342,19 @@ class VisorTestdriveRuta extends VisorBase {
         if (!this.#hudCtx || !this.#mov || !window.RenderizadorVelocimetro) return;
         const W = this.#hudCanvas.width, H = this.#hudCanvas.height;
         this.#hudCtx.clearRect(0, 0, W, H);
-        const fraccion = Math.min(1, Math.abs(this.#mov.speed) / this.#mov.maxFwd);
+        const fraccion = Math.min(1, Math.abs(this.#mov.velocidad) / this.#mov.maxFwd);
         const cx = W - 70, cy = H - 70, r = 50;
         window.RenderizadorVelocimetro.dibujar(this.#hudCtx, cx, cy, r, fraccion, this.#mov.velocimetroModelo);
     }
 
     // ── Física ───────────────────────────────────────────────────
     #updatePhysics() {
-        this.#mov.accelInput = this.accelInput;
-        this.#mov.steerInput = this.steerInput;
+        this.#mov.entradaAcel = this.entradaAcel;
+        this.#mov.entradaDireccion = this.entradaDireccion;
         this.#mov.actualizar();
 
         if (!this.#movimientoLibre && this.#ruta.longitud > 0) {
-            this.#progress = ((this.#progress + this.#mov.speed / this.#ruta.longitud) % 1 + 1) % 1;
+            this.#progress = ((this.#progress + this.#mov.velocidad / this.#ruta.longitud) % 1 + 1) % 1;
 
             // Límite suave: empujar de vuelta si se aleja más de 3.8 del trazado
             const p = this.#ruta.posicionEn(this.#progress);
@@ -375,7 +375,7 @@ class VisorTestdriveRuta extends VisorBase {
             this.#carGroup.rotation.y = this.#mov.rotY;
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
-        for (const w of this.#wheels) w.rotation.x += this.#mov.speed * 6;
+        for (const w of this.#wheels) w.rotation.x += this.#mov.velocidad * 6;
     }
 
 

@@ -560,16 +560,16 @@ class Aplicacion {
         const td3dInitRotY = td.rotY;
 
         this.#td3dKeyDown = e => {
-            if (e.key === 'ArrowUp'    || e.key === 'w') td.accelInput =  1;
-            if (e.key === 'ArrowDown'  || e.key === 's') td.accelInput = -1;
-            if (e.key === 'ArrowLeft'  || e.key === 'a') td.steerInput = -1;
-            if (e.key === 'ArrowRight' || e.key === 'd') td.steerInput =  1;
+            if (e.key === 'ArrowUp'    || e.key === 'w') td.entradaAcel =  1;
+            if (e.key === 'ArrowDown'  || e.key === 's') td.entradaAcel = -1;
+            if (e.key === 'ArrowLeft'  || e.key === 'a') td.entradaDireccion = -1;
+            if (e.key === 'ArrowRight' || e.key === 'd') td.entradaDireccion =  1;
         };
         this.#td3dKeyUp = e => {
             if (e.key === 'ArrowUp'   || e.key === 'w' ||
-                e.key === 'ArrowDown' || e.key === 's') td.accelInput = 0;
+                e.key === 'ArrowDown' || e.key === 's') td.entradaAcel = 0;
             if (e.key === 'ArrowLeft' || e.key === 'a' ||
-                e.key === 'ArrowRight'|| e.key === 'd') td.steerInput = 0;
+                e.key === 'ArrowRight'|| e.key === 'd') td.entradaDireccion = 0;
         };
         window.addEventListener('keydown', this.#td3dKeyDown);
         window.addEventListener('keyup',   this.#td3dKeyUp);
@@ -581,17 +581,17 @@ class Aplicacion {
             el.addEventListener('touchend',   onEnd);
             this.#td3dTouchHandlers.push({ el, onStart, onEnd });
         };
-        addTouch('btn-gas', () => { td.accelInput =  1; }, () => { td.accelInput = 0; });
-        addTouch('btn-rev', () => { td.accelInput = -1; }, () => { td.accelInput = 0; });
-        addTouch('btn-izq', () => { td.steerInput = -1; }, () => { td.steerInput = 0; });
-        addTouch('btn-der', () => { td.steerInput =  1; }, () => { td.steerInput = 0; });
+        addTouch('btn-gas', () => { td.entradaAcel =  1; }, () => { td.entradaAcel = 0; });
+        addTouch('btn-rev', () => { td.entradaAcel = -1; }, () => { td.entradaAcel = 0; });
+        addTouch('btn-izq', () => { td.entradaDireccion = -1; }, () => { td.entradaDireccion = 0; });
+        addTouch('btn-der', () => { td.entradaDireccion =  1; }, () => { td.entradaDireccion = 0; });
 
         // Slider altura de cámara
         const sliderCam = document.getElementById('slider-cam-height');
         const ctrlCam   = document.getElementById('ctrl-cam-height');
         sliderCam.value = '2.8';
         ctrlCam.style.display = 'flex';
-        sliderCam.addEventListener('input', e => { td.camHeight = parseFloat(e.target.value); });
+        sliderCam.addEventListener('input', e => { td.alturaCamara = parseFloat(e.target.value); });
 
         // Minimapa
         const mmCanvas = document.getElementById('minimap-td3d');
@@ -635,32 +635,32 @@ class Aplicacion {
                 _dbgFps = Math.round(_dbgFrames * 1000 / (now - _dbgLast));
                 _dbgFrames = 0; _dbgLast = now;
             }
-            const s = td.speed, a = td.accel;
+            const s = td.velocidad, a = td.aceleracion;
             const kmh = Math.round(Math.abs(s) * 216);
             document.getElementById('dbg-vel').textContent    = Math.abs(s).toFixed(3);
             document.getElementById('dbg-kmh').textContent    = kmh;
             document.getElementById('dbg-acel').textContent   = (a >= 0 ? '+' : '') + a.toFixed(4);
-            document.getElementById('dbg-vmax').textContent   = td.maxSpeed.toFixed(3);
-            document.getElementById('dbg-iacel').textContent  = td.accelInput ===  1 ? '⬆ GAS'
-                                                              : td.accelInput === -1 ? '⬇ REVERSA' : 'NEUTRO';
-            document.getElementById('dbg-idir').textContent   = td.steerInput < -0.1 ? '◀ IZQ'
-                                                              : td.steerInput >  0.1 ? 'DER ▶' : 'RECTO';
+            document.getElementById('dbg-vmax').textContent   = td.velocidadMax.toFixed(3);
+            document.getElementById('dbg-iacel').textContent  = td.entradaAcel ===  1 ? '⬆ GAS'
+                                                              : td.entradaAcel === -1 ? '⬇ REVERSA' : 'NEUTRO';
+            document.getElementById('dbg-idir').textContent   = td.entradaDireccion < -0.1 ? '◀ IZQ'
+                                                              : td.entradaDireccion >  0.1 ? 'DER ▶' : 'RECTO';
             document.getElementById('dbg-px').textContent     = td.px.toFixed(2);
             document.getElementById('dbg-pz').textContent     = td.pz.toFixed(2);
             document.getElementById('dbg-rotx').textContent   = (0).toFixed(1);
             document.getElementById('dbg-rumbo').textContent  = (((td.rotY - td3dInitRotY) * 180 / Math.PI % 360 + 360) % 360).toFixed(1);
             document.getElementById('dbg-rotz').textContent   = (td.rotZ * 180 / Math.PI).toFixed(1);
             document.getElementById('dbg-fps').textContent    = _dbgFps;
-            document.getElementById('dbg-camh').textContent   = td.camHeight.toFixed(2);
+            document.getElementById('dbg-camh').textContent   = td.alturaCamara.toFixed(2);
             document.getElementById('dbg-cam-roty').textContent = (td.camRotY * 180 / Math.PI).toFixed(1);
             document.getElementById('dbg-cam-dist').textContent = td.physics.camDist;
             const ph = td.physics;
-            document.getElementById('dbg-f-accel').textContent  = ph.accel;
-            document.getElementById('dbg-f-brake').textContent  = ph.brake;
-            document.getElementById('dbg-f-drag').textContent   = ph.drag;
-            document.getElementById('dbg-f-steer').textContent  = ph.steer;
-            document.getElementById('dbg-f-maxfwd').textContent = ph.maxFwd;
-            document.getElementById('dbg-f-maxrev').textContent = ph.maxRev;
+            document.getElementById('dbg-f-accel').textContent  = ph.constAceleracion;
+            document.getElementById('dbg-f-brake').textContent  = ph.constFreno;
+            document.getElementById('dbg-f-drag').textContent   = ph.constArrastre;
+            document.getElementById('dbg-f-steer').textContent  = ph.constDireccion;
+            document.getElementById('dbg-f-maxfwd').textContent = ph.velMaxAdelante;
+            document.getElementById('dbg-f-maxrev').textContent = ph.velMaxReversa;
 
             if (mmVisible) {
                 mmCtx.clearRect(0, 0, MM_W, MM_H);
@@ -887,7 +887,7 @@ class Aplicacion {
         document.getElementById('ctrl-cam-height').style.display = 'flex';
         sliderCam.addEventListener('input', e => {
             if (cir.camAereaActiva) cir.setCamAereaAltura(parseFloat(e.target.value));
-            else cir.camHeight = parseFloat(e.target.value);
+            else cir.alturaCamara = parseFloat(e.target.value);
         });
 
         const btnCamAerea = document.getElementById('btn-cam-aerea');
@@ -900,7 +900,7 @@ class Aplicacion {
             document.getElementById('btn-toggle-datos').style.display     = activa ? 'none'  : 'block';
             document.getElementById('btn-toggle-mapas').style.display     = activa ? 'none'  : 'block';
             document.getElementById('ctrl-cam-height').style.display      = activa ? 'none'  : 'flex';
-            cir.accelInput = 0; cir.steerInput = 0;
+            cir.entradaAcel = 0; cir.entradaDireccion = 0;
         };
 
         const btnMovLibre = document.getElementById('btn-mov-libre');
@@ -1026,31 +1026,31 @@ class Aplicacion {
             _dbgFrames++;
             const now=performance.now();
             if (now-_dbgLast>=500) { _dbgFps=Math.round(_dbgFrames*1000/(now-_dbgLast)); _dbgFrames=0; _dbgLast=now; }
-            const s=cir.speed, a=cir.accel, kmh=Math.round(Math.abs(s)*216);
+            const s=cir.velocidad, a=cir.aceleracion, kmh=Math.round(Math.abs(s)*216);
             document.getElementById('dbg-vel').textContent   = Math.abs(s).toFixed(3);
             document.getElementById('dbg-kmh').textContent   = kmh;
             document.getElementById('dbg-acel').textContent  = (a>=0?'+':'')+a.toFixed(4);
-            document.getElementById('dbg-vmax').textContent  = cir.maxSpeed.toFixed(3);
-            document.getElementById('dbg-iacel').textContent = cir.accelInput===1?'⬆ GAS':cir.accelInput===-1?'⬇ REVERSA':'NEUTRO';
-            document.getElementById('dbg-idir').textContent  = cir.steerInput<-0.1?'◀ IZQ':cir.steerInput>0.1?'DER ▶':'RECTO';
+            document.getElementById('dbg-vmax').textContent  = cir.velocidadMax.toFixed(3);
+            document.getElementById('dbg-iacel').textContent = cir.entradaAcel===1?'⬆ GAS':cir.entradaAcel===-1?'⬇ REVERSA':'NEUTRO';
+            document.getElementById('dbg-idir').textContent  = cir.entradaDireccion<-0.1?'◀ IZQ':cir.entradaDireccion>0.1?'DER ▶':'RECTO';
             document.getElementById('dbg-rotx').textContent  = (0).toFixed(1);
             document.getElementById('dbg-rumbo').textContent = (((cir.rotY-cirInitRotY)*180/Math.PI%360)+360)%360 |0;
             document.getElementById('dbg-rotz').textContent  = (cir.rotZ*180/Math.PI).toFixed(1);
             document.getElementById('dbg-px').textContent    = cir.px.toFixed(1);
             document.getElementById('dbg-pz').textContent    = cir.pz.toFixed(1);
             document.getElementById('dbg-fps').textContent   = _dbgFps;
-            document.getElementById('dbg-camh').textContent      = cir.camHeight.toFixed(2);
+            document.getElementById('dbg-camh').textContent      = cir.alturaCamara.toFixed(2);
             document.getElementById('dbg-cam-rotx').textContent  = (cir.camRotX*180/Math.PI).toFixed(1);
             document.getElementById('dbg-cam-roty').textContent  = (cir.camRotY*180/Math.PI|0);
             document.getElementById('dbg-cam-rotz').textContent  = (cir.camRotZ*180/Math.PI).toFixed(1);
             document.getElementById('dbg-cam-dist').textContent  = cir.physics.camDist;
             const ph=cir.physics;
-            document.getElementById('dbg-f-accel').textContent = ph.accel;
-            document.getElementById('dbg-f-brake').textContent = ph.brake;
-            document.getElementById('dbg-f-drag').textContent  = ph.drag;
-            document.getElementById('dbg-f-steer').textContent = ph.steer;
-            document.getElementById('dbg-f-maxfwd').textContent= ph.maxFwd;
-            document.getElementById('dbg-f-maxrev').textContent= ph.maxRev;
+            document.getElementById('dbg-f-accel').textContent = ph.constAceleracion;
+            document.getElementById('dbg-f-brake').textContent = ph.constFreno;
+            document.getElementById('dbg-f-drag').textContent  = ph.constArrastre;
+            document.getElementById('dbg-f-steer').textContent = ph.constDireccion;
+            document.getElementById('dbg-f-maxfwd').textContent= ph.velMaxAdelante;
+            document.getElementById('dbg-f-maxrev').textContent= ph.velMaxReversa;
             const totalKm = (cir.pathLen / 1000).toFixed(2);
             document.getElementById('dbg-total').textContent = totalKm;
             document.getElementById('dbg-recor').textContent = (cir.progress * cir.pathLen / 1000).toFixed(3);
@@ -1320,10 +1320,10 @@ class Aplicacion {
             this.#dgTouchHandlers.push({ el, onStart, onEnd });
         };
         const dg = this.#visorDG;
-        addTouch('btn-gas', () => { dg.accelInput =  1; }, () => { dg.accelInput = 0; });
-        addTouch('btn-rev', () => { dg.accelInput = -1; }, () => { dg.accelInput = 0; });
-        addTouch('btn-izq', () => { dg.steerInput = -1; }, () => { dg.steerInput = 0; });
-        addTouch('btn-der', () => { dg.steerInput =  1; }, () => { dg.steerInput = 0; });
+        addTouch('btn-gas', () => { dg.entradaAcel =  1; }, () => { dg.entradaAcel = 0; });
+        addTouch('btn-rev', () => { dg.entradaAcel = -1; }, () => { dg.entradaAcel = 0; });
+        addTouch('btn-izq', () => { dg.entradaDireccion = -1; }, () => { dg.entradaDireccion = 0; });
+        addTouch('btn-der', () => { dg.entradaDireccion =  1; }, () => { dg.entradaDireccion = 0; });
     }
 
     #detenerVisorDG() {

@@ -9,7 +9,7 @@ import { VisorBase } from './visor_base.js';
 // ================================================================
 class Visor3D extends VisorBase {
     #renderer = null; #scene = null; #camera = null; #controls = null;
-    #canvas; #raf = 0; #carGroup = null;
+    #canvas; #idAnimacion = 0; #carGroup = null;
 
     constructor(canvas) {
         super();
@@ -18,7 +18,7 @@ class Visor3D extends VisorBase {
     }
 
     async cargar(tipo, color) {
-        if (!this.#raf) this.#tick();
+        if (!this.#idAnimacion) this.#tick();
         try {
             const gltf = await VisorBase.cargarGLTF();
             this.#setCar(gltf, tipo, color);
@@ -36,8 +36,8 @@ class Visor3D extends VisorBase {
     }
 
     detener() {
-        cancelAnimationFrame(this.#raf);
-        this.#raf = 0;
+        cancelAnimationFrame(this.#idAnimacion);
+        this.#idAnimacion = 0;
         this.#controls?.dispose();
         this.#renderer?.dispose();
     }
@@ -107,7 +107,7 @@ class Visor3D extends VisorBase {
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(() => this.#tick());
+        this.#idAnimacion = requestAnimationFrame(() => this.#tick());
         this.#controls.update();
         this.#renderer.render(this.#scene, this.#camera);
     }

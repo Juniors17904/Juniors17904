@@ -30,10 +30,10 @@ class ControlTeclado extends ControlEntrada {
                 if (e.key === 'ArrowUp'    || e.key === 'w') circuito.camAerea.moveZ = -1;
                 if (e.key === 'ArrowDown'  || e.key === 's') circuito.camAerea.moveZ =  1;
             } else {
-                if (e.key === 'ArrowUp'    || e.key === 'w') circuito.accelInput =  1;
-                if (e.key === 'ArrowDown'  || e.key === 's') circuito.accelInput = -1;
-                if (e.key === 'ArrowLeft'  || e.key === 'a') circuito.steerInput = -1;
-                if (e.key === 'ArrowRight' || e.key === 'd') circuito.steerInput =  1;
+                if (e.key === 'ArrowUp'    || e.key === 'w') circuito.entradaAcel =  1;
+                if (e.key === 'ArrowDown'  || e.key === 's') circuito.entradaAcel = -1;
+                if (e.key === 'ArrowLeft'  || e.key === 'a') circuito.entradaDireccion = -1;
+                if (e.key === 'ArrowRight' || e.key === 'd') circuito.entradaDireccion =  1;
             }
         };
         this.#keyUp = e => {
@@ -44,9 +44,9 @@ class ControlTeclado extends ControlEntrada {
                     e.key === 'ArrowDown'  || e.key === 's') circuito.camAerea.moveZ = 0;
             } else {
                 if (e.key === 'ArrowUp'    || e.key === 'w' ||
-                    e.key === 'ArrowDown'  || e.key === 's') circuito.accelInput = 0;
+                    e.key === 'ArrowDown'  || e.key === 's') circuito.entradaAcel = 0;
                 if (e.key === 'ArrowLeft'  || e.key === 'a' ||
-                    e.key === 'ArrowRight' || e.key === 'd') circuito.steerInput = 0;
+                    e.key === 'ArrowRight' || e.key === 'd') circuito.entradaDireccion = 0;
             }
         };
         window.addEventListener('keydown', this.#keyDown);
@@ -58,7 +58,7 @@ class ControlTeclado extends ControlEntrada {
         if (this.#keyUp)   window.removeEventListener('keyup',   this.#keyUp);
         this.#keyDown = null;
         this.#keyUp   = null;
-        if (this.#cir) { this.#cir.accelInput = 0; this.#cir.steerInput = 0; }
+        if (this.#cir) { this.#cir.entradaAcel = 0; this.#cir.entradaDireccion = 0; }
         this.#cir = null;
     }
 }

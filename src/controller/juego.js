@@ -86,7 +86,7 @@ class Juego {
     #actualizar(dt) {
         const c = this.#carro;
         c.giro = this.#controles.leerGiro();
-        if (this.#esTestDrive) c.accelInput = this.#controles.leerAcel();
+        if (this.#esTestDrive) c.entradaAcel = this.#controles.leerAcel();
 
         const fuera = this.#pista.fueraDePista(c.camX / (CFG.GIRO_MAX * 4));
         c.update(dt, fuera);

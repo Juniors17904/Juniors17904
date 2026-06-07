@@ -50,7 +50,7 @@ export class CamaraSeguimiento extends CamaraBase {
         if (this.#indicador) this.#indicador.visible = v;
     }
 
-    actualizar(px, pz, rotY, steerInput = 0) {
+    actualizar(px, pz, rotY, entradaDireccion = 0) {
         this.#carRotY = rotY;
         const orbit = this.#seguirRotacion ? rotY : 0;
         const sinY  = Math.sin(orbit);

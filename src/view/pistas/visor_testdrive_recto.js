@@ -10,22 +10,22 @@ import { Cielo } from '../cielo.js';
 // ================================================================
 class VisorTestdriveRecto extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
-    #canvas; #carGroup = null; #raf = 0; #sun = null; #cielo = null;
-    #tickFn = () => this.#tick();
+    #canvas; #carGroup = null; #idAnimacion = 0; #sun = null; #cielo = null;
+    #funcionAnimacion = () => this.#tick();
     #resizeHandler = null;
     #carro = null;
     #leanGroup = null;
     #wheels = [];
 
-    accelInput = 0;
-    steerInput = 0;
-    camHeight  = 2.8;
+    entradaAcel      = 0;
+    entradaDireccion = 0;
+    alturaCamara     = 2.8;
 
-    get speed()    { return this.#carro?.speed    ?? 0; }
-    get accel()    { return this.#carro?.accel    ?? 0; }
-    get maxSpeed() { return this.#carro?.maxSpeed ?? 0; }
+    get velocidad()    { return this.#carro?.velocidad    ?? 0; }
+    get aceleracion()  { return this.#carro?.aceleracion  ?? 0; }
+    get velocidadMax() { return this.#carro?.velocidadMax ?? 0; }
     get camRotY()  { return 0; }
-    get physics()  { return { maxFwd:0.74, maxRev:0.28, accel:0.006, brake:0.026, drag:0.009, steer:0.010, camDist:7 }; }
+    get physics()  { return { velMaxAdelante:0.74, velMaxReversa:0.28, constAceleracion:0.006, constFreno:0.026, constArrastre:0.009, constDireccion:0.010, camDist:7 }; }
     get px()       { return this.#carro?.px       ?? -2; }
     get pz()       { return this.#carro?.pz       ?? 0; }
     get rotY()     { return this.#carro?.rotY     ?? 0; }
@@ -48,7 +48,7 @@ class VisorTestdriveRecto extends VisorBase {
     }
 
     iniciar() {
-        if (!this.#raf) {
+        if (!this.#idAnimacion) {
             this.#resizeHandler = () => {
                 const W = window.innerWidth, H = window.innerHeight;
                 this.#canvas.width = W;
@@ -65,8 +65,8 @@ class VisorTestdriveRecto extends VisorBase {
     }
 
     detener() {
-        cancelAnimationFrame(this.#raf);
-        this.#raf = 0;
+        cancelAnimationFrame(this.#idAnimacion);
+        this.#idAnimacion = 0;
         if (this.#resizeHandler) {
             window.removeEventListener('resize', this.#resizeHandler);
             this.#resizeHandler = null;
@@ -310,9 +310,9 @@ class VisorTestdriveRecto extends VisorBase {
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(this.#tickFn);
+        this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
         this.#updatePhysics();
-        this.#camaraChase.altura = this.camHeight;
+        this.#camaraChase.altura = this.alturaCamara;
         this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, 0);
         this.#sun.position.set(this.#carro.px + 10, 20, this.#carro.pz + 10);
         this.#sun.target.position.set(this.#carro.px, 0, this.#carro.pz);
@@ -322,8 +322,8 @@ class VisorTestdriveRecto extends VisorBase {
     }
 
     #updatePhysics() {
-        this.#carro.accelInput = this.accelInput;
-        this.#carro.steerInput = this.steerInput;
+        this.#carro.entradaAcel      = this.entradaAcel;
+        this.#carro.entradaDireccion = this.entradaDireccion;
         this.#carro.actualizar();
 
         const px = this.#carro.px, pz = this.#carro.pz;
@@ -337,7 +337,7 @@ class VisorTestdriveRecto extends VisorBase {
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carro.carLean;
 
-        const spin = this.#carro.speed * 6;
+        const spin = this.#carro.velocidad * 6;
         for (const w of this.#wheels) w.rotation.x += spin;
     }
 

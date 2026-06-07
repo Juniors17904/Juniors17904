@@ -18,7 +18,7 @@ class VisorDisenoPista extends VisorBase {
     #renderer    = null;
     #scene       = null;
     #camaraChase = null;
-    #raf         = 0;
+    #idAnimacion         = 0;
     #cielo       = null;
     #ruta        = new Ruta();
     #mov         = null;
@@ -27,7 +27,7 @@ class VisorDisenoPista extends VisorBase {
 
     #pista      = null;
     #objetos    = [];
-    #tickFn     = () => this.#tick();
+    #funcionAnimacion     = () => this.#tick();
 
     #meshPasto  = null;
     #grupoPista = null;
@@ -40,9 +40,9 @@ class VisorDisenoPista extends VisorBase {
     #mostrarObjetos = true;
     #mostrarCielo   = true;
 
-    accelInput = 0;
-    steerInput = 0;
-    camHeight  = 2.8;
+    entradaAcel = 0;
+    entradaDireccion = 0;
+    alturaCamara  = 2.8;
 
     // Stubs para compatibilidad con VistaConduccion
     get camAereaActiva() { return false; }
@@ -292,12 +292,12 @@ class VisorDisenoPista extends VisorBase {
 
     // ── Loop de render ───────────────────────────────────────────
     iniciar() {
-        if (!this.#raf) this.#tick();
+        if (!this.#idAnimacion) this.#tick();
     }
 
     detener() {
-        cancelAnimationFrame(this.#raf);
-        this.#raf = 0;
+        cancelAnimationFrame(this.#idAnimacion);
+        this.#idAnimacion = 0;
         this.#resizeObs?.disconnect();
         this.#resizeObs = null;
         for (const obj of this.#objetos) obj.destruir(this.#scene);
@@ -308,11 +308,11 @@ class VisorDisenoPista extends VisorBase {
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(this.#tickFn);
+        this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
 
         if (this.#mov) {
-            this.#mov.accelInput = this.accelInput;
-            this.#mov.steerInput = this.steerInput;
+            this.#mov.entradaAcel = this.entradaAcel;
+            this.#mov.entradaDireccion = this.entradaDireccion;
             this.#mov.actualizar();
 
             if (this.#carGroup) {
@@ -325,8 +325,8 @@ class VisorDisenoPista extends VisorBase {
             this.#sol.target.position.set(this.#mov.px, 0, this.#mov.pz);
             this.#sol.target.updateMatrixWorld();
 
-            this.#camaraChase.altura = this.camHeight;
-            this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.steerInput);
+            this.#camaraChase.altura = this.alturaCamara;
+            this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.entradaDireccion);
         }
 
         if (this.#renderer && this.#scene) {

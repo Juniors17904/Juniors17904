@@ -12,9 +12,9 @@ class Carro2D {
     velMaxBase = CFG.VEL_MAX;
     velAcc     = CFG.VEL_ACC;
     velFreno   = CFG.VEL_FRENO;
-    turboMax   = CFG.TURBO_MAX;
-    turboDur   = CFG.TURBO_DUR;
-    turboMult  = CFG.TURBO_MULT;
+    turboMaximo        = CFG.TURBO_MAX;
+    turboDuracion      = CFG.TURBO_DUR;
+    turboMultiplicador = CFG.TURBO_MULT;
 
     constructor(color, distMeta = CFG.DIST_META) {
         this.color       = color;
@@ -23,8 +23,8 @@ class Carro2D {
         this.posicion    = 0;
         this.camX        = 0;
         this.giro        = 0;
-        this.accelInput  = 1;
-        this.turbosLeft  = this.turboMax;
+        this.entradaAcel  = 1;
+        this.turbosLeft  = this.turboMaximo;
         this.turboActivo = false;
         this.turboTimer  = 0;
         this.velMax      = 0;
@@ -35,7 +35,7 @@ class Carro2D {
         if (this.turbosLeft <= 0) return;
         this.turbosLeft--;
         this.turboActivo = true;
-        this.turboTimer  = this.turboDur;
+        this.turboTimer  = this.turboDuracion;
     }
 
     update(dt, fuera) {
@@ -45,16 +45,16 @@ class Carro2D {
                 if (this.turboTimer <= 0) { this.turboActivo = false; this.turboTimer = 0; }
             }
 
-            const velLimite = this.turboActivo ? this.velMaxBase * this.turboMult : this.velMaxBase;
+            const velLimite = this.turboActivo ? this.velMaxBase * this.turboMultiplicador : this.velMaxBase;
             const freno     = fuera ? this.velFreno * 3 : this.velFreno;
 
-            if (this.accelInput > 0) {
+            if (this.entradaAcel > 0) {
                 if (this.velocidad < velLimite)
                     this.velocidad = Math.min(velLimite, this.velocidad + this.velAcc * dt * 0.06);
                 else
                     this.velocidad += (velLimite - this.velocidad) * 0.05;
                 if (fuera) this.velocidad = Math.max(0, this.velocidad - freno * dt * 0.06);
-            } else if (this.accelInput < 0) {
+            } else if (this.entradaAcel < 0) {
                 this.velocidad = Math.max(-(this.velMaxBase * 0.45), this.velocidad - this.velAcc * dt * 0.05);
             } else {
                 this.velocidad *= Math.pow(0.97, dt * 0.06 * 10);

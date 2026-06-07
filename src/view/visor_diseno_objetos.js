@@ -17,10 +17,10 @@ class VisorDisenoObjetos extends VisorBase {
     #camera        = null;
     #controlOrbita = null;
     #fabrica       = new FabricaObjetoEscena();
-    #raf           = 0;
+    #idAnimacion           = 0;
     #objeto        = null;
     #resizeObs     = null;
-    #tickFn        = () => this.#tick();
+    #funcionAnimacion        = () => this.#tick();
 
     constructor(canvas) {
         super();
@@ -92,11 +92,11 @@ class VisorDisenoObjetos extends VisorBase {
     }
 
     // ── Ciclo de vida ────────────────────────────────────────────
-    iniciar() { if (!this.#raf) this.#tick(); }
+    iniciar() { if (!this.#idAnimacion) this.#tick(); }
 
     detener() {
-        cancelAnimationFrame(this.#raf);
-        this.#raf = 0;
+        cancelAnimationFrame(this.#idAnimacion);
+        this.#idAnimacion = 0;
         this.#resizeObs?.disconnect();
         this.#resizeObs = null;
         this.#controlOrbita?.destruir();
@@ -107,7 +107,7 @@ class VisorDisenoObjetos extends VisorBase {
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(this.#tickFn);
+        this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
         this.#controlOrbita?.actualizar();
         if (this.#renderer && this.#scene && this.#camera)
             this.#renderer.render(this.#scene, this.#camera);

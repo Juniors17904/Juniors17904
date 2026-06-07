@@ -8,10 +8,10 @@ import { Carro } from './carro.js';
 export class CarroSUV extends Carro {
     constructor(px = 0, pz = 0, rotY = 0) {
         super(px, pz, rotY);
-        this.maxFwd     = 0.60;
-        this.accelConst = 0.005;
-        this.dragConst  = 0.010;
-        this.turboMax   = 4;
-        this.turbosLeft = 4;
+        this.velMaxAdelante  = 0.60;
+        this.constAceleracion = 0.005;
+        this.constArrastre   = 0.010;
+        this.turboMaximo     = 4;
+        this.turbosLeft      = 4;
     }
 }
