@@ -350,6 +350,13 @@
             <button id="do-sel-salida"   class="do-obj-btn" data-tipo="salida">🚦<span>Salida</span></button>
             <button id="do-sel-barrera"  class="do-obj-btn" data-tipo="barrera">🚧<span>Barrera</span></button>
             <button id="do-sel-flecha"   class="do-obj-btn" data-tipo="flecha">▶▶▶<span>Curva</span></button>
+            <button id="do-sel-cielo"    class="do-obj-btn" data-tipo="cielo">☁<span>Cielo</span></button>
+        </div>
+
+        <!-- Panel del configurador de cielo (visible solo al seleccionar Cielo) -->
+        <div id="do-panel-cielo" style="display:none;position:absolute;top:50%;left:calc((100% - 86px)/2);transform:translate(-50%,-50%);z-index:10;background:rgba(10,10,30,0.88);border:1px solid #7c3aed;border-radius:14px;padding:24px 28px;text-align:center">
+            <div style="font:bold 11px 'Orbitron',monospace;color:#a78bfa;letter-spacing:2px;margin-bottom:16px">COLOR DEL CIELO</div>
+            <input type="color" id="do-color-cielo" value="#4a9eca" style="width:80px;height:80px;border:none;border-radius:10px;cursor:pointer;background:none;padding:0;display:block;margin:0 auto">
         </div>
     </div>
 

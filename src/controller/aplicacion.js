@@ -1353,13 +1353,30 @@ class Aplicacion {
         this.#visorDO = new window.VisorDisenoObjetos(canvas);
         this.#visorDO.iniciar();
 
+        const panelCielo  = document.getElementById('do-panel-cielo');
+        const inputCielo  = document.getElementById('do-color-cielo');
+
         document.querySelectorAll('.do-obj-btn').forEach(btn => {
-            btn.addEventListener('click', () => this.#visorDO?.mostrar(btn.dataset.tipo));
+            btn.addEventListener('click', () => {
+                const tipo = btn.dataset.tipo;
+                if (tipo === 'cielo') {
+                    panelCielo.style.display = 'block';
+                    this.#visorDO?.mostrarCielo(inputCielo.value);
+                } else {
+                    panelCielo.style.display = 'none';
+                    this.#visorDO?.mostrar(tipo);
+                }
+            });
+        });
+
+        inputCielo.addEventListener('input', e => {
+            this.#visorDO?.mostrarCielo(e.target.value);
         });
     }
 
     #detenerVisorDO() {
         if (!this.#visorDO) return;
+        document.getElementById('do-panel-cielo').style.display = 'none';
         this.#visorDO.detener();
         this.#visorDO = null;
     }

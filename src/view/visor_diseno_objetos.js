@@ -20,6 +20,7 @@ class VisorDisenoObjetos extends VisorBase {
     #raf           = 0;
     #objeto        = null;
     #resizeObs     = null;
+    #tickFn        = () => this.#tick();
 
     constructor(canvas) {
         super();
@@ -79,9 +80,15 @@ class VisorDisenoObjetos extends VisorBase {
     // ── Mostrar objeto ───────────────────────────────────────────
     async mostrar(tipo) {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
+        this.#scene.background = new THREE.Color(0x1a2a3a);
         this.#objeto = this.#fabrica.crear(tipo, 0, 0,
             { escala: tipo === 'arbol' ? 1.4 : 1, texto: 'STOP' });
         await this.#objeto?.construir(this.#scene);
+    }
+
+    mostrarCielo(color = '#4a9eca') {
+        if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
+        this.#scene.background = new THREE.Color(color);
     }
 
     // ── Ciclo de vida ────────────────────────────────────────────
@@ -100,7 +107,7 @@ class VisorDisenoObjetos extends VisorBase {
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(() => this.#tick());
+        this.#raf = requestAnimationFrame(this.#tickFn);
         this.#controlOrbita?.actualizar();
         if (this.#renderer && this.#scene && this.#camera)
             this.#renderer.render(this.#scene, this.#camera);
