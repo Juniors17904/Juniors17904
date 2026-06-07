@@ -815,11 +815,7 @@ class Aplicacion {
         const cir = new window.VisorJuego(canvas, tipoPista);
         this.#cir3d = cir;
         this.#vistaConduccion.aplicarA(cir, this.#estado.timonModelo);
-        if (this.#cir3dOrigen === 'pantalla-td3d-selector') {
-            this.#vistaConduccion.ocultarOverlay();
-        } else {
-            this.#vistaConduccion.mostrarOverlay();
-        }
+        this.#vistaConduccion.mostrarOverlay();
         cir.cargar(this.#estado.tipoAuto, this.#estado.color);
         cir.setVelocimetroModelo(this.#estado.velocimetroModelo);
         cir.iniciar();
