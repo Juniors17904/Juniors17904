@@ -3,13 +3,15 @@ import * as THREE from 'three';
 import { Carro } from '../../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { VisorBase } from '../visor_base.js';
+import { Cielo } from '../cielo.js';
 
 // ================================================================
 // CLASS: TestDrive3D — pista recta 3D con cámara chase
 // ================================================================
 class VisorTestdriveRecto extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
-    #canvas; #carGroup = null; #raf = 0; #sun = null;
+    #canvas; #carGroup = null; #raf = 0; #sun = null; #cielo = null;
+    #tickFn = () => this.#tick();
     #resizeHandler = null;
     #carro = null;
     #leanGroup = null;
@@ -69,6 +71,8 @@ class VisorTestdriveRecto extends VisorBase {
             window.removeEventListener('resize', this.#resizeHandler);
             this.#resizeHandler = null;
         }
+        this.#cielo?.destruir(this.#scene);
+        this.#cielo = null;
         this.#renderer?.dispose();
         this.#renderer = null;
     }
@@ -77,8 +81,8 @@ class VisorTestdriveRecto extends VisorBase {
         const W = this.#canvas.width, H = this.#canvas.height;
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = new THREE.Color(0x4a9eca);
-        this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
+        this.#cielo = new Cielo('#4a9eca');
+        this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
 
@@ -306,13 +310,14 @@ class VisorTestdriveRecto extends VisorBase {
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(() => this.#tick());
+        this.#raf = requestAnimationFrame(this.#tickFn);
         this.#updatePhysics();
         this.#camaraChase.altura = this.camHeight;
         this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, 0);
         this.#sun.position.set(this.#carro.px + 10, 20, this.#carro.pz + 10);
         this.#sun.target.position.set(this.#carro.px, 0, this.#carro.pz);
         this.#sun.target.updateMatrixWorld();
+        this.#cielo?.actualizar(this.#camaraChase.camera);
         this.#renderer.render(this.#scene, this.#camaraChase.camera);
     }
 

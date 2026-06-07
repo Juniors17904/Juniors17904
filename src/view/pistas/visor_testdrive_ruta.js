@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { Ruta } from '../../model/ruta.js';
 import { Carro } from '../../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
+import { Cielo } from '../cielo.js';
 import { CamaraAerea } from '../camaras/camara_aerea.js';
 import { VisorBase } from '../visor_base.js';
 
@@ -12,7 +13,8 @@ import { VisorBase } from '../visor_base.js';
 class VisorTestdriveRuta extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #hudCanvas = null; #hudCtx = null; #raf = 0; #sun = null;
-    #carGroup = null; #leanGroup = null; #wheels = [];
+    #tickFn = () => this.#tick();
+    #carGroup = null; #leanGroup = null; #wheels = []; #cielo = null;
     #resizeHandler = null;
 
     #ruta = new Ruta();
@@ -64,7 +66,7 @@ class VisorTestdriveRuta extends VisorBase {
             this.#scene.fog = null;
         } else {
             if (this.#camAerea) { this.#camAerea.moveX = 0; this.#camAerea.moveZ = 0; }
-            this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
+            this.#cielo?.construir(this.#scene);
         }
         return this.#camAereaActiva;
     }
@@ -95,8 +97,8 @@ class VisorTestdriveRuta extends VisorBase {
         this.#renderer.toneMappingExposure = 1.4;
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = new THREE.Color(0x4a9eca);
-        this.#scene.fog = new THREE.FogExp2(0x4a9eca, 0.018);
+        this.#cielo = new Cielo('#4a9eca');
+        this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
         this.#camaraChase.agregarIndicador(this.#scene);
@@ -126,6 +128,11 @@ class VisorTestdriveRuta extends VisorBase {
             this.#ruta.construir(pista.tramos, pista.totalSegs);
             const inicio = this.#ruta.inicio;
             this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
+            if (pista.cielo && this.#cielo) {
+                this.#cielo.destruir(this.#scene);
+                this.#cielo = new Cielo(pista.cielo);
+                this.#cielo.construir(this.#scene);
+            }
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
             window.__modelErrors.push('[pista_ciudad] ' + e.message);
@@ -281,11 +288,12 @@ class VisorTestdriveRuta extends VisorBase {
             window.removeEventListener('resize', this.#resizeHandler);
             this.#resizeHandler = null;
         }
+        this.#cielo?.destruir(this.#scene); this.#cielo = null;
         this.#renderer?.dispose(); this.#renderer = null;
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(() => this.#tick());
+        this.#raf = requestAnimationFrame(this.#tickFn);
         this.#updatePhysics();
         this.#camaraChase.altura = this.camHeight;
         this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.steerInput);
@@ -325,6 +333,7 @@ class VisorTestdriveRuta extends VisorBase {
         }
 
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
+        this.#cielo?.actualizar(cam);
         this.#renderer.render(this.#scene, cam);
         this.#dibujarHUD();
     }

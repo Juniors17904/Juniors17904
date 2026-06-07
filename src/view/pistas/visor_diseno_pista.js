@@ -6,6 +6,7 @@ import { Carro }             from '../../model/carros/carro.js';
 import { VisorBase }         from '../visor_base.js';
 import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
+import { Cielo } from '../cielo.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
@@ -18,6 +19,7 @@ class VisorDisenoPista extends VisorBase {
     #scene       = null;
     #camaraChase = null;
     #raf         = 0;
+    #cielo       = null;
     #ruta        = new Ruta();
     #mov         = null;
     #sol         = null;
@@ -25,6 +27,7 @@ class VisorDisenoPista extends VisorBase {
 
     #pista      = null;
     #objetos    = [];
+    #tickFn     = () => this.#tick();
 
     #meshPasto  = null;
     #grupoPista = null;
@@ -91,8 +94,8 @@ class VisorDisenoPista extends VisorBase {
         this.#renderer.toneMappingExposure = 1.4;
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = new THREE.Color(0x4a9eca);
-        this.#scene.fog        = new THREE.FogExp2(0x4a9eca, 0.018);
+        this.#cielo = new Cielo(this.#pista?.cielo ?? '#4a9eca');
+        this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
 
@@ -284,12 +287,13 @@ class VisorDisenoPista extends VisorBase {
         this.#resizeObs = null;
         for (const obj of this.#objetos) obj.destruir(this.#scene);
         this.#objetos = [];
+        this.#cielo?.destruir(this.#scene); this.#cielo = null;
         this.#renderer?.dispose();
         this.#renderer = null;
     }
 
     #tick() {
-        this.#raf = requestAnimationFrame(() => this.#tick());
+        this.#raf = requestAnimationFrame(this.#tickFn);
 
         if (this.#mov) {
             this.#mov.accelInput = this.accelInput;
@@ -311,6 +315,7 @@ class VisorDisenoPista extends VisorBase {
         }
 
         if (this.#renderer && this.#scene) {
+            this.#cielo?.actualizar(this.#camaraChase.camera);
             this.#renderer.render(this.#scene, this.#camaraChase.camera);
         }
     }
