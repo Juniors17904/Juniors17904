@@ -12,9 +12,10 @@ export class Cielo {
     #colorHorizonte;
 
     constructor(colorCielo = '#4a9eca') {
-        this.#colorArriba    = new THREE.Color(colorCielo);
-        // Horizonte: mezcla del color del cielo con celeste claro
-        this.#colorHorizonte = this.#colorArriba.clone().lerp(new THREE.Color('#c8e8ff'), 0.4);
+        // Horizonte: el color que configura la pista (lo que más ve la cámara)
+        this.#colorHorizonte = new THREE.Color(colorCielo);
+        // Cenit: versión más oscura y profunda del mismo color
+        this.#colorArriba    = this.#colorHorizonte.clone().lerp(new THREE.Color('#0a1a2e'), 0.55);
     }
 
     construir(scene) {
@@ -46,8 +47,9 @@ export class Cielo {
         scene.fog = new THREE.FogExp2(this.#colorHorizonte.getHex(), 0.018);
     }
 
-    restaurarNiebla(scene) {
-        scene.fog = new THREE.FogExp2(this.#colorHorizonte.getHex(), 0.018);
+    restaurar(scene) {
+        scene.background = this.#colorHorizonte.clone();
+        scene.fog        = new THREE.FogExp2(this.#colorHorizonte.getHex(), 0.018);
     }
 
     get visible()  { return this.#malla?.visible ?? false; }

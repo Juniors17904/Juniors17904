@@ -73,7 +73,7 @@ class VisorDisenoPista extends VisorBase {
         if (this.#cielo) this.#cielo.visible = this.#mostrarCielo;
         if (this.#scene) {
             if (this.#mostrarCielo) {
-                this.#cielo?.restaurarNiebla(this.#scene);
+                this.#cielo?.restaurar(this.#scene);
             } else {
                 this.#scene.background = null;
                 this.#scene.fog        = null;
