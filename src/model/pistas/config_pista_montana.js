@@ -4,7 +4,7 @@ try {
 // ================================================================
 // MODEL — PistaMontana: circuito de montaña con curvas cerradas
 // ================================================================
-class PistaMontana extends PistaConfig {
+class ConfigPistaMontana extends ConfigPista {
     #tramos = [
         [0,   20,  0      ],
         [20,  40,  2.8    ],
@@ -33,7 +33,7 @@ class PistaMontana extends PistaConfig {
     get borde()   { return '#888'; }
 }
 
-window.PISTAS.montana = new PistaMontana();
+window.PISTAS.montana = new ConfigPistaMontana();
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

@@ -4,7 +4,7 @@ try {
 // ================================================================
 // MODEL — PistaDesierto: circuito en terreno árido y seco
 // ================================================================
-class PistaDesierto extends PistaConfig {
+class ConfigPistaDesierto extends ConfigPista {
     #tramos = [
         [0,   40,  0      ],
         [40,  60,  1.8    ],
@@ -32,7 +32,7 @@ class PistaDesierto extends PistaConfig {
     get borde()   { return '#d4a050'; }
 }
 
-window.PISTAS.desierto = new PistaDesierto();
+window.PISTAS.desierto = new ConfigPistaDesierto();
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

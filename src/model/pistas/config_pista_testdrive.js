@@ -4,7 +4,7 @@ try {
 // ================================================================
 // MODEL — PistaTestDrive: pista recta sin meta para pruebas
 // ================================================================
-class PistaTestDrive extends PistaConfig {
+class ConfigPistaTestDrive extends ConfigPista {
     get nombre()         { return 'Test Drive'; }
     get totalSegs()      { return 80; }
     get distMeta()       { return Infinity; }
@@ -20,7 +20,7 @@ class PistaTestDrive extends PistaConfig {
     get borde()   { return '#888'; }
 }
 
-window.PISTAS.testdrive = new PistaTestDrive();
+window.PISTAS.testdrive = new ConfigPistaTestDrive();
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

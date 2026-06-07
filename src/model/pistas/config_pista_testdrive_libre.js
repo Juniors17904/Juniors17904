@@ -5,7 +5,7 @@ try {
 // MODEL — PistaTestDriveLibre: wrapper que convierte cualquier pista
 //         en modo libre (sin meta, sin fin de carrera)
 // ================================================================
-class PistaTestDriveLibre extends PistaConfig {
+class ConfigPistaTestDriveLibre extends ConfigPista {
     #base;
     constructor(base) {
         super();

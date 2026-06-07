@@ -4,7 +4,7 @@ try {
 // ================================================================
 // MODEL — PistaCosta: circuito costero con curvas suaves
 // ================================================================
-class PistaCosta extends PistaConfig {
+class ConfigPistaCosta extends ConfigPista {
     #tramos = [
         [0,   30,  0      ],
         [30,  50,  1.2    ],
@@ -33,7 +33,7 @@ class PistaCosta extends PistaConfig {
     get borde()   { return '#6ab4e8'; }
 }
 
-window.PISTAS.costa = new PistaCosta();
+window.PISTAS.costa = new ConfigPistaCosta();
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

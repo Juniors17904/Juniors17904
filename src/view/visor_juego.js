@@ -1,21 +1,21 @@
 'use strict';
 import * as THREE from 'three';
-import { Ruta } from '../model/ruta.js';
+import { RutaSpline } from '../model/ruta_spline.js';
 import { Carro } from '../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from './camaras/camara_seguimiento.js';
 import { CamaraAerea } from './camaras/camara_aerea.js';
 import { VisorBase } from './visor_base.js';
 
 // ================================================================
-// CLASS: CircuitoUrbano — pista 3D con curvas reales desde tramos
+// CLASS: VisorJuego — pista 3D con curvas reales desde tramos
 // ================================================================
-class CircuitoUrbano extends VisorBase {
+class VisorJuego extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #hudCanvas = null; #hudCtx = null; #raf = 0; #sun = null;
     #carGroup = null; #leanGroup = null; #wheels = [];
     #resizeHandler = null;
 
-    #ruta = new Ruta();
+    #ruta = new RutaSpline();
     #camAerea = null;
     #camAereaActiva = false;
     #mov = null;
@@ -240,7 +240,7 @@ class CircuitoUrbano extends VisorBase {
         try {
             const gltf = await VisorBase.cargarGLTF();
             this.#setCar(gltf, tipo, color);
-        } catch(e) { console.error('CircuitoUrbano:', e); }
+        } catch(e) { console.error('VisorJuego:', e); }
     }
 
     #setCar(gltf, tipo, color) {
@@ -372,4 +372,4 @@ class CircuitoUrbano extends VisorBase {
 
 }
 
-window.CircuitoUrbano = CircuitoUrbano;
+window.VisorJuego = VisorJuego;

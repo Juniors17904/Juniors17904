@@ -4,7 +4,7 @@ try {
 // ================================================================
 // MODEL — PistaCiudad: circuito urbano con curvas y tráfico
 // ================================================================
-class PistaCiudad extends PistaConfig {
+class ConfigPistaCiudad extends ConfigPista {
     #tramos = [
         [0,   25,  0      ],
         [25,  40,  -1.5   ],
@@ -58,7 +58,7 @@ class PistaCiudad extends PistaConfig {
     }
 }
 
-window.PISTAS.ciudad = new PistaCiudad();
+window.PISTAS.ciudad = new ConfigPistaCiudad();
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

@@ -4,7 +4,7 @@ try {
 // ================================================================
 // CLASE BASE: PistaConfig — interfaz común para toda configuración de pista
 // ================================================================
-class PistaConfig {
+class ConfigPista {
     get nombre()          { return ''; }
     get totalSegs()       { return 300; }
     get distMeta()        { return 1800; }
@@ -34,7 +34,7 @@ class PistaConfig {
     }
 }
 
-window.PistaConfig = PistaConfig;
+window.ConfigPista = ConfigPista;
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

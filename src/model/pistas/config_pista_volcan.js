@@ -4,7 +4,7 @@ try {
 // ================================================================
 // MODEL — PistaVolcan: circuito volcánico de alta dificultad
 // ================================================================
-class PistaVolcan extends PistaConfig {
+class ConfigPistaVolcan extends ConfigPista {
     #tramos = [
         [0,   20,  0      ],
         [20,  35,  2.3271 ],
@@ -36,7 +36,7 @@ class PistaVolcan extends PistaConfig {
     get borde()   { return '#ef4444'; }
 }
 
-window.PISTAS.volcan = new PistaVolcan();
+window.PISTAS.volcan = new ConfigPistaVolcan();
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];
