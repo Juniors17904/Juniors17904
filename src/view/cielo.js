@@ -36,7 +36,7 @@ export class Cielo {
         }
         geo.setAttribute('color', new THREE.Float32BufferAttribute(colArr, 3));
 
-        const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, depthWrite: false, depthTest: false });
+        const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, depthWrite: false, depthTest: false, toneMapped: false });
         this.#malla = new THREE.Mesh(geo, mat);
         this.#malla.renderOrder    = -1;
         this.#malla.frustumCulled  = false;
