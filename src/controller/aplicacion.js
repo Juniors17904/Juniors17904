@@ -532,7 +532,7 @@ class Aplicacion {
 
     #iniciarTestDrive3D(tipoPista = 'ciudad') {
         this.#td3dPending = true;
-        if (!window.ManejoLibre3D) {
+        if (!window.VisorTestdriveRecto) {
             setTimeout(() => { if (this.#td3dPending) this.#iniciarTestDrive3D(tipoPista); }, 200);
             return;
         }
@@ -549,7 +549,7 @@ class Aplicacion {
         document.getElementById('btn-exit-td3d').style.display = 'flex';
 
         const canvas = document.getElementById('canvas-td3d');
-        const td = new window.ManejoLibre3D(canvas);
+        const td = new window.VisorTestdriveRecto(canvas);
         this.#td3d = td;
         td.cargar(this.#estado.tipoAuto, this.#estado.color);
         td.iniciar();
@@ -774,7 +774,7 @@ class Aplicacion {
     #cir3dCanvasTouchMove  = null;
 
     #iniciarCircuito3D(tipoPista = 'ciudad', origen = 'pantalla-detalle-pista') {
-        if (!window.VisorJuego) {
+        if (!window.VisorTestdriveRuta) {
             setTimeout(() => this.#iniciarCircuito3D(tipoPista, origen), 150);
             return;
         }
@@ -816,7 +816,7 @@ class Aplicacion {
         tituloCir.style.display = 'block';
         document.getElementById('btn-exit-cir3d').style.display = 'block';
 
-        const cir = new window.VisorJuego(canvas, tipoPista);
+        const cir = new window.VisorTestdriveRuta(canvas, tipoPista);
         this.#cir3d = cir;
         this.#vistaConduccion.aplicarA(cir, this.#estado.timonModelo);
         this.#vistaConduccion.mostrarOverlay();
@@ -1278,7 +1278,7 @@ class Aplicacion {
 
     // ── Visor 3D de Diseño General ───────────────────────────────
     #iniciarVisorDG() {
-        if (!window.VisorDisenoGeneral) {
+        if (!window.VisorDisenoPista) {
             setTimeout(() => this.#iniciarVisorDG(), 200);
             return;
         }
@@ -1288,7 +1288,7 @@ class Aplicacion {
         canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        this.#visorDG = new window.VisorDisenoGeneral(canvas, window.PISTAS['ciudad']);
+        this.#visorDG = new window.VisorDisenoPista(canvas, window.PISTAS['ciudad']);
         this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visorDG.iniciar();
 

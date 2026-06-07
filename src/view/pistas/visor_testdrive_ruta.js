@@ -1,15 +1,15 @@
 'use strict';
 import * as THREE from 'three';
-import { Ruta } from '../model/ruta.js';
-import { Carro } from '../model/carros/carro.js';
-import { CamaraSeguimiento as CamaraChase } from './camaras/camara_seguimiento.js';
-import { CamaraAerea } from './camaras/camara_aerea.js';
-import { VisorBase } from './visor_base.js';
+import { Ruta } from '../../model/ruta.js';
+import { Carro } from '../../model/carros/carro.js';
+import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
+import { CamaraAerea } from '../camaras/camara_aerea.js';
+import { VisorBase } from '../visor_base.js';
 
 // ================================================================
 // CLASS: VisorJuego — pista 3D con curvas reales desde tramos
 // ================================================================
-class VisorJuego extends VisorBase {
+class VisorTestdriveRuta extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #hudCanvas = null; #hudCtx = null; #raf = 0; #sun = null;
     #carGroup = null; #leanGroup = null; #wheels = [];
@@ -372,4 +372,4 @@ class VisorJuego extends VisorBase {
 
 }
 
-window.VisorJuego = VisorJuego;
+window.VisorTestdriveRuta = VisorTestdriveRuta;

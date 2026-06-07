@@ -1,13 +1,13 @@
 'use strict';
 import * as THREE from 'three';
-import { Carro } from '../model/carros/carro.js';
-import { CamaraSeguimiento as CamaraChase } from './camaras/camara_seguimiento.js';
-import { VisorBase } from './visor_base.js';
+import { Carro } from '../../model/carros/carro.js';
+import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
+import { VisorBase } from '../visor_base.js';
 
 // ================================================================
 // CLASS: TestDrive3D — pista recta 3D con cámara chase
 // ================================================================
-class TestDrive3D extends VisorBase {
+class VisorTestdriveRecto extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #carGroup = null; #raf = 0; #sun = null;
     #resizeHandler = null;
@@ -339,6 +339,6 @@ class TestDrive3D extends VisorBase {
 
 }
 
-window.ManejoLibre3D = TestDrive3D;
+window.VisorTestdriveRecto = VisorTestdriveRecto;
 // Alias de compatibilidad
-window.TestDrive3D = TestDrive3D;
+

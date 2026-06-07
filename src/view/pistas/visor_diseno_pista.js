@@ -1,18 +1,18 @@
 'use strict';
 
 import * as THREE    from 'three';
-import { Ruta } from '../model/ruta.js';
-import { Carro }             from '../model/carros/carro.js';
-import { VisorBase }         from './visor_base.js';
-import { CamaraSeguimiento } from './camaras/camara_seguimiento.js';
-import { FabricaObjetoEscena } from './objetos/fabrica_objeto_escena.js';
+import { Ruta } from '../../model/ruta.js';
+import { Carro }             from '../../model/carros/carro.js';
+import { VisorBase }         from '../visor_base.js';
+import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
+import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
 //        para la pantalla Diseño General.
 //        Capas activables: pasto → pista → auto
 // ================================================================
-class VisorDisenoGeneral extends VisorBase {
+class VisorDisenoPista extends VisorBase {
     #canvas;
     #renderer    = null;
     #scene       = null;
@@ -316,4 +316,4 @@ class VisorDisenoGeneral extends VisorBase {
     }
 }
 
-window.VisorDisenoGeneral = VisorDisenoGeneral;
+window.VisorDisenoPista = VisorDisenoPista;
