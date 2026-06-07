@@ -34,6 +34,18 @@ class ConfigPistaVolcan extends ConfigPista {
     get cesped()  { return ['#2a0a00', '#1a0800']; }
     get asfalto() { return ['#3a2a2a', '#2a1a1a']; }
     get borde()   { return '#ef4444'; }
+
+    get decoraciones() {
+        return [
+            { tipo: 'senal_curva', prog: 0.05, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.17, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.30, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.45, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.58, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.78, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.93, lado: 1, dist: 5.5, direccion: 'derecha'   },
+        ];
+    }
 }
 
 window.PISTAS.volcan = new ConfigPistaVolcan();

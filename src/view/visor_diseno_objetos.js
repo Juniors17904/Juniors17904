@@ -82,7 +82,7 @@ class VisorDisenoObjetos extends VisorBase {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
         this.#scene.background = new THREE.Color(0x1a2a3a);
         this.#objeto = this.#fabrica.crear(tipo, 0, 0,
-            { escala: tipo === 'arbol' ? 1.4 : 1, texto: 'STOP' });
+            { escala: tipo === 'arbol' ? 1.4 : 1, texto: 'STOP', direccion: 'derecha' });
         await this.#objeto?.construir(this.#scene);
     }
 

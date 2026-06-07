@@ -31,6 +31,16 @@ class ConfigPistaCosta extends ConfigPista {
     get cesped()  { return ['#0a4a2a', '#0a6a3a']; }
     get asfalto() { return ['#4a6a8a', '#3a5a7a']; }
     get borde()   { return '#6ab4e8'; }
+
+    get decoraciones() {
+        return [
+            { tipo: 'senal_curva', prog: 0.08, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.28, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.48, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.68, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.88, lado: 1, dist: 5.5, direccion: 'derecha'   },
+        ];
+    }
 }
 
 window.PISTAS.costa = new ConfigPistaCosta();

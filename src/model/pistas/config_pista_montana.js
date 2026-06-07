@@ -31,6 +31,16 @@ class ConfigPistaMontana extends ConfigPista {
     get cesped()  { return ['#1a3a1a', '#2d5a2d']; }
     get asfalto() { return ['#5a5a5a', '#4a4a4a']; }
     get borde()   { return '#888'; }
+
+    get decoraciones() {
+        return [
+            { tipo: 'senal_curva', prog: 0.05, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.22, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.38, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.58, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.78, lado: 1, dist: 5.5, direccion: 'derecha'   },
+        ];
+    }
 }
 
 window.PISTAS.montana = new ConfigPistaMontana();

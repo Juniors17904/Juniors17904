@@ -30,6 +30,16 @@ class ConfigPistaDesierto extends ConfigPista {
     get cesped()  { return ['#8b6914', '#7a5c10']; }
     get asfalto() { return ['#c4a44a', '#b8943a']; }
     get borde()   { return '#d4a050'; }
+
+    get decoraciones() {
+        return [
+            { tipo: 'senal_curva', prog: 0.12, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.32, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.52, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.72, lado: 1, dist: 5.5, direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.92, lado: 1, dist: 5.5, direccion: 'derecha'   },
+        ];
+    }
 }
 
 window.PISTAS.desierto = new ConfigPistaDesierto();
