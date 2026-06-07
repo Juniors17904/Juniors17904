@@ -136,16 +136,30 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | Superclase | Subclases | Interfaz obligatoria |
 |---|---|---|
 | `ControlEntrada` | `ControlTimon`, `ControlTeclado` | `activar(cir)`, `destruir()` |
-| `PistaConfig` | `PistaCiudad`, `PistaDesierto`, … | `nombre`, `tramos`, `totalSegs` |
+| `ConfigPista` | `ConfigPistaCiudad`, `ConfigPistaDesierto`, … | `nombre`, `tramos`, `totalSegs` |
 | `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
-| `VisorBase` | `CircuitoUrbano`, `Testdrive3D` | (utilidades Three.js) |
+| `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista` | (utilidades Three.js) |
 | `MinimapBase` | `MinimapaConductor`, `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
 - `src/view/controles/` → `ControlEntrada` + subclases + timones
 - `src/view/velocimetros/` → `Velocimetro` + subclases
 - `src/view/minimapas/` → `MinimapBase` + subclases
+- `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes)
+
+### Visores de pista — REGLA: uno por pantalla, todos independientes
+
+Cada pantalla que muestra un circuito 3D tiene su propia clase. Nunca dos pantallas comparten la misma instancia ni la misma clase si tienen identidad distinta.
+
+| Pantalla | Clase | Archivo |
+|---|---|---|
+| Test Drive 3D → Simple | `VisorTestdriveRecto` | `pistas/visor_testdrive_recto.js` |
+| Test Drive 3D → Con Ruta | `VisorTestdriveRuta` | `pistas/visor_testdrive_ruta.js` |
+| Diseño de Pistas → Entrar | `VisorCarreraUrbana` | `pistas/visor_carrera_urbana.js` |
+| 🎨 Diseño General | `VisorDisenoPista` | `pistas/visor_diseno_pista.js` |
+
+`Aplicacion` guarda cada instancia en su propio campo privado (`#td3d`, `#cir3d`, `#visorDG`, `#visorDO`). Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
 
 ### Encapsulamiento — reglas estrictas
 

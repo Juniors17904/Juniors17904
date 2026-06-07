@@ -372,4 +372,5 @@ class VisorTestdriveRuta extends VisorBase {
 
 }
 
+export { VisorTestdriveRuta };
 window.VisorTestdriveRuta = VisorTestdriveRuta;

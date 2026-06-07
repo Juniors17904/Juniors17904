@@ -774,7 +774,10 @@ class Aplicacion {
     #cir3dCanvasTouchMove  = null;
 
     #iniciarCircuito3D(tipoPista = 'ciudad', origen = 'pantalla-detalle-pista') {
-        if (!window.VisorTestdriveRuta) {
+        const ClaseVisor = origen === 'pantalla-td3d-selector'
+            ? window.VisorTestdriveRuta
+            : window.VisorCarreraUrbana;
+        if (!ClaseVisor) {
             setTimeout(() => this.#iniciarCircuito3D(tipoPista, origen), 150);
             return;
         }
@@ -816,7 +819,7 @@ class Aplicacion {
         tituloCir.style.display = 'block';
         document.getElementById('btn-exit-cir3d').style.display = 'block';
 
-        const cir = new window.VisorTestdriveRuta(canvas, tipoPista);
+        const cir = new ClaseVisor(canvas, tipoPista);
         this.#cir3d = cir;
         this.#vistaConduccion.aplicarA(cir, this.#estado.timonModelo);
         this.#vistaConduccion.mostrarOverlay();
