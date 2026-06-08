@@ -279,6 +279,12 @@ class Aplicacion {
         document.getElementById('tog-objetos').addEventListener('change', e => {
             if (this.#visorDG) this.#visorDG.mostrarObjetos = e.target.checked;
         });
+        document.getElementById('tog-senales').addEventListener('change', e => {
+            if (this.#visorDG) this.#visorDG.mostrarSenales = e.target.checked;
+        });
+        document.getElementById('tog-flechas').addEventListener('change', e => {
+            if (this.#visorDG) this.#visorDG.mostrarFlechas = e.target.checked;
+        });
         document.getElementById('tog-cielo').addEventListener('change', e => {
             if (this.#visorDG) this.#visorDG.mostrarCielo = e.target.checked;
         });
@@ -1304,6 +1310,8 @@ class Aplicacion {
         this.#visorDG.mostrarPista   = document.getElementById('tog-pista').checked;
         this.#visorDG.mostrarAuto    = document.getElementById('tog-auto').checked;
         this.#visorDG.mostrarObjetos = document.getElementById('tog-objetos').checked;
+        this.#visorDG.mostrarSenales = document.getElementById('tog-senales').checked;
+        this.#visorDG.mostrarFlechas = document.getElementById('tog-flechas').checked;
         this.#visorDG.mostrarCielo   = document.getElementById('tog-cielo').checked;
 
         // Activar control (teclado o timón según preferencia)

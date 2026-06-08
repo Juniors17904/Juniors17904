@@ -27,6 +27,8 @@ class VisorDisenoPista extends VisorBase {
 
     #pista      = null;
     #objetos    = [];
+    #objetosSenales = [];
+    #objetosFlechas = [];
     #funcionAnimacion     = () => this.#tick();
 
     #meshPasto  = null;
@@ -38,6 +40,8 @@ class VisorDisenoPista extends VisorBase {
     #mostrarPista   = false;
     #mostrarAuto    = false;
     #mostrarObjetos = true;
+    #mostrarSenales = false;
+    #mostrarFlechas = false;
     #mostrarCielo   = true;
 
     entradaAcel = 0;
@@ -68,6 +72,16 @@ class VisorDisenoPista extends VisorBase {
         for (const obj of this.#objetos) obj.setVisible(this.#mostrarObjetos);
     }
 
+    set mostrarSenales(v) {
+        this.#mostrarSenales = !!v;
+        for (const obj of this.#objetosSenales) obj.setVisible(this.#mostrarSenales);
+    }
+
+    set mostrarFlechas(v) {
+        this.#mostrarFlechas = !!v;
+        for (const obj of this.#objetosFlechas) obj.setVisible(this.#mostrarFlechas);
+    }
+
     set mostrarCielo(v) {
         this.#mostrarCielo = !!v;
         if (this.#cielo) this.#cielo.visible = this.#mostrarCielo;
@@ -85,6 +99,8 @@ class VisorDisenoPista extends VisorBase {
     get mostrarPista()   { return this.#mostrarPista;   }
     get mostrarAuto()    { return this.#mostrarAuto;    }
     get mostrarObjetos() { return this.#mostrarObjetos; }
+    get mostrarSenales() { return this.#mostrarSenales; }
+    get mostrarFlechas() { return this.#mostrarFlechas; }
     get mostrarCielo()   { return this.#mostrarCielo;   }
 
     constructor(canvas, pista) {
@@ -258,7 +274,18 @@ class VisorDisenoPista extends VisorBase {
         // ── Capa 3: decoraciones de la pista ────────────────────
         for (const dec of this.#pista.decoraciones) {
             const obj = this.#crearObjeto(dec);
-            if (obj) { obj.construir(this.#scene); this.#objetos.push(obj); }
+            if (!obj) continue;
+            obj.construir(this.#scene);
+            if (dec.tipo === 'senal_curva') {
+                obj.setVisible(this.#mostrarSenales);
+                this.#objetosSenales.push(obj);
+            } else if (dec.tipo === 'flecha') {
+                obj.setVisible(this.#mostrarFlechas);
+                this.#objetosFlechas.push(obj);
+            } else {
+                obj.setVisible(this.#mostrarObjetos);
+                this.#objetos.push(obj);
+            }
         }
     }
 
@@ -300,8 +327,10 @@ class VisorDisenoPista extends VisorBase {
         this.#idAnimacion = 0;
         this.#resizeObs?.disconnect();
         this.#resizeObs = null;
-        for (const obj of this.#objetos) obj.destruir(this.#scene);
-        this.#objetos = [];
+        for (const obj of this.#objetos)         obj.destruir(this.#scene);
+        for (const obj of this.#objetosSenales)  obj.destruir(this.#scene);
+        for (const obj of this.#objetosFlechas)  obj.destruir(this.#scene);
+        this.#objetos = []; this.#objetosSenales = []; this.#objetosFlechas = [];
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
         this.#renderer?.dispose();
         this.#renderer = null;
