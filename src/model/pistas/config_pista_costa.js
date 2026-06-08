@@ -27,6 +27,7 @@ class ConfigPistaCosta extends ConfigPista {
     get obstTipos()       { return ['carro','carro','turbo','bache']; }
     get coloresTrafico()  { return ['#3b82f6','#0ea5e9','#06b6d4','#6b7280']; }
 
+    get tipoCielo() { return 'soleado'; }
     get cielo()   { return ['#0a3a6a', '#1a6aaa']; }
     get cesped()  { return ['#0a4a2a', '#0a6a3a']; }
     get asfalto() { return ['#4a6a8a', '#3a5a7a']; }
