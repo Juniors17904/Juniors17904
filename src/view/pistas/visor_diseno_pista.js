@@ -6,7 +6,8 @@ import { Carro }             from '../../model/carros/carro.js';
 import { VisorBase }         from '../visor_base.js';
 import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
-import { Cielo } from '../cielo.js';
+import { CieloSoleado }  from '../cielo_soleado.js';
+import { CieloNocturno } from '../cielo_nocturno.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
@@ -125,7 +126,10 @@ class VisorDisenoPista extends VisorBase {
         this.#renderer.toneMappingExposure = 1.4;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new Cielo(this.#pista?.cielo ?? '#4a9eca');
+        const tipoCielo = this.#pista?.tipoCielo ?? 'soleado';
+        this.#cielo = tipoCielo === 'soleado'
+            ? new CieloSoleado(this.#pista?.cielo ?? '#4a9eca')
+            : new CieloNocturno(this.#pista?.cielo ?? '#4a9eca');
         this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
@@ -137,6 +141,8 @@ class VisorDisenoPista extends VisorBase {
         this.#sol.shadow.camera.near = 1; this.#sol.shadow.camera.far = 60;
         this.#sol.shadow.camera.left = this.#sol.shadow.camera.bottom = -15;
         this.#sol.shadow.camera.right = this.#sol.shadow.camera.top   =  15;
+        const posSol = this.#cielo.posicionSol ?? new THREE.Vector3(6, 10, 4);
+        this.#sol.position.copy(posSol);
         this.#scene.add(this.#sol, this.#sol.target);
 
         const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
