@@ -49,11 +49,11 @@ export class FlechaCurvaEscena extends ObjetoEscena {
         ctx.fillStyle = '#f5c800';
         ctx.fillRect(0, 0, 192, 64);
 
-        ctx.strokeStyle = '#cc4400';
+        ctx.strokeStyle = '#cc8800';
         ctx.lineWidth = 4;
         ctx.strokeRect(2, 2, 188, 60);
 
-        ctx.strokeStyle = '#cc0000';
+        ctx.strokeStyle = '#111111';
         ctx.lineWidth   = 20;
         ctx.lineCap     = 'round';
         ctx.lineJoin    = 'round';
