@@ -16,8 +16,8 @@ export class FlechaCurvaEscena extends ObjetoEscena {
     }
 
     _poblar(grupo) {
-        const ancho  = 1.40;   // ancho del tablero (≈2.42 m)
-        const alto   = 0.40;   // alto del tablero  (≈0.69 m)
+        const ancho  = 2.20;   // ancho del tablero (≈3.80 m)
+        const alto   = 0.70;   // alto del tablero  (≈1.21 m)
         const hPoste = 0.36;   // altura poste      (≈0.62 m)
         const yPanel = hPoste + alto / 2;  // centro panel → top ≈ 0.96 u ≈ 1.66 m
 
