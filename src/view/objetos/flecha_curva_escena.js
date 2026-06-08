@@ -19,7 +19,7 @@ export class FlechaCurvaEscena extends ObjetoEscena {
 
     _poblar(grupo) {
         const matPoste = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.8 });
-        const geoPoste = new THREE.CylinderGeometry(0.04, 0.05, 1.2, 6);
+        const geoPoste = new THREE.CylinderGeometry(0.04, 0.05, 0.7, 6);
 
         const lienzo = document.createElement('canvas');
         lienzo.width  = 64;
@@ -42,7 +42,7 @@ export class FlechaCurvaEscena extends ObjetoEscena {
             const oz = (i - 2) * 0.7;
 
             const poste = new THREE.Mesh(geoPoste, matPoste);
-            poste.position.set(0, 0.6, oz);
+            poste.position.set(0, 0.35, oz);
             poste.castShadow = true;
             grupo.add(poste);
 
@@ -50,7 +50,7 @@ export class FlechaCurvaEscena extends ObjetoEscena {
                 new THREE.PlaneGeometry(0.45, 0.55),
                 new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide })
             );
-            panel.position.set(0, 1.5, oz);
+            panel.position.set(0, 0.98, oz);
             // Cada panel gira 90° para mirar hacia adentro de la pista.
             // lado determina si la cara mira a izquierda o derecha del grupo.
             // scale.x = -lado invierte ">" para que apunte en sentido de marcha.
