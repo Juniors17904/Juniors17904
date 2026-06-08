@@ -52,7 +52,7 @@ export class GuardarrailEscena extends ObjetoEscena {
 
         // ── Viga W-beam (dos capas para simular el perfil en W) ───
         const viga1 = new THREE.Mesh(
-            new THREE.BoxGeometry(largo + 0.15, 0.17, 0.055), matViga
+            new THREE.BoxGeometry(0.055, 0.17, largo + 0.15), matViga
         );
         viga1.position.set(0, 0.60, 0);
         viga1.castShadow = true;
@@ -60,10 +60,10 @@ export class GuardarrailEscena extends ObjetoEscena {
 
         // Franja central rehundida (efecto W)
         const viganeg = new THREE.Mesh(
-            new THREE.BoxGeometry(largo + 0.15, 0.06, 0.020),
+            new THREE.BoxGeometry(0.020, 0.06, largo + 0.15),
             new THREE.MeshStandardMaterial({ color: 0x8899a4, roughness: 0.4, metalness: 0.7 })
         );
-        viganeg.position.set(0, 0.60, 0.018);
+        viganeg.position.set(0.018, 0.60, 0);
         grupo.add(viganeg);
 
         // ── Reflectores rojos ─────────────────────────────────────
