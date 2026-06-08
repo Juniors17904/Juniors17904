@@ -46,27 +46,33 @@ export class FlechaCurvaEscena extends ObjetoEscena {
         lienzo.height = 64;
         const ctx = lienzo.getContext('2d');
 
-        ctx.fillStyle = '#f5f5f5';
+        ctx.fillStyle = '#f5c800';
         ctx.fillRect(0, 0, 192, 64);
 
-        ctx.strokeStyle = '#cc0000';
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#cc4400';
+        ctx.lineWidth = 4;
         ctx.strokeRect(2, 2, 188, 60);
 
-        ctx.strokeStyle = '#ee1111';
-        ctx.lineWidth   = 18;
+        ctx.strokeStyle = '#cc0000';
+        ctx.lineWidth   = 20;
         ctx.lineCap     = 'round';
         ctx.lineJoin    = 'round';
         ctx.beginPath();
-        ctx.moveTo(72, 10);
-        ctx.lineTo(120, 32);
-        ctx.lineTo(72, 54);
+        ctx.moveTo(72, 8);
+        ctx.lineTo(124, 32);
+        ctx.lineTo(72, 56);
         ctx.stroke();
 
         const textura = new THREE.CanvasTexture(lienzo);
         const panel = new THREE.Mesh(
             new THREE.PlaneGeometry(ancho, alto),
-            new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide })
+            new THREE.MeshStandardMaterial({
+                map:              textura,
+                emissiveMap:      textura,
+                emissive:         new THREE.Color(0xffffff),
+                emissiveIntensity: 0.75,
+                side:             THREE.DoubleSide,
+            })
         );
         panel.position.set(0, yPanel, 0);
         panel.rotation.y = -this.#lado * Math.PI / 2;
