@@ -6,7 +6,8 @@ import { MetaEscena }        from './meta_escena.js';
 import { SalidaEscena }      from './salida_escena.js';
 import { BarreraEscena }     from './barrera_escena.js';
 import { FlechaCurvaEscena }  from './flecha_curva_escena.js';
-import { SenalCurvaEscena }   from './senal_curva_escena.js';
+import { SenalCurvaEscena }     from './senal_curva_escena.js';
+import { BalizaChevronEscena }  from './baliza_chevron_escena.js';
 
 // ================================================================
 // CLASS: FabricaObjetoEscena — crea instancias de ObjetoEscena
@@ -24,8 +25,9 @@ export class FabricaObjetoEscena {
             case 'salida':      return new SalidaEscena(x, z);
             case 'barrera':     return new BarreraEscena(x, z);
             case 'flecha':      return new FlechaCurvaEscena(x, z, rotY, lado);
-            case 'senal_curva': return new SenalCurvaEscena(x, z, direccion, rotY);
-            default:            return null;
+            case 'senal_curva':     return new SenalCurvaEscena(x, z, direccion, rotY);
+            case 'baliza_chevron':  return new BalizaChevronEscena(x, z, rotY, direccion);
+            default:                return null;
         }
     }
 }
