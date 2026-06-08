@@ -9,15 +9,18 @@ export class ObjetoEscena {
     #grupo = null;
     #x;
     #z;
+    #rotY;
 
-    constructor(x, z) {
-        this.#x = x;
-        this.#z = z;
+    constructor(x, z, rotY = 0) {
+        this.#x    = x;
+        this.#z    = z;
+        this.#rotY = rotY;
     }
 
     construir(scene) {
         this.#grupo = new THREE.Group();
         this.#grupo.position.set(this.#x, 0, this.#z);
+        this.#grupo.rotation.y = this.#rotY;
         this._poblar(this.#grupo);
         scene.add(this.#grupo);
     }

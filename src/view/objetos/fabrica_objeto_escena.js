@@ -15,7 +15,7 @@ import { SenalCurvaEscena }   from './senal_curva_escena.js';
 // ================================================================
 export class FabricaObjetoEscena {
     crear(tipo, x = 0, z = 0, opciones = {}) {
-        const { escala = 1, texto = '', direccion = 'derecha' } = opciones;
+        const { escala = 1, texto = '', direccion = 'derecha', rotY = 0 } = opciones;
         switch (tipo) {
             case 'arbol':       return new ArbolEscena(x, z, escala);
             case 'poste':       return new PosteEscena(x, z);
@@ -23,8 +23,8 @@ export class FabricaObjetoEscena {
             case 'meta':        return new MetaEscena(x, z);
             case 'salida':      return new SalidaEscena(x, z);
             case 'barrera':     return new BarreraEscena(x, z);
-            case 'flecha':      return new FlechaCurvaEscena(x, z);
-            case 'senal_curva': return new SenalCurvaEscena(x, z, direccion);
+            case 'flecha':      return new FlechaCurvaEscena(x, z, rotY);
+            case 'senal_curva': return new SenalCurvaEscena(x, z, direccion, rotY);
             default:            return null;
         }
     }

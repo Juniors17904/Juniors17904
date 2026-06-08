@@ -7,7 +7,7 @@ import { ObjetoEscena } from './objeto_escena.js';
 //        Tres postes con panel de textura canvas mostrando ">" rojo
 // ================================================================
 export class FlechaCurvaEscena extends ObjetoEscena {
-    constructor(x, z) { super(x, z); }
+    constructor(x, z, rotY = 0) { super(x, z, rotY); }
 
     _poblar(grupo) {
         const matPoste = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.8 });

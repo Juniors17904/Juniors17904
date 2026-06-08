@@ -11,8 +11,8 @@ import { ObjetoEscena } from './objeto_escena.js';
 export class SenalCurvaEscena extends ObjetoEscena {
     #direccion;
 
-    constructor(x, z, direccion = 'derecha') {
-        super(x, z);
+    constructor(x, z, direccion = 'derecha', rotY = 0) {
+        super(x, z, rotY);
         this.#direccion = direccion;
     }
 
