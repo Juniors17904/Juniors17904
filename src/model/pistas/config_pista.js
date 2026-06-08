@@ -18,7 +18,7 @@ class ConfigPista {
     // Genera entradas de flecha para cada segmento de curva.
     // Las subclases llaman this._flechasEnCurvas() en su get decoraciones().
     _flechasEnCurvas() {
-        const paso = 0.875;
+        const paso = 0.30;
         const resultado = [];
         for (const [ini, fin, curva] of this.tramos) {
             if (curva === 0) continue;
