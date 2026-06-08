@@ -18,10 +18,10 @@ export class SenalCurvaEscena extends ObjetoEscena {
 
     _poblar(grupo) {
         const poste = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.05, 0.05, 2.8, 8),
+            new THREE.CylinderGeometry(0.04, 0.05, 1.8, 8),
             new THREE.MeshStandardMaterial({ color: 0x888888 })
         );
-        poste.position.set(0, 1.4, 0);
+        poste.position.set(0, 0.9, 0);
         poste.castShadow = true;
         grupo.add(poste);
 
@@ -69,10 +69,10 @@ export class SenalCurvaEscena extends ObjetoEscena {
 
         const textura = new THREE.CanvasTexture(lienzo);
         const panel = new THREE.Mesh(
-            new THREE.PlaneGeometry(0.8, 0.8),
+            new THREE.PlaneGeometry(0.5, 0.5),
             new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide })
         );
-        panel.position.set(0, 2.85, 0);
+        panel.position.set(0, 2.05, 0);
         grupo.add(panel);
     }
 }

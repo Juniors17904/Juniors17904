@@ -24,14 +24,14 @@ export class AvisoEscena extends ObjetoEscena {
         poste.castShadow = true;
 
         const panel = new THREE.Mesh(
-            new THREE.BoxGeometry(2.2, 0.9, 0.08),
+            new THREE.BoxGeometry(1.2, 0.55, 0.08),
             new THREE.MeshStandardMaterial({ color: this.#colorPanel, roughness: 0.5 })
         );
-        panel.position.y = 3.3;
+        panel.position.y = 3.3;  // poste 3m → panel montado en el extremo superior
         panel.castShadow = true;
 
         const borde = new THREE.Mesh(
-            new THREE.BoxGeometry(2.4, 1.1, 0.04),
+            new THREE.BoxGeometry(1.4, 0.75, 0.04),
             new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 })
         );
         borde.position.y = 3.3;

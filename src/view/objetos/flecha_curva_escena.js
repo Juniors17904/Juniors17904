@@ -19,7 +19,7 @@ export class FlechaCurvaEscena extends ObjetoEscena {
 
     _poblar(grupo) {
         const matPoste = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.8 });
-        const geoPoste = new THREE.CylinderGeometry(0.05, 0.06, 1.8, 6);
+        const geoPoste = new THREE.CylinderGeometry(0.04, 0.05, 1.2, 6);
 
         const lienzo = document.createElement('canvas');
         lienzo.width  = 64;
@@ -42,15 +42,15 @@ export class FlechaCurvaEscena extends ObjetoEscena {
             const oz = (i - 1) * 1.2;
 
             const poste = new THREE.Mesh(geoPoste, matPoste);
-            poste.position.set(0, 0.9, oz);
+            poste.position.set(0, 0.6, oz);
             poste.castShadow = true;
             grupo.add(poste);
 
             const panel = new THREE.Mesh(
-                new THREE.PlaneGeometry(0.9, 1.1),
+                new THREE.PlaneGeometry(0.45, 0.55),
                 new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide })
             );
-            panel.position.set(0, 2.35, oz);
+            panel.position.set(0, 1.5, oz);
             // lado negativo = curva a la derecha → espeja ">" a "<" para que
             // la flecha apunte hacia donde dobla la pista
             panel.scale.x = this.#lado;

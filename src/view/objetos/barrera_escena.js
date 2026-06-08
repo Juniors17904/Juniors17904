@@ -15,36 +15,36 @@ export class BarreraEscena extends ObjetoEscena {
         const matAmaril = new THREE.MeshStandardMaterial({ color: 0xf5c400 });
 
         for (let i = 0; i < 4; i++) {
-            const ox = (i - 1.5) * 1.5;
+            const ox = (i - 1.5) * 1.0;
 
-            // Base ancha
+            // Base ancha — 0.18u alto ≈ 0.31m real
             const base = new THREE.Mesh(
-                new THREE.BoxGeometry(1.4, 0.3, 0.65), matGris);
-            base.position.set(ox, 0.15, 0);
+                new THREE.BoxGeometry(0.9, 0.18, 0.4), matGris);
+            base.position.set(ox, 0.09, 0);
             base.castShadow = true;
 
-            // Talud (transición)
+            // Talud (transición) — 0.21u alto
             const talud = new THREE.Mesh(
-                new THREE.BoxGeometry(1.15, 0.35, 0.5), matGris);
-            talud.position.set(ox, 0.48, 0);
+                new THREE.BoxGeometry(0.75, 0.21, 0.3), matGris);
+            talud.position.set(ox, 0.285, 0);
             talud.castShadow = true;
 
-            // Cuerpo vertical superior
+            // Cuerpo vertical superior — 0.28u alto → total ≈ 0.67u ≈ 1.14m real
             const cuerpo = new THREE.Mesh(
-                new THREE.BoxGeometry(0.9, 0.5, 0.4), matGris);
-            cuerpo.position.set(ox, 0.85, 0);
+                new THREE.BoxGeometry(0.55, 0.28, 0.22), matGris);
+            cuerpo.position.set(ox, 0.53, 0);
             cuerpo.castShadow = true;
 
             grupo.add(base, talud, cuerpo);
 
             // Franjas diagonales rojo/amarillo en la cara delantera
             if (i % 2 === 0) {
-                [-0.22, 0.22].forEach((dy, j) => {
+                [-0.13, 0.13].forEach((dy, j) => {
                     const franja = new THREE.Mesh(
-                        new THREE.BoxGeometry(0.18, 0.42, 0.02),
+                        new THREE.BoxGeometry(0.11, 0.25, 0.02),
                         j % 2 === 0 ? matRojo : matAmaril);
                     franja.rotation.z = Math.PI / 5;
-                    franja.position.set(ox + dy * 0.8, 0.75, 0.21);
+                    franja.position.set(ox + dy, 0.48, 0.12);
                     grupo.add(franja);
                 });
             }
