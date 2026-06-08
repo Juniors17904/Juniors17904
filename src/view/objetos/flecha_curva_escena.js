@@ -16,10 +16,10 @@ export class FlechaCurvaEscena extends ObjetoEscena {
     }
 
     _poblar(grupo) {
-        const ancho  = 0.85;   // ancho del tablero (≈1.47 m)
-        const alto   = 0.22;   // alto del tablero  (≈0.38 m)
+        const ancho  = 1.40;   // ancho del tablero (≈2.42 m)
+        const alto   = 0.40;   // alto del tablero  (≈0.69 m)
         const hPoste = 0.36;   // altura poste      (≈0.62 m)
-        const yPanel = hPoste + alto / 2;  // centro panel → top ≈ 0.58 u ≈ 1.0 m
+        const yPanel = hPoste + alto / 2;  // centro panel → top ≈ 0.96 u ≈ 1.66 m
 
         // ── Estructura: dos postes + base ───────────────────────
         const matPoste = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6 });
