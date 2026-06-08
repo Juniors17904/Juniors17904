@@ -38,8 +38,8 @@ export class FlechaCurvaEscena extends ObjetoEscena {
         ctx.stroke();
         const textura = new THREE.CanvasTexture(lienzo);
 
-        for (let i = 0; i < 3; i++) {
-            const oz = (i - 1) * 1.2;
+        for (let i = 0; i < 5; i++) {
+            const oz = (i - 2) * 0.7;
 
             const poste = new THREE.Mesh(geoPoste, matPoste);
             poste.position.set(0, 0.6, oz);
