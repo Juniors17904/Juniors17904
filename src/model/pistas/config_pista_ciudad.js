@@ -38,7 +38,7 @@ class ConfigPistaCiudad extends ConfigPista {
     // prog: 0..1 a lo largo del trazado | lado: +1 derecha / -1 izquierda | dist: metros desde el centro
     get decoraciones() {
         return [
-            ...this._flechasEnCurvas(5),
+            ...this._flechasEnCurvas(),
             { tipo: 'arbol',       prog: 0.04, lado:  1, dist: 7,   escala: 1.1 },
             { tipo: 'arbol',       prog: 0.08, lado: -1, dist: 8,   escala: 0.9 },
             { tipo: 'poste',       prog: 0.11, lado:  1, dist: 5.5              },

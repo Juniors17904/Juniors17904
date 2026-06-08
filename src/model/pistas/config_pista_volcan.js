@@ -37,7 +37,7 @@ class ConfigPistaVolcan extends ConfigPista {
 
     get decoraciones() {
         return [
-            ...this._flechasEnCurvas(5),
+            ...this._flechasEnCurvas(),
             { tipo: 'senal_curva', prog: 0.05, lado: 1, dist: 5.5, direccion: 'derecha'   },
             { tipo: 'senal_curva', prog: 0.17, lado: 1, dist: 5.5, direccion: 'izquierda' },
             { tipo: 'senal_curva', prog: 0.30, lado: 1, dist: 5.5, direccion: 'derecha'   },

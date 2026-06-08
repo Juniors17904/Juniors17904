@@ -34,7 +34,7 @@ class ConfigPistaMontana extends ConfigPista {
 
     get decoraciones() {
         return [
-            ...this._flechasEnCurvas(5),
+            ...this._flechasEnCurvas(),
             { tipo: 'senal_curva', prog: 0.05, lado: 1, dist: 5.5, direccion: 'derecha'   },
             { tipo: 'senal_curva', prog: 0.22, lado: 1, dist: 5.5, direccion: 'izquierda' },
             { tipo: 'senal_curva', prog: 0.38, lado: 1, dist: 5.5, direccion: 'derecha'   },
