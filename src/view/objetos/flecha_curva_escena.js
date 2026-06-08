@@ -51,9 +51,11 @@ export class FlechaCurvaEscena extends ObjetoEscena {
                 new THREE.MeshBasicMaterial({ map: textura, side: THREE.DoubleSide })
             );
             panel.position.set(0, 1.5, oz);
-            // lado negativo = curva a la derecha → espeja ">" a "<" para que
-            // la flecha apunte hacia donde dobla la pista
-            panel.scale.x = this.#lado;
+            // Cada panel gira 90° para mirar hacia adentro de la pista.
+            // lado determina si la cara mira a izquierda o derecha del grupo.
+            // scale.x = -lado invierte ">" para que apunte en sentido de marcha.
+            panel.rotation.y = -this.#lado * Math.PI / 2;
+            panel.scale.x    = this.#lado;
             grupo.add(panel);
         }
     }
