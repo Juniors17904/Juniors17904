@@ -296,7 +296,7 @@ class VisorDisenoPista extends VisorBase {
         const pos  = this.#ruta.posicionEn(prog);
         const wx   = pos.x + Math.cos(pos.angle) * dist * lado;
         const wz   = pos.z - Math.sin(pos.angle) * dist * lado;
-        const rotY = pos.angle - Math.PI / 2;
+        const rotY = pos.angle + Math.PI;
         return this.#fabrica.crear(tipo, wx, wz, { escala, texto, direccion, rotY });
     }
 

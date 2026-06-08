@@ -21,7 +21,7 @@ class ConfigPista {
         const resultado = [];
         for (const [ini, fin, curva] of this.tramos) {
             if (curva === 0) continue;
-            const lado = curva > 0 ? 1 : -1;
+            const lado = curva > 0 ? -1 : 1;
             for (let s = ini; s <= fin; s += paso) {
                 resultado.push({ tipo: 'flecha', prog: Math.min(s / this.totalSegs, 0.999), lado, dist: 4.3 });
             }
