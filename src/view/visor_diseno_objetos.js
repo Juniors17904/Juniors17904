@@ -43,7 +43,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#scene.background = new THREE.Color(0x1a2a3a);
 
         this.#camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 200);
-        this.#camera.position.set(5, 4, 5);
+        this.#camera.position.set(8, 6, 8);
 
         this.#controlOrbita = new ControlOrbitaObjeto();
         this.#controlOrbita.activar(this.#camera, this.#canvas);
@@ -54,13 +54,52 @@ class VisorDisenoObjetos extends VisorBase {
         sol.castShadow = true;
         this.#scene.add(sol);
 
+        // ── Suelo (pasto) ────────────────────────────────────────
         const suelo = new THREE.Mesh(
-            new THREE.CircleGeometry(3, 32),
+            new THREE.CircleGeometry(12, 40),
             new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 })
         );
         suelo.rotation.x = -Math.PI / 2;
         suelo.receiveShadow = true;
         this.#scene.add(suelo);
+
+        // ── Tramo de asfalto (referencia de alineación) ──────────
+        const matAsfalto = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.85 });
+        const carretera  = new THREE.Mesh(new THREE.PlaneGeometry(5.5, 14), matAsfalto);
+        carretera.rotation.x = -Math.PI / 2;
+        carretera.position.set(3, 0.001, 0);
+        carretera.receiveShadow = true;
+        this.#scene.add(carretera);
+
+        // Línea de borde izquierda (junto al objeto)
+        const matBlanco = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const bordeIzq  = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 14), matBlanco);
+        bordeIzq.rotation.x = -Math.PI / 2;
+        bordeIzq.position.set(0.20, 0.002, 0);
+        this.#scene.add(bordeIzq);
+
+        // Línea de borde derecha
+        const bordeDer = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 14), matBlanco);
+        bordeDer.rotation.x = -Math.PI / 2;
+        bordeDer.position.set(5.80, 0.002, 0);
+        this.#scene.add(bordeDer);
+
+        // Línea central punteada amarilla
+        const dc = document.createElement('canvas');
+        dc.width = 16; dc.height = 128;
+        const dctx = dc.getContext('2d');
+        dctx.fillStyle = '#ffee44';
+        dctx.fillRect(0, 0, 16, 64);
+        const dashTex = new THREE.CanvasTexture(dc);
+        dashTex.wrapT = THREE.RepeatWrapping;
+        dashTex.repeat.set(1, 7);
+        const centreLine = new THREE.Mesh(
+            new THREE.PlaneGeometry(0.12, 14),
+            new THREE.MeshBasicMaterial({ map: dashTex, transparent: true })
+        );
+        centreLine.rotation.x = -Math.PI / 2;
+        centreLine.position.set(3.0, 0.002, 0);
+        this.#scene.add(centreLine);
 
         this.#resizeObs = new ResizeObserver(() => this.#resize());
         this.#resizeObs.observe(this.#canvas);
