@@ -38,27 +38,24 @@ class ConfigPistaCiudad extends ConfigPista {
     // prog: 0..1 a lo largo del trazado | lado: +1 derecha / -1 izquierda | dist: metros desde el centro
     get decoraciones() {
         return [
+            ...this._flechasEnCurvas(5),
             { tipo: 'arbol',       prog: 0.04, lado:  1, dist: 7,   escala: 1.1 },
             { tipo: 'arbol',       prog: 0.08, lado: -1, dist: 8,   escala: 0.9 },
             { tipo: 'poste',       prog: 0.11, lado:  1, dist: 5.5              },
             { tipo: 'arbol',       prog: 0.18, lado:  1, dist: 7,   escala: 1.3 },
-            { tipo: 'senal_curva', prog: 0.25, lado:  1, dist: 5.5, direccion: 'derecha' },
-            { tipo: 'flecha',      prog: 0.26, lado:  1, dist: 4.3                       },
+            { tipo: 'senal_curva', prog: 0.25, lado:  1, dist: 5.5, direccion: 'derecha'   },
             { tipo: 'arbol',       prog: 0.30, lado: -1, dist: 8,   escala: 1.0 },
             { tipo: 'poste',       prog: 0.35, lado:  1, dist: 5.5              },
-            { tipo: 'senal_curva', prog: 0.43, lado:  1, dist: 5.5, direccion: 'derecha' },
-            { tipo: 'flecha',      prog: 0.44, lado:  1, dist: 4.3                       },
+            { tipo: 'senal_curva', prog: 0.43, lado:  1, dist: 5.5, direccion: 'derecha'   },
             { tipo: 'arbol',       prog: 0.42, lado:  1, dist: 7,   escala: 1.2 },
             { tipo: 'arbol',       prog: 0.50, lado: -1, dist: 7,   escala: 0.8 },
             { tipo: 'poste',       prog: 0.60, lado: -1, dist: 5.5              },
             { tipo: 'arbol',       prog: 0.68, lado:  1, dist: 8,   escala: 1.1 },
-            { tipo: 'senal_curva', prog: 0.75, lado:  1, dist: 5.5, direccion: 'derecha' },
-            { tipo: 'flecha',      prog: 0.76, lado:  1, dist: 4.3                       },
+            { tipo: 'senal_curva', prog: 0.75, lado:  1, dist: 5.5, direccion: 'derecha'   },
             { tipo: 'arbol',       prog: 0.75, lado: -1, dist: 7,   escala: 1.4 },
             { tipo: 'poste',       prog: 0.82, lado:  1, dist: 5.5              },
             { tipo: 'arbol',       prog: 0.88, lado:  1, dist: 7,   escala: 1.0 },
-            { tipo: 'senal_curva', prog: 0.93, lado:  1, dist: 5.5, direccion: 'derecha' },
-            { tipo: 'flecha',      prog: 0.94, lado:  1, dist: 4.3                       },
+            { tipo: 'senal_curva', prog: 0.93, lado:  1, dist: 5.5, direccion: 'derecha'   },
             { tipo: 'arbol',       prog: 0.93, lado: -1, dist: 8,   escala: 0.9 },
         ];
     }

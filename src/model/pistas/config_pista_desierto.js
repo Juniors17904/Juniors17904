@@ -33,16 +33,12 @@ class ConfigPistaDesierto extends ConfigPista {
 
     get decoraciones() {
         return [
+            ...this._flechasEnCurvas(5),
             { tipo: 'senal_curva', prog: 0.12, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'flecha',      prog: 0.13, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.32, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'flecha',      prog: 0.33, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.52, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'flecha',      prog: 0.53, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.72, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'flecha',      prog: 0.73, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.92, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'flecha',      prog: 0.93, lado: 1, dist: 4.3                          },
         ];
     }
 }

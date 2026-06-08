@@ -37,20 +37,14 @@ class ConfigPistaVolcan extends ConfigPista {
 
     get decoraciones() {
         return [
+            ...this._flechasEnCurvas(5),
             { tipo: 'senal_curva', prog: 0.05, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'flecha',      prog: 0.06, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.17, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'flecha',      prog: 0.18, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.30, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'flecha',      prog: 0.31, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.45, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'flecha',      prog: 0.46, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.58, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'flecha',      prog: 0.59, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.78, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'flecha',      prog: 0.79, lado: 1, dist: 4.3                          },
             { tipo: 'senal_curva', prog: 0.93, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'flecha',      prog: 0.94, lado: 1, dist: 4.3                          },
         ];
     }
 }
