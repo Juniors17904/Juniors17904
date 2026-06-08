@@ -26,8 +26,8 @@ export class GuardarrailEscena extends ObjetoEscena {
         });
 
         // ── Postes ────────────────────────────────────────────────
-        const geoPoste   = new THREE.BoxGeometry(0.07, hPoste, 0.05);
-        const geoFlancha = new THREE.BoxGeometry(0.13, 0.04, 0.05);
+        const geoPoste   = new THREE.BoxGeometry(0.05, hPoste, 0.07);
+        const geoFlancha = new THREE.BoxGeometry(0.05, 0.04, 0.13);
 
         for (let i = 0; i < nPost; i++) {
             const oz = (i / (nPost - 1) - 0.5) * largo;
@@ -78,7 +78,7 @@ export class GuardarrailEscena extends ObjetoEscena {
             const ref = new THREE.Mesh(
                 new THREE.BoxGeometry(0.04, 0.06, 0.015), matRef
             );
-            ref.position.set(0, 0.71, oz);
+            ref.position.set(0, 0.60, oz);
             grupo.add(ref);
         }
     }
