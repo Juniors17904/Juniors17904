@@ -50,23 +50,24 @@ export class GuardarrailEscena extends ObjetoEscena {
             grupo.add(flancha);
         }
 
-        // ── Viga W-beam (dos capas para simular el perfil en W) ───
+        // ── Viga tipo C-beam ──────────────────────────────────────
         const viga1 = new THREE.Mesh(
-            new THREE.BoxGeometry(0.055, 0.17, largo + 0.15), matViga
+            new THREE.BoxGeometry(0.04, 0.17, largo + 0.15), matViga
         );
         viga1.position.set(0, 0.60, 0);
         viga1.castShadow = true;
         grupo.add(viga1);
 
-        // Franja central rehundida (efecto W)
-        const viganeg = new THREE.Mesh(
-            new THREE.BoxGeometry(0.020, 0.06, largo + 0.15),
-            new THREE.MeshStandardMaterial({ color: 0x8899a4, roughness: 0.4, metalness: 0.7 })
-        );
-        viganeg.position.set(0.018, 0.60, 0);
-        grupo.add(viganeg);
+        // Labios superior e inferior (perfil en C abierto hacia la pista)
+        for (const dy of [0.085, -0.085]) {
+            const labio = new THREE.Mesh(
+                new THREE.BoxGeometry(0.09, 0.022, largo + 0.15), matViga
+            );
+            labio.position.set(0.025, 0.60 + dy, 0);
+            grupo.add(labio);
+        }
 
-        // ── Reflectores rojos ─────────────────────────────────────
+        // ── Reflectores rojos (cara a la pista, al centro de la viga) ──
         const matRef = new THREE.MeshStandardMaterial({
             color: 0xdd1100,
             emissive: new THREE.Color(0xdd1100),
@@ -76,9 +77,9 @@ export class GuardarrailEscena extends ObjetoEscena {
         for (let i = 0; i < nPost - 1; i++) {
             const oz = (-largo / 2) + paso * i + paso / 2;
             const ref = new THREE.Mesh(
-                new THREE.BoxGeometry(0.04, 0.06, 0.015), matRef
+                new THREE.BoxGeometry(0.02, 0.08, 0.06), matRef
             );
-            ref.position.set(0, 0.60, oz);
+            ref.position.set(0.06, 0.60, oz);
             grupo.add(ref);
         }
     }
