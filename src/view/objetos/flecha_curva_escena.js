@@ -54,17 +54,14 @@ export class FlechaCurvaEscena extends ObjetoEscena {
         ctx.strokeRect(2, 2, 188, 60);
 
         ctx.strokeStyle = '#ee1111';
-        ctx.lineWidth   = 14;
+        ctx.lineWidth   = 18;
         ctx.lineCap     = 'round';
         ctx.lineJoin    = 'round';
-        for (let i = 0; i < 3; i++) {
-            const cx = 32 + i * 64;
-            ctx.beginPath();
-            ctx.moveTo(cx - 16, 10);
-            ctx.lineTo(cx + 16, 32);
-            ctx.lineTo(cx - 16, 54);
-            ctx.stroke();
-        }
+        ctx.beginPath();
+        ctx.moveTo(72, 10);
+        ctx.lineTo(120, 32);
+        ctx.lineTo(72, 54);
+        ctx.stroke();
 
         const textura = new THREE.CanvasTexture(lienzo);
         const panel = new THREE.Mesh(
