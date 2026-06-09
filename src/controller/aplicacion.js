@@ -1305,6 +1305,8 @@ class Aplicacion {
         this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visorDG.iniciar();
 
+        document.getElementById('tog-cielo').checked = true;
+
         // Sincronizar estado real de los toggles (evita bug de timing)
         this.#visorDG.mostrarPasto   = document.getElementById('tog-pasto').checked;
         this.#visorDG.mostrarPista   = document.getElementById('tog-pista').checked;
