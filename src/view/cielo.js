@@ -58,8 +58,13 @@ export class Cielo {
         scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
 
+    _visibles = [];  // protected — subclases agregan meshes extra aquí
+
     get visible()  { return this.#malla?.visible ?? false; }
-    set visible(v) { if (this.#malla) this.#malla.visible = !!v; }
+    set visible(v) {
+        if (this.#malla) this.#malla.visible = !!v;
+        for (const obj of this._visibles) obj.visible = !!v;
+    }
 
     actualizar(camara) {
         if (this.#malla && camara) this.#malla.position.copy(camara.position);

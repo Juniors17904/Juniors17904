@@ -4,6 +4,7 @@ import * as THREE                from 'three';
 import { VisorBase }             from './visor_base.js';
 import { ControlOrbitaObjeto }   from './controles/control_orbita_objeto.js';
 import { FabricaObjetoEscena }   from './objetos/fabrica_objeto_escena.js';
+import { CieloSoleado }          from './cielo_soleado.js';
 
 // ================================================================
 // CLASS: VisorDisenoObjetos — visor 3D de un objeto decorativo.
@@ -19,6 +20,7 @@ class VisorDisenoObjetos extends VisorBase {
     #fabrica       = new FabricaObjetoEscena();
     #idAnimacion           = 0;
     #objeto        = null;
+    #cielo         = null;
     #resizeObs     = null;
     #funcionAnimacion        = () => this.#tick();
 
@@ -40,7 +42,9 @@ class VisorDisenoObjetos extends VisorBase {
         this.#renderer.shadowMap.enabled = true;
 
         this.#scene = new THREE.Scene();
-        this.#scene.background = new THREE.Color(0x1a2a3a);
+        this.#cielo = new CieloSoleado('#4a9eca');
+        this.#cielo.construir(this.#scene);
+        this.#scene.fog = null;
 
         this.#camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 200);
         this.#camera.position.set(8, 6, 8);
@@ -141,6 +145,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#controlOrbita?.destruir();
         this.#controlOrbita = null;
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
+        this.#cielo?.destruir(this.#scene); this.#cielo = null;
         this.#renderer?.dispose();
         this.#renderer = null;
     }
@@ -148,6 +153,7 @@ class VisorDisenoObjetos extends VisorBase {
     #tick() {
         this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
         this.#controlOrbita?.actualizar();
+        this.#cielo?.actualizar(this.#camera);
         if (this.#renderer && this.#scene && this.#camera)
             this.#renderer.render(this.#scene, this.#camera);
     }
