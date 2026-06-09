@@ -104,6 +104,7 @@ class VisorTestdriveRecto extends VisorBase {
         this.#sun.shadow.camera.right  =  15;
         this.#sun.shadow.camera.top    =  15;
         this.#sun.shadow.camera.bottom = -15;
+        this.#sun.position.set(6, 10, 4);
         this.#scene.add(this.#sun);
         this.#scene.add(this.#sun.target);
         const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
