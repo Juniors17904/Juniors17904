@@ -106,6 +106,7 @@ class VisorTestdriveRuta extends VisorBase {
 
         this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
+        this.#sun.position.set(6, 10, 4);
         this.#sun.castShadow = true;
         this.#sun.shadow.mapSize.set(1024, 1024);
         this.#sun.shadow.camera.near = 1; this.#sun.shadow.camera.far = 60;
