@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { Carro } from '../../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { VisorBase } from '../visor_base.js';
-import { Cielo } from '../cielo.js';
+import { CieloSoleado } from '../cielo_soleado.js';
 
 // ================================================================
 // CLASS: TestDrive3D — pista recta 3D con cámara chase
@@ -81,7 +81,7 @@ class VisorTestdriveRecto extends VisorBase {
         const W = this.#canvas.width, H = this.#canvas.height;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new Cielo('#4a9eca');
+        this.#cielo = new CieloSoleado('#4a9eca');
         this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
