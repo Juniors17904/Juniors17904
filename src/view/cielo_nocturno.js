@@ -3,68 +3,57 @@ import * as THREE from 'three';
 import { Cielo } from './cielo.js';
 
 // ================================================================
-// CLASS: CieloNocturno — cielo oscuro con estrellas 3D.
-//        Usa THREE.Points con sizeAttenuation:false (tamaño fijo en
-//        píxeles de pantalla) para garantizar visibilidad en mobile.
+// CLASS: CieloNocturno — cielo oscuro con estrellas en canvas.
+//        Dibuja círculos sólidos de 8-28px sobre canvas 2048×1024
+//        para garantizar visibilidad tras el mapeo UV sobre la esfera.
 // ================================================================
 export class CieloNocturno extends Cielo {
-    #estrellas = null;
-
     constructor(colorCielo) { super(colorCielo); }
 
-    construir(scene) {
-        super.construir(scene);
-        this.#estrellas = this.#crearPuntos();
-        scene.add(this.#estrellas);
-        this._visibles.push(this.#estrellas);
-    }
+    _generarTextura() {
+        const W = 2048, H = 1024;
+        const lienzo = document.createElement('canvas');
+        lienzo.width = W; lienzo.height = H;
+        const ctx = lienzo.getContext('2d');
 
-    actualizar(camara) {
-        super.actualizar(camara);
-        if (this.#estrellas && camara) this.#estrellas.position.copy(camara.position);
-    }
+        // Fondo: negro puro arriba → color de la pista en horizonte
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0,    '#010208');
+        grad.addColorStop(0.60, '#' + this._colorHorizonte.getHexString());
+        grad.addColorStop(1,    '#' + this._colorHorizonte.getHexString());
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
 
-    destruir(scene) {
-        if (this.#estrellas) {
-            scene.remove(this.#estrellas);
-            this.#estrellas.geometry.dispose();
-            this.#estrellas.material.dispose();
-            this.#estrellas = null;
-        }
-        super.destruir(scene);
-    }
-
-    #crearPuntos() {
         const rng = this.#rng(98765);
-        const pos = [];
-        const R = 165;
 
-        for (let i = 0; i < 320; i++) {
-            const theta = rng() * Math.PI * 2;
-            const phi   = rng() * Math.PI * 0.50;
-            pos.push(
-                R * Math.sin(phi) * Math.cos(theta),
-                R * Math.cos(phi),
-                R * Math.sin(phi) * Math.sin(theta)
-            );
+        // 200 estrellas medianas — círculos sólidos sin transparencia
+        for (let i = 0; i < 200; i++) {
+            const x  = rng() * W;
+            const y  = rng() * H * 0.65;
+            const r  = rng() * 6 + 8;
+            const al = (rng() * 0.3 + 0.7).toFixed(2);
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255,255,240,${al})`;
+            ctx.fill();
         }
 
-        const geo = new THREE.BufferGeometry();
-        geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+        // 25 estrellas grandes con halo
+        for (let i = 0; i < 25; i++) {
+            const x = rng() * W;
+            const y = rng() * H * 0.55;
+            const r = rng() * 10 + 18;
+            const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+            g.addColorStop(0,   'rgba(255,255,255,1.0)');
+            g.addColorStop(0.4, 'rgba(220,230,255,0.85)');
+            g.addColorStop(1,   'rgba(180,200,255,0)');
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fillStyle = g;
+            ctx.fill();
+        }
 
-        const mat = new THREE.PointsMaterial({
-            color: 0xfffce0,
-            size: 3,
-            sizeAttenuation: false,
-            depthWrite: false,
-            depthTest: false,
-            toneMapped: false,
-        });
-
-        const pts = new THREE.Points(geo, mat);
-        pts.renderOrder   = 0;
-        pts.frustumCulled = false;
-        return pts;
+        return lienzo;
     }
 
     #rng(semilla) {
