@@ -26,6 +26,7 @@ class ConfigPistaDesierto extends ConfigPista {
     get obstTipos()       { return ['bache','bache','carro','turbo']; }
     get coloresTrafico()  { return ['#d4a050','#c47a2b','#8b6914']; }
 
+    get tipoCielo() { return 'soleado'; }
     get cielo()   { return ['#7c4a1e', '#c47a2b']; }
     get cesped()  { return ['#8b6914', '#7a5c10']; }
     get asfalto() { return ['#c4a44a', '#b8943a']; }

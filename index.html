@@ -281,6 +281,9 @@
         <!-- Canvas 3D — fondo completo -->
         <canvas id="canvas-dg-visor" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;display:block"></canvas>
 
+        <!-- Título de pantalla -->
+        <div style="position:absolute;top:22px;left:50%;transform:translateX(-50%);z-index:10;font:bold 13px 'Orbitron',monospace;color:#a78bfa;letter-spacing:2px;text-shadow:0 0 10px #7c3aed;pointer-events:none">DISEÑO GENERAL</div>
+
         <!-- UI superpuesta -->
         <button id="btn-volver-diseno-general" class="btn-tuerca" style="top:16px;left:16px;z-index:10">←</button>
 
@@ -291,56 +294,56 @@
                 <label class="dg-toggle-fila" for="tog-pasto">
                     <span class="dg-toggle-lbl">Pasto</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-pasto">
+                        <input type="checkbox" id="tog-pasto" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
                 <label class="dg-toggle-fila" for="tog-pista">
                     <span class="dg-toggle-lbl">Pista / Vía</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-pista">
+                        <input type="checkbox" id="tog-pista" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
                 <label class="dg-toggle-fila" for="tog-auto">
                     <span class="dg-toggle-lbl">Auto</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-auto">
+                        <input type="checkbox" id="tog-auto" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
                 <label class="dg-toggle-fila" for="tog-botones">
                     <span class="dg-toggle-lbl">Botones</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-botones">
+                        <input type="checkbox" id="tog-botones" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
                 <label class="dg-toggle-fila" for="tog-objetos">
                     <span class="dg-toggle-lbl">Árboles / Objetos</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-objetos">
+                        <input type="checkbox" id="tog-objetos" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
                 <label class="dg-toggle-fila" for="tog-senales">
                     <span class="dg-toggle-lbl">Señales de curva</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-senales">
+                        <input type="checkbox" id="tog-senales" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
                 <label class="dg-toggle-fila" for="tog-flechas">
                     <span class="dg-toggle-lbl">Flechas &gt;&gt;&gt;</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-flechas">
+                        <input type="checkbox" id="tog-flechas" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
                 <label class="dg-toggle-fila" for="tog-cielo">
                     <span class="dg-toggle-lbl">Cielo</span>
                     <div class="dg-toggle">
-                        <input type="checkbox" id="tog-cielo">
+                        <input type="checkbox" id="tog-cielo" checked>
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
@@ -362,9 +365,11 @@
             <button id="do-sel-aviso"   class="do-obj-btn" data-tipo="aviso">🪧<span>Aviso</span></button>
             <button id="do-sel-meta"     class="do-obj-btn" data-tipo="meta">🏁<span>Meta</span></button>
             <button id="do-sel-salida"   class="do-obj-btn" data-tipo="salida">🚦<span>Salida</span></button>
-            <button id="do-sel-barrera"  class="do-obj-btn" data-tipo="barrera">🚧<span>Barrera</span></button>
+            <button id="do-sel-barrera"      class="do-obj-btn" data-tipo="barrera">🚧<span>Barrera</span></button>
+            <button id="do-sel-guardarrail" class="do-obj-btn" data-tipo="guardarrail">🛡<span>Guardarrail</span></button>
             <button id="do-sel-flecha"      class="do-obj-btn" data-tipo="flecha">▶▶▶<span>Curva</span></button>
-            <button id="do-sel-senal-curva" class="do-obj-btn" data-tipo="senal_curva">◇<span>Señal</span></button>
+            <button id="do-sel-senal-curva"   class="do-obj-btn" data-tipo="senal_curva">◇<span>Señal</span></button>
+            <button id="do-sel-baliza-chevron" class="do-obj-btn" data-tipo="baliza_chevron">◀<span>Chevrón</span></button>
             <button id="do-sel-cielo"    class="do-obj-btn" data-tipo="cielo">☁<span>Cielo</span></button>
         </div>
 
@@ -733,12 +738,12 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Módulos ES (Three.js, pistas 3D) -->
-    <script type="module" src="src/view/viewer3d.js"></script>
-    <script type="module" src="src/view/pistas/visor_testdrive_recto.js"></script>
-    <script type="module" src="src/view/pistas/visor_testdrive_ruta.js"></script>
-    <script type="module" src="src/view/pistas/visor_carrera_urbana.js"></script>
-    <script type="module" src="src/view/pistas/visor_diseno_pista.js"></script>
-    <script type="module" src="src/view/visor_diseno_objetos.js"></script>
+    <script type="module" src="src/view/viewer3d.js?v=11"></script>
+    <script type="module" src="src/view/pistas/visor_testdrive_recto.js?v=11"></script>
+    <script type="module" src="src/view/pistas/visor_testdrive_ruta.js?v=11"></script>
+    <script type="module" src="src/view/pistas/visor_carrera_urbana.js?v=11"></script>
+    <script type="module" src="src/view/pistas/visor_diseno_pista.js?v=11"></script>
+    <script type="module" src="src/view/visor_diseno_objetos.js?v=11"></script>
 
     <!-- Scripts globales (window.*) — en orden de dependencia -->
     <script src="src/services/supabase-client.js"></script>
