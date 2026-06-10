@@ -247,12 +247,14 @@ class Aplicacion {
         });
         document.getElementById('btn-volver-diseno-general').addEventListener('click', () => {
             this.#detenerVisorDG();
-            document.getElementById('tog-pasto').checked   = false;
-            document.getElementById('tog-pista').checked   = false;
-            document.getElementById('tog-auto').checked    = false;
-            document.getElementById('tog-botones').checked = false;
-            document.getElementById('tog-objetos').checked = false;
-            document.getElementById('tog-cielo').checked   = true;
+            document.getElementById('tog-pasto').checked   = true;
+            document.getElementById('tog-pista').checked   = true;
+            document.getElementById('tog-auto').checked    = true;
+            document.getElementById('tog-botones').checked = true;
+            document.getElementById('tog-objetos').checked = true;
+            document.getElementById('tog-senales').checked = true;
+            document.getElementById('tog-flechas').checked = true;
+            document.getElementById('tog-cielo').checked   = false;
             this.#mostrar('pantalla-ajustes');
         });
         document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
@@ -1305,6 +1307,8 @@ class Aplicacion {
         this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visorDG.iniciar();
 
+        document.getElementById('tog-cielo').checked = true;
+
         // Sincronizar estado real de los toggles (evita bug de timing)
         this.#visorDG.mostrarPasto   = document.getElementById('tog-pasto').checked;
         this.#visorDG.mostrarPista   = document.getElementById('tog-pista').checked;
@@ -1318,8 +1322,8 @@ class Aplicacion {
         this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);
 
         // Controles táctiles — activar toggle y mostrar el overlay correcto
-        document.getElementById('tog-botones').checked = false;
-        this.#vistaConduccion.ocultarOverlay();
+        document.getElementById('tog-botones').checked = true;
+        this.#vistaConduccion.mostrarOverlay();
         this.#dgTouchHandlers = [];
         const addTouch = (id, onStart, onEnd) => {
             const el = document.getElementById(id);

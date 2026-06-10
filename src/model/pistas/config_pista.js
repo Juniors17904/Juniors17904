@@ -18,7 +18,7 @@ class ConfigPista {
     // Genera entradas de flecha para cada segmento de curva.
     // Las subclases llaman this._flechasEnCurvas() en su get decoraciones().
     _flechasEnCurvas() {
-        const paso = 0.875;
+        const paso = 0.30;
         const resultado = [];
         for (const [ini, fin, curva] of this.tramos) {
             if (curva === 0) continue;
@@ -35,6 +35,7 @@ class ConfigPista {
 
     // ── Propiedades visuales del entorno ─────────────────────────
     // Cada subclase sobreescribe estos getters con sus colores propios.
+    get tipoCielo() { return 'nocturno'; }
     get cielo()   { return ['#060a14', '#0d1b2a']; }
     get cesped()  { return ['#1a5c1a', '#174d17']; }
     get asfalto() { return ['#484848', '#3d3d3d']; }
