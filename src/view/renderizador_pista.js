@@ -3,8 +3,8 @@
 // VIEW — RenderizadorPista (antes RenderPista)
 // Dibuja la pista pseudo-3D en canvas 2D
 // Depende de model.js cargado antes.
-const CFG     = window.CFG;
-const NIVELES = window.NIVELES;
+var CFG = window.CFG;
+var NIVELES = window.NIVELES;
 
 try {
 
