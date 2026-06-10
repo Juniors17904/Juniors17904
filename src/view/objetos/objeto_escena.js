@@ -6,7 +6,7 @@ import * as THREE from 'three';
 //        Subclases implementan _poblar(grupo) con sus propios meshes.
 // ================================================================
 export class ObjetoEscena {
-    #grupo = null;
+    _grupo = null; // protegido: subclases como Luna lo usan en actualizar()
     #x;
     #z;
     #rotY;
@@ -18,23 +18,26 @@ export class ObjetoEscena {
     }
 
     construir(scene) {
-        this.#grupo = new THREE.Group();
-        this.#grupo.position.set(this.#x, 0, this.#z);
-        this.#grupo.rotation.y = this.#rotY;
-        this._poblar(this.#grupo);
-        scene.add(this.#grupo);
+        this._grupo = new THREE.Group();
+        this._grupo.position.set(this.#x, 0, this.#z);
+        this._grupo.rotation.y = this.#rotY;
+        this._poblar(this._grupo);
+        scene.add(this._grupo);
     }
 
-    setVisible(v) { if (this.#grupo) this.#grupo.visible = v; }
+    setVisible(v) { if (this._grupo) this._grupo.visible = v; }
+
+    // Hook para objetos que necesitan seguir la cámara (Luna, NubeAtmosferica, etc.)
+    actualizar(camara) {}
 
     destruir(scene) {
-        if (!this.#grupo) return;
-        scene.remove(this.#grupo);
-        this.#grupo.traverse(child => {
+        if (!this._grupo) return;
+        scene.remove(this._grupo);
+        this._grupo.traverse(child => {
             child.geometry?.dispose();
             child.material?.dispose();
         });
-        this.#grupo = null;
+        this._grupo = null;
     }
 
     _poblar(grupo) {}

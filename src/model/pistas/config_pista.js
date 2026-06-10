@@ -35,10 +35,11 @@ class ConfigPista {
 
     // ── Propiedades visuales del entorno ─────────────────────────
     // Cada subclase sobreescribe estos getters con sus colores propios.
-    get cielo()   { return ['#060a14', '#0d1b2a']; }
-    get cesped()  { return ['#1a5c1a', '#174d17']; }
-    get asfalto() { return ['#484848', '#3d3d3d']; }
-    get borde()   { return '#888'; }
+    get cielo()      { return ['#060a14', '#0d1b2a']; }
+    get cesped()     { return ['#1a5c1a', '#174d17']; }
+    get asfalto()    { return ['#484848', '#3d3d3d']; }
+    get borde()      { return '#888'; }
+    get esNocturno() { return false; }
 
     // Compatibilidad con pista.js — construido desde los getters individuales
     get nivelFijo() {

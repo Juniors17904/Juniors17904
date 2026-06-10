@@ -4,6 +4,9 @@ import { Ruta } from '../../model/ruta.js';
 import { Carro } from '../../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { Cielo } from '../cielo.js';
+import { CieloNocturno } from '../cielo_nocturno.js';
+import { Luna } from '../objetos/luna.js';
+import { NubeAtmosferica } from '../objetos/nube_atmosferica.js';
 import { CamaraAerea } from '../camaras/camara_aerea.js';
 import { VisorBase } from '../visor_base.js';
 
@@ -15,6 +18,7 @@ class VisorTestdriveRuta extends VisorBase {
     #canvas; #hudCanvas = null; #hudCtx = null; #idAnimacion = 0; #sun = null;
     #funcionAnimacion = () => this.#tick();
     #carGroup = null; #leanGroup = null; #wheels = []; #cielo = null;
+    #luna = null; #nubes = [];
     #resizeHandler = null;
 
     #ruta = new Ruta();
@@ -130,8 +134,21 @@ class VisorTestdriveRuta extends VisorBase {
             this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
             if (pista.cielo && this.#cielo) {
                 this.#cielo.destruir(this.#scene);
-                this.#cielo = new Cielo(pista.cielo);
+                const colorCielo = Array.isArray(pista.cielo) ? pista.cielo[0] : pista.cielo;
+                this.#cielo = pista.esNocturno
+                    ? new CieloNocturno(colorCielo)
+                    : new Cielo(colorCielo);
                 this.#cielo.construir(this.#scene);
+            }
+            if (pista.esNocturno) {
+                this.#luna = new Luna();
+                this.#luna.construir(this.#scene);
+                this.#nubes = [
+                    new NubeAtmosferica(-30,  12,  6, 1.2),
+                    new NubeAtmosferica( 28, -18, -6, 0.9),
+                    new NubeAtmosferica(  8,  28, 14, 0.7),
+                ];
+                for (const n of this.#nubes) n.construir(this.#scene);
             }
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
@@ -289,6 +306,9 @@ class VisorTestdriveRuta extends VisorBase {
             this.#resizeHandler = null;
         }
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
+        this.#luna?.destruir(this.#scene); this.#luna = null;
+        for (const n of this.#nubes) n.destruir(this.#scene);
+        this.#nubes = [];
         this.#renderer?.dispose(); this.#renderer = null;
     }
 
@@ -334,6 +354,8 @@ class VisorTestdriveRuta extends VisorBase {
 
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
         this.#cielo?.actualizar(cam);
+        this.#luna?.actualizar(cam);
+        for (const n of this.#nubes) n.actualizar(cam);
         this.#renderer.render(this.#scene, cam);
         this.#dibujarHUD();
     }
