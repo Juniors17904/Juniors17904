@@ -3,7 +3,8 @@ import * as THREE from 'three';
 import { Ruta } from '../../model/ruta.js';
 import { Carro } from '../../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
-import { Cielo } from '../cielo.js';
+import { CieloSoleado }  from '../cielo_soleado.js';
+import { CieloNocturno } from '../cielo_nocturno.js';
 import { CamaraAerea } from '../camaras/camara_aerea.js';
 import { VisorBase } from '../visor_base.js';
 
@@ -97,7 +98,7 @@ class VisorTestdriveRuta extends VisorBase {
         this.#renderer.toneMappingExposure = 1.4;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new Cielo('#4a9eca');
+        this.#cielo = new CieloSoleado('#4a9eca');
         this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
@@ -105,11 +106,13 @@ class VisorTestdriveRuta extends VisorBase {
 
         this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
+        this.#sun.position.set(6, 10, 4);
         this.#sun.castShadow = true;
         this.#sun.shadow.mapSize.set(1024, 1024);
         this.#sun.shadow.camera.near = 1; this.#sun.shadow.camera.far = 60;
         this.#sun.shadow.camera.left = -15; this.#sun.shadow.camera.right = 15;
         this.#sun.shadow.camera.top  =  15; this.#sun.shadow.camera.bottom = -15;
+        this.#sun.position.set(6, 10, 4);
         this.#scene.add(this.#sun, this.#sun.target);
         const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
         fill.position.set(-5, 4, -3);
@@ -130,8 +133,12 @@ class VisorTestdriveRuta extends VisorBase {
             this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
             if (pista.cielo && this.#cielo) {
                 this.#cielo.destruir(this.#scene);
-                this.#cielo = new Cielo(pista.cielo);
+                this.#cielo = pista.tipoCielo === 'soleado'
+                    ? new CieloSoleado(pista.cielo)
+                    : new CieloNocturno(pista.cielo);
                 this.#cielo.construir(this.#scene);
+                const pos = this.#cielo.posicionSol;
+                if (pos && this.#sun) this.#sun.position.copy(pos);
             }
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
