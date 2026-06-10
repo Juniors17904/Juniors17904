@@ -50,26 +50,26 @@ export class CieloNocturno extends Cielo {
 
         const rng = this.#rng(98765);
 
-        // 200 estrellas medianas — círculos sólidos
-        for (let i = 0; i < 200; i++) {
+        // 300 estrellas pequeñas — círculos sólidos r=1-2.5px
+        for (let i = 0; i < 300; i++) {
             const x  = rng() * W;
-            const y  = rng() * H * 0.65;
-            const r  = rng() * 6 + 8;
-            const al = (rng() * 0.3 + 0.7).toFixed(2);
+            const y  = rng() * H * 0.55;
+            const r  = rng() * 1.5 + 1;
+            const al = (rng() * 0.4 + 0.6).toFixed(2);
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(255,255,240,${al})`;
             ctx.fill();
         }
 
-        // 25 estrellas grandes con halo radial
-        for (let i = 0; i < 25; i++) {
+        // 40 estrellas medianas con halo suave r=3-5px
+        for (let i = 0; i < 40; i++) {
             const x = rng() * W;
-            const y = rng() * H * 0.55;
-            const r = rng() * 10 + 18;
+            const y = rng() * H * 0.50;
+            const r = rng() * 2 + 3;
             const g = ctx.createRadialGradient(x, y, 0, x, y, r);
             g.addColorStop(0,   'rgba(255,255,255,1.0)');
-            g.addColorStop(0.4, 'rgba(220,230,255,0.85)');
+            g.addColorStop(0.4, 'rgba(220,230,255,0.8)');
             g.addColorStop(1,   'rgba(180,200,255,0)');
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
