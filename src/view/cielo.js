@@ -2,60 +2,66 @@
 import * as THREE from 'three';
 
 // ================================================================
-// CLASS: Cielo — domo semiesférico con gradiente de color.
-//        Se mueve con la cámara para que nunca se vea el borde.
-//        Recibe el color del cielo desde ConfigPista.
+// CLASS: Cielo — domo semiesférico base con gradiente de color.
+//        Las subclases sobreescriben _generarTextura() para añadir
+//        efectos (estrellas, sol, nubes).
 // ================================================================
 export class Cielo {
-    #malla          = null;
-    #colorArriba;
-    #colorHorizonte;
+    #malla = null;
+    _colorArriba;
+    _colorHorizonte;
 
     constructor(colorCielo = '#4a9eca') {
-        // Horizonte: el color que configura la pista (lo que más ve la cámara)
-        this.#colorHorizonte = new THREE.Color(colorCielo);
-        // Cenit: versión más oscura y profunda del mismo color
-        this.#colorArriba    = this.#colorHorizonte.clone().lerp(new THREE.Color('#0a1a2e'), 0.55);
+        if (Array.isArray(colorCielo)) {
+            this._colorArriba    = new THREE.Color(colorCielo[0]);
+            this._colorHorizonte = new THREE.Color(colorCielo[1]);
+        } else {
+            this._colorHorizonte = new THREE.Color(colorCielo);
+            this._colorArriba    = this._colorHorizonte.clone().lerp(new THREE.Color('#020810'), 0.72);
+        }
     }
 
+    _generarTextura() {
+        const W = 512, H = 256;
+        const lienzo = document.createElement('canvas');
+        lienzo.width = W; lienzo.height = H;
+        const ctx = lienzo.getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, '#' + this._colorArriba.getHexString());
+        grad.addColorStop(1, '#' + this._colorHorizonte.getHexString());
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+        return lienzo;
+    }
+
+    get posicionSol() { return null; }
+
     construir(scene) {
-        const radio = 180;
-        const geo = new THREE.SphereGeometry(radio, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
-
-        // Gradiente de vértices: horizonte (abajo) → cielo (arriba)
-        const posArr = geo.attributes.position.array;
-        const colArr = new Float32Array(posArr.length);
-        const top = this.#colorArriba;
-        const hor = this.#colorHorizonte;
-
-        for (let i = 0; i < posArr.length; i += 3) {
-            const t = posArr[i + 1] / radio; // 0 = horizonte, 1 = cenit
-            colArr[i]     = hor.r + t * (top.r - hor.r);
-            colArr[i + 1] = hor.g + t * (top.g - hor.g);
-            colArr[i + 2] = hor.b + t * (top.b - hor.b);
-        }
-        geo.setAttribute('color', new THREE.Float32BufferAttribute(colArr, 3));
-
-        const mat = new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide, depthWrite: false, depthTest: false, toneMapped: false });
+        const tex = new THREE.CanvasTexture(this._generarTextura());
+        tex.colorSpace    = THREE.SRGBColorSpace;
+        tex.generateMipmaps = false;
+        tex.minFilter = THREE.LinearFilter;
+        const mat = new THREE.MeshBasicMaterial({
+            map: tex, side: THREE.BackSide,
+            depthWrite: false, depthTest: false, toneMapped: false, fog: false,
+        });
+        const geo = new THREE.SphereGeometry(180, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2);
         this.#malla = new THREE.Mesh(geo, mat);
-        this.#malla.renderOrder    = -1;
-        this.#malla.frustumCulled  = false;
+        this.#malla.renderOrder   = -1;
+        this.#malla.frustumCulled = false;
         scene.add(this.#malla);
-
-        // Fondo y niebla usan el color del horizonte para continuidad visual
-        scene.background = this.#colorHorizonte.clone();
-        scene.fog = new THREE.FogExp2(this.#colorHorizonte.getHex(), 0.018);
+        scene.background = this._colorHorizonte.clone();
+        scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
 
     restaurar(scene) {
-        scene.background = this.#colorHorizonte.clone();
-        scene.fog        = new THREE.FogExp2(this.#colorHorizonte.getHex(), 0.018);
+        scene.background = this._colorHorizonte.clone();
+        scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
 
     get visible()  { return this.#malla?.visible ?? false; }
     set visible(v) { if (this.#malla) this.#malla.visible = !!v; }
 
-    // Llamar en cada tick pasando la cámara activa
     actualizar(camara) {
         if (this.#malla && camara) this.#malla.position.copy(camara.position);
     }

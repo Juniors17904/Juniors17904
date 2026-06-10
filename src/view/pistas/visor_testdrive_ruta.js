@@ -3,10 +3,8 @@ import * as THREE from 'three';
 import { Ruta } from '../../model/ruta.js';
 import { Carro } from '../../model/carros/carro.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
-import { Cielo } from '../cielo.js';
+import { CieloSoleado }  from '../cielo_soleado.js';
 import { CieloNocturno } from '../cielo_nocturno.js';
-import { Luna } from '../objetos/luna.js';
-import { NubeAtmosferica } from '../objetos/nube_atmosferica.js';
 import { CamaraAerea } from '../camaras/camara_aerea.js';
 import { VisorBase } from '../visor_base.js';
 
@@ -18,7 +16,6 @@ class VisorTestdriveRuta extends VisorBase {
     #canvas; #hudCanvas = null; #hudCtx = null; #idAnimacion = 0; #sun = null;
     #funcionAnimacion = () => this.#tick();
     #carGroup = null; #leanGroup = null; #wheels = []; #cielo = null;
-    #luna = null; #nubes = [];
     #resizeHandler = null;
 
     #ruta = new Ruta();
@@ -101,7 +98,7 @@ class VisorTestdriveRuta extends VisorBase {
         this.#renderer.toneMappingExposure = 1.4;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new Cielo('#4a9eca');
+        this.#cielo = new CieloSoleado('#4a9eca');
         this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraChase(W / H, { seguirRotacion: true });
@@ -109,11 +106,13 @@ class VisorTestdriveRuta extends VisorBase {
 
         this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
+        this.#sun.position.set(6, 10, 4);
         this.#sun.castShadow = true;
         this.#sun.shadow.mapSize.set(1024, 1024);
         this.#sun.shadow.camera.near = 1; this.#sun.shadow.camera.far = 60;
         this.#sun.shadow.camera.left = -15; this.#sun.shadow.camera.right = 15;
         this.#sun.shadow.camera.top  =  15; this.#sun.shadow.camera.bottom = -15;
+        this.#sun.position.set(6, 10, 4);
         this.#scene.add(this.#sun, this.#sun.target);
         const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
         fill.position.set(-5, 4, -3);
@@ -134,21 +133,12 @@ class VisorTestdriveRuta extends VisorBase {
             this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
             if (pista.cielo && this.#cielo) {
                 this.#cielo.destruir(this.#scene);
-                const colorCielo = Array.isArray(pista.cielo) ? pista.cielo[0] : pista.cielo;
-                this.#cielo = pista.esNocturno
-                    ? new CieloNocturno(colorCielo)
-                    : new Cielo(colorCielo);
+                this.#cielo = pista.tipoCielo === 'soleado'
+                    ? new CieloSoleado(pista.cielo)
+                    : new CieloNocturno(pista.cielo);
                 this.#cielo.construir(this.#scene);
-            }
-            if (pista.esNocturno) {
-                this.#luna = new Luna();
-                this.#luna.construir(this.#scene);
-                this.#nubes = [
-                    new NubeAtmosferica(-30,  12,  6, 1.2),
-                    new NubeAtmosferica( 28, -18, -6, 0.9),
-                    new NubeAtmosferica(  8,  28, 14, 0.7),
-                ];
-                for (const n of this.#nubes) n.construir(this.#scene);
+                const pos = this.#cielo.posicionSol;
+                if (pos && this.#sun) this.#sun.position.copy(pos);
             }
         } catch (e) {
             window.__modelErrors = window.__modelErrors || [];
@@ -306,9 +296,6 @@ class VisorTestdriveRuta extends VisorBase {
             this.#resizeHandler = null;
         }
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
-        this.#luna?.destruir(this.#scene); this.#luna = null;
-        for (const n of this.#nubes) n.destruir(this.#scene);
-        this.#nubes = [];
         this.#renderer?.dispose(); this.#renderer = null;
     }
 
@@ -354,8 +341,6 @@ class VisorTestdriveRuta extends VisorBase {
 
         const cam = this.#camAereaActiva ? this.#camAerea.camera : this.#camaraChase.camera;
         this.#cielo?.actualizar(cam);
-        this.#luna?.actualizar(cam);
-        for (const n of this.#nubes) n.actualizar(cam);
         this.#renderer.render(this.#scene, cam);
         this.#dibujarHUD();
     }

@@ -1,9 +1,9 @@
 'use strict';
 
 // Model
-const CFG      = window.CFG;
-const NIVELES  = window.NIVELES;
-const PISTAS   = window.PISTAS;
+var CFG = window.CFG;
+var NIVELES = window.NIVELES;
+var PISTAS = window.PISTAS;
 const Carro2D  = window.Carro2D;
 const Pista    = window.Pista;
 // View

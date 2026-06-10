@@ -4,7 +4,7 @@
 // Depende de model.js (CFG) cargado antes.
 
 try {
-const CFG = window.CFG;
+var CFG = window.CFG;
 
 class Carro2D {
     #tilt = 0;
