@@ -50,11 +50,11 @@ export class CieloNocturno extends Cielo {
 
         const rng = this.#rng(98765);
 
-        // 300 estrellas pequeñas — círculos sólidos r=1-2.5px
+        // 300 estrellas pequeñas — círculos sólidos r=0.5-1.2px
         for (let i = 0; i < 300; i++) {
             const x  = rng() * W;
             const y  = rng() * H * 0.55;
-            const r  = rng() * 1.5 + 1;
+            const r  = rng() * 0.7 + 0.5;
             const al = (rng() * 0.4 + 0.6).toFixed(2);
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -62,11 +62,11 @@ export class CieloNocturno extends Cielo {
             ctx.fill();
         }
 
-        // 40 estrellas medianas con halo suave r=3-5px
+        // 40 estrellas medianas con halo suave r=1.5-2.5px
         for (let i = 0; i < 40; i++) {
             const x = rng() * W;
             const y = rng() * H * 0.50;
-            const r = rng() * 2 + 3;
+            const r = rng() * 1 + 1.5;
             const g = ctx.createRadialGradient(x, y, 0, x, y, r);
             g.addColorStop(0,   'rgba(255,255,255,1.0)');
             g.addColorStop(0.4, 'rgba(220,230,255,0.8)');
