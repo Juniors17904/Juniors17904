@@ -85,9 +85,9 @@ export class CieloNocturno extends Cielo {
         for (let i = 0; i < 7; i++) {
             const x  = rng() * W;
             const y  = rng() * H * 0.52;
-            const tam = rng() * 18 + 14;   // longitud del brazo horizontal
-            const tamV = tam * 0.55;        // brazo vertical más corto
-            const gr  = rng() * 0.8 + 1.2; // grosor del trazo
+            const tam = rng() * 4 + 3;     // longitud del brazo horizontal
+            const tamV = tam * 0.55;       // brazo vertical más corto
+            const gr  = rng() * 0.3 + 0.5; // grosor del trazo
 
             // Brazo horizontal
             const gH = ctx.createLinearGradient(x - tam, y, x + tam, y);
@@ -108,7 +108,7 @@ export class CieloNocturno extends Cielo {
             ctx.beginPath(); ctx.moveTo(x, y - tamV); ctx.lineTo(x, y + tamV); ctx.stroke();
 
             // Núcleo brillante
-            const gC = ctx.createRadialGradient(x, y, 0, x, y, gr * 5);
+            const gC = ctx.createRadialGradient(x, y, 0, x, y, gr * 3);
             gC.addColorStop(0,   'rgba(255,255,255,1.0)');
             gC.addColorStop(0.5, 'rgba(200,215,255,0.6)');
             gC.addColorStop(1,   'rgba(150,180,255,0)');
