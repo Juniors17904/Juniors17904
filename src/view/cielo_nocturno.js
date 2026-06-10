@@ -3,12 +3,36 @@ import * as THREE from 'three';
 import { Cielo } from './cielo.js';
 
 // ================================================================
-// CLASS: CieloNocturno — cielo oscuro con estrellas en canvas.
-//        Dibuja círculos sólidos de 8-28px sobre canvas 2048×1024
-//        para garantizar visibilidad tras el mapeo UV sobre la esfera.
+// CLASS: CieloNocturno — fondo de noche con estrellas dibujadas en canvas.
+//        Usa scene.background = CanvasTexture (no domo esférico),
+//        garantía absoluta de visibilidad: la textura 2D se renderiza
+//        siempre detrás de toda la geometría 3D.
 // ================================================================
 export class CieloNocturno extends Cielo {
+    #textura = null;
+
     constructor(colorCielo) { super(colorCielo); }
+
+    construir(scene) {
+        this.#textura = new THREE.CanvasTexture(this._generarTextura());
+        this.#textura.generateMipmaps = false;
+        this.#textura.minFilter = THREE.LinearFilter;
+        scene.background = this.#textura;
+        scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
+    }
+
+    restaurar(scene) {
+        if (this.#textura) scene.background = this.#textura;
+        scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
+    }
+
+    actualizar(_camara) { /* fondo 2D estático, no sigue la cámara */ }
+
+    destruir(scene) {
+        if (scene.background === this.#textura) scene.background = null;
+        if (this.#textura) { this.#textura.dispose(); this.#textura = null; }
+        scene.fog = null;
+    }
 
     _generarTextura() {
         const W = 2048, H = 1024;
@@ -16,7 +40,6 @@ export class CieloNocturno extends Cielo {
         lienzo.width = W; lienzo.height = H;
         const ctx = lienzo.getContext('2d');
 
-        // Fondo: negro puro arriba → color de la pista en horizonte
         const grad = ctx.createLinearGradient(0, 0, 0, H);
         grad.addColorStop(0,    '#010208');
         grad.addColorStop(0.60, '#' + this._colorHorizonte.getHexString());
@@ -26,7 +49,7 @@ export class CieloNocturno extends Cielo {
 
         const rng = this.#rng(98765);
 
-        // 200 estrellas medianas — círculos sólidos sin transparencia
+        // 200 estrellas medianas — círculos sólidos
         for (let i = 0; i < 200; i++) {
             const x  = rng() * W;
             const y  = rng() * H * 0.65;
@@ -38,7 +61,7 @@ export class CieloNocturno extends Cielo {
             ctx.fill();
         }
 
-        // 25 estrellas grandes con halo
+        // 25 estrellas grandes con halo radial
         for (let i = 0; i < 25; i++) {
             const x = rng() * W;
             const y = rng() * H * 0.55;

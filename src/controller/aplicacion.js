@@ -1306,6 +1306,7 @@ class Aplicacion {
         this.#visorDG = new window.VisorDisenoPista(canvas, window.PISTAS['ciudad']);
         this.#visorDG.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visorDG.iniciar();
+        document.getElementById('titulo-dg3d').style.display = 'block';
 
         document.getElementById('tog-cielo').checked = true;
 
@@ -1340,6 +1341,8 @@ class Aplicacion {
 
     #detenerVisorDG() {
         if (!this.#visorDG) return;
+        const tDG = document.getElementById('titulo-dg3d');
+        if (tDG) tDG.style.display = 'none';
         this.#vistaConduccion.destruirControl();
         for (const { el, onStart, onEnd } of this.#dgTouchHandlers) {
             el.removeEventListener('touchstart', onStart);
