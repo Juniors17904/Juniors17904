@@ -4,9 +4,9 @@ import { Cielo } from './cielo.js';
 
 // ================================================================
 // CLASS: CieloNocturno — fondo de noche con estrellas dibujadas en canvas.
-//        Usa scene.background = CanvasTexture (no domo esférico),
-//        garantía absoluta de visibilidad: la textura 2D se renderiza
-//        siempre detrás de toda la geometría 3D.
+//        Usa scene.background con EquirectangularReflectionMapping para que
+//        el panorama gire con la cámara: las estrellas se mueven al girar,
+//        igual que un cielo real visto desde un auto.
 // ================================================================
 export class CieloNocturno extends Cielo {
     #textura = null;
@@ -15,6 +15,7 @@ export class CieloNocturno extends Cielo {
 
     construir(scene) {
         this.#textura = new THREE.CanvasTexture(this._generarTextura());
+        this.#textura.mapping = THREE.EquirectangularReflectionMapping;
         this.#textura.generateMipmaps = false;
         this.#textura.minFilter = THREE.LinearFilter;
         scene.background = this.#textura;
@@ -26,7 +27,7 @@ export class CieloNocturno extends Cielo {
         scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
 
-    actualizar(_camara) { /* fondo 2D estático, no sigue la cámara */ }
+    actualizar(_camara) { /* el panorama equirectangular gira solo con la cámara, sin update manual */ }
 
     destruir(scene) {
         if (scene.background === this.#textura) scene.background = null;
