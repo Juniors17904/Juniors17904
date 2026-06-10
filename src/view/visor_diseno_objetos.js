@@ -4,7 +4,7 @@ import * as THREE                from 'three';
 import { VisorBase }             from './visor_base.js';
 import { ControlOrbitaObjeto }   from './controles/control_orbita_objeto.js';
 import { FabricaObjetoEscena }   from './objetos/fabrica_objeto_escena.js';
-import { CieloSoleado }          from './cielo_soleado.js';
+import { CieloNocturno }          from './cielo_nocturno.js';
 
 // ================================================================
 // CLASS: VisorDisenoObjetos — visor 3D de un objeto decorativo.
@@ -42,7 +42,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#renderer.shadowMap.enabled = true;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new CieloSoleado('#4a9eca');
+        this.#cielo = new CieloNocturno();
         this.#cielo.construir(this.#scene);
         this.#scene.fog = null;
 
