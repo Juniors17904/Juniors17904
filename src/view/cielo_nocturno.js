@@ -5,13 +5,13 @@ import { Luna }  from './cielos/luna.js';
 import { Nube }  from './cielos/nube.js';
 
 // ================================================================
-// CLASS: CieloNocturno — fondo de noche sobre textura equirectangular.
-//        Usa scene.background con EquirectangularReflectionMapping para
-//        que el panorama gire con la cámara igual que un cielo real.
-//        Compone objetos ObjetoCielo: Luna, estrellas, etc.
+// CLASS: CieloNocturno — domo esférico nocturno con textura canvas.
+//        Usa MeshBasicMaterial con toneMapped:false para que los colores
+//        oscuros del cielo no sean aclarados por el tone mapping del renderer.
+//        Compone objetos ObjetoCielo: Luna, estrellas, nubes.
 // ================================================================
 export class CieloNocturno extends Cielo {
-    #textura = null;
+    #malla   = null;
     #luna    = new Luna(0.25, 0.18);
     #nubes   = [
         new Nube(0.32, 0.23, 1.3),
@@ -24,24 +24,43 @@ export class CieloNocturno extends Cielo {
     constructor(colorCielo = '#071830') { super(colorCielo); }
 
     construir(scene) {
-        this.#textura = new THREE.CanvasTexture(this.#generarTextura());
-        this.#textura.mapping = THREE.EquirectangularReflectionMapping;
-        this.#textura.generateMipmaps = false;
-        this.#textura.minFilter = THREE.LinearFilter;
-        scene.background = this.#textura;
+        const tex = new THREE.CanvasTexture(this.#generarTextura());
+        tex.colorSpace    = THREE.SRGBColorSpace;
+        tex.generateMipmaps = false;
+        tex.minFilter = THREE.LinearFilter;
+        const mat = new THREE.MeshBasicMaterial({
+            map: tex, side: THREE.BackSide,
+            depthWrite: false, depthTest: false, toneMapped: false, fog: false,
+        });
+        // Esfera completa (no semidomo) para cubrir todo el cielo nocturno
+        const geo = new THREE.SphereGeometry(180, 32, 32);
+        this.#malla = new THREE.Mesh(geo, mat);
+        this.#malla.renderOrder   = -1;
+        this.#malla.frustumCulled = false;
+        scene.add(this.#malla);
+        scene.background = this._colorHorizonte.clone();
         scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
 
     restaurar(scene) {
-        if (this.#textura) scene.background = this.#textura;
+        scene.background = this._colorHorizonte.clone();
         scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
 
-    actualizar(_camara) { /* el panorama equirectangular gira solo con la cámara */ }
+    actualizar(camara) {
+        if (this.#malla && camara) this.#malla.position.copy(camara.position);
+    }
+
+    get visible()  { return this.#malla?.visible ?? false; }
+    set visible(v) { if (this.#malla) this.#malla.visible = !!v; }
 
     destruir(scene) {
-        if (scene.background === this.#textura) scene.background = null;
-        if (this.#textura) { this.#textura.dispose(); this.#textura = null; }
+        if (!this.#malla) return;
+        scene.remove(this.#malla);
+        this.#malla.geometry.dispose();
+        this.#malla.material.map?.dispose();
+        this.#malla.material.dispose();
+        this.#malla = null;
         scene.fog = null;
     }
 

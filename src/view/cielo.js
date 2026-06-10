@@ -38,6 +38,7 @@ export class Cielo {
 
     construir(scene) {
         const tex = new THREE.CanvasTexture(this._generarTextura());
+        tex.colorSpace    = THREE.SRGBColorSpace;
         tex.generateMipmaps = false;
         tex.minFilter = THREE.LinearFilter;
         const mat = new THREE.MeshBasicMaterial({
