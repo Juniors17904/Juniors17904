@@ -6,7 +6,7 @@ import { Carro }             from '../../model/carros/carro.js';
 import { VisorBase }         from '../visor_base.js';
 import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
-import { Cielo } from '../cielo.js';
+import { CieloNocturno } from '../cielo_nocturno.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
@@ -125,7 +125,7 @@ class VisorDisenoPista extends VisorBase {
         this.#renderer.toneMappingExposure = 1.4;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new Cielo(this.#pista?.cielo ?? '#4a9eca');
+        this.#cielo = new CieloNocturno();
         this.#cielo.construir(this.#scene);
 
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
