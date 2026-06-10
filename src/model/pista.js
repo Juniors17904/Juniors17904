@@ -4,9 +4,9 @@
 // Depende de model.js (CFG, NIVELES, PISTAS) y segmento.js cargados antes.
 
 try {
-const CFG     = window.CFG;
-const NIVELES = window.NIVELES;
-const PISTAS  = window.PISTAS;
+var CFG = window.CFG;
+var NIVELES = window.NIVELES;
+var PISTAS = window.PISTAS;
 
 class Pista {
     #segmentos = [];

@@ -1,0 +1,58 @@
+'use strict';
+import { ObjetoCielo } from './objeto_cielo.js';
+
+// ================================================================
+// CLASS: Nube — nube nocturna azul oscura dibujada como blobs
+//        superpuestos sobre la textura del cielo.
+//        posX / posY: posición normalizada (0..1). escala: tamaño.
+// ================================================================
+export class Nube extends ObjetoCielo {
+    #posX;
+    #posY;
+    #escala;
+
+    constructor(posX, posY, escala = 1) {
+        super();
+        this.#posX   = posX;
+        this.#posY   = posY;
+        this.#escala = escala;
+    }
+
+    dibujar(ctx, W, H, _rng) {
+        const cx = this.#posX * W;
+        const cy = this.#posY * H;
+        const s  = this.#escala * W * 0.09;
+
+        ctx.save();
+
+        // Sombra difusa de fondo
+        const gradBase = ctx.createRadialGradient(cx, cy + s * 0.1, 0, cx, cy, s * 2.2);
+        gradBase.addColorStop(0,   'rgba(8,22,50,0.88)');
+        gradBase.addColorStop(0.5, 'rgba(6,18,42,0.55)');
+        gradBase.addColorStop(1,   'rgba(4,12,30,0)');
+        ctx.fillStyle = gradBase;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, s * 2.2, s * 0.8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Blobs que forman el cuerpo de la nube
+        const _blob = (bx, by, rx, ry) => {
+            const g = ctx.createRadialGradient(bx, by - ry * 0.2, 0, bx, by, Math.max(rx, ry));
+            g.addColorStop(0,   'rgba(18,45,82,0.72)');
+            g.addColorStop(0.4, 'rgba(10,28,58,0.65)');
+            g.addColorStop(1,   'rgba(4,14,35,0)');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.ellipse(bx, by, rx, ry, 0, 0, Math.PI * 2);
+            ctx.fill();
+        };
+
+        _blob(cx,             cy,             s * 1.6, s * 0.60);
+        _blob(cx - s * 0.70,  cy + s * 0.05,  s * 0.9, s * 0.55);
+        _blob(cx + s * 0.80,  cy + s * 0.05,  s * 1.0, s * 0.50);
+        _blob(cx + s * 0.20,  cy - s * 0.35,  s * 0.85, s * 0.45);
+        _blob(cx - s * 0.35,  cy - s * 0.28,  s * 0.75, s * 0.40);
+
+        ctx.restore();
+    }
+}
