@@ -19,33 +19,44 @@ export class Luna extends ObjetoCielo {
     dibujar(ctx, W, H, _rng) {
         const x = this.#posX * W;
         const y = this.#posY * H;
-        const r = W * 0.018;   // radio proporcional al ancho del canvas
+        const r = W * 0.038;   // luna grande y prominente
 
-        // Halo exterior difuso
-        const halo = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 2.8);
-        halo.addColorStop(0,   'rgba(255,240,180,0.18)');
-        halo.addColorStop(0.4, 'rgba(255,225,140,0.07)');
-        halo.addColorStop(1,   'rgba(255,210,100,0)');
-        ctx.fillStyle = halo;
+        // Halo exterior amplio — resplandor azulado frío
+        const haloExt = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 4.0);
+        haloExt.addColorStop(0,   'rgba(200,215,255,0.12)');
+        haloExt.addColorStop(0.4, 'rgba(160,185,240,0.05)');
+        haloExt.addColorStop(1,   'rgba(120,155,220,0)');
+        ctx.fillStyle = haloExt;
         ctx.beginPath();
-        ctx.arc(x, y, r * 2.8, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 4.0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Disco lunar con degradado radial (luz viene de arriba-izquierda)
-        const disco = ctx.createRadialGradient(x - r * 0.28, y - r * 0.28, 0, x, y, r);
-        disco.addColorStop(0,   '#fffde8');
-        disco.addColorStop(0.5, '#f5e49a');
-        disco.addColorStop(1,   '#d4b84a');
+        // Halo interior cálido-blanco
+        const halo = ctx.createRadialGradient(x, y, r * 0.85, x, y, r * 2.2);
+        halo.addColorStop(0,   'rgba(245,242,228,0.22)');
+        halo.addColorStop(0.5, 'rgba(230,228,210,0.08)');
+        halo.addColorStop(1,   'rgba(210,215,200,0)');
+        ctx.fillStyle = halo;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 2.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Disco lunar — blanco frío, luz desde arriba-izquierda
+        const disco = ctx.createRadialGradient(x - r * 0.22, y - r * 0.22, 0, x, y, r);
+        disco.addColorStop(0,   '#f8f8f2');
+        disco.addColorStop(0.45, '#edeae0');
+        disco.addColorStop(0.85, '#d8d4c8');
+        disco.addColorStop(1,   '#c8c2b0');
         ctx.fillStyle = disco;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
 
-        // Sombra sutil en el lado opuesto para dar volumen
-        const sombra = ctx.createRadialGradient(x + r * 0.35, y + r * 0.25, r * 0.45, x, y, r);
-        sombra.addColorStop(0,   'rgba(90,60,20,0)');
-        sombra.addColorStop(0.65,'rgba(70,45,10,0.10)');
-        sombra.addColorStop(1,   'rgba(50,30,5,0.28)');
+        // Sombra en el lado derecho para dar volumen esférico
+        const sombra = ctx.createRadialGradient(x + r * 0.3, y + r * 0.2, r * 0.4, x, y, r);
+        sombra.addColorStop(0,   'rgba(60,70,90,0)');
+        sombra.addColorStop(0.6, 'rgba(40,55,80,0.08)');
+        sombra.addColorStop(1,   'rgba(25,40,65,0.22)');
         ctx.fillStyle = sombra;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);

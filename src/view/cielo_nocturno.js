@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { Cielo } from './cielo.js';
 import { Luna }  from './cielos/luna.js';
+import { Nube }  from './cielos/nube.js';
 
 // ================================================================
 // CLASS: CieloNocturno — fondo de noche sobre textura equirectangular.
@@ -11,9 +12,16 @@ import { Luna }  from './cielos/luna.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #textura = null;
-    #luna    = new Luna(0.15, 0.20);
+    #luna    = new Luna(0.25, 0.18);
+    #nubes   = [
+        new Nube(0.32, 0.23, 1.3),
+        new Nube(0.68, 0.16, 1.0),
+        new Nube(0.54, 0.34, 0.75),
+        new Nube(0.10, 0.27, 0.95),
+        new Nube(0.82, 0.28, 0.80),
+    ];
 
-    constructor(colorCielo = '#0d0b2e') { super(colorCielo); }
+    constructor(colorCielo = '#071830') { super(colorCielo); }
 
     construir(scene) {
         this.#textura = new THREE.CanvasTexture(this.#generarTextura());
@@ -45,51 +53,57 @@ export class CieloNocturno extends Cielo {
         const ctx = lienzo.getContext('2d');
         const rng = this.#rng(98765);
 
-        // Gradiente azul oscuro → púrpura profundo
+        // Gradiente azul medianoche (sin púrpura)
         const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0,    '#050310');
-        grad.addColorStop(0.35, '#0d0b2e');
-        grad.addColorStop(0.70, '#1e1060');
-        grad.addColorStop(1,    '#2d1457');
+        grad.addColorStop(0,    '#020c18');
+        grad.addColorStop(0.30, '#051428');
+        grad.addColorStop(0.65, '#071a32');
+        grad.addColorStop(1,    '#0d2240');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
 
-        // 500 estrellas de fondo — puntitos r=0.3-0.8px
-        for (let i = 0; i < 500; i++) {
+        // 650 estrellas de fondo — puntitos visibles r=0.5-1.2px
+        for (let i = 0; i < 650; i++) {
             const x  = rng() * W;
-            const y  = rng() * H * 0.65;
-            const r  = rng() * 0.5 + 0.3;
-            const al = (rng() * 0.5 + 0.5).toFixed(2);
+            const y  = rng() * H * 0.62;
+            const r  = rng() * 0.7 + 0.5;
+            const al = (rng() * 0.4 + 0.6).toFixed(2);
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(210,220,255,${al})`;
+            ctx.fillStyle = `rgba(220,228,255,${al})`;
             ctx.fill();
         }
 
-        // 35 estrellas medianas con glow azul-blanco r=1-2px
-        for (let i = 0; i < 35; i++) {
+        // 45 estrellas medianas con glow r=1.5-3px
+        for (let i = 0; i < 45; i++) {
             const x = rng() * W;
-            const y = rng() * H * 0.58;
-            const r = rng() * 1 + 1;
+            const y = rng() * H * 0.55;
+            const r = rng() * 1.5 + 1.5;
             const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
-            g.addColorStop(0,   'rgba(230,235,255,1.0)');
-            g.addColorStop(0.3, 'rgba(180,200,255,0.5)');
-            g.addColorStop(1,   'rgba(140,170,255,0)');
+            g.addColorStop(0,   'rgba(238,242,255,1.0)');
+            g.addColorStop(0.3, 'rgba(190,208,255,0.55)');
+            g.addColorStop(1,   'rgba(150,175,255,0)');
             ctx.fillStyle = g;
             ctx.beginPath();
             ctx.arc(x, y, r * 3, 0, Math.PI * 2);
             ctx.fill();
         }
 
-        // 7 estrellas brillantes con efecto cruz/sparkle
+        // Luna detrás de las nubes
+        this.#luna.dibujar(ctx, W, H, rng);
+
+        // Nubes oscuras azul-gris nocturnas
+        for (const nube of this.#nubes) nube.dibujar(ctx, W, H, rng);
+
+        // 9 estrellas brillantes sparkle sobre las nubes
         ctx.save();
         ctx.globalCompositeOperation = 'screen';
-        for (let i = 0; i < 7; i++) {
-            const x   = rng() * W;
-            const y   = rng() * H * 0.52;
-            const tam = rng() * 4 + 3;
-            const tamV = tam * 0.55;
-            const gr  = rng() * 0.3 + 0.5;
+        for (let i = 0; i < 9; i++) {
+            const x    = rng() * W;
+            const y    = rng() * H * 0.50;
+            const tam  = rng() * 5 + 4;
+            const tamV = tam * 0.50;
+            const gr   = rng() * 0.4 + 0.6;
 
             const gH = ctx.createLinearGradient(x - tam, y, x + tam, y);
             gH.addColorStop(0,   'rgba(255,255,255,0)');
@@ -109,15 +123,12 @@ export class CieloNocturno extends Cielo {
 
             const gC = ctx.createRadialGradient(x, y, 0, x, y, gr * 3);
             gC.addColorStop(0,   'rgba(255,255,255,1.0)');
-            gC.addColorStop(0.5, 'rgba(200,215,255,0.6)');
-            gC.addColorStop(1,   'rgba(150,180,255,0)');
+            gC.addColorStop(0.5, 'rgba(210,225,255,0.65)');
+            gC.addColorStop(1,   'rgba(160,190,255,0)');
             ctx.fillStyle = gC;
             ctx.beginPath(); ctx.arc(x, y, gr * 5, 0, Math.PI * 2); ctx.fill();
         }
         ctx.restore();
-
-        // Luna — objeto cielo que dibuja disco + halo
-        this.#luna.dibujar(ctx, W, H, rng);
 
         return lienzo;
     }
