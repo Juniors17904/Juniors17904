@@ -21,7 +21,7 @@ export class CieloNocturno extends Cielo {
         new Nube(0.82, 0.28, 0.80),
     ];
 
-    constructor(colorCielo = '#071830') { super(colorCielo); }
+    constructor(colorCielo = '#050e20') { super(colorCielo); }
 
     construir(scene) {
         const tex = new THREE.CanvasTexture(this.#generarTextura());
@@ -72,12 +72,12 @@ export class CieloNocturno extends Cielo {
         const ctx = lienzo.getContext('2d');
         const rng = this.#rng(98765);
 
-        // Gradiente azul medianoche (sin púrpura)
+        // Gradiente azul profundo — cenit casi negro, horizonte azul marino oscuro
         const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0,    '#020c18');
-        grad.addColorStop(0.30, '#051428');
-        grad.addColorStop(0.65, '#071a32');
-        grad.addColorStop(1,    '#0d2240');
+        grad.addColorStop(0,    '#020810');  // cenit: casi negro
+        grad.addColorStop(0.25, '#040f1e');  // azul muy oscuro
+        grad.addColorStop(0.55, '#061830');  // azul marino
+        grad.addColorStop(1,    '#08152a');  // horizonte: azul profundo
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
 
