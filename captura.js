@@ -123,7 +123,7 @@ async function capturar(nombrePantalla, archivoSalida) {
         });
 
         const ctx = await browser.newContext({
-            viewport:       { width: 1280, height: 720 },
+            viewport:       { width: 390, height: 844 },
             serviceWorkers: 'block',
         });
 
