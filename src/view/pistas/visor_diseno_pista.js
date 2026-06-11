@@ -163,7 +163,6 @@ class VisorDisenoPista extends VisorBase {
         this.#canvas.height = H;
         this.#camaraChase?.resize(W / H);
         this.#renderer?.setSize(W, H, false);
-        this.alturaCamara = W < H ? 1.2 : 2.8;
     }
 
     // ── Construir circuito ────────────────────────────────────────
