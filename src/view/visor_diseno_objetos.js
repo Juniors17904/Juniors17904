@@ -43,7 +43,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#renderer.shadowMap.enabled = true;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new CieloNocturno();
+        this.#cielo = new CieloNocturno('#050e20', true); // sinLuna: LunaEscena 3D reemplaza la 2D
         this.#cielo.construir(this.#scene);
         this.#scene.fog = null;
 

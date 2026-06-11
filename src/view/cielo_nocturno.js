@@ -13,6 +13,7 @@ import { Nube }  from './cielos/nube.js';
 export class CieloNocturno extends Cielo {
     #malla   = null;
     #luna    = new Luna(0.875, 0.50);
+    #sinLuna = false;
     #nubes   = [
         new Nube(0.875, 0.59, 1.3),
         new Nube(0.810, 0.55, 1.0),
@@ -21,7 +22,10 @@ export class CieloNocturno extends Cielo {
         new Nube(0.960, 0.52, 0.80),
     ];
 
-    constructor(colorCielo = '#050e20') { super(colorCielo); }
+    constructor(colorCielo = '#050e20', sinLuna = false) {
+        super(colorCielo);
+        this.#sinLuna = sinLuna;
+    }
 
     construir(scene) {
         const tex = new THREE.CanvasTexture(this.#generarTextura());
@@ -111,8 +115,8 @@ export class CieloNocturno extends Cielo {
         // Nubes detrás de la luna
         for (const nube of this.#nubes) nube.dibujar(ctx, W, H, rng);
 
-        // Luna sobre las nubes — disco visible con halo
-        this.#luna.dibujar(ctx, W, H, rng);
+        // Luna sobre las nubes — disco visible con halo (opcional)
+        if (!this.#sinLuna) this.#luna.dibujar(ctx, W, H, rng);
 
         // 9 estrellas brillantes sparkle sobre las nubes
         ctx.save();
