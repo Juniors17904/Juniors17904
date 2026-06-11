@@ -124,9 +124,10 @@ class VisorDisenoObjetos extends VisorBase {
     async mostrar(tipo) {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
 
-        const esLuna = tipo === 'luna';
-        this.#grupoPiso.visible = !esLuna;
-        this.#camera.position.set(esLuna ? 6 : 8, esLuna ? 7 : 6, esLuna ? 6 : 8);
+        const flotante = tipo === 'luna' || tipo === 'nube';
+        this.#grupoPiso.visible = !flotante;
+        this.#cielo.visible     = tipo !== 'luna';
+        this.#camera.position.set(flotante ? 6 : 8, flotante ? 7 : 6, flotante ? 6 : 8);
 
         this.#objeto = this.#fabrica.crear(tipo, 0, 0,
             { escala: tipo === 'arbol' ? 1.4 : 1, texto: 'STOP', direccion: 'derecha' });
