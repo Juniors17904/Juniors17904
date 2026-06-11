@@ -7,12 +7,15 @@ import { ObjetoEscena } from './objeto_escena.js';
 //        Hereda de ObjetoEscena. Se muestra sin suelo en el visor.
 // ================================================================
 export class LunaEscena extends ObjetoEscena {
-    constructor() {
-        super(0, 0);
+    #alturaBase;
+
+    constructor(x = 0, z = 0, alturaBase = 3.5) {
+        super(x, z);
+        this.#alturaBase = alturaBase;
     }
 
     _poblar(grupo) {
-        const Y = 3.5;
+        const Y = this.#alturaBase;
 
         // Disco lunar — esfera principal con material semi-emisivo
         const disco = new THREE.Mesh(
@@ -29,7 +32,7 @@ export class LunaEscena extends ObjetoEscena {
         grupo.add(disco);
 
         // Luz puntual irradiada — ilumina el entorno con tono frío lunar
-        const luzLuna = new THREE.PointLight(0xc8d8f0, 4.0, 60);
+        const luzLuna = new THREE.PointLight(0xc8d8f0, 300, 0);
         luzLuna.position.y = Y;
         grupo.add(luzLuna);
     }
