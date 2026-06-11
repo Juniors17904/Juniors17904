@@ -25,22 +25,22 @@ export class Nube extends ObjetoCielo {
 
         ctx.save();
 
-        // Sombra difusa de fondo
+        // Sombra difusa de fondo — más pronunciada para dar volumen
         const gradBase = ctx.createRadialGradient(cx, cy + s * 0.1, 0, cx, cy, s * 2.2);
-        gradBase.addColorStop(0,   'rgba(8,22,50,0.88)');
-        gradBase.addColorStop(0.5, 'rgba(6,18,42,0.55)');
-        gradBase.addColorStop(1,   'rgba(4,12,30,0)');
+        gradBase.addColorStop(0,   'rgba(20,45,90,0.92)');
+        gradBase.addColorStop(0.5, 'rgba(14,32,68,0.60)');
+        gradBase.addColorStop(1,   'rgba(6,16,38,0)');
         ctx.fillStyle = gradBase;
         ctx.beginPath();
         ctx.ellipse(cx, cy, s * 2.2, s * 0.8, 0, 0, Math.PI * 2);
         ctx.fill();
 
-        // Blobs que forman el cuerpo de la nube
+        // Blobs que forman el cuerpo de la nube — más claros y contrastantes
         const _blob = (bx, by, rx, ry) => {
             const g = ctx.createRadialGradient(bx, by - ry * 0.2, 0, bx, by, Math.max(rx, ry));
-            g.addColorStop(0,   'rgba(18,45,82,0.72)');
-            g.addColorStop(0.4, 'rgba(10,28,58,0.65)');
-            g.addColorStop(1,   'rgba(4,14,35,0)');
+            g.addColorStop(0,   'rgba(35,68,125,0.88)');
+            g.addColorStop(0.4, 'rgba(22,48,95,0.72)');
+            g.addColorStop(1,   'rgba(8,20,48,0)');
             ctx.fillStyle = g;
             ctx.beginPath();
             ctx.ellipse(bx, by, rx, ry, 0, 0, Math.PI * 2);
