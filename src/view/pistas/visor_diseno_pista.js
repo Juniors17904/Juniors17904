@@ -135,8 +135,8 @@ class VisorDisenoPista extends VisorBase {
 
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
 
-        this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
-        this.#sol = new THREE.DirectionalLight(0xfffbe6, 2.2);
+        this.#scene.add(new THREE.AmbientLight(0x8899bb, 0.18));
+        this.#sol = new THREE.DirectionalLight(0xaabbdd, 0.35);
         this.#sol.castShadow = true;
         this.#sol.shadow.mapSize.set(1024, 1024);
         this.#sol.shadow.camera.near = 1; this.#sol.shadow.camera.far = 60;
@@ -147,7 +147,7 @@ class VisorDisenoPista extends VisorBase {
         if (posSol) this.#sol.position.copy(posSol);
         else this.#sol.position.set(6, 10, 4);
 
-        const fill = new THREE.DirectionalLight(0xc8e8ff, 0.5);
+        const fill = new THREE.DirectionalLight(0x8899cc, 0.12);
         fill.position.set(-5, 4, -3);
         this.#scene.add(fill);
 
