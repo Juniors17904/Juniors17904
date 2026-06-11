@@ -41,12 +41,12 @@ export class Luna extends ObjetoCielo {
         ctx.arc(x, y, r * 2.5, 0, Math.PI * 2);
         ctx.fill();
 
-        // Disco lunar — blanco frío, luz desde arriba-izquierda
+        // Disco lunar — ROJO (prueba de reconocimiento)
         const disco = ctx.createRadialGradient(x - r * 0.22, y - r * 0.22, 0, x, y, r);
-        disco.addColorStop(0,   '#f8f8f2');
-        disco.addColorStop(0.45, '#edeae0');
-        disco.addColorStop(0.85, '#d8d4c8');
-        disco.addColorStop(1,   '#c8c2b0');
+        disco.addColorStop(0,   '#ff4444');
+        disco.addColorStop(0.45, '#dd2222');
+        disco.addColorStop(0.85, '#bb1111');
+        disco.addColorStop(1,   '#990000');
         ctx.fillStyle = disco;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
