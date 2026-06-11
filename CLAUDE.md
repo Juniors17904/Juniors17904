@@ -238,3 +238,57 @@ class TimonF1 { dibujar(ctx, S) { /* lógica F1 aquí */ } }
 - El sitio se sirve desde `main` (Vercel apunta a `main`)
 - Flujo obligatorio después de cada commit: `git checkout main && git merge claude/system-overview-Z6Zik && git push origin main`
 - Nunca dejar cambios solo en la rama de desarrollo sin mergear a main
+
+---
+
+## 📸 CAPTURAS DE PANTALLA — SISTEMA Y USO
+
+### Problema: Three.js se ve negro sin `--use-gl=angle`
+
+Three.js usa `MeshStandardMaterial` (materiales PBR — físicamente basados). Estos materiales requieren el **pipeline de GPU real** para renderizar luz, sombras y texturas.
+
+**El error común**: usar `--use-gl=swiftshader` (o no pasar ningún flag, que cae en SwiftShader como fallback). SwiftShader es un renderizador por software que **NO soporta PBR**. Resultado: toda la escena Three.js se ve negra — el canvas existe, pero nada se renderiza visualmente.
+
+**La solución**: `--use-gl=angle` hace que Chrome use ANGLE para traducir WebGL → OpenGL real a través de Xvfb. Esto activa el pipeline completo de GPU y Three.js renderiza correctamente.
+
+```
+❌ --use-gl=swiftshader  →  Three.js negro (software renderer, sin PBR)
+✅ --use-gl=angle        →  Three.js correcto (OpenGL real vía ANGLE + Xvfb)
+```
+
+También es obligatorio `headless: false` + Xvfb. Con `headless: true` Chrome usa una ruta diferente que no pasa por ANGLE correctamente.
+
+### Importmap patch — por qué es necesario
+
+El HTML del juego carga Three.js desde CDN (`cdn.jsdelivr.net`). En el entorno de capturas **se bloquean todas las URLs `https://`** para evitar dependencias externas. El script parcha el importmap en el HTML al vuelo para apuntar a los módulos locales en `node_modules/three/`.
+
+La detección del HTML se hace por `content-type: text/html` (NO por `url.endsWith('.html')`), porque la URL raíz es `/` y el servidor responde con `Content-Type: text/html`.
+
+### Script `captura.js` — cómo usar
+
+**Requisitos previos:**
+1. Tener Xvfb instalado: `apt install xvfb`
+2. Tener Playwright en `/opt/node22/lib/node_modules/playwright`
+3. Tener Three.js local: `npm install` en la raíz del proyecto
+
+**Pantallas disponibles:**
+```
+inicio, ajustes, diseno-objetos, diseno-general,
+garage, preview-carro, velocimetro, timon
+```
+
+**Comando:**
+```bash
+node captura.js <pantalla> [archivo.png]
+
+# Ejemplos:
+node captura.js diseno-general
+node captura.js diseno-objetos resultado.png
+```
+
+**Notas importantes:**
+- Xvfb se inicia automáticamente si no está corriendo
+- El servidor HTTP local se levanta en el puerto 7654
+- Three.js CDN se intercepta y sirve desde `node_modules/three/`
+- Para `diseno-general`: el carro avanza automáticamente 8 s para mostrar la pista negra
+- Las capturas temporales (`captura_*.png`) están en `.gitignore`
