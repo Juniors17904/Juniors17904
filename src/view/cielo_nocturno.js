@@ -12,13 +12,13 @@ import { Nube }  from './cielos/nube.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #malla   = null;
-    #luna    = new Luna(0.75, 0.18);
+    #luna    = new Luna(0.875, 0.30);
     #nubes   = [
-        new Nube(0.70, 0.22, 1.3),
-        new Nube(0.80, 0.16, 1.0),
-        new Nube(0.65, 0.28, 0.75),
-        new Nube(0.60, 0.20, 0.95),
-        new Nube(0.85, 0.24, 0.80),
+        new Nube(0.875, 0.35, 1.3),
+        new Nube(0.820, 0.28, 1.0),
+        new Nube(0.930, 0.32, 0.75),
+        new Nube(0.780, 0.38, 0.95),
+        new Nube(0.960, 0.25, 0.80),
     ];
 
     constructor(colorCielo = '#050e20') { super(colorCielo); }
