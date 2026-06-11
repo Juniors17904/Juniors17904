@@ -29,7 +29,7 @@ export class LunaEscena extends ObjetoEscena {
         grupo.add(disco);
 
         // Luz puntual irradiada — ilumina el entorno con tono frío lunar
-        const luzLuna = new THREE.PointLight(0xc8d8f0, 1.5, 18);
+        const luzLuna = new THREE.PointLight(0xc8d8f0, 4.0, 60);
         luzLuna.position.y = Y;
         grupo.add(luzLuna);
     }
