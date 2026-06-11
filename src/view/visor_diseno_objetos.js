@@ -126,7 +126,6 @@ class VisorDisenoObjetos extends VisorBase {
 
         const esLuna = tipo === 'luna';
         this.#grupoPiso.visible = !esLuna;
-        this.#cielo.visible     = !esLuna;
         this.#camera.position.set(esLuna ? 6 : 8, esLuna ? 7 : 6, esLuna ? 6 : 8);
 
         this.#objeto = this.#fabrica.crear(tipo, 0, 0,
