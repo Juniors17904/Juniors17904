@@ -18,11 +18,12 @@ class VisorDisenoObjetos extends VisorBase {
     #camera        = null;
     #controlOrbita = null;
     #fabrica       = new FabricaObjetoEscena();
-    #idAnimacion           = 0;
+    #idAnimacion   = 0;
     #objeto        = null;
     #cielo         = null;
     #resizeObs     = null;
-    #funcionAnimacion        = () => this.#tick();
+    #funcionAnimacion = () => this.#tick();
+    #grupoPiso     = null; // suelo + carretera — se oculta para la luna
 
     constructor(canvas) {
         super();
@@ -58,37 +59,36 @@ class VisorDisenoObjetos extends VisorBase {
         sol.castShadow = true;
         this.#scene.add(sol);
 
-        // ── Suelo (pasto) ────────────────────────────────────────
+        // ── Piso (suelo + carretera) agrupados para poder ocultarlos ─
+        this.#grupoPiso = new THREE.Group();
+        this.#scene.add(this.#grupoPiso);
+
         const suelo = new THREE.Mesh(
             new THREE.CircleGeometry(12, 40),
             new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 })
         );
         suelo.rotation.x = -Math.PI / 2;
         suelo.receiveShadow = true;
-        this.#scene.add(suelo);
+        this.#grupoPiso.add(suelo);
 
-        // ── Tramo de asfalto (referencia de alineación) ──────────
         const matAsfalto = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.85 });
         const carretera  = new THREE.Mesh(new THREE.PlaneGeometry(5.5, 14), matAsfalto);
         carretera.rotation.x = -Math.PI / 2;
         carretera.position.set(3, 0.001, 0);
         carretera.receiveShadow = true;
-        this.#scene.add(carretera);
+        this.#grupoPiso.add(carretera);
 
-        // Línea de borde izquierda (junto al objeto)
         const matBlanco = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const bordeIzq  = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 14), matBlanco);
         bordeIzq.rotation.x = -Math.PI / 2;
         bordeIzq.position.set(0.20, 0.002, 0);
-        this.#scene.add(bordeIzq);
+        this.#grupoPiso.add(bordeIzq);
 
-        // Línea de borde derecha
         const bordeDer = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 14), matBlanco);
         bordeDer.rotation.x = -Math.PI / 2;
         bordeDer.position.set(5.80, 0.002, 0);
-        this.#scene.add(bordeDer);
+        this.#grupoPiso.add(bordeDer);
 
-        // Línea central punteada amarilla
         const dc = document.createElement('canvas');
         dc.width = 16; dc.height = 128;
         const dctx = dc.getContext('2d');
@@ -103,7 +103,7 @@ class VisorDisenoObjetos extends VisorBase {
         );
         centreLine.rotation.x = -Math.PI / 2;
         centreLine.position.set(3.0, 0.002, 0);
-        this.#scene.add(centreLine);
+        this.#grupoPiso.add(centreLine);
 
         this.#resizeObs = new ResizeObserver(() => this.#resize());
         this.#resizeObs.observe(this.#canvas);
@@ -123,6 +123,11 @@ class VisorDisenoObjetos extends VisorBase {
     // ── Mostrar objeto ───────────────────────────────────────────
     async mostrar(tipo) {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
+
+        const esLuna = tipo === 'luna';
+        this.#grupoPiso.visible = !esLuna;
+        this.#camera.position.set(esLuna ? 6 : 8, esLuna ? 7 : 6, esLuna ? 6 : 8);
+
         this.#objeto = this.#fabrica.crear(tipo, 0, 0,
             { escala: tipo === 'arbol' ? 1.4 : 1, texto: 'STOP', direccion: 'derecha' });
         await this.#objeto?.construir(this.#scene);
