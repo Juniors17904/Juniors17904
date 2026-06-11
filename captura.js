@@ -125,6 +125,7 @@ async function capturar(nombrePantalla, archivoSalida) {
         const ctx = await browser.newContext({
             viewport:       { width: 390, height: 844 },
             serviceWorkers: 'block',
+            hasTouch:       true,
         });
 
         const page = await ctx.newPage();
@@ -159,7 +160,23 @@ async function capturar(nombrePantalla, archivoSalida) {
         await sleep(800);
 
         // Navegar paso a paso hasta la pantalla objetivo
-        for (const btnId of cfg.pasos) {
+        for (let _i = 0; _i < cfg.pasos.length; _i++) {
+            const btnId = cfg.pasos[_i];
+
+            // Diseño General: inyectar captura de instancia ANTES del último clic
+            if (nombrePantalla === 'diseno-general' && _i === cfg.pasos.length - 1) {
+                await page.waitForFunction(() => !!window.VisorDisenoPista, { timeout: 10000 }).catch(() => {});
+                await page.evaluate(() => {
+                    const Orig = window.VisorDisenoPista;
+                    if (Orig && !Orig.__interceptado) {
+                        window.VisorDisenoPista = class extends Orig {
+                            constructor(c, p) { super(c, p); window.__visorDG = this; }
+                        };
+                        window.VisorDisenoPista.__interceptado = true;
+                    }
+                });
+            }
+
             await page.waitForSelector(`#${btnId}`, { timeout: 5000 });
             await page.click(`#${btnId}`);
             await sleep(400);
@@ -177,6 +194,14 @@ async function capturar(nombrePantalla, archivoSalida) {
 
         // Tiempo extra para que WebGL termine de renderizar
         await sleep(cfg.espera);
+
+        // En Diseño General: mover el carro hacia adelante para mostrar la pista negra
+        if (nombrePantalla === 'diseno-general') {
+            await page.evaluate(() => { if (window.__visorDG) window.__visorDG.entradaAcel = 1; });
+            await sleep(8000);
+            await page.evaluate(() => { if (window.__visorDG) window.__visorDG.entradaAcel = 0; });
+            await sleep(1000);
+        }
 
         // Screenshot
         const salida = archivoSalida || `captura_${nombrePantalla}.png`;
