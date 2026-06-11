@@ -26,14 +26,14 @@ export class NubeEscena extends ObjetoEscena {
 
         // Blobs que forman el cuerpo — posición [dx, dy, rx, ry]
         const blobs = [
-            [ 0.0,  0.0,  1.5, 0.70],
-            [-1.2,  0.1,  1.0, 0.65],
-            [ 1.4,  0.1,  1.1, 0.60],
-            [ 0.3, -0.6,  0.9, 0.55],
-            [-0.5, -0.5,  0.8, 0.50],
-            [-0.2, -1.0,  0.7, 0.45],
-            [ 0.9, -0.9,  0.6, 0.40],
-            [-0.9, -0.8,  0.5, 0.38],
+            [ 0.0,  0.0,  1.5, 0.70],  // cuerpo central
+            [-1.2, -0.1,  1.0, 0.65],  // lado izquierdo
+            [ 1.4, -0.1,  1.1, 0.60],  // lado derecho
+            [ 0.3,  0.6,  0.9, 0.55],  // protuberancia superior centro
+            [-0.5,  0.5,  0.8, 0.50],  // protuberancia superior izquierda
+            [-0.2,  1.0,  0.7, 0.45],  // punta alta centro
+            [ 0.9,  0.9,  0.6, 0.40],  // punta alta derecha
+            [-0.9,  0.8,  0.5, 0.38],  // punta alta izquierda
         ];
 
         for (const [dx, dy, rx, ry] of blobs) {
@@ -52,7 +52,7 @@ export class NubeEscena extends ObjetoEscena {
         });
         const luzMesh = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 6), matLuz);
         luzMesh.scale.set(2.2, 0.45, 1.4);
-        luzMesh.position.set(-0.1, Y + 0.2, 0);
+        luzMesh.position.set(-0.1, Y + 0.8, 0);
         grupo.add(luzMesh);
     }
 }
