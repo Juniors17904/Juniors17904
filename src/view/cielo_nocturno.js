@@ -12,13 +12,13 @@ import { Nube }  from './cielos/nube.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #malla   = null;
-    #luna    = new Luna(0.875, 0.30);
+    #luna    = new Luna(0.875, 0.50);
     #nubes   = [
-        new Nube(0.875, 0.35, 1.3),
-        new Nube(0.820, 0.28, 1.0),
-        new Nube(0.930, 0.32, 0.75),
-        new Nube(0.780, 0.38, 0.95),
-        new Nube(0.960, 0.25, 0.80),
+        new Nube(0.875, 0.59, 1.3),
+        new Nube(0.810, 0.55, 1.0),
+        new Nube(0.940, 0.57, 0.75),
+        new Nube(0.770, 0.62, 0.95),
+        new Nube(0.960, 0.52, 0.80),
     ];
 
     constructor(colorCielo = '#050e20') { super(colorCielo); }
@@ -84,7 +84,7 @@ export class CieloNocturno extends Cielo {
         // 650 estrellas de fondo — puntitos visibles r=0.5-1.2px
         for (let i = 0; i < 650; i++) {
             const x  = rng() * W;
-            const y  = rng() * H * 0.62;
+            const y  = (0.38 + rng() * 0.30) * H;
             const r  = rng() * 0.7 + 0.5;
             const al = (rng() * 0.4 + 0.6).toFixed(2);
             ctx.beginPath();
@@ -96,7 +96,7 @@ export class CieloNocturno extends Cielo {
         // 45 estrellas medianas con glow r=1.5-3px
         for (let i = 0; i < 45; i++) {
             const x = rng() * W;
-            const y = rng() * H * 0.55;
+            const y = (0.40 + rng() * 0.22) * H;
             const r = rng() * 1.5 + 1.5;
             const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
             g.addColorStop(0,   'rgba(238,242,255,1.0)');
@@ -108,18 +108,18 @@ export class CieloNocturno extends Cielo {
             ctx.fill();
         }
 
-        // Luna detrás de las nubes
-        this.#luna.dibujar(ctx, W, H, rng);
-
-        // Nubes oscuras azul-gris nocturnas
+        // Nubes detrás de la luna
         for (const nube of this.#nubes) nube.dibujar(ctx, W, H, rng);
+
+        // Luna sobre las nubes — disco visible con halo
+        this.#luna.dibujar(ctx, W, H, rng);
 
         // 9 estrellas brillantes sparkle sobre las nubes
         ctx.save();
         ctx.globalCompositeOperation = 'screen';
         for (let i = 0; i < 9; i++) {
             const x    = rng() * W;
-            const y    = rng() * H * 0.50;
+            const y    = (0.45 + rng() * 0.15) * H;
             const tam  = rng() * 5 + 4;
             const tamV = tam * 0.50;
             const gr   = rng() * 0.4 + 0.6;
