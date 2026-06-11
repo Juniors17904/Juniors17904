@@ -12,7 +12,7 @@ export class LunaEscena extends ObjetoEscena {
     }
 
     _poblar(grupo) {
-        const Y = 3.5; // altura de flotación sobre la escena
+        const Y = 3.5;
 
         // Disco lunar — esfera principal con material semi-emisivo
         const disco = new THREE.Mesh(
@@ -27,34 +27,6 @@ export class LunaEscena extends ObjetoEscena {
         );
         disco.position.y = Y;
         grupo.add(disco);
-
-        // Halo interior — blanco cálido, semitransparente
-        const haloInt = new THREE.Mesh(
-            new THREE.SphereGeometry(2.3, 16, 16),
-            new THREE.MeshBasicMaterial({
-                color:       0xfff5d0,
-                transparent: true,
-                opacity:     0.07,
-                side:        THREE.BackSide,
-                depthWrite:  false,
-            })
-        );
-        haloInt.position.y = Y;
-        grupo.add(haloInt);
-
-        // Halo exterior — azul frío, muy tenue
-        const haloExt = new THREE.Mesh(
-            new THREE.SphereGeometry(3.5, 16, 16),
-            new THREE.MeshBasicMaterial({
-                color:       0x4466bb,
-                transparent: true,
-                opacity:     0.04,
-                side:        THREE.BackSide,
-                depthWrite:  false,
-            })
-        );
-        haloExt.position.y = Y;
-        grupo.add(haloExt);
 
         // Luz puntual irradiada — ilumina el entorno con tono frío lunar
         const luzLuna = new THREE.PointLight(0xc8d8f0, 1.5, 18);
