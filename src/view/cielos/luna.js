@@ -19,26 +19,26 @@ export class Luna extends ObjetoCielo {
     dibujar(ctx, W, H, _rng) {
         const x = this.#posX * W;
         const y = this.#posY * H;
-        const r = W * 0.038;   // luna grande y prominente
+        const r = W * 0.052;   // luna grande — ~106px en canvas 2048
 
         // Halo exterior amplio — resplandor azulado frío
-        const haloExt = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 4.0);
-        haloExt.addColorStop(0,   'rgba(200,215,255,0.12)');
-        haloExt.addColorStop(0.4, 'rgba(160,185,240,0.05)');
+        const haloExt = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 5.0);
+        haloExt.addColorStop(0,   'rgba(200,215,255,0.28)');
+        haloExt.addColorStop(0.4, 'rgba(160,185,240,0.12)');
         haloExt.addColorStop(1,   'rgba(120,155,220,0)');
         ctx.fillStyle = haloExt;
         ctx.beginPath();
-        ctx.arc(x, y, r * 4.0, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 5.0, 0, Math.PI * 2);
         ctx.fill();
 
         // Halo interior cálido-blanco
-        const halo = ctx.createRadialGradient(x, y, r * 0.85, x, y, r * 2.2);
-        halo.addColorStop(0,   'rgba(245,242,228,0.22)');
-        halo.addColorStop(0.5, 'rgba(230,228,210,0.08)');
+        const halo = ctx.createRadialGradient(x, y, r * 0.85, x, y, r * 2.5);
+        halo.addColorStop(0,   'rgba(245,242,228,0.55)');
+        halo.addColorStop(0.5, 'rgba(230,228,210,0.20)');
         halo.addColorStop(1,   'rgba(210,215,200,0)');
         ctx.fillStyle = halo;
         ctx.beginPath();
-        ctx.arc(x, y, r * 2.2, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 2.5, 0, Math.PI * 2);
         ctx.fill();
 
         // Disco lunar — blanco frío, luz desde arriba-izquierda
