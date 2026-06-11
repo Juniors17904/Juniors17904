@@ -30,7 +30,7 @@ if (!cfg) {
 }
 
 const URL_APP  = 'http://localhost:8099/';
-const ESPERA   = 7000;  // ms para que Three.js renderice
+const ESPERA   = 12000; // ms para que Three.js renderice y cargue el modelo GLB
 
 // ── Parche de importmap (Three.js local en vez de CDN) ─────────────────────
 const parchearRuta = async route => {
