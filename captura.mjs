@@ -81,7 +81,10 @@ async function capturar(browser, ancho, alto, nombreArchivo) {
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
-const browser = await chromium.launch({ headless: false });
+const browser = await chromium.launch({
+    headless: false,
+    args: ['--enable-webgl', '--ignore-gpu-blocklist', '--use-gl=angle'],
+});
 
 await capturar(browser,  390,  844, `${cfg.salida}_portrait.png`);
 await capturar(browser,  844,  390, `${cfg.salida}_landscape.png`);
