@@ -8,6 +8,7 @@ import { BarreraEscena }        from './barrera_escena.js';
 import { FlechaCurvaEscena }    from './flecha_curva_escena.js';
 import { SenalCurvaEscena }     from './senal_curva_escena.js';
 import { GuardarrailEscena }    from './guardarrail_escena.js';
+import { LunaEscena }           from './luna_escena.js';
 
 // ================================================================
 // CLASS: FabricaObjetoEscena — crea instancias de ObjetoEscena
@@ -27,6 +28,7 @@ export class FabricaObjetoEscena {
             case 'flecha':         return new FlechaCurvaEscena(x, z, rotY, lado);
             case 'senal_curva':    return new SenalCurvaEscena(x, z, direccion, rotY);
             case 'guardarrail':    return new GuardarrailEscena(x, z, rotY);
+            case 'luna':           return new LunaEscena();
             default:               return null;
         }
     }
