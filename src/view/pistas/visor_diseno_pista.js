@@ -6,6 +6,7 @@ import { Carro }             from '../../model/carros/carro.js';
 import { VisorBase }         from '../visor_base.js';
 import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
+import { LunaEscena }          from '../objetos/luna_escena.js';
 import { CieloSoleado }  from '../cielo_soleado.js';
 import { CieloNocturno } from '../cielo_nocturno.js';
 
@@ -21,6 +22,7 @@ class VisorDisenoPista extends VisorBase {
     #camaraChase = null;
     #idAnimacion         = 0;
     #cielo       = null;
+    #luna        = null;
     #ruta        = new Ruta();
     #mov         = null;
     #sol         = null;
@@ -130,12 +132,17 @@ class VisorDisenoPista extends VisorBase {
         const colorCielo = this.#pista?.cielo ?? '#4a9eca';
         this.#cielo = tipoCielo === 'soleado'
             ? new CieloSoleado(colorCielo)
-            : new CieloNocturno(colorCielo);
+            : new CieloNocturno(colorCielo, true); // sinLuna: se usa LunaEscena 3D
         this.#cielo.construir(this.#scene);
+
+        if (tipoCielo !== 'soleado') {
+            this.#luna = new LunaEscena(-6, -4, 10);
+            this.#luna.construir(this.#scene);
+        }
 
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
 
-        this.#scene.add(new THREE.AmbientLight(0x8899bb, 0.18));
+        this.#scene.add(new THREE.AmbientLight(0x8899bb, 0.28));
         this.#sol = new THREE.DirectionalLight(0xaabbdd, 0.35);
         this.#sol.castShadow = true;
         this.#sol.shadow.mapSize.set(1024, 1024);
@@ -341,6 +348,7 @@ class VisorDisenoPista extends VisorBase {
         for (const obj of this.#objetosFlechas)  obj.destruir(this.#scene);
         this.#objetos = []; this.#objetosSenales = []; this.#objetosFlechas = [];
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
+        this.#luna?.destruir(this.#scene); this.#luna = null;
         this.#renderer?.dispose();
         this.#renderer = null;
     }
