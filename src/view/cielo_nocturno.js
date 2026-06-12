@@ -70,7 +70,7 @@ export class CieloNocturno extends Cielo {
         this.#lunaHalo.frustumCulled = false;
         scene.add(this.#lunaHalo);
 
-        this.#lunaLuz = new THREE.PointLight(0xc8d8f0, 300, 0);
+        this.#lunaLuz = new THREE.PointLight(0xc8d8f0, 80, 0);
         scene.add(this.#lunaLuz);
 
         scene.background = this._colorHorizonte.clone();
