@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { Cielo } from './cielo.js';
 import { Nube }  from './cielos/nube.js';
+import { Luna }  from './cielos/luna.js';
 
 // ================================================================
 // CLASS: CieloNocturno — domo esférico nocturno con textura canvas.
@@ -11,8 +12,7 @@ import { Nube }  from './cielos/nube.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #malla     = null;
-    #lunaDisc  = null;
-    #lunaHalo  = null;
+    #luna      = new Luna(0.75, 0.38);
     #lunaLuz   = null;
     #nubes     = [
         new Nube(0.875, 0.59, 0.30),
@@ -42,34 +42,6 @@ export class CieloNocturno extends Cielo {
         this.#malla.frustumCulled = false;
         scene.add(this.#malla);
 
-        // Luna 3D integrada en el cielo — sigue a la cámara en actualizar()
-        const lunaGeo = new THREE.SphereGeometry(8, 32, 32);
-        const lunaMat = new THREE.MeshBasicMaterial({ color: 0xf0eedf, toneMapped: false, fog: false });
-        this.#lunaDisc = new THREE.Mesh(lunaGeo, lunaMat);
-        this.#lunaDisc.frustumCulled = false;
-        scene.add(this.#lunaDisc);
-
-        // Halo luminoso — sprite con gradiente radial azulado
-        const haloCanvas = document.createElement('canvas');
-        haloCanvas.width = haloCanvas.height = 256;
-        const hCtx = haloCanvas.getContext('2d');
-        const hGrad = hCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
-        hGrad.addColorStop(0,    'rgba(220,230,255,0.85)');
-        hGrad.addColorStop(0.18, 'rgba(190,210,255,0.55)');
-        hGrad.addColorStop(0.45, 'rgba(140,175,255,0.18)');
-        hGrad.addColorStop(1,    'rgba(100,140,255,0)');
-        hCtx.fillStyle = hGrad;
-        hCtx.fillRect(0, 0, 256, 256);
-        const haloMat = new THREE.SpriteMaterial({
-            map: new THREE.CanvasTexture(haloCanvas),
-            blending: THREE.AdditiveBlending,
-            depthWrite: false, fog: false, toneMapped: false,
-        });
-        this.#lunaHalo = new THREE.Sprite(haloMat);
-        this.#lunaHalo.scale.set(45, 45, 1);
-        this.#lunaHalo.frustumCulled = false;
-        scene.add(this.#lunaHalo);
-
         this.#lunaLuz = new THREE.PointLight(0xc8d8f0, 80, 0);
         scene.add(this.#lunaLuz);
 
@@ -82,36 +54,26 @@ export class CieloNocturno extends Cielo {
         scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
 
-    // Dirección en espacio de cámara: centrada, ligeramente arriba-izquierda, adelante
-    static #LUNA_CAM_DIR = new THREE.Vector3(-0.08, 0.35, -1).normalize();
-
     actualizar(camara) {
         if (this.#malla && camara) this.#malla.position.copy(camara.position);
-        if (camara) {
-            const dir = CieloNocturno.#LUNA_CAM_DIR.clone().applyQuaternion(camara.quaternion);
-            if (this.#lunaDisc) this.#lunaDisc.position.copy(camara.position).addScaledVector(dir, 150);
-            if (this.#lunaHalo) this.#lunaHalo.position.copy(camara.position).addScaledVector(dir, 149);
-            if (this.#lunaLuz)  this.#lunaLuz.position.copy(camara.position).addScaledVector(dir, 25);
+        if (this.#lunaLuz && camara) {
+            this.#lunaLuz.position.set(
+                camara.position.x - 8,
+                camara.position.y + 5,
+                camara.position.z + 20,
+            );
         }
     }
 
     get visible()  { return this.#malla?.visible ?? false; }
     set visible(v) {
-        if (this.#malla)    this.#malla.visible    = !!v;
-        if (this.#lunaDisc) this.#lunaDisc.visible = !!v;
-        if (this.#lunaHalo) this.#lunaHalo.visible = !!v;
-        if (this.#lunaLuz)  this.#lunaLuz.visible  = !!v;
+        if (this.#malla)   this.#malla.visible   = !!v;
+        if (this.#lunaLuz) this.#lunaLuz.visible = !!v;
     }
 
     destruir(scene) {
         if (!this.#malla) return;
         scene.remove(this.#malla);
-        this.#lunaDisc?.geometry.dispose();
-        this.#lunaDisc?.material.dispose();
-        this.#lunaDisc = null;
-        this.#lunaHalo?.material.map?.dispose();
-        this.#lunaHalo?.material.dispose();
-        this.#lunaHalo = null;
         this.#malla.geometry.dispose();
         this.#malla.material.map?.dispose();
         this.#malla.material.dispose();
@@ -164,7 +126,10 @@ export class CieloNocturno extends Cielo {
             ctx.fill();
         }
 
-        // Nubes detrás de la luna
+        // Luna
+        this.#luna.dibujar(ctx, W, H, rng);
+
+        // Nubes delante de la luna
         for (const nube of this.#nubes) nube.dibujar(ctx, W, H, rng);
 
         // 9 estrellas brillantes sparkle sobre las nubes
