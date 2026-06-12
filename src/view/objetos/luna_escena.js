@@ -21,8 +21,8 @@ export class LunaEscena extends ObjetoEscena {
         const disco = new THREE.Mesh(
             new THREE.SphereGeometry(1.8, 32, 32),
             new THREE.MeshStandardMaterial({
-                color:             0xf0eedf,
-                emissive:          0xc8c0a0,
+                color:             0xff2200,
+                emissive:          0xaa1100,
                 emissiveIntensity: 0.7,
                 roughness:         0.85,
                 metalness:         0.0,
