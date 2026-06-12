@@ -83,7 +83,7 @@ export class CieloNocturno extends Cielo {
     }
 
     // Dirección en espacio de cámara: centrada, ligeramente arriba-izquierda, adelante
-    static #LUNA_CAM_DIR = new THREE.Vector3(-0.08, 0.22, -1).normalize();
+    static #LUNA_CAM_DIR = new THREE.Vector3(-0.08, 0.35, -1).normalize();
 
     actualizar(camara) {
         if (this.#malla && camara) this.#malla.position.copy(camara.position);
