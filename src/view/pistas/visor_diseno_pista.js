@@ -136,7 +136,7 @@ class VisorDisenoPista extends VisorBase {
         this.#cielo.construir(this.#scene);
 
         if (tipoCielo !== 'soleado') {
-            this.#luna = new LunaEscena(-6, -4, 10);
+            this.#luna = new LunaEscena(-8, 15, 5);
             this.#luna.construir(this.#scene);
         }
 
