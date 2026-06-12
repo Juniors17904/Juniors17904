@@ -43,7 +43,7 @@ export class CieloNocturno extends Cielo {
         scene.add(this.#malla);
 
         // Luna 3D integrada en el cielo — sigue a la cámara en actualizar()
-        const lunaGeo = new THREE.SphereGeometry(14, 32, 32);
+        const lunaGeo = new THREE.SphereGeometry(8, 32, 32);
         const lunaMat = new THREE.MeshBasicMaterial({ color: 0xf0eedf, toneMapped: false, fog: false });
         this.#lunaDisc = new THREE.Mesh(lunaGeo, lunaMat);
         this.#lunaDisc.frustumCulled = false;
@@ -66,7 +66,7 @@ export class CieloNocturno extends Cielo {
             depthWrite: false, fog: false, toneMapped: false,
         });
         this.#lunaHalo = new THREE.Sprite(haloMat);
-        this.#lunaHalo.scale.set(80, 80, 1);
+        this.#lunaHalo.scale.set(45, 45, 1);
         this.#lunaHalo.frustumCulled = false;
         scene.add(this.#lunaHalo);
 
