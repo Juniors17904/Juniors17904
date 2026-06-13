@@ -13,7 +13,6 @@ import { Luna }  from './cielos/luna.js';
 export class CieloNocturno extends Cielo {
     #malla     = null;
     #luna      = new Luna(0.25, 0.38);
-    #lunaLuz   = null;
     #nubes     = [
         new Nube(0.875, 0.59, 0.30),
         new Nube(0.810, 0.55, 0.22),
@@ -42,9 +41,6 @@ export class CieloNocturno extends Cielo {
         this.#malla.frustumCulled = false;
         scene.add(this.#malla);
 
-        this.#lunaLuz = new THREE.PointLight(0xc8d8f0, 80, 0);
-        scene.add(this.#lunaLuz);
-
         scene.background = this._colorHorizonte.clone();
         scene.fog = new THREE.FogExp2(this._colorHorizonte.getHex(), 0.018);
     }
@@ -56,20 +52,10 @@ export class CieloNocturno extends Cielo {
 
     actualizar(camara) {
         if (this.#malla && camara) this.#malla.position.copy(camara.position);
-        if (this.#lunaLuz && camara) {
-            this.#lunaLuz.position.set(
-                camara.position.x - 8,
-                camara.position.y + 5,
-                camara.position.z + 20,
-            );
-        }
     }
 
     get visible()  { return this.#malla?.visible ?? false; }
-    set visible(v) {
-        if (this.#malla)   this.#malla.visible   = !!v;
-        if (this.#lunaLuz) this.#lunaLuz.visible = !!v;
-    }
+    set visible(v) { if (this.#malla) this.#malla.visible = !!v; }
 
     destruir(scene) {
         if (!this.#malla) return;
@@ -78,7 +64,6 @@ export class CieloNocturno extends Cielo {
         this.#malla.material.map?.dispose();
         this.#malla.material.dispose();
         this.#malla = null;
-        if (this.#lunaLuz) { scene.remove(this.#lunaLuz); this.#lunaLuz = null; }
         scene.fog = null;
     }
 
