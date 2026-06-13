@@ -27,9 +27,10 @@ class VisorDisenoPista extends VisorBase {
     #resizeObs   = null;
 
     #pista      = null;
-    #objetos    = [];
+    #objetos        = [];
     #objetosSenales = [];
     #objetosFlechas = [];
+    #objetosPostes  = [];
     #funcionAnimacion     = () => this.#tick();
 
     #meshPasto  = null;
@@ -41,6 +42,7 @@ class VisorDisenoPista extends VisorBase {
     #mostrarPista   = false;
     #mostrarAuto    = false;
     #mostrarObjetos = true;
+    #mostrarPostes  = true;
     #mostrarSenales = false;
     #mostrarFlechas = false;
     #mostrarCielo   = true;
@@ -73,6 +75,11 @@ class VisorDisenoPista extends VisorBase {
         for (const obj of this.#objetos) obj.setVisible(this.#mostrarObjetos);
     }
 
+    set mostrarPostes(v) {
+        this.#mostrarPostes = !!v;
+        for (const obj of this.#objetosPostes) obj.setVisible(this.#mostrarPostes);
+    }
+
     set mostrarSenales(v) {
         this.#mostrarSenales = !!v;
         for (const obj of this.#objetosSenales) obj.setVisible(this.#mostrarSenales);
@@ -100,6 +107,7 @@ class VisorDisenoPista extends VisorBase {
     get mostrarPista()   { return this.#mostrarPista;   }
     get mostrarAuto()    { return this.#mostrarAuto;    }
     get mostrarObjetos() { return this.#mostrarObjetos; }
+    get mostrarPostes()  { return this.#mostrarPostes;  }
     get mostrarSenales() { return this.#mostrarSenales; }
     get mostrarFlechas() { return this.#mostrarFlechas; }
     get mostrarCielo()   { return this.#mostrarCielo;   }
@@ -290,6 +298,9 @@ class VisorDisenoPista extends VisorBase {
             } else if (dec.tipo === 'flecha') {
                 obj.setVisible(this.#mostrarFlechas);
                 this.#objetosFlechas.push(obj);
+            } else if (dec.tipo === 'poste') {
+                obj.setVisible(this.#mostrarPostes);
+                this.#objetosPostes.push(obj);
             } else {
                 obj.setVisible(this.#mostrarObjetos);
                 this.#objetos.push(obj);
@@ -339,7 +350,8 @@ class VisorDisenoPista extends VisorBase {
         for (const obj of this.#objetos)         obj.destruir(this.#scene);
         for (const obj of this.#objetosSenales)  obj.destruir(this.#scene);
         for (const obj of this.#objetosFlechas)  obj.destruir(this.#scene);
-        this.#objetos = []; this.#objetosSenales = []; this.#objetosFlechas = [];
+        for (const obj of this.#objetosPostes)   obj.destruir(this.#scene);
+        this.#objetos = []; this.#objetosSenales = []; this.#objetosFlechas = []; this.#objetosPostes = [];
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
         this.#renderer?.dispose();
         this.#renderer = null;
