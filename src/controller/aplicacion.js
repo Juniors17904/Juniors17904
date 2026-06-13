@@ -1351,9 +1351,8 @@ class Aplicacion {
         };
         requestAnimationFrame(_dgDbgLoop);
 
-        document.getElementById('btn-datos-dg').addEventListener('click', () => {
-            const panel = document.getElementById('debug-dg');
-            panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+        document.getElementById('tog-datos-dg').addEventListener('change', e => {
+            document.getElementById('debug-dg').style.display = e.target.checked ? 'flex' : 'none';
         });
 
         // Activar control (teclado o timón según preferencia)

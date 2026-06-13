@@ -286,7 +286,6 @@
 
         <!-- UI superpuesta -->
         <button id="btn-volver-diseno-general" class="btn-tuerca" style="top:16px;left:16px;z-index:10">←</button>
-        <button id="btn-datos-dg" style="position:absolute;top:16px;left:56px;z-index:10;background:rgba(10,10,30,0.82);color:#a78bfa;border:1px solid #7c3aed;border-radius:6px;font:bold 8px 'Orbitron',monospace;padding:5px 8px;cursor:pointer;letter-spacing:1px">DATOS</button>
 
         <!-- Panel debug Diseño General -->
         <div id="debug-dg" style="display:none;position:absolute;top:50px;left:8px;background:rgba(0,0,0,0.80);color:#e0e0e0;font:8px/1.65 monospace;padding:6px 9px;z-index:50;pointer-events:none;border-radius:8px;border:1px solid rgba(124,58,237,0.55);backdrop-filter:blur(4px)">
@@ -372,6 +371,13 @@
                     <span class="dg-toggle-lbl">Cielo</span>
                     <div class="dg-toggle">
                         <input type="checkbox" id="tog-cielo" checked>
+                        <span class="dg-toggle-slider"></span>
+                    </div>
+                </label>
+                <label class="dg-toggle-fila" for="tog-datos-dg">
+                    <span class="dg-toggle-lbl">Panel de datos</span>
+                    <div class="dg-toggle">
+                        <input type="checkbox" id="tog-datos-dg">
                         <span class="dg-toggle-slider"></span>
                     </div>
                 </label>
