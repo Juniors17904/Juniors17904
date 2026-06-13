@@ -10,6 +10,7 @@ import { ObjetoEscena } from './objeto_escena.js';
 // ================================================================
 export class PosteEscena extends ObjetoEscena {
     #lado;
+    #luz = null;
 
     constructor(x, z, rotY = 0, lado = -1) {
         super(x, z, rotY);
@@ -28,7 +29,6 @@ export class PosteEscena extends ObjetoEscena {
             new THREE.CylinderGeometry(0.04, 0.04, 1.2, 6),
             new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.6 })
         );
-        // -lado: brazo apunta hacia el interior de la pista
         brazo.position.set(-0.6 * this.#lado, 5.0, 0);
         brazo.rotation.z = Math.PI / 2;
 
@@ -38,9 +38,15 @@ export class PosteEscena extends ObjetoEscena {
         );
         lampara.position.set(-1.1 * this.#lado, 5.0, 0);
 
-        const luz = new THREE.PointLight(0xffe8a0, 150, 12);
-        luz.position.set(-1.1 * this.#lado, 4.8, 0);
+        this.#luz = new THREE.PointLight(0xffe8a0, 150, 12);
+        this.#luz.position.set(-1.1 * this.#lado, 4.8, 0);
 
-        grupo.add(poste, brazo, lampara, luz);
+        grupo.add(poste, brazo, lampara, this.#luz);
+    }
+
+    // Apaga/enciende también la luz — Three.js ignora visible del Group padre para luces
+    setVisible(v) {
+        super.setVisible(v);
+        if (this.#luz) this.#luz.visible = !!v;
     }
 }
