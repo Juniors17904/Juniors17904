@@ -112,6 +112,12 @@ class VisorDisenoPista extends VisorBase {
     get mostrarFlechas() { return this.#mostrarFlechas; }
     get mostrarCielo()   { return this.#mostrarCielo;   }
 
+    // Datos del carro para el panel de debug de Diseño General
+    get velocidad()    { return this.#mov?.velocidad    ?? 0; }
+    get velocidadMax() { return this.#mov?.velocidadMax ?? 0; }
+    get px()           { return this.#mov?.px           ?? 0; }
+    get pz()           { return this.#mov?.pz           ?? 0; }
+
     constructor(canvas, pista) {
         super();
         this.#canvas = canvas;

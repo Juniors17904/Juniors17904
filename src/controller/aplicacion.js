@@ -1318,9 +1318,43 @@ class Aplicacion {
         this.#visorDG.mostrarPista   = document.getElementById('tog-pista').checked;
         this.#visorDG.mostrarAuto    = document.getElementById('tog-auto').checked;
         this.#visorDG.mostrarObjetos = document.getElementById('tog-objetos').checked;
+        this.#visorDG.mostrarPostes  = document.getElementById('tog-postes').checked;
         this.#visorDG.mostrarSenales = document.getElementById('tog-senales').checked;
         this.#visorDG.mostrarFlechas = document.getElementById('tog-flechas').checked;
         this.#visorDG.mostrarCielo   = document.getElementById('tog-cielo').checked;
+
+        // Panel de debug — loop RAF que actualiza datos si el panel está visible
+        let _dgFps = 60, _dgFrames = 0, _dgFpsLast = performance.now();
+        const _dgDbgLoop = () => {
+            if (!this.#visorDG) return;
+            _dgFrames++;
+            const now = performance.now();
+            if (now - _dgFpsLast >= 500) {
+                _dgFps = Math.round(_dgFrames * 1000 / (now - _dgFpsLast));
+                _dgFrames = 0; _dgFpsLast = now;
+            }
+            const panel = document.getElementById('debug-dg');
+            if (panel?.style.display !== 'none') {
+                const dg  = this.#visorDG;
+                const kmh = Math.round(Math.abs(dg.velocidad) * 216);
+                document.getElementById('dgd-kmh').textContent   = kmh;
+                document.getElementById('dgd-vmax').textContent  = Math.round(dg.velocidadMax * 216);
+                document.getElementById('dgd-gas').textContent   = dg.entradaAcel ===  1 ? '⬆ GAS'
+                                                                 : dg.entradaAcel === -1 ? '⬇ FREN' : 'NEUTRO';
+                document.getElementById('dgd-steer').textContent = dg.entradaDireccion < -0.1 ? '◀ IZQ'
+                                                                 : dg.entradaDireccion >  0.1 ? 'DER ▶' : 'RECTO';
+                document.getElementById('dgd-px').textContent    = dg.px.toFixed(1);
+                document.getElementById('dgd-pz').textContent    = dg.pz.toFixed(1);
+                document.getElementById('dgd-fps').textContent   = _dgFps;
+            }
+            requestAnimationFrame(_dgDbgLoop);
+        };
+        requestAnimationFrame(_dgDbgLoop);
+
+        document.getElementById('btn-datos-dg').addEventListener('click', () => {
+            const panel = document.getElementById('debug-dg');
+            panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+        });
 
         // Activar control (teclado o timón según preferencia)
         this.#vistaConduccion.aplicarA(this.#visorDG, this.#estado.timonModelo);
