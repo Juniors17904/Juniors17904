@@ -252,6 +252,7 @@ class Aplicacion {
             document.getElementById('tog-auto').checked    = true;
             document.getElementById('tog-botones').checked = true;
             document.getElementById('tog-objetos').checked = true;
+            document.getElementById('tog-postes').checked  = true;
             document.getElementById('tog-senales').checked = true;
             document.getElementById('tog-flechas').checked = true;
             document.getElementById('tog-cielo').checked   = false;
@@ -280,6 +281,9 @@ class Aplicacion {
         });
         document.getElementById('tog-objetos').addEventListener('change', e => {
             if (this.#visorDG) this.#visorDG.mostrarObjetos = e.target.checked;
+        });
+        document.getElementById('tog-postes').addEventListener('change', e => {
+            if (this.#visorDG) this.#visorDG.mostrarPostes = e.target.checked;
         });
         document.getElementById('tog-senales').addEventListener('change', e => {
             if (this.#visorDG) this.#visorDG.mostrarSenales = e.target.checked;
