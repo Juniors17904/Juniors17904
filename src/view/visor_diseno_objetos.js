@@ -53,7 +53,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#controlOrbita = new ControlOrbitaObjeto();
         this.#controlOrbita.activar(this.#camera, this.#canvas);
 
-        this.#scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+        this.#scene.add(new THREE.AmbientLight(0xffffff, 0.3));
 
         // ── Piso (suelo + carretera) agrupados para poder ocultarlos ─
         this.#grupoPiso = new THREE.Group();
