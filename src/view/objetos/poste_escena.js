@@ -31,7 +31,7 @@ export class PosteEscena extends ObjetoEscena {
         );
         lampara.position.set(1.1, 5.0, 0);
 
-        const luz = new THREE.PointLight(0xffe8a0, 60, 12);
+        const luz = new THREE.PointLight(0xffe8a0, 150, 12);
         luz.position.set(1.1, 4.8, 0);
 
         grupo.add(poste, brazo, lampara, luz);
