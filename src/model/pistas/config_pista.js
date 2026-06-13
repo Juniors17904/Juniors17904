@@ -19,10 +19,13 @@ class ConfigPista {
     // Las subclases llaman this._postesEnPista() en su get decoraciones().
     _postesEnPista(cadaSegs = 2, dist = 5.5) {
         const resultado = [];
+        let idx = 0;
         for (let i = 0; i < this.totalSegs; i += cadaSegs) {
-            const prog = i / this.totalSegs;
-            const lado = (Math.floor(i / cadaSegs) % 2 === 0) ? 1 : -1;
-            resultado.push({ tipo: 'poste', prog, lado, dist });
+            const prog   = i / this.totalSegs;
+            const lado   = (idx % 2 === 0) ? 1 : -1;
+            const conLuz = (idx % 4 === 0);   // 1 de cada 4 postes lleva PointLight
+            resultado.push({ tipo: 'poste', prog, lado, dist, conLuz });
+            idx++;
         }
         return resultado;
     }

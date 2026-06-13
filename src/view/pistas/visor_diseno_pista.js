@@ -311,12 +311,12 @@ class VisorDisenoPista extends VisorBase {
     // ── Posición en mundo a partir de datos relativos a la ruta ──
     #fabrica = new FabricaObjetoEscena();
 
-    #crearObjeto({ tipo, prog, lado, dist, escala = 1, texto = '', direccion = 'derecha' }) {
+    #crearObjeto({ tipo, prog, lado, dist, escala = 1, texto = '', direccion = 'derecha', conLuz = true }) {
         const pos  = this.#ruta.posicionEn(prog);
         const wx   = pos.x + Math.cos(pos.angle) * dist * lado;
         const wz   = pos.z - Math.sin(pos.angle) * dist * lado;
         const rotY = pos.angle;
-        return this.#fabrica.crear(tipo, wx, wz, { escala, texto, direccion, rotY, lado });
+        return this.#fabrica.crear(tipo, wx, wz, { escala, texto, direccion, rotY, lado, conLuz });
     }
 
     // ── Cargar auto ──────────────────────────────────────────────

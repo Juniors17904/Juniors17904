@@ -18,10 +18,10 @@ import { NubeEscena }           from './nube_escena.js';
 // ================================================================
 export class FabricaObjetoEscena {
     crear(tipo, x = 0, z = 0, opciones = {}) {
-        const { escala = 1, texto = '', direccion = 'derecha', rotY = 0, lado = -1 } = opciones;
+        const { escala = 1, texto = '', direccion = 'derecha', rotY = 0, lado = -1, conLuz = true } = opciones;
         switch (tipo) {
             case 'arbol':          return new ArbolEscena(x, z, escala);
-            case 'poste':          return new PosteEscena(x, z, rotY, lado);
+            case 'poste':          return new PosteEscena(x, z, rotY, lado, conLuz);
             case 'aviso':          return new AvisoEscena(x, z, texto);
             case 'meta':           return new MetaEscena(x, z);
             case 'salida':         return new SalidaEscena(x, z);

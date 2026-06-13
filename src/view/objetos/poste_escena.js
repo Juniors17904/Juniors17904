@@ -2,7 +2,8 @@
 import * as THREE from 'three';
 import { ObjetoEscena } from './objeto_escena.js';
 
-const INTENSIDAD_LUZ = 150;
+const INTENSIDAD_LUZ = 300;
+const RANGO_LUZ      = 30;
 
 // ================================================================
 // CLASS: PosteEscena — poste de alumbrado urbano
@@ -10,19 +11,21 @@ const INTENSIDAD_LUZ = 150;
 //        de la pista: lado=+1 (derecha) → brazo hacia -X local,
 //        lado=-1 (izquierda) → brazo hacia +X local.
 //
-//        La PointLight se añade DIRECTAMENTE a la escena (no al
-//        grupo) para evitar recompilación de shaders de Three.js
-//        cuando el toggle de postes cambia el conteo de luces activas.
-//        Al ocultar postes se usa intensity=0 en vez de visible=false.
+//        Solo 1 de cada 4 postes lleva PointLight real (conLuz=true).
+//        La luz se añade DIRECTAMENTE a la escena para mantener el
+//        conteo de luces fijo y evitar recompilación de shaders.
+//        El apagado/encendido usa intensity=0/INTENSIDAD en vez de visible.
 // ================================================================
 export class PosteEscena extends ObjetoEscena {
     #lado;
+    #conLuz;
     #luz   = null;
     #scene = null;
 
-    constructor(x, z, rotY = 0, lado = -1) {
+    constructor(x, z, rotY = 0, lado = -1, conLuz = true) {
         super(x, z, rotY);
-        this.#lado = lado;
+        this.#lado   = lado;
+        this.#conLuz = conLuz;
     }
 
     _poblar(grupo) {
@@ -46,17 +49,17 @@ export class PosteEscena extends ObjetoEscena {
         );
         lampara.position.set(-1.1 * this.#lado, 5.0, 0);
 
-        this.#luz = new THREE.PointLight(0xffe8a0, INTENSIDAD_LUZ, 12);
-        this.#luz.position.set(-1.1 * this.#lado, 4.8, 0);
+        if (this.#conLuz) {
+            this.#luz = new THREE.PointLight(0xffe8a0, INTENSIDAD_LUZ, RANGO_LUZ);
+            this.#luz.position.set(-1.1 * this.#lado, 4.8, 0);
+        }
 
-        // La luz NO se agrega al grupo — se agrega a la escena en construir()
         grupo.add(poste, brazo, lampara);
     }
 
     construir(scene) {
         this.#scene = scene;
         super.construir(scene);
-        // Calcular posición mundial de la luz y añadirla directo a la escena
         if (this.#luz && this._grupo) {
             this._grupo.updateMatrixWorld(true);
             const posM = this.#luz.position.clone();
@@ -66,8 +69,6 @@ export class PosteEscena extends ObjetoEscena {
         }
     }
 
-    // Alterna geometría (grupo) y controla la luz con intensity en vez de visible,
-    // evitando que Three.js recompile shaders al cambiar el conteo de luces activas
     setVisible(v) {
         super.setVisible(v);
         if (this.#luz) this.#luz.intensity = v ? INTENSIDAD_LUZ : 0;
