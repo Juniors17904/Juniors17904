@@ -4,10 +4,16 @@ import { ObjetoEscena } from './objeto_escena.js';
 
 // ================================================================
 // CLASS: PosteEscena — poste de alumbrado urbano
+//        El brazo y la lámpara apuntan siempre hacia el interior
+//        de la pista: lado=+1 (derecha) → brazo hacia -X local,
+//        lado=-1 (izquierda) → brazo hacia +X local.
 // ================================================================
 export class PosteEscena extends ObjetoEscena {
-    constructor(x, z) {
-        super(x, z);
+    #lado;
+
+    constructor(x, z, rotY = 0, lado = -1) {
+        super(x, z, rotY);
+        this.#lado = lado;
     }
 
     _poblar(grupo) {
@@ -22,17 +28,18 @@ export class PosteEscena extends ObjetoEscena {
             new THREE.CylinderGeometry(0.04, 0.04, 1.2, 6),
             new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.6 })
         );
-        brazo.position.set(0.6, 5.0, 0);
+        // -lado: brazo apunta hacia el interior de la pista
+        brazo.position.set(-0.6 * this.#lado, 5.0, 0);
         brazo.rotation.z = Math.PI / 2;
 
         const lampara = new THREE.Mesh(
             new THREE.SphereGeometry(0.18, 8, 6),
             new THREE.MeshStandardMaterial({ color: 0xfffbe0, emissive: 0xfffbe0, emissiveIntensity: 0.6 })
         );
-        lampara.position.set(1.1, 5.0, 0);
+        lampara.position.set(-1.1 * this.#lado, 5.0, 0);
 
         const luz = new THREE.PointLight(0xffe8a0, 150, 12);
-        luz.position.set(1.1, 4.8, 0);
+        luz.position.set(-1.1 * this.#lado, 4.8, 0);
 
         grupo.add(poste, brazo, lampara, luz);
     }

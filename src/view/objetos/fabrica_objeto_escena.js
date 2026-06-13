@@ -21,7 +21,7 @@ export class FabricaObjetoEscena {
         const { escala = 1, texto = '', direccion = 'derecha', rotY = 0, lado = -1 } = opciones;
         switch (tipo) {
             case 'arbol':          return new ArbolEscena(x, z, escala);
-            case 'poste':          return new PosteEscena(x, z);
+            case 'poste':          return new PosteEscena(x, z, rotY, lado);
             case 'aviso':          return new AvisoEscena(x, z, texto);
             case 'meta':           return new MetaEscena(x, z);
             case 'salida':         return new SalidaEscena(x, z);

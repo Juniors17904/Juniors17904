@@ -15,6 +15,18 @@ class ConfigPista {
     get coloresTrafico()  { return []; }
     get decoraciones()    { return []; }
 
+    // Genera postes de alumbrado cada `cadaSegs` segmentos, alternando lados.
+    // Las subclases llaman this._postesEnPista() en su get decoraciones().
+    _postesEnPista(cadaSegs = 2, dist = 5.5) {
+        const resultado = [];
+        for (let i = 0; i < this.totalSegs; i += cadaSegs) {
+            const prog = i / this.totalSegs;
+            const lado = (Math.floor(i / cadaSegs) % 2 === 0) ? 1 : -1;
+            resultado.push({ tipo: 'poste', prog, lado, dist });
+        }
+        return resultado;
+    }
+
     // Genera entradas de flecha para cada segmento de curva.
     // Las subclases llaman this._flechasEnCurvas() en su get decoraciones().
     _flechasEnCurvas() {
