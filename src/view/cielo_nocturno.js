@@ -12,7 +12,7 @@ import { Luna }  from './cielos/luna.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #malla     = null;
-    #luna      = new Luna(0.25, 0.38);
+    #luna      = new Luna(0.25, 0.46);
     #nubes     = [
         new Nube(0.875, 0.59, 0.30),
         new Nube(0.810, 0.55, 0.22),
