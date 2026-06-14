@@ -21,17 +21,7 @@ export class Luna extends ObjetoCielo {
         const y = this.#posY * H;
         const r = W * 0.0066;
 
-        // Halo atmosférico azulado difuso
-        const haloExt = ctx.createRadialGradient(x, y, r, x, y, r * 4.0);
-        haloExt.addColorStop(0,   'rgba(180,205,255,0.22)');
-        haloExt.addColorStop(0.3, 'rgba(150,180,240,0.10)');
-        haloExt.addColorStop(1,   'rgba(100,140,220,0)');
-        ctx.fillStyle = haloExt;
-        ctx.beginPath();
-        ctx.arc(x, y, r * 4.0, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Disco lunar — crema claro con ligero gradiente esférico
+        // Disco lunar — color sólido sin halo para máxima nitidez
         const disco = ctx.createRadialGradient(x - r * 0.18, y - r * 0.18, 0, x, y, r);
         disco.addColorStop(0,    '#f0eedf');
         disco.addColorStop(0.6,  '#dddac8');
