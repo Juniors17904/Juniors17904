@@ -42,7 +42,7 @@ export class PosteEscena extends ObjetoEscena {
         brazo.position.set(-0.6 * this.#lado, 5.0, 0);
         brazo.rotation.z = Math.PI / 2;
 
-        const colorLampara = this.#conLuz ? 0xff0000 : 0xfffbe0;
+        const colorLampara = this.#conLuz ? 0xfffbe0 : 0xff0000;
         const lampara = new THREE.Mesh(
             new THREE.SphereGeometry(0.18, 8, 6),
             new THREE.MeshStandardMaterial({ color: colorLampara, emissive: colorLampara, emissiveIntensity: 0.6 })
