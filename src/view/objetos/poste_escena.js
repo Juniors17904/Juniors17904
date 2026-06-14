@@ -34,7 +34,6 @@ export class PosteEscena extends ObjetoEscena {
             new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.6 })
         );
         poste.position.y = 2.5;
-        poste.castShadow = true;
 
         const brazo = new THREE.Mesh(
             new THREE.CylinderGeometry(0.04, 0.04, 1.2, 6),

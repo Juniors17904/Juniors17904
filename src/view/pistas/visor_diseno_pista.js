@@ -132,10 +132,9 @@ class VisorDisenoPista extends VisorBase {
         const H = this.#canvas.height || window.innerHeight;
 
         this.#renderer = new THREE.WebGLRenderer({ canvas: this.#canvas, antialias: true });
-        this.#renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+        this.#renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
         this.#renderer.setSize(W, H, false);
-        this.#renderer.shadowMap.enabled = true;
-        this.#renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+        this.#renderer.shadowMap.enabled = false;
         this.#renderer.toneMapping         = THREE.ACESFilmicToneMapping;
         this.#renderer.toneMappingExposure = 1.4;
 
@@ -151,11 +150,6 @@ class VisorDisenoPista extends VisorBase {
 
         this.#scene.add(new THREE.AmbientLight(0x8899bb, 0.28));
         this.#sol = new THREE.DirectionalLight(0xaabbdd, 0.35);
-        this.#sol.castShadow = true;
-        this.#sol.shadow.mapSize.set(1024, 1024);
-        this.#sol.shadow.camera.near = 1; this.#sol.shadow.camera.far = 60;
-        this.#sol.shadow.camera.left = this.#sol.shadow.camera.bottom = -15;
-        this.#sol.shadow.camera.right = this.#sol.shadow.camera.top   =  15;
         this.#scene.add(this.#sol, this.#sol.target);
         const posSol = this.#cielo.posicionSol;
         if (posSol) this.#sol.position.copy(posSol);
@@ -376,10 +370,6 @@ class VisorDisenoPista extends VisorBase {
                 this.#carGroup.rotation.y = this.#mov.rotY;
             }
             if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
-
-            this.#sol.position.set(this.#mov.px + 10, 20, this.#mov.pz + 10);
-            this.#sol.target.position.set(this.#mov.px, 0, this.#mov.pz);
-            this.#sol.target.updateMatrixWorld();
 
             this.#camaraChase.altura = this.alturaCamara;
             this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.entradaDireccion);
