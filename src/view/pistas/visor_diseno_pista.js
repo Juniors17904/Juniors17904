@@ -175,9 +175,16 @@ class VisorDisenoPista extends VisorBase {
         halo.lookAt(0, pos.y, 0);
         this.#scene.add(halo);
 
-        // Disco lunar — geometría pura, borde matemáticamente nítido
+        // Anillo oscuro fino — define el borde contra el cielo y neutraliza el blur del anti-aliasing
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x060c1a, depthWrite: false, side: THREE.DoubleSide });
+        const ring    = new THREE.Mesh(new THREE.RingGeometry(13.2, 15.2, 64), ringMat);
+        ring.position.copy(pos);
+        ring.lookAt(0, pos.y, 0);
+        this.#scene.add(ring);
+
+        // Disco lunar — geometría pura, borde nítido
         const discoMat = new THREE.MeshBasicMaterial({ color: 0xf5f3e8, depthWrite: false, side: THREE.DoubleSide });
-        const disco    = new THREE.Mesh(new THREE.CircleGeometry(14, 64), discoMat);
+        const disco    = new THREE.Mesh(new THREE.CircleGeometry(13.2, 64), discoMat);
         disco.position.copy(pos);
         disco.lookAt(0, pos.y, 0);
         this.#scene.add(disco);
