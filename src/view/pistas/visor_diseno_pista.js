@@ -373,8 +373,10 @@ class VisorDisenoPista extends VisorBase {
         for (const obj of this.#objetosPostes)   obj.destruir(this.#scene);
         this.#objetos = []; this.#objetosSenales = []; this.#objetosFlechas = []; this.#objetosPostes = [];
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
+        const gl = this.#renderer?.getContext();
         this.#renderer?.dispose();
         this.#renderer = null;
+        gl?.getExtension('WEBGL_lose_context')?.loseContext();
     }
 
     #tick() {

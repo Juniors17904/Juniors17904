@@ -260,7 +260,7 @@ class Aplicacion {
         });
         document.getElementById('btn-recargar-diseno-general').addEventListener('click', () => {
             this.#detenerVisorDG();
-            this.#iniciarVisorDG();
+            setTimeout(() => this.#iniciarVisorDG(), 150);
         });
         document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
             e.stopPropagation();
