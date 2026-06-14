@@ -19,7 +19,7 @@ export class Luna extends ObjetoCielo {
     dibujar(ctx, W, H, _rng) {
         const x = this.#posX * W;
         const y = this.#posY * H;
-        const r = W * 0.0065;  // ~13px en canvas 2048
+        const r = W * 0.011;  // más grande para contrarrestar el blur de la textura
 
         // Halo exterior amplio — resplandor azulado frío
         const haloExt = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 3.0);
@@ -41,16 +41,20 @@ export class Luna extends ObjetoCielo {
         ctx.arc(x, y, r * 1.7, 0, Math.PI * 2);
         ctx.fill();
 
-        // Disco lunar — blanco frío, luz desde arriba-izquierda
+        // Disco lunar — borde duro, gradiente comprimido al interior
         const disco = ctx.createRadialGradient(x - r * 0.22, y - r * 0.22, 0, x, y, r);
-        disco.addColorStop(0,   '#f8f8f2');
-        disco.addColorStop(0.45, '#edeae0');
-        disco.addColorStop(0.85, '#d8d4c8');
-        disco.addColorStop(1,   '#c8c2b0');
+        disco.addColorStop(0,    '#f8f8f2');
+        disco.addColorStop(0.6,  '#edeae0');
+        disco.addColorStop(0.92, '#d8d4c8');
+        disco.addColorStop(1,    '#c0baa8');
         ctx.fillStyle = disco;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
+        // Contorno oscuro para definir el borde contra el cielo
+        ctx.strokeStyle = 'rgba(20,30,55,0.45)';
+        ctx.lineWidth   = r * 0.12;
+        ctx.stroke();
 
         // Sombra en el lado derecho para dar volumen esférico
         const sombra = ctx.createRadialGradient(x + r * 0.3, y + r * 0.2, r * 0.4, x, y, r);
