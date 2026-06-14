@@ -143,7 +143,7 @@ class VisorDisenoPista extends VisorBase {
         const colorCielo = this.#pista?.cielo ?? '#4a9eca';
         this.#cielo = tipoCielo === 'soleado'
             ? new CieloSoleado(colorCielo)
-            : new CieloNocturno(colorCielo, { sinLuna: true });
+            : new CieloNocturno(colorCielo);
         this.#cielo.construir(this.#scene);
 
         if (tipoCielo === 'nocturno') this.#agregarLuna3D();
@@ -168,16 +168,16 @@ class VisorDisenoPista extends VisorBase {
     #agregarLuna3D() {
         const pos = new THREE.Vector3(-280, 180, -450);
 
-        // Anillo oscuro — define el borde nítido contra el cielo
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x03060d, depthWrite: false, side: THREE.DoubleSide });
-        const ring    = new THREE.Mesh(new THREE.RingGeometry(18, 21, 64), ringMat);
+        // Anillo oscuro grueso — contraste fuerte para definir el borde
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x04080f, depthWrite: false, side: THREE.DoubleSide });
+        const ring    = new THREE.Mesh(new THREE.RingGeometry(11.5, 14.5, 64), ringMat);
         ring.position.copy(pos);
         ring.lookAt(0, pos.y, 0);
         this.#scene.add(ring);
 
-        // Disco lunar — color crema visible sin bloom
-        const discoMat = new THREE.MeshBasicMaterial({ color: 0xd8d4c2, depthWrite: false, side: THREE.DoubleSide });
-        const disco    = new THREE.Mesh(new THREE.CircleGeometry(18, 64), discoMat);
+        // Disco lunar — color crema medio (no blanco puro) para evitar bloom del toneMapping
+        const discoMat = new THREE.MeshBasicMaterial({ color: 0xc8c4b2, depthWrite: false, side: THREE.DoubleSide });
+        const disco    = new THREE.Mesh(new THREE.CircleGeometry(11.5, 64), discoMat);
         disco.position.copy(pos);
         disco.lookAt(0, pos.y, 0);
         this.#scene.add(disco);
