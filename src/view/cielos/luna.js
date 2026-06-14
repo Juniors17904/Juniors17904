@@ -19,7 +19,7 @@ export class Luna extends ObjetoCielo {
     dibujar(ctx, W, H, _rng) {
         const x = this.#posX * W;
         const y = this.#posY * H;
-        const r = W * 0.0066;
+        const r = W * 0.0046;
 
         // Disco lunar — color sólido sin halo para máxima nitidez
         const disco = ctx.createRadialGradient(x - r * 0.18, y - r * 0.18, 0, x, y, r);
