@@ -59,8 +59,8 @@ class RenderizadorPista {
                 ctx.lineTo(cx2 + w2, y2); ctx.lineTo(cx2 - w2, y2);
                 ctx.closePath(); ctx.fill();
 
-                const bw1 = w1 * 0.07, bw2 = w2 * 0.07;
-                ctx.fillStyle = nv.borde;
+                const bw1 = w1 * 0.09, bw2 = w2 * 0.09;
+                ctx.fillStyle = alt ? '#cc0000' : '#f0f0f0';
                 ctx.beginPath();
                 ctx.moveTo(cx1 - w1, y1);       ctx.lineTo(cx1 - w1 + bw1, y1);
                 ctx.lineTo(cx2 - w2 + bw2, y2); ctx.lineTo(cx2 - w2, y2);
