@@ -240,8 +240,8 @@ class VisorDisenoPista extends VisorBase {
         grupoPista.add(road);
 
         const curbW = 0.7, BAND = 10;
-        const redMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.7, side: THREE.DoubleSide });
-        const whtMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.7, side: THREE.DoubleSide });
+        const redMat = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.3, emissive: 0xaa0000, emissiveIntensity: 0.25, side: THREE.DoubleSide });
+        const whtMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25, emissive: 0xffffff, emissiveIntensity: 0.2,  side: THREE.DoubleSide });
 
         const _buildCurbs = (lo, ro) => {
             const rPos=[], rNor=[], rIdx=[], wPos=[], wNor=[], wIdx=[];
