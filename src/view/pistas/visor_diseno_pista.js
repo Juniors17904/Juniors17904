@@ -166,37 +166,21 @@ class VisorDisenoPista extends VisorBase {
     }
 
     #agregarLuna3D() {
-        const cv = document.createElement('canvas');
-        cv.width = cv.height = 256;
-        const c = cv.getContext('2d');
-        const cx = 128, cy = 128, r = 110;
-        // Halo
-        const halo = c.createRadialGradient(cx, cy, r * 0.9, cx, cy, r * 2.2);
-        halo.addColorStop(0,   'rgba(180,205,255,0.22)');
-        halo.addColorStop(1,   'rgba(100,140,220,0)');
-        c.fillStyle = halo;
-        c.beginPath(); c.arc(cx, cy, r * 2.2, 0, Math.PI * 2); c.fill();
-        // Disco
-        const disco = c.createRadialGradient(cx - 20, cy - 20, 0, cx, cy, r);
-        disco.addColorStop(0,    '#ffffff');
-        disco.addColorStop(0.6,  '#f5f4ee');
-        disco.addColorStop(0.92, '#e8e4d8');
-        disco.addColorStop(1,    '#d8d2c0');
-        c.fillStyle = disco;
-        c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
-        // Sombra esférica
-        const sombra = c.createRadialGradient(cx + 30, cy + 20, 30, cx, cy, r);
-        sombra.addColorStop(0,   'rgba(50,60,85,0)');
-        sombra.addColorStop(1,   'rgba(20,35,60,0.18)');
-        c.fillStyle = sombra;
-        c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
+        const pos = new THREE.Vector3(-280, 180, -450);
 
-        const tex = new THREE.CanvasTexture(cv);
-        tex.minFilter = THREE.LinearFilter;
-        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
-        sprite.position.set(-280, 180, -450);
-        sprite.scale.set(38, 38, 1);
-        this.#scene.add(sprite);
+        // Halo — círculo semitransparente detrás del disco
+        const haloMat = new THREE.MeshBasicMaterial({ color: 0xb0c8ff, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide });
+        const halo    = new THREE.Mesh(new THREE.CircleGeometry(22, 64), haloMat);
+        halo.position.copy(pos);
+        halo.lookAt(0, pos.y, 0);
+        this.#scene.add(halo);
+
+        // Disco lunar — geometría pura, borde matemáticamente nítido
+        const discoMat = new THREE.MeshBasicMaterial({ color: 0xf5f3e8, depthWrite: false, side: THREE.DoubleSide });
+        const disco    = new THREE.Mesh(new THREE.CircleGeometry(14, 64), discoMat);
+        disco.position.copy(pos);
+        disco.lookAt(0, pos.y, 0);
+        this.#scene.add(disco);
     }
 
     #resize() {
