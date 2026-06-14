@@ -146,6 +146,8 @@ class VisorDisenoPista extends VisorBase {
             : new CieloNocturno(colorCielo);
         this.#cielo.construir(this.#scene);
 
+        if (tipoCielo === 'nocturno') this.#agregarLuna3D();
+
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
 
         this.#scene.add(new THREE.AmbientLight(0x8899bb, 0.28));
@@ -161,6 +163,40 @@ class VisorDisenoPista extends VisorBase {
 
         this.#resizeObs = new ResizeObserver(() => this.#resize());
         this.#resizeObs.observe(this.#canvas);
+    }
+
+    #agregarLuna3D() {
+        const cv = document.createElement('canvas');
+        cv.width = cv.height = 256;
+        const c = cv.getContext('2d');
+        const cx = 128, cy = 128, r = 110;
+        // Halo
+        const halo = c.createRadialGradient(cx, cy, r * 0.9, cx, cy, r * 2.2);
+        halo.addColorStop(0,   'rgba(180,205,255,0.22)');
+        halo.addColorStop(1,   'rgba(100,140,220,0)');
+        c.fillStyle = halo;
+        c.beginPath(); c.arc(cx, cy, r * 2.2, 0, Math.PI * 2); c.fill();
+        // Disco
+        const disco = c.createRadialGradient(cx - 20, cy - 20, 0, cx, cy, r);
+        disco.addColorStop(0,    '#ffffff');
+        disco.addColorStop(0.6,  '#f5f4ee');
+        disco.addColorStop(0.92, '#e8e4d8');
+        disco.addColorStop(1,    '#d8d2c0');
+        c.fillStyle = disco;
+        c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
+        // Sombra esférica
+        const sombra = c.createRadialGradient(cx + 30, cy + 20, 30, cx, cy, r);
+        sombra.addColorStop(0,   'rgba(50,60,85,0)');
+        sombra.addColorStop(1,   'rgba(20,35,60,0.18)');
+        c.fillStyle = sombra;
+        c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.fill();
+
+        const tex = new THREE.CanvasTexture(cv);
+        tex.minFilter = THREE.LinearFilter;
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+        sprite.position.set(-280, 180, -450);
+        sprite.scale.set(38, 38, 1);
+        this.#scene.add(sprite);
     }
 
     #resize() {
