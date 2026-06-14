@@ -176,7 +176,7 @@ class VisorDisenoPista extends VisorBase {
         this.#scene.add(ring);
 
         // Disco lunar — color crema medio (no blanco puro) para evitar bloom del toneMapping
-        const discoMat = new THREE.MeshBasicMaterial({ color: 0xc8c4b2, depthWrite: false, side: THREE.DoubleSide });
+        const discoMat = new THREE.MeshBasicMaterial({ color: 0xff0000, depthWrite: false, side: THREE.DoubleSide });
         const disco    = new THREE.Mesh(new THREE.CircleGeometry(11.5, 64), discoMat);
         disco.position.copy(pos);
         disco.lookAt(0, pos.y, 0);
