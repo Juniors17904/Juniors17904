@@ -143,7 +143,7 @@ class VisorDisenoPista extends VisorBase {
         const colorCielo = this.#pista?.cielo ?? '#4a9eca';
         this.#cielo = tipoCielo === 'soleado'
             ? new CieloSoleado(colorCielo)
-            : new CieloNocturno(colorCielo);
+            : new CieloNocturno(colorCielo, { sinLuna: true });
         this.#cielo.construir(this.#scene);
 
         if (tipoCielo === 'nocturno') this.#agregarLuna3D();
@@ -166,7 +166,7 @@ class VisorDisenoPista extends VisorBase {
     }
 
     #agregarLuna3D() {
-        const pos = new THREE.Vector3(-280, 180, -450);
+        const pos = new THREE.Vector3(-60, 200, -400);
 
         // Anillo oscuro grueso — contraste fuerte para definir el borde
         const ringMat = new THREE.MeshBasicMaterial({ color: 0x04080f, depthWrite: false, side: THREE.DoubleSide });
