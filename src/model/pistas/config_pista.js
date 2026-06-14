@@ -23,7 +23,7 @@ class ConfigPista {
         for (let i = 0; i < this.totalSegs; i += cadaSegs) {
             const prog   = i / this.totalSegs;
             const lado   = (idx % 2 === 0) ? 1 : -1;
-            const conLuz = (Math.floor(idx / 2) % 2 === 0); // par izq+der comparten estado de luz
+            const conLuz = (Math.floor(idx / 2) % 4 === 0); // par izq+der sincronizados, 1 par de cada 4 alumbra
             resultado.push({ tipo: 'poste', prog, lado, dist, conLuz });
             idx++;
         }
