@@ -12,7 +12,6 @@ import { Luna }  from './cielos/luna.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #malla     = null;
-    #sinLuna;
     #luna      = new Luna(0.25, 0.46);
     #nubes     = [
         new Nube(0.875, 0.59, 0.30),
@@ -22,9 +21,8 @@ export class CieloNocturno extends Cielo {
         new Nube(0.960, 0.52, 0.19),
     ];
 
-    constructor(colorCielo = '#050e20', { sinLuna = false } = {}) {
+    constructor(colorCielo = '#050e20') {
         super(colorCielo);
-        this.#sinLuna = sinLuna;
     }
 
     construir(scene) {
@@ -114,7 +112,7 @@ export class CieloNocturno extends Cielo {
         }
 
         // Luna
-        if (!this.#sinLuna) this.#luna.dibujar(ctx, W, H, rng);
+        this.#luna.dibujar(ctx, W, H, rng);
 
         // Nubes delante de la luna
         for (const nube of this.#nubes) nube.dibujar(ctx, W, H, rng);
