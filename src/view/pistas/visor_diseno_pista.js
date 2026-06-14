@@ -143,7 +143,7 @@ class VisorDisenoPista extends VisorBase {
         const colorCielo = this.#pista?.cielo ?? '#4a9eca';
         this.#cielo = tipoCielo === 'soleado'
             ? new CieloSoleado(colorCielo)
-            : new CieloNocturno(colorCielo);
+            : new CieloNocturno(colorCielo, { sinLuna: true });
         this.#cielo.construir(this.#scene);
 
         if (tipoCielo === 'nocturno') this.#agregarLuna3D();
