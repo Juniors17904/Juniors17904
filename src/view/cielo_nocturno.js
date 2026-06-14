@@ -88,7 +88,7 @@ export class CieloNocturno extends Cielo {
         for (let i = 0; i < 650; i++) {
             const x  = rng() * W;
             const y  = (0.38 + rng() * 0.30) * H;
-            const r  = rng() * 0.7 + 0.5;
+            const r  = rng() * 0.56 + 0.4;
             const al = (rng() * 0.4 + 0.6).toFixed(2);
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -100,7 +100,7 @@ export class CieloNocturno extends Cielo {
         for (let i = 0; i < 45; i++) {
             const x = rng() * W;
             const y = (0.40 + rng() * 0.22) * H;
-            const r = rng() * 1.5 + 1.5;
+            const r = rng() * 1.2 + 1.2;
             const g = ctx.createRadialGradient(x, y, 0, x, y, r * 3);
             g.addColorStop(0,   'rgba(238,242,255,1.0)');
             g.addColorStop(0.3, 'rgba(190,208,255,0.55)');
@@ -123,7 +123,7 @@ export class CieloNocturno extends Cielo {
         for (let i = 0; i < 9; i++) {
             const x    = rng() * W;
             const y    = (0.45 + rng() * 0.15) * H;
-            const tam  = rng() * 5 + 4;
+            const tam  = rng() * 4 + 3.2;
             const tamV = tam * 0.50;
             const gr   = rng() * 0.4 + 0.6;
 
