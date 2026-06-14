@@ -258,6 +258,10 @@ class Aplicacion {
             document.getElementById('tog-cielo').checked   = false;
             this.#mostrar('pantalla-ajustes');
         });
+        document.getElementById('btn-recargar-diseno-general').addEventListener('click', () => {
+            this.#detenerVisorDG();
+            this.#iniciarVisorDG();
+        });
         document.getElementById('btn-dg-hamburgesa').addEventListener('click', e => {
             e.stopPropagation();
             document.getElementById('dg-dropdown').classList.toggle('abierto');
