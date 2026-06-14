@@ -168,23 +168,16 @@ class VisorDisenoPista extends VisorBase {
     #agregarLuna3D() {
         const pos = new THREE.Vector3(-280, 180, -450);
 
-        // Halo — círculo semitransparente detrás del disco
-        const haloMat = new THREE.MeshBasicMaterial({ color: 0xb0c8ff, transparent: true, opacity: 0.12, depthWrite: false, side: THREE.DoubleSide });
-        const halo    = new THREE.Mesh(new THREE.CircleGeometry(22, 64), haloMat);
-        halo.position.copy(pos);
-        halo.lookAt(0, pos.y, 0);
-        this.#scene.add(halo);
-
-        // Anillo oscuro fino — define el borde contra el cielo y neutraliza el blur del anti-aliasing
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x060c1a, depthWrite: false, side: THREE.DoubleSide });
-        const ring    = new THREE.Mesh(new THREE.RingGeometry(13.2, 15.2, 64), ringMat);
+        // Anillo oscuro grueso — contraste fuerte para definir el borde
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0x04080f, depthWrite: false, side: THREE.DoubleSide });
+        const ring    = new THREE.Mesh(new THREE.RingGeometry(11.5, 14.5, 64), ringMat);
         ring.position.copy(pos);
         ring.lookAt(0, pos.y, 0);
         this.#scene.add(ring);
 
-        // Disco lunar — geometría pura, borde nítido
-        const discoMat = new THREE.MeshBasicMaterial({ color: 0xf5f3e8, depthWrite: false, side: THREE.DoubleSide });
-        const disco    = new THREE.Mesh(new THREE.CircleGeometry(13.2, 64), discoMat);
+        // Disco lunar — color crema medio (no blanco puro) para evitar bloom del toneMapping
+        const discoMat = new THREE.MeshBasicMaterial({ color: 0xc8c4b2, depthWrite: false, side: THREE.DoubleSide });
+        const disco    = new THREE.Mesh(new THREE.CircleGeometry(11.5, 64), discoMat);
         disco.position.copy(pos);
         disco.lookAt(0, pos.y, 0);
         this.#scene.add(disco);
