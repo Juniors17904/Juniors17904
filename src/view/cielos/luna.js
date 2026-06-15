@@ -19,7 +19,7 @@ export class Luna extends ObjetoCielo {
     dibujar(ctx, W, H, _rng) {
         const x = this.#posX * W;
         const y = this.#posY * H;
-        const r = W * 0.015;
+        const r = W * 0.0046;
 
         // Halo exterior atmosférico — glow azulado amplio
         const haloExt = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 6.0);
