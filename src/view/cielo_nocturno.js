@@ -13,6 +13,7 @@ import { Montana } from './cielos/montana.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #malla     = null;
+    #mostrarMontanas = true;
     #luna        = new Luna(0.25, 0.47);
     #montanas    = [
         new Montana(0.03, 0.65, 0.18),
@@ -75,6 +76,23 @@ export class CieloNocturno extends Cielo {
     get visible()  { return this.#malla?.visible ?? false; }
     set visible(v) { if (this.#malla) this.#malla.visible = !!v; }
 
+    setMostrarMontanas(v) {
+        this.#mostrarMontanas = !!v;
+        this.#reconstruirTextura();
+    }
+
+    #reconstruirTextura() {
+        if (!this.#malla) return;
+        this.#malla.material.map?.dispose();
+        const tex = new THREE.CanvasTexture(this.#generarTextura());
+        tex.colorSpace      = THREE.SRGBColorSpace;
+        tex.generateMipmaps = true;
+        tex.minFilter       = THREE.LinearMipmapLinearFilter;
+        tex.anisotropy      = 8;
+        this.#malla.material.map = tex;
+        this.#malla.material.needsUpdate = true;
+    }
+
     destruir(scene) {
         if (!this.#malla) return;
         scene.remove(this.#malla);
@@ -130,7 +148,7 @@ export class CieloNocturno extends Cielo {
         }
 
         // Montañas — siluetas en el horizonte (delante de las estrellas, detrás de las nubes)
-        for (const montana of this.#montanas) montana.dibujar(ctx, W, H, rng);
+        for (const montana of this.#montanas) montana.dibujar(ctx, W, H, rng, this.#mostrarMontanas);
 
         // Nubes detrás de la luna
         for (const nube of this.#nubesAtras) nube.dibujar(ctx, W, H, rng);

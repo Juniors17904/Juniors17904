@@ -103,6 +103,10 @@ class VisorDisenoPista extends VisorBase {
         }
     }
 
+    set mostrarMontanas(v) {
+        this.#cielo?.setMostrarMontanas?.(!!v);
+    }
+
     get mostrarPasto()   { return this.#mostrarPasto;   }
     get mostrarPista()   { return this.#mostrarPista;   }
     get mostrarAuto()    { return this.#mostrarAuto;    }

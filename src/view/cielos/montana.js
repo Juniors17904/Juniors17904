@@ -20,7 +20,7 @@ export class Montana extends ObjetoCielo {
         this.#ancho  = ancho;
     }
 
-    dibujar(ctx, W, H, rng) {
+    dibujar(ctx, W, H, rng, visible = true) {
         const cx    = this.#posX * W;
         const hw    = this.#ancho * W * 0.14;
         const baseY = H * 0.514;
@@ -28,6 +28,8 @@ export class Montana extends ObjetoCielo {
 
         const v1 = rng() * 0.05 - 0.025;
         const v2 = rng() * 0.05 - 0.025;
+
+        if (!visible) return;
 
         ctx.save();
         ctx.beginPath();
