@@ -23,9 +23,9 @@ export class Luna extends ObjetoCielo {
 
         // Halo exterior atmosférico — glow azulado amplio
         const haloExt = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 6.0);
-        haloExt.addColorStop(0,   'rgba(200,220,255,0.18)');
-        haloExt.addColorStop(0.3, 'rgba(170,200,255,0.10)');
-        haloExt.addColorStop(0.6, 'rgba(140,175,240,0.04)');
+        haloExt.addColorStop(0,   'rgba(200,220,255,0.10)');
+        haloExt.addColorStop(0.3, 'rgba(170,200,255,0.06)');
+        haloExt.addColorStop(0.6, 'rgba(140,175,240,0.02)');
         haloExt.addColorStop(1,   'rgba(100,140,220,0)');
         ctx.fillStyle = haloExt;
         ctx.beginPath();
@@ -34,8 +34,8 @@ export class Luna extends ObjetoCielo {
 
         // Corona interior — warm glow alrededor del disco
         const haloInt = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 2.4);
-        haloInt.addColorStop(0,   'rgba(255,250,220,0.40)');
-        haloInt.addColorStop(0.4, 'rgba(230,240,255,0.18)');
+        haloInt.addColorStop(0,   'rgba(255,250,220,0.22)');
+        haloInt.addColorStop(0.4, 'rgba(230,240,255,0.10)');
         haloInt.addColorStop(1,   'rgba(180,210,255,0)');
         ctx.fillStyle = haloInt;
         ctx.beginPath();
