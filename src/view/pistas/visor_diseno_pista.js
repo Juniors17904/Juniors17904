@@ -296,10 +296,10 @@ class VisorDisenoPista extends VisorBase {
         _buildCurbs(-4 - curbW, -4);
         _buildCurbs(4, 4 + curbW);
 
-        const dashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const DASH = 10, GAP = 10;
+        const dashMat = new THREE.MeshBasicMaterial({ color: 0xffee44 });
+        const DASH = 14, GAP = 10;
         for (let i = 0; i < DIV; i += DASH + GAP) {
-            grupoPista.add(new THREE.Mesh(_ribbon(-0.12, 0.12, 0.005, i, Math.min(i+DASH, DIV)), dashMat));
+            grupoPista.add(new THREE.Mesh(_ribbon(-0.22, 0.22, 0.03, i, Math.min(i+DASH, DIV)), dashMat));
         }
         grupoPista.add(new THREE.Mesh(_ribbon(-4, 4, 0.015, 0, 5), new THREE.MeshBasicMaterial({ color: 0xffffff })));
 
