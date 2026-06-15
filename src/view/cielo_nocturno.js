@@ -27,9 +27,10 @@ export class CieloNocturno extends Cielo {
 
     construir(scene) {
         const tex = new THREE.CanvasTexture(this.#generarTextura());
-        tex.colorSpace    = THREE.SRGBColorSpace;
-        tex.generateMipmaps = false;
-        tex.minFilter = THREE.LinearFilter;
+        tex.colorSpace      = THREE.SRGBColorSpace;
+        tex.generateMipmaps = true;
+        tex.minFilter       = THREE.LinearMipmapLinearFilter;
+        tex.anisotropy      = 8;
         const mat = new THREE.MeshBasicMaterial({
             map: tex, side: THREE.BackSide,
             depthWrite: false, depthTest: false, toneMapped: false, fog: false,
@@ -69,7 +70,7 @@ export class CieloNocturno extends Cielo {
 
     // ── Generación de la textura canvas ─────────────────────────────
     #generarTextura() {
-        const W = 2048, H = 1024;
+        const W = 4096, H = 2048;
         const lienzo = document.createElement('canvas');
         lienzo.width = W; lienzo.height = H;
         const ctx = lienzo.getContext('2d');
