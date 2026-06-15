@@ -14,16 +14,16 @@ export class CieloNocturno extends Cielo {
     #malla     = null;
     #luna        = new Luna(0.22, 0.36);
     #nubesAtras  = [
-        new Nube(0.14, 0.32, 0.42),
-        new Nube(0.28, 0.33, 0.34),
+        new Nube(0.14, 0.32, 0.24),
+        new Nube(0.28, 0.33, 0.20),
     ];
     #nubes       = [
-        new Nube(0.07, 0.40, 0.50),
-        new Nube(0.18, 0.46, 0.42),
-        new Nube(0.34, 0.43, 0.46),
-        new Nube(0.44, 0.37, 0.36),
-        new Nube(0.58, 0.50, 0.38),
-        new Nube(0.12, 0.30, 0.28),
+        new Nube(0.07, 0.40, 0.28),
+        new Nube(0.18, 0.46, 0.24),
+        new Nube(0.34, 0.43, 0.26),
+        new Nube(0.44, 0.37, 0.20),
+        new Nube(0.58, 0.50, 0.22),
+        new Nube(0.12, 0.30, 0.16),
     ];
 
     constructor(colorCielo = '#050e20') {
