@@ -1,8 +1,9 @@
 'use strict';
 import * as THREE from 'three';
 import { Cielo } from './cielo.js';
-import { Nube }  from './cielos/nube.js';
-import { Luna }  from './cielos/luna.js';
+import { Nube }    from './cielos/nube.js';
+import { Luna }    from './cielos/luna.js';
+import { Montana } from './cielos/montana.js';
 
 // ================================================================
 // CLASS: CieloNocturno — domo esférico nocturno con textura canvas.
@@ -13,6 +14,18 @@ import { Luna }  from './cielos/luna.js';
 export class CieloNocturno extends Cielo {
     #malla     = null;
     #luna        = new Luna(0.25, 0.47);
+    #montanas    = [
+        new Montana(0.03, 0.65, 0.18),
+        new Montana(0.12, 0.85, 0.22),
+        new Montana(0.22, 0.55, 0.16),
+        new Montana(0.32, 0.78, 0.20),
+        new Montana(0.43, 0.62, 0.18),
+        new Montana(0.54, 0.80, 0.22),
+        new Montana(0.65, 0.52, 0.16),
+        new Montana(0.75, 0.72, 0.20),
+        new Montana(0.85, 0.68, 0.18),
+        new Montana(0.94, 0.76, 0.22),
+    ];
     #nubesAtras  = [
         new Nube(0.17, 0.46, 0.22),
         new Nube(0.34, 0.45, 0.18),
@@ -115,6 +128,9 @@ export class CieloNocturno extends Cielo {
             ctx.arc(x, y, r * 3, 0, Math.PI * 2);
             ctx.fill();
         }
+
+        // Montañas — siluetas en el horizonte (delante de las estrellas, detrás de las nubes)
+        for (const montana of this.#montanas) montana.dibujar(ctx, W, H, rng);
 
         // Nubes detrás de la luna
         for (const nube of this.#nubesAtras) nube.dibujar(ctx, W, H, rng);
