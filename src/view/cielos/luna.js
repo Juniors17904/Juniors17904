@@ -19,9 +19,30 @@ export class Luna extends ObjetoCielo {
     dibujar(ctx, W, H, _rng) {
         const x = this.#posX * W;
         const y = this.#posY * H;
-        const r = W * 0.0046;
+        const r = W * 0.015;
 
-        // Disco lunar — color sólido sin halo para máxima nitidez
+        // Halo exterior atmosférico — glow azulado amplio
+        const haloExt = ctx.createRadialGradient(x, y, r * 0.8, x, y, r * 6.0);
+        haloExt.addColorStop(0,   'rgba(200,220,255,0.18)');
+        haloExt.addColorStop(0.3, 'rgba(170,200,255,0.10)');
+        haloExt.addColorStop(0.6, 'rgba(140,175,240,0.04)');
+        haloExt.addColorStop(1,   'rgba(100,140,220,0)');
+        ctx.fillStyle = haloExt;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 6.0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Corona interior — warm glow alrededor del disco
+        const haloInt = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 2.4);
+        haloInt.addColorStop(0,   'rgba(255,250,220,0.40)');
+        haloInt.addColorStop(0.4, 'rgba(230,240,255,0.18)');
+        haloInt.addColorStop(1,   'rgba(180,210,255,0)');
+        ctx.fillStyle = haloInt;
+        ctx.beginPath();
+        ctx.arc(x, y, r * 2.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Disco lunar
         const disco = ctx.createRadialGradient(x - r * 0.18, y - r * 0.18, 0, x, y, r);
         disco.addColorStop(0,    '#f0eedf');
         disco.addColorStop(0.6,  '#dddac8');
@@ -36,7 +57,7 @@ export class Luna extends ObjetoCielo {
         const sombra = ctx.createRadialGradient(x + r * 0.28, y + r * 0.18, r * 0.3, x, y, r);
         sombra.addColorStop(0,   'rgba(50,60,85,0)');
         sombra.addColorStop(0.7, 'rgba(35,48,72,0.06)');
-        sombra.addColorStop(1,   'rgba(20,35,60,0.18)');
+        sombra.addColorStop(1,   'rgba(20,35,60,0.22)');
         ctx.fillStyle = sombra;
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);

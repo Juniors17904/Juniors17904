@@ -12,13 +12,18 @@ import { Luna }  from './cielos/luna.js';
 // ================================================================
 export class CieloNocturno extends Cielo {
     #malla     = null;
-    #luna      = new Luna(0.25, 0.46);
-    #nubes     = [
-        new Nube(0.875, 0.59, 0.30),
-        new Nube(0.810, 0.55, 0.22),
-        new Nube(0.940, 0.57, 0.18),
-        new Nube(0.770, 0.62, 0.22),
-        new Nube(0.960, 0.52, 0.19),
+    #luna        = new Luna(0.22, 0.36);
+    #nubesAtras  = [
+        new Nube(0.14, 0.32, 0.42),
+        new Nube(0.28, 0.33, 0.34),
+    ];
+    #nubes       = [
+        new Nube(0.07, 0.40, 0.50),
+        new Nube(0.18, 0.46, 0.42),
+        new Nube(0.34, 0.43, 0.46),
+        new Nube(0.44, 0.37, 0.36),
+        new Nube(0.58, 0.50, 0.38),
+        new Nube(0.12, 0.30, 0.28),
     ];
 
     constructor(colorCielo = '#050e20') {
@@ -111,6 +116,9 @@ export class CieloNocturno extends Cielo {
             ctx.arc(x, y, r * 3, 0, Math.PI * 2);
             ctx.fill();
         }
+
+        // Nubes detrás de la luna
+        for (const nube of this.#nubesAtras) nube.dibujar(ctx, W, H, rng);
 
         // Luna
         this.#luna.dibujar(ctx, W, H, rng);
