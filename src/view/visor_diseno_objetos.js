@@ -21,13 +21,14 @@ class VisorDisenoObjetos extends VisorBase {
     #fabrica       = new FabricaObjetoEscena();
     #idAnimacion   = 0;
     #objeto        = null;
-    #cielo         = null;   // CieloDespejado — siempre activo
-    #cieloNoche    = null;   // CieloNocturno — se crea la 1ª vez que se necesita
-    #cieloActivo   = null;   // referencia al cielo actualmente visible
+    #cielo         = null;
+    #cieloNoche    = null;
+    #cieloActivo   = null;
+    #luzAmbiente   = null;
+    #luzSol        = null;
     #resizeObs     = null;
     #funcionAnimacion = () => this.#tick();
     #grupoPiso     = null;
-    // Objetos que requieren fondo de cielo nocturno
     static #TIPOS_NOCHE = new Set(['nube', 'luna']);
 
     constructor(canvas) {
@@ -59,7 +60,16 @@ class VisorDisenoObjetos extends VisorBase {
         this.#controlOrbita = new ControlOrbitaObjeto();
         this.#controlOrbita.activar(this.#camera, this.#canvas);
 
-        this.#scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+        // Luz ambiente — día por defecto
+        this.#luzAmbiente = new THREE.AmbientLight(0xffffff, 0.7);
+        this.#scene.add(this.#luzAmbiente);
+
+        // Luz solar — simula el sol de día (desde arriba-adelante-izquierda)
+        this.#luzSol = new THREE.DirectionalLight(0xfff5e0, 1.4);
+        this.#luzSol.position.set(-6, 12, 8);
+        this.#luzSol.castShadow = true;
+        this.#luzSol.shadow.mapSize.set(1024, 1024);
+        this.#scene.add(this.#luzSol);
 
         // ── Piso (suelo + carretera) agrupados para poder ocultarlos ─
         this.#grupoPiso = new THREE.Group();
@@ -137,6 +147,9 @@ class VisorDisenoObjetos extends VisorBase {
             this.#cielo.visible = true;
             this.#cielo.restaurar(this.#scene);
         }
+        // Ajustar luces según el modo
+        if (this.#luzAmbiente) this.#luzAmbiente.intensity = nocturno ? 0.15 : 0.7;
+        if (this.#luzSol)      this.#luzSol.intensity      = nocturno ? 0.05 : 1.4;
         this.#scene.fog  = null;
         this.#cieloActivo = nocturno ? this.#cieloNoche : this.#cielo;
     }
