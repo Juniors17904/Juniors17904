@@ -1464,19 +1464,30 @@ class Aplicacion {
         ctx.fillStyle = 'rgba(220,228,255,0.8)';
         for (const [px,py] of pts) { ctx.beginPath(); ctx.arc(px*W,py*H,0.9,0,Math.PI*2); ctx.fill(); }
 
-        // Silueta de montaña
+        // Cordillera con 5 picos (igual que Montana.dibujar)
         const cx = W*0.5, hw = W*0.42, baseY = H*0.72, picY = H*0.18;
+        const yAt = (t) => picY + (baseY - picY) * t;
         ctx.beginPath();
-        ctx.moveTo(cx - hw, baseY);
-        ctx.quadraticCurveTo(cx - hw*0.72, baseY+(picY-baseY)*0.55, cx - hw*0.20, picY+H*0.04);
-        ctx.quadraticCurveTo(cx - hw*0.06, picY-H*0.015, cx, picY);
-        ctx.quadraticCurveTo(cx + hw*0.06, picY-H*0.015, cx + hw*0.20, picY+H*0.04);
-        ctx.quadraticCurveTo(cx + hw*0.72, baseY+(picY-baseY)*0.55, cx + hw, baseY);
+        ctx.moveTo(cx - hw,          baseY);
+        ctx.lineTo(cx - hw * 0.85,   yAt(0.48));
+        ctx.lineTo(cx - hw * 0.70,   yAt(0.18));
+        ctx.lineTo(cx - hw * 0.57,   yAt(0.34));
+        ctx.lineTo(cx - hw * 0.42,   yAt(0.11));
+        ctx.lineTo(cx - hw * 0.28,   yAt(0.26));
+        ctx.lineTo(cx - hw * 0.10,   yAt(0.04));
+        ctx.lineTo(cx,               picY);
+        ctx.lineTo(cx + hw * 0.10,   yAt(0.04));
+        ctx.lineTo(cx + hw * 0.26,   yAt(0.20));
+        ctx.lineTo(cx + hw * 0.42,   yAt(0.09));
+        ctx.lineTo(cx + hw * 0.56,   yAt(0.30));
+        ctx.lineTo(cx + hw * 0.72,   yAt(0.15));
+        ctx.lineTo(cx + hw * 0.86,   yAt(0.44));
+        ctx.lineTo(cx + hw,          baseY);
         ctx.lineTo(W, H); ctx.lineTo(0, H);
         ctx.closePath();
         ctx.fillStyle = '#030c1e'; ctx.fill();
 
-        // Destello de luna en el pico
+        // Destello de luna en los picos
         ctx.save(); ctx.clip();
         const luz = ctx.createLinearGradient(cx-hw*0.35, picY, cx+hw*0.6, picY+hw*0.9);
         luz.addColorStop(0, 'rgba(160,185,230,0.20)');

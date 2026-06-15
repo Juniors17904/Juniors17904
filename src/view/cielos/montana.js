@@ -21,31 +21,46 @@ export class Montana extends ObjetoCielo {
     }
 
     dibujar(ctx, W, H, rng, visible = true) {
+        // Siempre consumir RNG para mantener semilla consistente
+        const v1 = rng() * 0.06 - 0.03;
+        const v2 = rng() * 0.06 - 0.03;
+
+        if (!visible) return;
+
         const cx    = this.#posX * W;
         const hw    = this.#ancho * W * 0.14;
         const baseY = H * 0.514;
         const picY  = H * (0.502 - this.#altura * 0.085);
 
-        const v1 = rng() * 0.05 - 0.025;
-        const v2 = rng() * 0.05 - 0.025;
+        // Interpola entre pico y base: t=0 → picY, t=1 → baseY
+        const yAt = (t) => picY + (baseY - picY) * t;
 
-        if (!visible) return;
-
+        // Cordillera con 5 picos: 2 izq + principal (centro) + 2 der
         ctx.save();
         ctx.beginPath();
-        ctx.moveTo(cx - hw, baseY);
-        ctx.quadraticCurveTo(cx - hw * 0.72, baseY + (picY - baseY) * (0.55 + v1), cx - hw * 0.20, picY + H * 0.007);
-        ctx.quadraticCurveTo(cx - hw * 0.06, picY - H * 0.003, cx, picY);
-        ctx.quadraticCurveTo(cx + hw * 0.06, picY - H * 0.003, cx + hw * 0.20, picY + H * 0.007);
-        ctx.quadraticCurveTo(cx + hw * 0.72, baseY + (picY - baseY) * (0.55 + v2), cx + hw, baseY);
-        ctx.lineTo(cx + hw, H); ctx.lineTo(cx - hw, H);
+        ctx.moveTo(cx - hw,          baseY);
+        ctx.lineTo(cx - hw * 0.85,   yAt(0.48 + v1));   // pie izq
+        ctx.lineTo(cx - hw * 0.70,   yAt(0.18));         // sub-pico izq 1
+        ctx.lineTo(cx - hw * 0.57,   yAt(0.34));         // col 1
+        ctx.lineTo(cx - hw * 0.42,   yAt(0.11));         // sub-pico izq 2
+        ctx.lineTo(cx - hw * 0.28,   yAt(0.26));         // col 2
+        ctx.lineTo(cx - hw * 0.10,   yAt(0.04));         // hombro izq
+        ctx.lineTo(cx,               picY);               // PICO PRINCIPAL
+        ctx.lineTo(cx + hw * 0.10,   yAt(0.04));         // hombro der
+        ctx.lineTo(cx + hw * 0.26,   yAt(0.20 + v2));    // col 3
+        ctx.lineTo(cx + hw * 0.42,   yAt(0.09));         // sub-pico der 1
+        ctx.lineTo(cx + hw * 0.56,   yAt(0.30));         // col 4
+        ctx.lineTo(cx + hw * 0.72,   yAt(0.15));         // sub-pico der 2
+        ctx.lineTo(cx + hw * 0.86,   yAt(0.44));         // pie der
+        ctx.lineTo(cx + hw,          baseY);
+        ctx.lineTo(cx + hw, H);
+        ctx.lineTo(cx - hw, H);
         ctx.closePath();
 
-        // Silueta oscura azul-noche
         ctx.fillStyle = '#030c1e';
         ctx.fill();
 
-        // Destello de luna en el pico — lado superior izquierdo
+        // Destello de luna sobre los picos
         ctx.clip();
         const luz = ctx.createLinearGradient(cx - hw * 0.35, picY, cx + hw * 0.6, picY + hw * 0.9);
         luz.addColorStop(0,   'rgba(160,185,230,0.13)');
