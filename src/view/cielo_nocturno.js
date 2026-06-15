@@ -16,16 +16,16 @@ export class CieloNocturno extends Cielo {
     #mostrarMontanas = true;
     #luna        = new Luna(0.25, 0.47);
     #montanas    = [
-        new Montana(0.03, 0.65, 0.18),
-        new Montana(0.12, 0.85, 0.22),
-        new Montana(0.22, 0.55, 0.16),
-        new Montana(0.32, 0.78, 0.20),
-        new Montana(0.43, 0.62, 0.18),
-        new Montana(0.54, 0.80, 0.22),
-        new Montana(0.65, 0.52, 0.16),
-        new Montana(0.75, 0.72, 0.20),
-        new Montana(0.85, 0.68, 0.18),
-        new Montana(0.94, 0.76, 0.22),
+        new Montana(0.03, 0.33, 0.36),
+        new Montana(0.12, 0.43, 0.44),
+        new Montana(0.22, 0.28, 0.32),
+        new Montana(0.32, 0.39, 0.40),
+        new Montana(0.43, 0.31, 0.36),
+        new Montana(0.54, 0.40, 0.44),
+        new Montana(0.65, 0.26, 0.32),
+        new Montana(0.75, 0.36, 0.40),
+        new Montana(0.85, 0.34, 0.36),
+        new Montana(0.94, 0.38, 0.44),
     ];
     #nubesAtras  = [
         new Nube(0.17, 0.46, 0.22),
