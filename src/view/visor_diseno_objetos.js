@@ -4,6 +4,7 @@ import * as THREE                from 'three';
 import { VisorBase }             from './visor_base.js';
 import { ControlOrbitaObjeto }   from './controles/control_orbita_objeto.js';
 import { FabricaObjetoEscena }   from './objetos/fabrica_objeto_escena.js';
+import { CieloDespejado }         from './cielo_despejado.js';
 import { CieloNocturno }          from './cielo_nocturno.js';
 
 // ================================================================
@@ -20,10 +21,14 @@ class VisorDisenoObjetos extends VisorBase {
     #fabrica       = new FabricaObjetoEscena();
     #idAnimacion   = 0;
     #objeto        = null;
-    #cielo         = null;
+    #cielo         = null;   // CieloDespejado — siempre activo
+    #cieloNoche    = null;   // CieloNocturno — se crea la 1ª vez que se necesita
+    #cieloActivo   = null;   // referencia al cielo actualmente visible
     #resizeObs     = null;
     #funcionAnimacion = () => this.#tick();
-    #grupoPiso     = null; // suelo + carretera — se oculta para la luna
+    #grupoPiso     = null;
+    // Objetos que requieren fondo de cielo nocturno
+    static #TIPOS_NOCHE = new Set(['nube', 'luna']);
 
     constructor(canvas) {
         super();
@@ -43,8 +48,9 @@ class VisorDisenoObjetos extends VisorBase {
         this.#renderer.shadowMap.enabled = true;
 
         this.#scene = new THREE.Scene();
-        this.#cielo = new CieloNocturno('#050e20');
+        this.#cielo = new CieloDespejado();
         this.#cielo.construir(this.#scene);
+        this.#cieloActivo = this.#cielo;
         this.#scene.fog = null;
 
         this.#camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 200);
@@ -116,13 +122,33 @@ class VisorDisenoObjetos extends VisorBase {
         this.#renderer?.setSize(W, H, false);
     }
 
+    // ── Cambiar fondo según el tipo de objeto ────────────────────
+    #cambiarCielo(nocturno) {
+        if (nocturno) {
+            if (!this.#cieloNoche) {
+                this.#cieloNoche = new CieloNocturno('#050e20');
+                this.#cieloNoche.construir(this.#scene);
+            }
+            this.#cielo.visible      = false;
+            this.#cieloNoche.visible = true;
+            this.#cieloNoche.restaurar(this.#scene);
+        } else {
+            if (this.#cieloNoche) this.#cieloNoche.visible = false;
+            this.#cielo.visible = true;
+            this.#cielo.restaurar(this.#scene);
+        }
+        this.#scene.fog  = null;
+        this.#cieloActivo = nocturno ? this.#cieloNoche : this.#cielo;
+    }
+
     // ── Mostrar objeto ───────────────────────────────────────────
     async mostrar(tipo) {
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
 
+        const nocturno = VisorDisenoObjetos.#TIPOS_NOCHE.has(tipo);
         const flotante = tipo === 'luna' || tipo === 'nube';
         this.#grupoPiso.visible = !flotante;
-        this.#cielo.visible     = tipo !== 'luna';
+        this.#cambiarCielo(nocturno);
         this.#camera.position.set(flotante ? 6 : 8, flotante ? 7 : 6, flotante ? 6 : 8);
 
         this.#objeto = this.#fabrica.crear(tipo, 0, 0,
@@ -145,7 +171,9 @@ class VisorDisenoObjetos extends VisorBase {
         this.#controlOrbita?.destruir();
         this.#controlOrbita = null;
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
-        this.#cielo?.destruir(this.#scene); this.#cielo = null;
+        this.#cielo?.destruir(this.#scene);     this.#cielo     = null;
+        this.#cieloNoche?.destruir(this.#scene); this.#cieloNoche = null;
+        this.#cieloActivo = null;
         this.#renderer?.dispose();
         this.#renderer = null;
     }
@@ -153,7 +181,7 @@ class VisorDisenoObjetos extends VisorBase {
     #tick() {
         this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
         this.#controlOrbita?.actualizar();
-        this.#cielo?.actualizar(this.#camera);
+        this.#cieloActivo?.actualizar(this.#camera);
         if (this.#renderer && this.#scene && this.#camera)
             this.#renderer.render(this.#scene, this.#camera);
     }
