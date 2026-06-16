@@ -25,6 +25,7 @@ class VisorDisenoObjetos extends VisorBase {
     #cieloNoche    = null;
     #cieloActivo   = null;
     #luzAmbiente   = null;
+    #luzHemisferio = null;
     #luzSol        = null;
     #resizeObs     = null;
     #funcionAnimacion = () => this.#tick();
@@ -64,8 +65,12 @@ class VisorDisenoObjetos extends VisorBase {
         this.#luzAmbiente = new THREE.AmbientLight(0xffffff, 0.7);
         this.#scene.add(this.#luzAmbiente);
 
+        // Luz de hemisferio — cielo azul arriba, suelo verde abajo, sin sombras
+        this.#luzHemisferio = new THREE.HemisphereLight(0x9fd3ff, 0x4a7c3a, 0.9);
+        this.#scene.add(this.#luzHemisferio);
+
         // Luz solar — simula el sol de día (desde arriba-adelante-izquierda)
-        this.#luzSol = new THREE.DirectionalLight(0xfff5e0, 1.4);
+        this.#luzSol = new THREE.DirectionalLight(0xfff5e0, 2.0);
         this.#luzSol.position.set(-6, 12, 8);
         this.#luzSol.castShadow = true;
         this.#luzSol.shadow.mapSize.set(1024, 1024);
@@ -148,8 +153,9 @@ class VisorDisenoObjetos extends VisorBase {
             this.#cielo.restaurar(this.#scene);
         }
         // Ajustar luces según el modo
-        if (this.#luzAmbiente) this.#luzAmbiente.intensity = nocturno ? 0.15 : 0.7;
-        if (this.#luzSol)      this.#luzSol.intensity      = nocturno ? 0.05 : 1.4;
+        if (this.#luzAmbiente)   this.#luzAmbiente.intensity   = nocturno ? 0.15 : 0.7;
+        if (this.#luzHemisferio) this.#luzHemisferio.intensity = nocturno ? 0.05 : 0.9;
+        if (this.#luzSol)        this.#luzSol.intensity        = nocturno ? 0.05 : 2.0;
         this.#scene.fog  = null;
         this.#cieloActivo = nocturno ? this.#cieloNoche : this.#cielo;
     }
