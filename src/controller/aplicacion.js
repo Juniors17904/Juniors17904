@@ -1494,14 +1494,16 @@ class Aplicacion {
         ctx.lineTo(W, BASE);
         ctx.lineTo(W, H);
         ctx.closePath();
-        ctx.fillStyle = '#040d1e';
+        // Color más claro para ver bien la forma en modo diseño
+        ctx.fillStyle = '#1e3a5f';
         ctx.fill();
 
-        // Luz de luna sobre los picos
+        // Highlight fuerte en los picos para ver la silueta
         ctx.save(); ctx.clip();
-        const lgl = ctx.createLinearGradient(W*0.15, 0, W*0.65, BASE);
-        lgl.addColorStop(0, 'rgba(170,200,255,0.09)');
-        lgl.addColorStop(1, 'rgba(60,100,180,0)');
+        const lgl = ctx.createLinearGradient(0, 0, 0, BASE);
+        lgl.addColorStop(0,   'rgba(140,185,255,0.55)');
+        lgl.addColorStop(0.4, 'rgba(100,150,220,0.25)');
+        lgl.addColorStop(1,   'rgba(60,100,180,0)');
         ctx.fillStyle = lgl;
         ctx.fillRect(0, 0, W, BASE + 5);
         ctx.restore();
