@@ -1453,46 +1453,57 @@ class Aplicacion {
         const ctx = canvas.getContext('2d');
         const W = canvas.width, H = canvas.height;
 
+        // Fondo de cielo nocturno
         const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0, '#020810');
-        grad.addColorStop(1, '#061828');
+        grad.addColorStop(0,    '#020810');
+        grad.addColorStop(0.55, '#061830');
+        grad.addColorStop(1,    '#08152a');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, W, H);
 
-        // Estrellas simples
-        const pts = [[0.1,0.12],[0.25,0.08],[0.4,0.18],[0.55,0.06],[0.7,0.14],[0.85,0.09],[0.15,0.22],[0.5,0.22],[0.78,0.20]];
-        ctx.fillStyle = 'rgba(220,228,255,0.8)';
-        for (const [px,py] of pts) { ctx.beginPath(); ctx.arc(px*W,py*H,0.9,0,Math.PI*2); ctx.fill(); }
+        // Estrellas
+        const estrellas = [[0.08,0.10],[0.22,0.06],[0.38,0.14],[0.52,0.05],[0.65,0.11],[0.80,0.08],[0.92,0.13],[0.15,0.18],[0.48,0.18],[0.75,0.16]];
+        ctx.fillStyle = 'rgba(220,228,255,0.85)';
+        for (const [px,py] of estrellas) { ctx.beginPath(); ctx.arc(px*W, py*H, 0.9, 0, Math.PI*2); ctx.fill(); }
 
-        // Cordillera con 5 picos (igual que Montana.dibujar)
-        const cx = W*0.5, hw = W*0.42, baseY = H*0.72, picY = H*0.18;
-        const yAt = (t) => picY + (baseY - picY) * t;
+        // Halo de ciudad — igual que la textura del cilindro
+        const centros = [0.08, 0.22, 0.38, 0.52, 0.67, 0.80, 0.93];
+        for (const gx of centros) {
+            const g = ctx.createRadialGradient(gx*W, H*0.58, 0, gx*W, H*0.58, W*0.13);
+            g.addColorStop(0,   'rgba(255,160,50,0.22)');
+            g.addColorStop(0.4, 'rgba(255,120,30,0.10)');
+            g.addColorStop(1,   'rgba(255,90,20,0)');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, W, H);
+        }
+
+        // Cordillera panorámica — mismos picos que el cilindro 3D
+        const BASE = H * 0.58;
+        const picos = [
+            [0.00, 0.26], [0.04, 0.44], [0.08, 0.20], [0.12, 0.50],
+            [0.17, 0.30], [0.22, 0.58], [0.27, 0.22], [0.32, 0.46],
+            [0.37, 0.34], [0.42, 0.54], [0.47, 0.24], [0.52, 0.42],
+            [0.57, 0.52], [0.62, 0.20], [0.67, 0.48], [0.72, 0.30],
+            [0.77, 0.56], [0.82, 0.24], [0.87, 0.44], [0.92, 0.36],
+            [0.97, 0.40], [1.00, 0.26],
+        ];
         ctx.beginPath();
-        ctx.moveTo(cx - hw,          baseY);
-        ctx.lineTo(cx - hw * 0.85,   yAt(0.48));
-        ctx.lineTo(cx - hw * 0.70,   yAt(0.18));
-        ctx.lineTo(cx - hw * 0.57,   yAt(0.34));
-        ctx.lineTo(cx - hw * 0.42,   yAt(0.11));
-        ctx.lineTo(cx - hw * 0.28,   yAt(0.26));
-        ctx.lineTo(cx - hw * 0.10,   yAt(0.04));
-        ctx.lineTo(cx,               picY);
-        ctx.lineTo(cx + hw * 0.10,   yAt(0.04));
-        ctx.lineTo(cx + hw * 0.26,   yAt(0.20));
-        ctx.lineTo(cx + hw * 0.42,   yAt(0.09));
-        ctx.lineTo(cx + hw * 0.56,   yAt(0.30));
-        ctx.lineTo(cx + hw * 0.72,   yAt(0.15));
-        ctx.lineTo(cx + hw * 0.86,   yAt(0.44));
-        ctx.lineTo(cx + hw,          baseY);
-        ctx.lineTo(W, H); ctx.lineTo(0, H);
+        ctx.moveTo(0, H);
+        ctx.lineTo(0, BASE);
+        for (const [px, ph] of picos) ctx.lineTo(px*W, BASE - ph*BASE*0.80);
+        ctx.lineTo(W, BASE);
+        ctx.lineTo(W, H);
         ctx.closePath();
-        ctx.fillStyle = '#030c1e'; ctx.fill();
+        ctx.fillStyle = '#040d1e';
+        ctx.fill();
 
-        // Destello de luna en los picos
+        // Luz de luna sobre los picos
         ctx.save(); ctx.clip();
-        const luz = ctx.createLinearGradient(cx-hw*0.35, picY, cx+hw*0.6, picY+hw*0.9);
-        luz.addColorStop(0, 'rgba(160,185,230,0.20)');
-        luz.addColorStop(1, 'rgba(60,100,180,0)');
-        ctx.fillStyle = luz; ctx.fillRect(cx-hw, picY, hw*2, baseY-picY);
+        const lgl = ctx.createLinearGradient(W*0.15, 0, W*0.65, BASE);
+        lgl.addColorStop(0, 'rgba(170,200,255,0.09)');
+        lgl.addColorStop(1, 'rgba(60,100,180,0)');
+        ctx.fillStyle = lgl;
+        ctx.fillRect(0, 0, W, BASE + 5);
         ctx.restore();
     }
 }
