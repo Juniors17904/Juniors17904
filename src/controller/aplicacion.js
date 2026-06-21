@@ -1,4 +1,5 @@
 'use strict';
+import { Cordillera } from '../view/cielos/cordillera.js';
 
 // ================================================================
 // CLASS: Aplicacion  (antes App) — controlador principal de la aplicación
@@ -1451,62 +1452,8 @@ class Aplicacion {
         const canvas = document.getElementById('do-canvas-montana');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        const W = canvas.width, H = canvas.height;
-
-        // Fondo de cielo nocturno
-        const grad = ctx.createLinearGradient(0, 0, 0, H);
-        grad.addColorStop(0,    '#020810');
-        grad.addColorStop(0.55, '#061830');
-        grad.addColorStop(1,    '#08152a');
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, W, H);
-
-        // Estrellas
-        const estrellas = [[0.08,0.10],[0.22,0.06],[0.38,0.14],[0.52,0.05],[0.65,0.11],[0.80,0.08],[0.92,0.13],[0.15,0.18],[0.48,0.18],[0.75,0.16]];
-        ctx.fillStyle = 'rgba(220,228,255,0.85)';
-        for (const [px,py] of estrellas) { ctx.beginPath(); ctx.arc(px*W, py*H, 0.9, 0, Math.PI*2); ctx.fill(); }
-
-        // Halo de ciudad — igual que la textura del cilindro
-        const centros = [0.08, 0.22, 0.38, 0.52, 0.67, 0.80, 0.93];
-        for (const gx of centros) {
-            const g = ctx.createRadialGradient(gx*W, H*0.58, 0, gx*W, H*0.58, W*0.13);
-            g.addColorStop(0,   'rgba(255,160,50,0.22)');
-            g.addColorStop(0.4, 'rgba(255,120,30,0.10)');
-            g.addColorStop(1,   'rgba(255,90,20,0)');
-            ctx.fillStyle = g;
-            ctx.fillRect(0, 0, W, H);
-        }
-
-        // Cordillera panorámica — mismos picos que el cilindro 3D
-        const BASE = H * 0.58;
-        const picos = [
-            [0.00, 0.26], [0.04, 0.44], [0.08, 0.20], [0.12, 0.50],
-            [0.17, 0.30], [0.22, 0.58], [0.27, 0.22], [0.32, 0.46],
-            [0.37, 0.34], [0.42, 0.54], [0.47, 0.24], [0.52, 0.42],
-            [0.57, 0.52], [0.62, 0.20], [0.67, 0.48], [0.72, 0.30],
-            [0.77, 0.56], [0.82, 0.24], [0.87, 0.44], [0.92, 0.36],
-            [0.97, 0.40], [1.00, 0.26],
-        ];
-        ctx.beginPath();
-        ctx.moveTo(0, H);
-        ctx.lineTo(0, BASE);
-        for (const [px, ph] of picos) ctx.lineTo(px*W, BASE - ph*BASE*0.80);
-        ctx.lineTo(W, BASE);
-        ctx.lineTo(W, H);
-        ctx.closePath();
-        // Color más claro para ver bien la forma en modo diseño
-        ctx.fillStyle = '#1e3a5f';
-        ctx.fill();
-
-        // Highlight fuerte en los picos para ver la silueta
-        ctx.save(); ctx.clip();
-        const lgl = ctx.createLinearGradient(0, 0, 0, BASE);
-        lgl.addColorStop(0,   'rgba(140,185,255,0.55)');
-        lgl.addColorStop(0.4, 'rgba(100,150,220,0.25)');
-        lgl.addColorStop(1,   'rgba(60,100,180,0)');
-        ctx.fillStyle = lgl;
-        ctx.fillRect(0, 0, W, BASE + 5);
-        ctx.restore();
+        // Dibuja exactamente la misma textura que usa la Cordillera en Diseño General
+        ctx.drawImage(new Cordillera().generarCanvas(), 0, 0, canvas.width, canvas.height);
     }
 }
 

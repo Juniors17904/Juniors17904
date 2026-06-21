@@ -46,6 +46,9 @@ export class Cordillera {
     get visible()  { return this.#malla?.visible ?? false; }
     set visible(v) { if (this.#malla) this.#malla.visible = !!v; }
 
+    // Devuelve el canvas con la textura — usado por el preview de Diseño de Objetos
+    generarCanvas() { return this.#generarTextura(); }
+
     // ── Textura panorámica ───────────────────────────────────────
     #generarTextura() {
         const W = 2048, H = 512;
