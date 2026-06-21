@@ -1,5 +1,4 @@
 'use strict';
-import { Cordillera } from '../view/cielos/cordillera.js';
 
 // ================================================================
 // CLASS: Aplicacion  (antes App) — controlador principal de la aplicación
@@ -1453,7 +1452,7 @@ class Aplicacion {
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         // Dibuja exactamente la misma textura que usa la Cordillera en Diseño General
-        ctx.drawImage(new Cordillera().generarCanvas(), 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(new window.Cordillera().generarCanvas(), 0, 0, canvas.width, canvas.height);
     }
 }
 
