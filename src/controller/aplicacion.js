@@ -1450,8 +1450,10 @@ class Aplicacion {
     #dibujarPreviewMontana() {
         const canvas = document.getElementById('do-canvas-montana');
         if (!canvas) return;
+        if (!window.Cordillera) { setTimeout(() => this.#dibujarPreviewMontana(), 200); return; }
         const ctx = canvas.getContext('2d');
-        // Dibuja exactamente la misma textura que usa la Cordillera en Diseño General
+        ctx.fillStyle = '#040d1e';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(new window.Cordillera().generarCanvas(), 0, 0, canvas.width, canvas.height);
     }
 }
