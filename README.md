@@ -12,7 +12,6 @@
 - 🌱 Aprendiendo: **desarrollo web y buenas prácticas de programación**
 - 👯 Busco colaborar en: **proyectos open source y aplicaciones web**
 - 💬 Pregúntame sobre: **JavaScript, Python, Git**
-- 📫 Cómo contactarme: **[tu correo o LinkedIn aquí]**
 - ⚡ Dato curioso: **me encanta seguir aprendiendo cosas nuevas de tecnología**
 
 ---
@@ -25,19 +24,6 @@
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
   <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white" />
   <img src="https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white" />
-</p>
-
----
-
-### 📊 Estadísticas de GitHub
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=Juniors17904&show_icons=true&theme=radical" alt="stats" />
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=Juniors17904&theme=radical" alt="streak" />
-</p>
-
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=Juniors17904&layout=compact&theme=radical" alt="top langs" />
 </p>
 
 ---
