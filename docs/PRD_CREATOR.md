@@ -32,6 +32,9 @@ Además (v2):
 - Antes de la sección 1, incluye una tabla **"Decisiones bloqueadas"** con todas las decisiones del Prompt 2 (D1, D2, …: número, categoría y texto completo). Los RF y RNF deben citarlas, y si alguno las contradice, mandan las decisiones.
 - Incluye un **Historial** (v1, v2, …) que diga qué cambió en cada versión.
 - Escribe **una sola lista** de archivos y clases que NO se modifican, y haz que las demás secciones la citen en vez de repetirla.
+- **Máximo 2 páginas (unas 100 líneas) y unos 15 requerimientos funcionales.** El PRD dice **qué** hace el producto y **por qué**, no **cómo** se programa. Escribe cada RF como un comportamiento que se puede observar (por ejemplo, "en el pasto la velocidad máxima baja al 40 %"), sin nombres de métodos, campos, fórmulas, milisegundos internos ni números de línea. Ese detalle vive en el código y en `pruebas/`.
+- No escribas pasos de verificación por cada RF. Las pruebas de `pruebas/` son la verificación y citan el número de RF que cubren.
+- Al corregir un PRD, **reemplaza** el texto en vez de agregar. Si al corregirlo pasa de 2 páginas, recórtalo.
 - Antes de guardar, revisa el PRD contra `CLAUDE.md`: ningún RF puede pedir objetos literales `{ }` guardados, funciones sueltas, más de una clase por archivo ni nombres en inglés. Si el diseño necesita una excepción, decláralo explícitamente en el RNF correspondiente; no la dejes solo como "deuda" en los riesgos.
 
 ---

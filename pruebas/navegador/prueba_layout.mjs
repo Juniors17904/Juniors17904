@@ -49,7 +49,7 @@ for (const c of casos) {
     check(!solapa(b,m.vel), c.nombre+': '+id+' no solapa velocímetro');
   }
   await page.screenshot({ path: SP+'/layout_'+c.nombre+'.png' });
-  // Panel de resultado sobre un overlay visible (RF-27)
+  // Panel de resultado sobre un overlay visible (RF-10)
   await page.evaluate(() => {
     const o = window.CarreraVueltas.prototype.actualizar;
     window.CarreraVueltas.prototype.actualizar = function(...a){ o.apply(this,a); return 'meta'; };

@@ -1,4 +1,4 @@
-// Prueba de navegador: RF-13, RF-14, RF-15, RF-20, RF-21, RF-22, RF-23, RF-28, RF-29 y RF-43
+// Prueba de navegador: RF-03, RF-04, RF-07, RF-11, RF-13, RF-14, RF-15 y RNF-01
 // del PRD docs/prds/prd_carrera_solo_vertical.md. Usa el visor y el controlador reales.
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULO || '/opt/node22/lib/node_modules/playwright/index.mjs');
 
@@ -60,12 +60,12 @@ const leer    = (page, fn) => page.evaluate(fn);
 {
   const { ctx, page, errores } = await abrir({ width: 390, height: 844 });
 
-  // RF-13
+  // RNF-01
   const herencia = await leer(page, () => ({
     tipo:  typeof window.VisorCarreraSolo,
     padre: Object.getPrototypeOf(window.VisorCarreraSolo)?.name,
   }));
-  check(herencia.tipo === 'function' && herencia.padre === 'VisorBase', 'RF-13 VisorCarreraSolo extiende VisorBase ' + JSON.stringify(herencia));
+  check(herencia.tipo === 'function' && herencia.padre === 'VisorBase', 'RNF-01 VisorCarreraSolo extiende VisorBase ' + JSON.stringify(herencia));
 
   await crearVisor(page);
   await esperar(page, 800);
@@ -87,7 +87,7 @@ const leer    = (page, fn) => page.evaluate(fn);
   });
   check(maxPasos >= 1 && maxPasos <= 5, 'RF-15 entre 1 y 5 pasos por frame (máx ' + maxPasos + ')');
 
-  // RF-20 y RF-43: muestras por longitud de arco, instancias de MuestraRuta
+  // RNF-01 y RNF-01: muestras por longitud de arco, instancias de MuestraRuta
   const muestras = await leer(page, () => {
     const m = window.__visor.muestrasRuta(400);
     const d = [];
@@ -100,13 +100,13 @@ const leer    = (page, fn) => page.evaluate(fn);
       inicio: [m[0].x, m[0].z, window.__visor.px, window.__visor.pz],
     };
   });
-  check(muestras.total === 400, 'RF-20 muestrasRuta(400) devuelve 400');
-  check(muestras.clase, 'RF-43 todas las muestras son MuestraRuta');
-  check(muestras.desvio <= 0.05, 'RF-20 paso constante ±5 % (desvío ' + muestras.desvio.toFixed(3) + ')');
+  check(muestras.total === 400, 'RNF-01 muestrasRuta(400) devuelve 400');
+  check(muestras.clase, 'RNF-01 todas las muestras son MuestraRuta');
+  check(muestras.desvio <= 0.05, 'RNF-01 paso constante ±5 % (desvío ' + muestras.desvio.toFixed(3) + ')');
   check(Math.hypot(muestras.inicio[0] - muestras.inicio[2], muestras.inicio[1] - muestras.inicio[3]) < 0.5,
-        'RF-20 la muestra 0 coincide con el inicio del carro');
+        'RNF-01 la muestra 0 coincide con el inicio del carro');
 
-  // RF-22: congelado no se mueve aunque se acelere
+  // RF-04: congelado no se mueve aunque se acelere
   const congelado = await leer(page, async () => {
     const v = window.__visor;
     v.congelar(true); v.entradaAcel = 1;
@@ -114,9 +114,9 @@ const leer    = (page, fn) => page.evaluate(fn);
     await new Promise(r => setTimeout(r, 1000));
     return { movio: Math.hypot(v.px - a[0], v.pz - a[1]), pasos: v.pasosUltimoFrame };
   });
-  check(congelado.movio === 0 && congelado.pasos === 0, 'RF-22 congelado no se mueve ' + JSON.stringify(congelado));
+  check(congelado.movio === 0 && congelado.pasos === 0, 'RF-04 congelado no se mueve ' + JSON.stringify(congelado));
 
-  // RF-21: el tope copiado limita la velocidad; al quitarlo vuelve a subir
+  // RF-07: el tope copiado limita la velocidad; al quitarlo vuelve a subir
   const tope = await leer(page, async () => {
     const v = window.__visor;
     v.congelar(false); v.entradaAcel = 1;
@@ -127,10 +127,10 @@ const leer    = (page, fn) => page.evaluate(fn);
     const conTope = v.velocidad;
     return { base: v.velocidadMaxBase, libre, conTope };
   });
-  check(tope.libre > tope.base * 0.4, 'RF-21 sin tope supera el 40 % ' + JSON.stringify(tope));
-  check(tope.conTope <= tope.base * 0.4 + 1e-6, 'RF-21 con tope 0.4 no pasa del 40 % de la base');
+  check(tope.libre > tope.base * 0.4, 'RF-07 sin tope supera el 40 % ' + JSON.stringify(tope));
+  check(tope.conTope <= tope.base * 0.4 + 1e-6, 'RF-07 con tope 0.4 no pasa del 40 % de la base');
 
-  // RF-23: reiniciarCarro vuelve al inicio con velocidad 0 y reaplica el tope
+  // RF-11: reiniciarCarro vuelve al inicio con velocidad 0 y reaplica el tope
   const reinicio = await leer(page, async () => {
     const v = window.__visor;
     v.reiniciarCarro();
@@ -139,9 +139,9 @@ const leer    = (page, fn) => page.evaluate(fn);
     await new Promise(r => setTimeout(r, 2500));
     return { ...tras, velDespues: v.velocidad, base: v.velocidadMaxBase };
   });
-  check(reinicio.vel === 0, 'RF-23 velocidad 0 tras reiniciar');
-  check(Math.hypot(reinicio.px - muestras.inicio[0], reinicio.pz - muestras.inicio[1]) < 0.5, 'RF-23 vuelve al inicio de la ruta');
-  check(reinicio.velDespues <= reinicio.base * 0.4 + 1e-6, 'RF-23 reaplica el último tope (vel ' + reinicio.velDespues + ')');
+  check(reinicio.vel === 0, 'RF-11 velocidad 0 tras reiniciar');
+  check(Math.hypot(reinicio.px - muestras.inicio[0], reinicio.pz - muestras.inicio[1]) < 0.5, 'RF-11 vuelve al inicio de la ruta');
+  check(reinicio.velDespues <= reinicio.base * 0.4 + 1e-6, 'RF-11 reaplica el último tope (vel ' + reinicio.velDespues + ')');
 
   // RF-15: detener() libera el contexto WebGL y es idempotente
   const fin = await leer(page, () => {
@@ -153,9 +153,9 @@ const leer    = (page, fn) => page.evaluate(fn);
     return { perdido: gl?.isContextLost?.() ?? null, doble };
   });
   check(fin.perdido === true, 'RF-15 detener() libera el contexto WebGL');
-  check(fin.doble, 'RF-35 detener() dos veces no falla');
+  check(fin.doble, 'RF-12 detener() dos veces no falla');
 
-  // RF-28: el controlador usa la pista y el carro del estado; clave inválida → ciudad
+  // RF-03: el controlador usa la pista y el carro del estado; clave inválida → ciudad
   const usa = await leer(page, async () => {
     const Original = window.VisorCarreraSolo;
     const registro = [];
@@ -180,9 +180,9 @@ const leer    = (page, fn) => page.evaluate(fn);
       error: (window.__modelErrors || []).length > errAntes,
     };
   });
-  check(usa.montana, 'RF-28 usa la pista, el carro y el color del estado');
-  check(usa.respaldo, 'RF-28 con una pista inválida usa ciudad');
-  check(usa.error, 'RF-28 registra la pista inválida en __modelErrors');
+  check(usa.montana, 'RF-03 usa la pista, el carro y el color del estado');
+  check(usa.respaldo, 'RF-03 con una pista inválida usa ciudad');
+  check(usa.error, 'RF-03 registra la pista inválida en __modelErrors');
 
   check(errores.length === 0, 'sin errores de página (390×844) ' + errores.join(' | '));
   await ctx.close();
@@ -202,7 +202,7 @@ const leer    = (page, fn) => page.evaluate(fn);
   await ctx.close();
 }
 
-// ── RF-29: si el módulo del visor no carga, avisa y vuelve a Inicio ──
+// ── RF-13: si el módulo del visor no carga, avisa y vuelve a Inicio ──
 {
   const { ctx, page } = await abrir({ width: 390, height: 844 }, { bloquearVisor: true });
   await page.click('#btn-solo');
@@ -211,8 +211,8 @@ const leer    = (page, fn) => page.evaluate(fn);
     activa: document.querySelector('.pantalla.activa')?.id,
     error:  (window.__modelErrors || []).some(e => /VisorCarreraSolo/.test(e)),
   }));
-  check(estado.activa === 'pantalla-inicio', 'RF-29 vuelve a Inicio si el visor no carga (' + estado.activa + ')');
-  check(estado.error, 'RF-29 registra el error en __modelErrors');
+  check(estado.activa === 'pantalla-inicio', 'RF-13 vuelve a Inicio si el visor no carga (' + estado.activa + ')');
+  check(estado.error, 'RF-13 registra el error en __modelErrors');
   await ctx.close();
 }
 
