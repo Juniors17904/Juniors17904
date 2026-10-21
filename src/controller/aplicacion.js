@@ -23,6 +23,7 @@ class Aplicacion {
     #visorDG            = null;
     #dgTouchHandlers    = [];
     #visorDO            = null;
+    #carreraSolo        = null;
 
     constructor() {
         GestorOrientacion.iniciarListeners();
@@ -46,6 +47,16 @@ class Aplicacion {
 
     // ── Navegación ──────────────────────────────────────────────
     #mostrar(id) {
+        // Carrera Solo 3D: liberar al salir y no mostrar la pantalla vacía sin controlador
+        if (this.#carreraSolo && id !== 'pantalla-carrera-solo') {
+            this.#carreraSolo.detener();
+            this.#carreraSolo = null;
+        }
+        if (id === 'pantalla-carrera-solo' && !this.#carreraSolo) {
+            id = 'pantalla-inicio';
+            if (this.#backNav) history.replaceState({ pantalla: id }, '');
+        }
+
         if (id !== 'pantalla-juego') this.#td3dPending = false;
 
         // Ocultar overlays globales al salir del juego
@@ -148,6 +159,20 @@ class Aplicacion {
         });
 
         document.getElementById('btn-solo').addEventListener('click', () => {
+            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
+            this.#estado.modoSolo = true;
+            GestorOrientacion.liberar();
+            this.#carreraSolo?.detener();
+            // Se crea antes de #mostrar para que la pantalla no se redirija a Inicio;
+            // el constructor no toca el DOM: todo arranca en iniciar()
+            const carrera = new ControladorCarreraSolo(
+                this.#estado, this.#vistaConduccion, () => this.#mostrar('pantalla-inicio'));
+            this.#carreraSolo = carrera;
+            this.#mostrar('pantalla-carrera-solo');
+            carrera.iniciar();
+        });
+
+        document.getElementById('btn-clasico-2d').addEventListener('click', () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#estado.modoSolo = true;
             this.#iniciarCuentaRegresiva();

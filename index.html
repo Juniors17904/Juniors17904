@@ -20,6 +20,49 @@
         }
     }
     </script>
+    <!-- Carrera Solo 3D vertical: overlays centrados solo mientras la pantalla está activa -->
+    <style>
+        #pantalla-carrera-solo { background: #000; justify-content: flex-start; }
+        #pantalla-carrera-solo .columna-carrera-solo {
+            position: relative;
+            width: min(100vw, 480px);
+            height: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+        #pantalla-carrera-solo #canvas-carrera-solo { display: block; }
+        #pantalla-carrera-solo.activa ~ #ctrl-timon,
+        #pantalla-carrera-solo.activa ~ #ctrl-botones {
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+            width: min(100vw, 480px);
+            /* La banda crece con su contenido y se apoya en el borde inferior:
+               nada queda cortado por abajo (RF-42) */
+            height: auto;
+            align-items: flex-end;
+            padding-bottom: 6px;
+        }
+        /* Modo timón: ACEL/FRENO de 52 px (52 + 8 + 52 + 6 = 118 px) caben en la banda de
+           120 px y dejan libre el velocímetro de RF-25 (centro alto − 176, disco r + 8 = 48 px) */
+        #pantalla-carrera-solo.activa ~ #ctrl-timon > div:last-child { gap: 8px !important; }
+        #pantalla-carrera-solo.activa ~ #ctrl-timon .btn-dir {
+            width: 52px;
+            height: 52px;
+            font-size: 10px !important;
+            letter-spacing: 0 !important;
+        }
+        /* Con el panel de resultado visible la pantalla sube por encima de .ctrl-overlay (z 20):
+           el z-index del panel solo vale dentro del contexto de apilamiento de la pantalla */
+        #pantalla-carrera-solo.activa.con-resultado { z-index: 25; }
+        #resultado-carrera-solo {
+            position: fixed;
+            z-index: 30;
+            inset: 0;
+            display: none;
+            background: rgba(0, 0, 0, 0.72);
+        }
+    </style>
 </head>
 <body>
 
@@ -273,6 +316,11 @@
             <button id="btn-ir-diseno-objetos" class="ajuste-item">
                 <span class="ajuste-icono">🌲</span>
                 <span class="ajuste-txt">Diseño de objetos</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
+            <button id="btn-clasico-2d" class="ajuste-item">
+                <span class="ajuste-icono">🕹️</span>
+                <span class="ajuste-txt">Clásico 2D</span>
                 <span class="ajuste-arrow">›</span>
             </button>
         </div>
@@ -763,6 +811,19 @@
         </div>
     </div>
 
+    <!-- Pantalla: Carrera Solo 3D (vertical) -->
+    <div id="pantalla-carrera-solo" class="pantalla">
+        <div class="columna-carrera-solo">
+            <canvas id="canvas-carrera-solo"></canvas>
+            <canvas id="canvas-hud-carrera-solo"></canvas>
+            <div id="cuenta-carrera-solo" style="display:none"></div>
+            <div id="resultado-carrera-solo">
+                <button id="btn-revancha-solo" class="btn-neon btn-compacto">Revancha 🔄</button>
+                <button id="btn-menu-solo" class="btn-link">Menú</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Controles globales (fixed — al final del body para quedar sobre todas las pantallas) -->
     <div id="ctrl-botones" class="ctrl-overlay" style="display:none">
         <button id="btn-izq" class="btn-dir">◀</button>
@@ -795,6 +856,7 @@
     <script type="module" src="src/view/pistas/visor_carrera_urbana.js?v=11"></script>
     <script type="module" src="src/view/pistas/visor_diseno_pista.js?v=11"></script>
     <script type="module" src="src/view/visor_diseno_objetos.js?v=11"></script>
+    <script type="module" src="src/view/pistas/visor_carrera_solo.js?v=11"></script>
 
     <!-- Scripts globales (window.*) — en orden de dependencia -->
     <script src="src/services/supabase-client.js"></script>
@@ -810,6 +872,8 @@
     <script src="src/model/carros/carro2d.js"></script>
     <script src="src/model/segmento.js"></script>
     <script src="src/model/pista.js"></script>
+    <script src="src/model/cronometro.js"></script>
+    <script src="src/model/carrera_vueltas.js"></script>
 
     <!-- View: controles base -->
     <script src="src/view/controles/control_entrada.js"></script>
@@ -831,6 +895,7 @@
     <script src="src/view/velocimetros/velocimetro_f1.js"></script>
     <script src="src/view/velocimetros/velocimetro_retro.js"></script>
     <script src="src/view/velocimetros/renderizador_velocimetro.js"></script>
+    <script src="src/view/hud_carrera.js"></script>
 
     <!-- View: minimapas (jerarquía: MinimapBase → subclases) -->
     <script src="src/view/minimapas/minimapa_base.js"></script>
@@ -848,6 +913,7 @@
     <script src="src/controller/controles.js"></script>
     <script src="src/controller/juego.js"></script>
     <script src="vista_conduccion.js"></script>
+    <script src="src/controller/controlador_carrera_solo.js"></script>
     <script src="src/controller/aplicacion.js"></script>
 </body>
 </html>
