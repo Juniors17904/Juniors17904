@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v4 — implementado y con pruebas en `pruebas/` |
+| Estado | v4 — implementado y con pruebas en `pruebas/`. Partes reemplazadas por el PRD 002 (D6) |
 | Fecha | 2026-10-21 |
 
 ## Decisiones bloqueadas
@@ -11,7 +11,7 @@ Las decisiones se tomaron con el usuario y son definitivas. Si algún requerimie
 
 | # | Decisión |
 |---|---|
-| D1 | "Jugar Solo" abre una carrera 3D **en vertical**. La carrera 2D se conserva intacta en ⚙ con el botón "Clásico 2D", que sigue en horizontal. |
+| D1 | "Jugar Solo" abre una carrera 3D **en vertical**. La carrera 2D se conserva intacta en ⚙ con el botón "Clásico 2D", que sigue en horizontal. *(Reemplazado por PRD 002, D6.)* |
 | D2 | El MVP tiene 3 vueltas, cuenta 3-2-1, cronómetro, velocímetro, contador de vuelta y un resultado (tiempo total y mejor vuelta) con los botones Revancha y Menú. |
 | D3 | Salirse al pasto baja la velocidad máxima al 40 %. No hay choques ni reinicio. |
 | D4 | Se usan la pista elegida en ⚙ → Pistas (Ciudad por defecto) y el carro, el color, el timón y el velocímetro del garaje. |
@@ -34,7 +34,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 - **Jugador que personaliza:** ve en la carrera la pista, el carro y el color que eligió.
 
 ## 4. Alcance
-**In scope:** carrera 3D vertical de 3 vueltas, cuenta regresiva, HUD (vuelta, tiempo y velocímetro), puntos de control, penalización por pasto, resultado con Revancha y Menú, botón "Clásico 2D" y mejoras visuales de la pista (más luz, línea central y línea de meta).
+**In scope:** carrera 3D vertical de 3 vueltas, cuenta regresiva, HUD (vuelta, tiempo y velocímetro), puntos de control, penalización por pasto, resultado con Revancha y Menú, botón "Clásico 2D" *(Reemplazado por PRD 002, D6.)* y mejoras visuales de la pista (más luz, línea central y línea de meta).
 
 **Out of scope:** rivales, récords guardados, choques o daños, pausa, turbo en el HUD, modo horizontal de la carrera nueva, cerrar las pistas abiertas y cambios en el multijugador.
 
@@ -51,7 +51,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 
 ## 6. Requerimientos funcionales
 - **RF-01:** "Jugar Solo" abre la carrera en vertical y en ningún momento muestra "GIRA TU CELULAR".
-- **RF-02:** "Clásico 2D" en ⚙ abre la carrera 2D de siempre, en horizontal.
+- **RF-02:** "Clásico 2D" en ⚙ abre la carrera 2D de siempre, en horizontal. *(Reemplazado por PRD 002, D6.)*
 - **RF-03:** La carrera usa la pista, el carro y el color elegidos. Si la pista no existe, usa Ciudad y registra el error.
 - **RF-04:** Hay una cuenta 3-2-1-¡YA! con unos 900 ms por número. El carro no se mueve hasta ¡YA!, aunque se acelere.
 - **RF-05:** Arriba se ven "Vuelta X/3" y el cronómetro en formato `m:ss.cc`.
@@ -76,7 +76,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 1. En un celular en vertical se puede jugar una carrera completa de 3 vueltas, de "Jugar Solo" hasta el resultado, sin el aviso de rotación.
 2. Cortar camino o ir en reversa no suma vueltas.
 3. Salirse al pasto frena el carro, y Revancha y Menú funcionan.
-4. "Clásico 2D" sigue funcionando igual que antes.
+4. "Clásico 2D" sigue funcionando igual que antes. *(Reemplazado por PRD 002, D6.)*
 5. Las pruebas de `pruebas/` pasan y la consola no muestra errores de la carrera.
 
 ## 9. Riesgos y supuestos

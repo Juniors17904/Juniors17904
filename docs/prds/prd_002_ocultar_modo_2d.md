@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — listo para implementar |
+| Estado | v3 — cerrado y verificado (Verificador PRD ✅). Listo para implementar |
 | Fecha | 2026-10-21 |
 | Backlog | B1 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D6 |
@@ -95,4 +95,5 @@ Que el jugador solo encuentre modos 3D, que nunca aparezca "GIRA TU CELULAR" y q
 ### Historial
 - **v1** (2026-10-21): primera versión.
 - **v2** (2026-10-21): "modo 2D" pasa a significar solo la carrera clásica; el selector de control se mantiene (B4); se amplía D6; el aviso se oculta en vez de quitarse; la redirección cubre todas las pantallas.
-- **v3** (2026-10-21): correcciones de 4 agentes revisores. D8 pasa a una clase por modo (`Modo` y subclases); D3 y RF-09 aclaran que las entradas normales del 3D nunca se redirigen; cada RF cita su decisión; se quitan textos repetidos de la lista única; el antiguo RF-11 (`ModosDisponibles`) pasa a RNF-01; RNF-03 pide errores de consola, el caso de redirección del 3D y la revisión de Inicio en navegador real.
+- **v3** (2026-10-21): cerrado tras el Verificador PRD; el PRD 001 lleva una nota en los puntos reemplazados.
+- **v3** (2026-10-21, primera parte): correcciones de 4 agentes revisores. D8 pasa a una clase por modo (`Modo` y subclases); D3 y RF-09 aclaran que las entradas normales del 3D nunca se redirigen; cada RF cita su decisión; se quitan textos repetidos de la lista única; el antiguo RF-11 (`ModosDisponibles`) pasa a RNF-01; RNF-03 pide errores de consola, el caso de redirección del 3D y la revisión de Inicio en navegador real.
