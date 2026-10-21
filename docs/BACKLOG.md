@@ -1,0 +1,9 @@
+# Backlog — TurboRace
+
+Ideas y tareas pendientes que todavía no tienen PRD. Cuando una idea se vaya a construir, se crea su PRD con el PRD CREATOR (`docs/PRD_CREATOR.md`) y aquí se marca con un enlace al PRD.
+
+| # | Idea | Estado | Notas |
+|---|---|---|---|
+| B1 | **Ocultar el modo 2D sin afectar el juego.** La versión 2D no se quiere dentro del juego. Se ocultan "Clásico 2D", "Test Drive" (2D) y los flujos que dependen del motor 2D. Lo que comparte con el 3D se conserva y se sigue usando: `PISTAS`, timones, velocímetros y `GestorOrientacion`. | 🟡 PRD por hacer, con el usuario | Cambia la decisión D1 del PRD Carrera Solo ("la 2D se conserva intacta"), así que va en un **PRD nuevo**, sin editar el anterior (lección 19). |
+| B2 | **Archivar el motor 2D.** Guardarlo con una etiqueta de git (por ejemplo `v-clasico-2d`) y quitarlo de `main` cuando ya esté oculto. | ⚪ Idea | Depende de B1. Antes hay que sacar `PISTAS` de `model.js`, porque el 3D lo usa. Elimina `CFG` y `NIVELES` como `{ }` y cierra la lección 17 (aviso "GIRA TU CELULAR" sin salida). |
+| B3 | **Multijugador en 3D vertical.** Hoy el multijugador solo existe en 2D y no funciona, porque faltan las claves de Supabase. | ⚪ Idea | Hay que decidir si se rehace en 3D o se retira junto con el 2D. |
