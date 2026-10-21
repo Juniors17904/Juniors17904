@@ -95,8 +95,8 @@ check(await activa()!=='pantalla-carrera-solo','adelante no deja pantalla vacía
 const n0 = await page.evaluate(()=>window.__llamadas);
 await page.evaluate(()=>{ history.pushState({pantalla:'pantalla-inicio'},''); });
 await page.click('#btn-solo');
-await page.waitForFunction(()=>document.getElementById('cuenta-carrera-solo').textContent==='¡YA!',null,{timeout:10000});
-check(true,'segunda entrada llega a ¡YA!');
+const llegoYa = await page.waitForFunction(()=>document.getElementById('cuenta-carrera-solo').textContent==='¡YA!',null,{timeout:10000}).then(()=>true,()=>false);
+check(llegoYa,'segunda entrada llega a ¡YA!');
 await page.waitForTimeout(1500);
 check(await page.evaluate(()=>window.__llamadas)>n0,'segunda entrada actualiza el modelo');
 await page.goBack(); await page.waitForTimeout(500);
@@ -110,7 +110,10 @@ await page.evaluate(()=>document.getElementById('btn-clasico-2d').click()); awai
 console.log('   clásico 2D →', await activa());
 check(['pantalla-espera','pantalla-rotar'].includes(await activa()) || await page.evaluate(()=>getComputedStyle(document.getElementById('pantalla-espera')).display!=='none'),'clásico 2D abre pantalla-espera');
 console.log('__modelErrors:', JSON.stringify(await page.evaluate(()=>window.__modelErrors)));
+// Errores ajenos a la carrera: ServiceWorker con ruta de GitHub Pages y URLs https bloqueadas a propósito
+const erroresReales = errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)/.test(t));
 console.log('errores:', errores.join('\n'));
+check(erroresReales.length===0, 'sin errores de consola de la carrera '+erroresReales.join(' | '));
 console.log(`OK ${ok}, fallos ${fallos}`);
 await browser.close();
 process.exitCode = fallos ? 1 : 0;
