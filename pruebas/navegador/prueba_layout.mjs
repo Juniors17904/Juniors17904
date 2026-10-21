@@ -44,9 +44,9 @@ for (const c of casos) {
   const visibles = Object.entries(m.elems).filter(([,b])=>b);
   check(visibles.length>=3, c.nombre+': controles visibles '+visibles.map(v=>v[0]).join(','));
   for (const [id,b] of visibles) {
-    check(b.b<=m.H+0.5 && b.y>=0, c.nombre+': '+id+' sin cortar ('+b.y.toFixed(0)+'..'+b.b.toFixed(0)+' de '+m.H+')');
-    check(b.x>=m.izq-0.5 && b.r<=m.der+0.5, c.nombre+': '+id+' dentro de la columna');
-    check(!solapa(b,m.vel), c.nombre+': '+id+' no solapa velocímetro');
+    check(b.b<=m.H+0.5 && b.y>=0, 'RF-09 '+c.nombre+': '+id+' sin cortar ('+b.y.toFixed(0)+'..'+b.b.toFixed(0)+' de '+m.H+')');
+    check(b.x>=m.izq-0.5 && b.r<=m.der+0.5, 'RF-09 '+c.nombre+': '+id+' dentro de la columna');
+    check(!solapa(b,m.vel), 'RF-08 '+c.nombre+': '+id+' no solapa velocímetro');
   }
   await page.screenshot({ path: SP+'/layout_'+c.nombre+'.png' });
   // Panel de resultado sobre un overlay visible (RF-10)

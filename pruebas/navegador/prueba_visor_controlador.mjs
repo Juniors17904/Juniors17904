@@ -188,6 +188,37 @@ const leer    = (page, fn) => page.evaluate(fn);
   await ctx.close();
 }
 
+// ── RF-15: mismos pasos de física a 30 Hz y a 120 Hz ──────────
+// Se controla el reloj de la pantalla: el visor recibe marcas de tiempo exactas
+// (como las daría una pantalla real de 30 o 120 Hz), sin depender de la GPU.
+async function pasosEn2s(hz) {
+  const { ctx, page } = await abrir({ width: 390, height: 844 });
+  await page.evaluate(() => { window.__cuadros = []; window.requestAnimationFrame = fn => { window.__cuadros.push(fn); return window.__cuadros.length; }; });
+  await crearVisor(page);
+  const r = await page.evaluate(ms => {
+    const v = window.__visor;
+    v.congelar(false); v.entradaAcel = 1;
+    let t = performance.now(), pasos = 0;
+    // Se ejecuta siempre el último cuadro pedido por el visor (uno por "refresco")
+    for (let transcurrido = 0; transcurrido <= 2000 + 1e-6; transcurrido += ms) {
+      const fn = window.__cuadros.pop();
+      window.__cuadros.length = 0;
+      if (!fn) break;
+      fn(t + transcurrido);
+      if (transcurrido > 0) pasos += v.pasosUltimoFrame;
+    }
+    v.detener();
+    return pasos;
+  }, 1000 / hz);
+  await ctx.close();
+  return r;
+}
+{
+  const p30 = await pasosEn2s(30), p120 = await pasosEn2s(120);
+  check(Math.abs(p30 - 120) <= 2 && Math.abs(p120 - 120) <= 2,
+        'RF-15 misma cantidad de pasos en 2 s a 30 y 120 Hz (' + p30 + ' vs ' + p120 + ', esperado ~120)');
+}
+
 // ── PC 1280×960: FOV horizontal ───────────────────────────────
 {
   const { ctx, page } = await abrir({ width: 1280, height: 960 }, { movil: false });

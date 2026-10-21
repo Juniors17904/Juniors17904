@@ -42,7 +42,7 @@ await page.evaluate(()=>{ window.__linea=[]; const c=document.getElementById('cu
     if(!u||u[0]!==v) window.__linea.push([v, Math.round(performance.now()-t0)]); }).observe(c,{childList:true,attributes:true,characterData:true,subtree:true}); });
 await page.evaluate(()=>document.getElementById('btn-solo').click());
 check(await activa()==='pantalla-carrera-solo','pantalla activa carrera-solo');
-check(await page.evaluate(()=>getComputedStyle(document.getElementById('pantalla-rotar')).display)==='none','sin pantalla-rotar');
+check(await page.evaluate(()=>getComputedStyle(document.getElementById('pantalla-rotar')).display)==='none','RF-01 sin pantalla-rotar');
 check(await page.evaluate(()=>getComputedStyle(document.getElementById('ctrl-timon')).display)!=='none','timón visible');
 const t = await page.evaluate(()=>{const cs=getComputedStyle(document.getElementById('ctrl-timon'));return cs.transform+' '+cs.width;});
 console.log('   ctrl-timon en carrera:', t);
@@ -108,7 +108,7 @@ check(await page.evaluate(()=>window.__llamadas)===n1,'sin frames tras salir');
 await page.evaluate(()=>document.getElementById('btn-garage').click()); await page.waitForTimeout(300);
 await page.evaluate(()=>document.getElementById('btn-clasico-2d').click()); await page.waitForTimeout(300);
 console.log('   clásico 2D →', await activa());
-check(['pantalla-espera','pantalla-rotar'].includes(await activa()) || await page.evaluate(()=>getComputedStyle(document.getElementById('pantalla-espera')).display!=='none'),'clásico 2D abre pantalla-espera');
+check(['pantalla-espera','pantalla-rotar'].includes(await activa()) || await page.evaluate(()=>getComputedStyle(document.getElementById('pantalla-espera')).display!=='none'),'RF-02 clásico 2D abre pantalla-espera');
 console.log('__modelErrors:', JSON.stringify(await page.evaluate(()=>window.__modelErrors)));
 // Errores ajenos a la carrera: ServiceWorker con ruta de GitHub Pages y URLs https bloqueadas a propósito
 const erroresReales = errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)/.test(t));
