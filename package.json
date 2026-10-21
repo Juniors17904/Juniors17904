@@ -4,5 +4,10 @@
   },
   "devDependencies": {
     "canvas": "^3.2.3"
+  },
+  "scripts": {
+    "test": "node pruebas/ejecutor_pruebas.mjs modelo",
+    "test:navegador": "node pruebas/ejecutor_pruebas.mjs navegador",
+    "test:todo": "node pruebas/ejecutor_pruebas.mjs todo"
   }
 }
