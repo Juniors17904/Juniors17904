@@ -1,10 +1,11 @@
 const fs=require('fs'),vm=require('vm');
 const R=require('path').join(__dirname,'../../src/')+'model/';
 const ctx={console,performance,Math,Object,Array,Number,String,Error,Infinity};ctx.window=ctx;vm.createContext(ctx);
-for(const f of ['cronometro.js','carrera_vueltas.js'])vm.runInContext(fs.readFileSync(R+f,'utf8'),ctx,{filename:f});
+for(const f of ['muestra_ruta.js','cronometro.js','carrera_vueltas.js'])vm.runInContext(fs.readFileSync(R+f,'utf8'),ctx,{filename:f});
 const fallos=[];const ok=(c,m)=>{if(!c)fallos.push(m);};
 ok(!ctx.__modelErrors,'modelErrors '+ctx.__modelErrors);
-const C=ctx.Cronometro, CV=ctx.CarreraVueltas;
+const C=ctx.Cronometro, CV=ctx.CarreraVueltas, M=ctx.MuestraRuta;
+const mr=o=>new M(o.x,o.z,o.angle);
 // RF-01..04
 new C();
 let t=0;const c=new C(()=>t);c.iniciar();t+=1000;ok(c.tiempoTotalMs===1000,'RF02 a');
@@ -24,7 +25,7 @@ for(const [a,b] of [[83456,'1:23.45'],[0,'0:00.00'],[59999,'0:59.99'],[60000,'1:
 // reloj default
 ok(typeof new C().tiempoTotalMs==='number','default reloj');
 // RF-05..12 circulo
-function circ(n,r=50){const a=[];for(let i=0;i<n;i++){const th=2*Math.PI*i/n;a.push({x:r*Math.sin(th),z:r*Math.cos(th),angle:th+Math.PI/2});}return a;}
+function circ(n,r=50){const a=[];for(let i=0;i<n;i++){const th=2*Math.PI*i/n;a.push(new M(r*Math.sin(th),r*Math.cos(th),th+Math.PI/2));}return a;}
 // in circle CCW? derive angle from tangent: d/dth (sin,cos)=(cos,-sin) -> angle s.t. sin(a)=cos th, cos(a)=-sin th -> a=th+pi/2 OK
 const m100=circ(100);let cv=new CV(m100);ok(cv.progreso===0&&cv.vueltaActual===1&&cv.totalVueltas===3,'RF05');
 for(let i=5;i<=25;i+=5)cv.actualizar(m100[i].x,m100[i].z);ok(cv.progreso===0.25,'RF06 0.25 '+cv.progreso);
@@ -36,11 +37,11 @@ cv=new CV(m100);let p=pt(m100,0,5);cv.actualizar(...p);ok(cv.enPasto===true,'RF0
 cv=new CV(m100);p=pt(m100,0,-5);cv.actualizar(...p);ok(cv.enPasto===true,'RF07 -5u '+cv.lateral);
 cv=new CV(m100);p=pt(m100,0,3);cv.actualizar(...p);ok(cv.enPasto===false,'RF07 3u');
 // segmento largo: 4 muestras de cuadrado de lado 100
-const cuad=[{x:0,z:0,angle:0},{x:0,z:100,angle:Math.PI/2},{x:100,z:100,angle:Math.PI},{x:100,z:0,angle:-Math.PI/2}];
+const cuad=[{x:0,z:0,angle:0},{x:0,z:100,angle:Math.PI/2},{x:100,z:100,angle:Math.PI},{x:100,z:0,angle:-Math.PI/2}].map(mr);
 cv=new CV(cuad);cv.actualizar(3,50);ok(cv.enPasto===false,'RF07 mitad seg 3u lat='+cv.lateral);cv=new CV(cuad);cv.actualizar(-3,50);ok(cv.enPasto===false,'RF07 mitad seg -3u lat='+cv.lateral);
 cv=new CV(cuad);cv.actualizar(5,50);ok(cv.enPasto===true,'RF07 mitad seg 5u');
 // mitad de segmento con muchos puntos: muestra 0..10 en recta sep 20
-const recta=[];for(let i=0;i<20;i++)recta.push({x:0,z:i*20,angle:0});
+const recta=[];for(let i=0;i<20;i++)recta.push(new M(0,i*20,0));
 cv=new CV(recta);cv.actualizar(3,10);ok(!cv.enPasto,'RF07 recta 3u '+cv.lateral);cv=new CV(recta);cv.actualizar(3,30);ok(!cv.enPasto,'RF07 recta 3u b '+cv.lateral);
 // pasto
 cv=new CV(m100);p=pt(m100,0,6);cv.actualizar(...p,60);ok(cv.fraccionTope<=0.43,'RF07 60 '+cv.fraccionTope);ok(cv.factorArrastre===3,'arrastre3');
@@ -82,6 +83,10 @@ cv=new CV(m100);cv.actualizar(m100[50].x,m100[50].z);ok(cv.progreso<=0.1,'V=10 '
 cv=new CV(m400,1);ev=[];for(const [a,b] of [[0,0.34],[0.34,0.67],[0.67,0.99],[0.99,0.01]])ev.push(...irA(cv,m400,a,b,1));ok(ev.includes('meta')&&cv.terminada,'1 vuelta');
 // constructor invalido
 try{new CV([]);ok(false,'vacio no lanza')}catch(e){}
+// RF-43: MuestraRuta solo lectura y CarreraVueltas rechaza literales
+{const m=new M(1,2,3);ok(m.x===1&&m.z===2&&m.angulo===3,'RF43 getters');m.x=9;ok(m.x===1,'RF43 solo lectura');}
+try{new CV([{x:0,z:0,angle:0},{x:0,z:1,angle:0}]);ok(false,'RF43 literales no lanza')}catch(e){}
+ok(!/\{ *x *:/.test(fs.readFileSync(R+'carrera_vueltas.js','utf8')),'RF43 sin literales en carrera_vueltas');
 // sin DOM/Three
 const src=fs.readFileSync(R+'carrera_vueltas.js','utf8');ok(!/THREE|document\./.test(src),'deps');
 console.log(fallos.length?fallos.join('\n'):'TODO OK');

@@ -4,7 +4,7 @@
 |---|---|
 | Producto | TURBO RACE (juego web, Three.js 0.164.1) |
 | Funcionalidad | Carrera 3D por vueltas desde "Jugar Solo", en orientación vertical |
-| Estado | v2 — corregido tras el Verificador PRD. Implementado en `f22daba`; **pendiente**: RF-43 (`MuestraRuta`) |
+| Estado | v2 — corregido tras el Verificador PRD. Implementado en `f22daba`; RF-43 (`MuestraRuta`) implementado aparte |
 | Fecha | 2026-10-21 |
 
 ## Decisiones bloqueadas

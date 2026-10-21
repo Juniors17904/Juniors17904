@@ -2,7 +2,7 @@
 
 // ================================================================
 // MODEL — CarreraVueltas: progreso, pasto, puntos de control y vueltas
-// Recibe las muestras de la ruta ({x, z, angle} por longitud de arco)
+// Recibe las muestras de la ruta (instancias de MuestraRuta por longitud de arco)
 // y cada frame la posición del carro. Sin Three.js ni DOM.
 // ================================================================
 
@@ -45,6 +45,9 @@ class CarreraVueltas {
     constructor(muestras, totalVueltas = 3) {
         if (!Array.isArray(muestras) || muestras.length < 2) {
             throw new Error('CarreraVueltas: se necesitan al menos 2 muestras de la ruta');
+        }
+        if (!muestras.every(m => m instanceof window.MuestraRuta)) {
+            throw new Error('CarreraVueltas: las muestras deben ser instancias de MuestraRuta');
         }
         this.#muestras      = muestras;
         this.#totalMuestras = muestras.length;
@@ -133,8 +136,8 @@ class CarreraVueltas {
             ux /= largo;
             uz /= largo;
         } else {
-            ux = Math.sin(actual.angle || 0);
-            uz = Math.cos(actual.angle || 0);
+            ux = Math.sin(actual.angulo);
+            uz = Math.cos(actual.angulo);
         }
         const dx = px - inicio.x;
         const dz = pz - inicio.z;

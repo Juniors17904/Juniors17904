@@ -110,7 +110,7 @@ class VisorCarreraSolo extends VisorBase {
             const u = i / total;
             const p = curva.getPointAt(u);
             const t = curva.getTangentAt(u);
-            muestras.push({ x: p.x, z: p.z, angle: Math.atan2(t.x, t.z) });
+            muestras.push(new window.MuestraRuta(p.x, p.z, Math.atan2(t.x, t.z)));
         }
         return muestras;
     }

@@ -1,6 +1,8 @@
 const fs = require('fs');
 global.window = {};
+eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/muestra_ruta.js', 'utf8'));
 eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/carrera_vueltas.js', 'utf8'));
+const M = window.MuestraRuta;
 if (window.__modelErrors) { console.error(window.__modelErrors); process.exit(1); }
 const C = window.CarreraVueltas;
 let fallos = 0, ok = 0;
@@ -12,7 +14,7 @@ function circulo(n, R = 100) {
     const a = 2 * Math.PI * i / n;
     const x = R * Math.sin(a), z = R * Math.cos(a);
     const tx = Math.cos(a), tz = -Math.sin(a);
-    return { x, z, angle: Math.atan2(tx, tz) };
+    return new M(x, z, Math.atan2(tx, tz));
   });
 }
 const pos = (m, f, off = 0) => { // posición en fracción f, desplazada radialmente off
@@ -59,7 +61,7 @@ recorrer(c, 0, 0.1, 1);
 // segmento largo: 20 muestras R=200 (espaciado ~63)
 {
   const n = 20, R = 200;
-  const ms = Array.from({ length: n }, (_, i) => { const a = 2*Math.PI*i/n; return { x: R*Math.sin(a), z: R*Math.cos(a), angle: Math.atan2(Math.cos(a), -Math.sin(a)) }; });
+  const ms = Array.from({ length: n }, (_, i) => { const a = 2*Math.PI*i/n; return new M(R*Math.sin(a), R*Math.cos(a), Math.atan2(Math.cos(a), -Math.sin(a))); });
   const cc = new C(ms);
   const a = ms[0], b = ms[1];
   const mx = (a.x + b.x) / 2, mz = (a.z + b.z) / 2;
