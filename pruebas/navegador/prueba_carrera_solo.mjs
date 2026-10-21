@@ -109,11 +109,11 @@ check(await activa()!=='pantalla-carrera-solo','atrás a mitad de carrera sale: 
 check(await page.evaluate(()=>getComputedStyle(document.getElementById('ctrl-timon')).display)==='none','timón oculto tras atrás');
 const n1 = await page.evaluate(()=>window.__llamadas); await page.waitForTimeout(500);
 check(await page.evaluate(()=>window.__llamadas)===n1,'sin frames tras salir');
-// Clásico 2D
+// Clásico 2D ya no se ve (PRD 002 reemplaza el RF-02 del PRD 001)
 await page.evaluate(()=>document.getElementById('btn-garage').click()); await page.waitForTimeout(300);
-await page.evaluate(()=>document.getElementById('btn-clasico-2d').click()); await page.waitForTimeout(300);
-console.log('   clásico 2D →', await activa());
-check(['pantalla-espera','pantalla-rotar'].includes(await activa()) || await page.evaluate(()=>getComputedStyle(document.getElementById('pantalla-espera')).display!=='none'),'RF-02 clásico 2D abre pantalla-espera');
+const clasicoVisible = await page.evaluate(()=>{ const b=document.getElementById('btn-clasico-2d');
+  if(!b) return false; const r=b.getBoundingClientRect(); return !b.hidden && getComputedStyle(b).display!=='none' && r.width>0 && r.height>0; });
+check(!clasicoVisible,'PRD 002 RF-01 el botón Clásico 2D ya no es visible en ⚙');
 console.log('__modelErrors:', JSON.stringify(await page.evaluate(()=>window.__modelErrors)));
 // Errores ajenos a la carrera: ServiceWorker con ruta de GitHub Pages y URLs https bloqueadas a propósito
 const erroresReales = errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)/.test(t));
