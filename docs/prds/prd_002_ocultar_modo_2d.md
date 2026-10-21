@@ -1,11 +1,11 @@
-# PRD — Ocultar el modo 2D (TURBO RACE)
+# PRD 002 — Ocultar el modo 2D (TURBO RACE)
 
 | Campo | Valor |
 |---|---|
 | Estado | v1 — listo para implementar |
 | Fecha | 2026-10-21 |
 | Backlog | B1 (`docs/BACKLOG.md`) |
-| Reemplaza | D1 y RF-02 del PRD Carrera Solo (`prd_carrera_solo_vertical.md`), sin editar ese PRD |
+| Reemplaza | D1 y RF-02 del PRD 001 (Carrera Solo) (`prd_001_carrera_solo_vertical.md`), sin editar ese PRD |
 
 ## Decisiones bloqueadas
 
@@ -18,7 +18,7 @@ Las decisiones se tomaron con el usuario y son definitivas. Si algún requerimie
 | D3 | Usuarios | Quien llegue a una pantalla oculta, por el botón atrás o por un enlace viejo, vuelve a Inicio. |
 | D4 | Usuarios | El selector Botones / Timón / Giroscopio de Inicio se oculta, porque solo lo usa el 2D. |
 | D5 | Dominio | Ocultar significa que no se ve ni se abre. El código 2D se queda en el repo; borrarlo es B2. |
-| D6 | Dominio | Este PRD reemplaza la D1 y el RF-02 del PRD Carrera Solo. |
+| D6 | Dominio | Este PRD reemplaza la D1 y el RF-02 del PRD 001 (Carrera Solo). |
 | D7 | Técnico | "GIRA TU CELULAR" se quita de la página y ninguna pantalla visible lo activa. No se modifica ninguna clase existente fuera de las que nombra la lista única. |
 | D8 | Técnico | Una sola clase nueva, `ModosDisponibles`, decide qué modos se muestran. Se permite ajustar las pruebas que esperan el 2D. |
 

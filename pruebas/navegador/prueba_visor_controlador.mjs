@@ -1,5 +1,5 @@
 // Prueba de navegador: RF-03, RF-04, RF-07, RF-09, RF-11, RF-12, RF-13, RF-14, RF-15 y RNF-01
-// del PRD docs/prds/prd_carrera_solo_vertical.md. Usa el visor y el controlador reales.
+// del PRD docs/prds/prd_001_carrera_solo_vertical.md. Usa el visor y el controlador reales.
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULO || '/opt/node22/lib/node_modules/playwright/index.mjs');
 
 const URL_APP = 'http://localhost:8099/';

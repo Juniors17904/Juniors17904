@@ -28,6 +28,8 @@ Ahora escribe el PRD completo en Markdown con esta estructura exacta: 1) Context
 
 Usa lenguaje claro y conciso. Que cada requerimiento funcional sea verificable. Guarda el PRD en `docs/prds`.
 
+Nombre del archivo: `prd_NNN_tema_corto.md`, con número correlativo de 3 dígitos (`prd_001_…`, `prd_002_…`). El título empieza igual: `# PRD NNN — Tema`.
+
 Además (v2):
 - Antes de la sección 1, incluye una tabla **"Decisiones bloqueadas"** con todas las decisiones del Prompt 2 (D1, D2, …: número, categoría y texto completo). Los RF y RNF deben citarlas, y si alguno las contradice, mandan las decisiones.
 - Incluye un **Historial** (v1, v2, …) que diga qué cambió en cada versión.

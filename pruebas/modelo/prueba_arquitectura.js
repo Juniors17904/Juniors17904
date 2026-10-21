@@ -1,5 +1,5 @@
 // ================================================================
-// CLASE: PruebaArquitectura — RNF-02 del PRD docs/prds/prd_carrera_solo_vertical.md
+// CLASE: PruebaArquitectura — RNF-02 del PRD docs/prds/prd_001_carrera_solo_vertical.md
 // Análisis estático (node, sin DOM):
 //   1) La vista (VisorCarreraSolo y HudCarrera) no contiene reglas del modelo
 //      (vueltas, puntos de control, fracciones de vuelta, reloj propio).
