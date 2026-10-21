@@ -4,8 +4,29 @@
 |---|---|
 | Producto | TURBO RACE (juego web, Three.js 0.164.1) |
 | Funcionalidad | Carrera 3D por vueltas desde "Jugar Solo", en orientación vertical |
-| Estado | Listo para implementar (decisiones D1–D10 cerradas; revisión técnica aplicada) |
+| Estado | v2 — corregido tras el Verificador PRD. Implementado en `f22daba`; **pendiente**: RF-43 (`MuestraRuta`) |
 | Fecha | 2026-10-21 |
+
+## Decisiones bloqueadas
+
+Estas decisiones se tomaron con el usuario (PRD CREATOR, Prompts 1 y 2) y son definitivas. Todo RF y RNF debe respetarlas; si alguno las contradice, mandan las decisiones.
+
+| # | Categoría | Decisión |
+|---|---|---|
+| D1 | Alcance | "Jugar Solo" abre la nueva carrera 3D en **vertical**. La carrera 2D actual se conserva intacta y queda en ⚙ (`pantalla-ajustes`) con un botón nuevo **"Clásico 2D"**, que sigue en horizontal. |
+| D2 | Alcance | MVP: 3 vueltas, cuenta 3-2-1, cronómetro, velocímetro, contador de vuelta y resultado (tiempo total + mejor vuelta) con botones Revancha y Menú. Fuera: rivales y récords guardados. |
+| D3 | Usuarios | Salirse al pasto reduce la velocidad máxima al 40 %, sin choque ni reinicio. |
+| D4 | Usuarios | Se usa la pista elegida en ⚙ → Pistas (por defecto Ciudad) y el carro, color, timón y velocímetro del garaje. |
+| D5 | Dominio | Una vuelta es válida solo si pasa 3 puntos de control en orden: 33 %, 66 % y meta. |
+| D6 | Dominio | Clases nuevas, una por archivo: `CarreraVueltas`, `Cronometro` y `MuestraRuta` (modelo); `VisorCarreraSolo` (extiende `VisorBase`) y `HudCarrera` (vista); `ControladorCarreraSolo` (controlador). *(v2: se añade `MuestraRuta`.)* |
+| D7 | Técnico | Cambios mínimos en archivos existentes: solo `index.html` (scripts nuevos, pantalla propia `pantalla-carrera-solo` con HUD y cuenta internos, botón "Clásico 2D") y `src/controller/aplicacion.js` (`btn-solo` llama a `ControladorCarreraSolo`; "Clásico 2D" abre la carrera 2D actual). Nada más se modifica. |
+| D8 | Técnico | `VisorCarreraSolo` reutiliza **sin modificar** `Ruta`, `Carro`, `CamaraSeguimiento`, `FabricaObjetoEscena`, los cielos y `RenderizadorVelocimetro`; sube la luz del asfalto y dibuja visible la línea central. |
+| D9 | Técnico | Orientación vertical: la carrera usa su propia pantalla `pantalla-carrera-solo`, que **no** pasa por `pantalla-espera` ni `pantalla-juego` (las que `GestorOrientacion` exige en horizontal). Así no aparece "GIRA TU CELULAR". `GestorOrientacion` no se modifica. |
+| D10 | Usuarios | Layout vertical: arriba vuelta X/3 y cronómetro; centro pista y carro; abajo a la izquierda el timón; abajo a la derecha ACEL/FRENO; velocímetro pequeño sobre los botones. En PC con teclado, misma composición centrada, con los botones de `ControlTeclado` (◀ ▲▼ ▶) en la banda inferior en vez del timón y ACEL/FRENO. *(v2: precisado.)* |
+
+### Historial
+- **v1** (2026-10-21): primera versión e implementación (`f22daba`).
+- **v2** (2026-10-21): correcciones del Verificador PRD — se escriben D1–D10 en el documento; las muestras de la ruta pasan a ser instancias de `MuestraRuta` (RF-43) en vez de objetos literales; una sola lista de archivos intocables; se aclaran la densidad de la cinta (RF-16), la excepción MVC del visor (RNF-04) y quién lleva el estado de la carrera (RNF-01).
 
 ---
 
@@ -55,7 +76,7 @@ Todo se hace en **archivos nuevos**, con cambios mínimos solo en `index.html` y
 - Pista de ⚙→Pistas (`#estado.pista`, por defecto `'ciudad'`). Carro (`tipoAuto`), `color`, `timonModelo` y `velocimetroModelo` del garaje (D4).
 - **Mejoras visuales** en el visor nuevo: asfalto y pianos más iluminados, línea central y línea de meta visibles (D8).
 - Botón **"Clásico 2D"** en `pantalla-ajustes`, que abre la carrera 2D actual en horizontal (D1).
-- Clases nuevas: `CarreraVueltas`, `Cronometro`, `VisorCarreraSolo`, `HudCarrera` y `ControladorCarreraSolo` (D6).
+- Clases nuevas: `CarreraVueltas`, `Cronometro`, `MuestraRuta`, `VisorCarreraSolo`, `HudCarrera` y `ControladorCarreraSolo` (D6).
 
 ### Out of scope (explícito)
 - Rivales, CPU, tráfico u oponentes en línea.
@@ -64,7 +85,7 @@ Todo se hace en **archivos nuevos**, con cambios mínimos solo en `index.html` y
 - Pausa de la carrera (ver S5).
 - Turbo en el HUD. No se añade botón; si `Carro` lo soporta internamente, no se expone.
 - Cerrar geométricamente las pistas abiertas (costa, desierto, montaña, volcán). Ver Riesgos (R1).
-- **Archivos y clases que NO se modifican** (lista única, igual a RNF-07 y a la tabla 5.3): `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, cielos (`CieloSoleado`, `CieloNocturno`), `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `src/style.css` y **`CLAUDE.md`**.
+- **Archivos y clases que NO se modifican** (**lista única**: RNF-07 la cita; la tabla 5.3 es solo el subconjunto de estas clases que se reutilizan): `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, cielos (`CieloSoleado`, `CieloNocturno`), `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas`, `src/style.css` y **`CLAUDE.md`**.
 - **Actualizar `CLAUDE.md`** (tabla de jerarquía `VisorBase` y tabla "Visores de pista: uno por pantalla"): no se hace en este MVP porque D7 dice que nada más se modifica. Queda como deuda de documentación (R13) para que el usuario decida después.
 - Cambiar el flujo multijugador (`btn-crear` y unirse siguen usando `#iniciarCuentaRegresiva`).
 - Cualquier cambio en otros archivos existentes fuera de D7.
@@ -75,7 +96,7 @@ Todo se hace en **archivos nuevos**, con cambios mínimos solo en `index.html` y
 ### 5.1 Glosario
 | Término | Definición |
 |---|---|
-| **Muestras de la ruta** | `N = 400` puntos `{x, z, angle}` tomados **por longitud de arco** (`ruta.curve.getPointAt(i/N)` y `getTangentAt(i/N)`), generados por `VisorCarreraSolo.muestrasRuta(N)` sin modificar `Ruta`. La muestra 0 coincide con `ruta.inicio` (`getPoint(0) === getPointAt(0)`). |
+| **Muestras de la ruta** | `N = 400` instancias de `MuestraRuta` (getters `x`, `z`, `angulo`; RF-43) tomadas **por longitud de arco** (`ruta.curve.getPointAt(i/N)` y `getTangentAt(i/N)`), generadas por `VisorCarreraSolo.muestrasRuta(N)` sin modificar `Ruta`. La muestra 0 coincide con `ruta.inicio` (`getPoint(0) === getPointAt(0)`). |
 | **Progreso** | Posición del carro a lo largo de la ruta, en 0..1. Se obtiene **proyectando** el carro a la muestra más cercana dentro de una ventana circular (RF-06): `progreso = idx / N`. No se integra la velocidad. Como las muestras son por longitud de arco, el progreso es proporcional a la distancia recorrida. |
 | **Δ envuelto** | Cambio de progreso entre dos llamadas tomando el envolvimiento módulo 1: `Δ = ((actual − anterior + 1.5) mod 1) − 0.5`, en (−0.5, 0.5]. `Δ > 0` es hacia adelante. |
 | **Lateral** | Distancia con signo del carro al **segmento** entre la muestra elegida y su vecina más cercana (anterior o siguiente). Con `(ux, uz)` el vector unitario del segmento y `(dx, dz)` = carro − inicio del segmento: `lateral = dx*uz + dz*(−ux)` (equivale a `dx*cos(a) + dz*(−sin(a))` con la dirección del segmento). |
@@ -88,21 +109,22 @@ Todo se hace en **archivos nuevos**, con cambios mínimos solo en `index.html` y
 | **Mejor vuelta** | Menor tiempo de vuelta entre las 3 completadas. |
 | **Fracción de tope** | Valor 0.4..1 que el modelo suaviza cada paso de simulación hacia 0.4 (pasto) o 1 (asfalto/piano). El visor lo aplica al `Carro` como `velMaxAdelante = velocidadMaxBase × fracción`. |
 | **Paso de simulación** | Una llamada a `carro.actualizar(16)`. El visor ejecuta pasos fijos a 60 Hz con acumulador (RF-15), así que la velocidad del juego no depende de los FPS de la pantalla. |
-| **Estado de carrera** | `preparando` → `cuenta` → `corriendo` → `terminada`. |
+| **Estado de carrera** | `preparando` → `cuenta` → `corriendo` → `terminada`. Es estado de **pantalla** y lo lleva `ControladorCarreraSolo` en un campo privado; `CarreraVueltas` solo informa `terminada` (RNF-01). |
 
 ### 5.2 Clases nuevas (una por archivo, nombres en español)
 
 | Clase | Archivo | Capa MVC | Tipo de script | Responsabilidad |
 |---|---|---|---|---|
 | `CarreraVueltas` | `src/model/carrera_vueltas.js` | **Modelo** | Clásico. Expone `window.CarreraVueltas` (con `try/catch` y `window.__modelErrors`) | Recibe las muestras de la ruta y, cada frame, `(px, pz, pasos)`. Calcula progreso y lateral, sabe si el carro está en el pasto, valida los puntos de control en orden, cuenta vueltas (total 3) y avisa cuándo termina. **Calcula la regla del pasto**: fracción de tope suavizada y factor de arrastre. Sin Three.js ni DOM. |
+| `MuestraRuta` | `src/model/muestra_ruta.js` | **Modelo** | Clásico. Expone `window.MuestraRuta` (con `try/catch` y `window.__modelErrors`) | Un punto de la ruta: campos `#x`, `#z`, `#angulo` y sus getters, de solo lectura. Sin Three.js ni DOM (RF-43). |
 | `Cronometro` | `src/model/cronometro.js` | **Modelo** | Clásico. Expone `window.Cronometro` (con `try/catch` y `window.__modelErrors`) | Mide el tiempo total y por vuelta con un reloj inyectable (`performance.now`). Métodos `iniciar()`, `pausar()`, `reanudar()`, `marcarVuelta()`, `detener()`, `reiniciar()`. Getters: `tiempoTotalMs`, `tiempoVueltaActualMs`, `tiemposVuelta`, `mejorVueltaMs`. Formato `m:ss.cc` (centésimas truncadas) mediante el método `formatear(ms)`. |
 | `VisorCarreraSolo` | `src/view/pistas/visor_carrera_solo.js` | **Vista** | Módulo ES. `extends VisorBase`, expone `window.VisorCarreraSolo` | Escena 3D de la pista: asfalto y pianos iluminados, línea central y línea de meta visibles, decoraciones, cielo, carro GLB y cámara de seguimiento con FOV ajustado a vertical. Mueve el `Carro` con pasos fijos de 60 Hz, expone pose y muestras de la ruta, avisa cada frame mediante `alActualizar(fn)` y **solo copia** al `Carro` el tope que le pasa el controlador (sin decidir la regla). |
 | `HudCarrera` | `src/view/hud_carrera.js` | **Vista** | Clásico. Expone `window.HudCarrera` | Dibuja "Vuelta X/3", el cronómetro, el velocímetro (`RenderizadorVelocimetro`), la cuenta 3-2-1/¡YA! y el panel de resultado, dentro de `pantalla-carrera-solo`. Dimensiona su propio canvas al ancho de la columna. Sin lógica de negocio. |
 | `ControladorCarreraSolo` | `src/controller/controlador_carrera_solo.js` | **Controlador** | Clásico. Expone `window.ControladorCarreraSolo` | Orquesta todo: crea el visor, el modelo y el HUD. Gestiona la cuenta regresiva y el ciclo por frame (callback del visor → modelo → tope al visor → HUD), el resultado y las acciones Revancha/Menú. Libera todo en `detener()`. |
 
-**Superclase:** `VisorCarreraSolo` entra en la jerarquía `VisorBase` existente. Las otras cuatro clases no comparten interfaz con ninguna familia activa, así que no requieren superclase nueva.
+**Superclase:** `VisorCarreraSolo` entra en la jerarquía `VisorBase` existente. Las otras cinco clases no comparten interfaz con ninguna familia activa, así que no requieren superclase nueva.
 
-### 5.3 Clases existentes reutilizadas SIN modificar (D8)
+### 5.3 Clases existentes reutilizadas SIN modificar (D7, D8)
 
 | Clase | Archivo | Uso |
 |---|---|---|
@@ -132,7 +154,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 
 > Cada RF indica cómo verificarlo. Los RF están agrupados por fase para que agentes distintos puedan implementarlos en paralelo o en secuencia. **Dependencias:** la Fase 2 solo necesita la interfaz pública de la Fase 1, y la Fase 3 depende de las Fases 1 y 2.
 
-### Fase 1 — Modelo (`CarreraVueltas`, `Cronometro`)
+### Fase 1 — Modelo (`CarreraVueltas`, `Cronometro`, `MuestraRuta`)
 
 - **RF-01** — Existe `src/model/cronometro.js` con la única clase `Cronometro`. Expone `window.Cronometro` y se envuelve en `try/catch` con `window.__modelErrors`, como las demás clases del modelo.
   *Verificación:* `new window.Cronometro()` en la consola no lanza error.
@@ -145,7 +167,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 - **RF-04** — `Cronometro.formatear(ms)` (método de instancia) devuelve el texto `m:ss.cc`. Las centésimas se **truncan** (`Math.floor(ms / 10) % 100`), igual que `Aplicacion.#formatearTiempo`; no se redondea.
   *Verificación:* `formatear(83456)` → `"1:23.45"`; `formatear(0)` → `"0:00.00"`; `formatear(59999)` → `"0:59.99"`.
 - **RF-05** — Existe `src/model/carrera_vueltas.js` con la única clase `CarreraVueltas`. Expone `window.CarreraVueltas`, sin dependencias de Three.js ni del DOM, y se envuelve en `try/catch` con `window.__modelErrors`, igual que RF-01.
-  - Constructor: `constructor(muestras, totalVueltas = 3)`, donde `muestras` es el array de `{x, z, angle}` que devuelve `visor.muestrasRuta(N)`. El índice inicial es **0** (la muestra 0 coincide con `ruta.inicio`) y el progreso inicial es 0.
+  - Constructor: `constructor(muestras, totalVueltas = 3)`, donde `muestras` es el array de instancias de `MuestraRuta` que devuelve `visor.muestrasRuta(N)` (nunca objetos literales). El índice inicial es **0** (la muestra 0 coincide con `ruta.inicio`) y el progreso inicial es 0.
   - *Verificación:* `new window.CarreraVueltas(circulo100)` (array sintético de 100 puntos de un círculo) no lanza error y `progreso === 0`.
 - **RF-06** — `actualizar(px, pz, pasos = 1)` calcula el **progreso por proyección**:
   - Busca la muestra más cercana en una **ventana circular** de `±V` muestras alrededor del índice anterior, con `V = round(0.1 × N)` (**±40 con N = 400**; ±10 con el círculo de 100). Los índices se envuelven **módulo N**, de modo que la ventana alrededor de la meta incluye `N−1` y `0` (idx 399 → 0) y el cruce de meta se puede detectar.
@@ -170,6 +192,9 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 - **RF-12** — `reiniciar()` vuelve el modelo a vuelta 1, índice 0, progreso 0, `fraccionTope = 1`, `terminada = false` y puntos de control a cero, sin crear una instancia nueva.
   *Verificación:* después de terminar y llamar a `reiniciar()`, `vueltaActual === 1`, `progreso === 0` y `terminada === false`.
 
+- **RF-43** — **Muestras como clase (v2).** Existe `src/model/muestra_ruta.js` con la única clase `MuestraRuta`. Constructor `constructor(x, z, angulo)`; campos `#x`, `#z`, `#angulo`; getters `x`, `z`, `angulo` sin setters. Expone `window.MuestraRuta` con `try/catch` y `window.__modelErrors`. `VisorCarreraSolo.muestrasRuta(n)` devuelve instancias de esta clase y `CarreraVueltas` solo trabaja con ellas.
+  - *Verificación:* `visor.muestrasRuta(400).every(m => m instanceof MuestraRuta)`; en `carrera_vueltas.js` y `visor_carrera_solo.js` no queda ningún `{ x:`/`{x,` guardado en un campo; las pruebas de `pruebas/modelo/` construyen sus círculos sintéticos con `new MuestraRuta(...)` y pasan.
+
 ### Fase 2 — Vista (`VisorCarreraSolo`, `HudCarrera`)
 
 - **RF-13** — Existe `src/view/pistas/visor_carrera_solo.js` con la única clase `VisorCarreraSolo extends VisorBase`. Llama a `super()` y termina con `window.VisorCarreraSolo = VisorCarreraSolo`.
@@ -187,7 +212,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
   - `detener()` cancela el RAF, desconecta los observadores, destruye el cielo y los objetos, hace `renderer.dispose()` y fuerza `WEBGL_lose_context`.
   - *Verificación:* tras `detener()` no quedan frames pedidos (no hay errores en la consola) y el contexto WebGL se libera. Con el RAF limitado a 30 FPS (emulación de CPU) y a 120 Hz, recorrer 100 u en recta a fondo tarda lo mismo (±5 %).
 - **RF-16** — **Asfalto iluminado (D8).** El asfalto se ve gris medio desde la cámara de seguimiento, no casi negro. Para lograrlo:
-  - Generar la cinta con caras orientadas hacia +Y (orden de índices `a,b,c, b,d,c`), usando la **misma polilínea por longitud de arco** que `muestrasRuta` (`getPointAt`, DIV = 800), para que el asfalto dibujado coincida con el que usa `CarreraVueltas` también en el tramo de cierre de las pistas abiertas.
+  - Generar la cinta con caras orientadas hacia +Y (orden de índices `a,b,c, b,d,c`), usando la **misma curva por longitud de arco** que `muestrasRuta` (`getPointAt`), con densidad DIV = 800 para la cinta y N = 400 para el modelo. La diferencia entre ambas cuerdas debe ser menor que el margen del piano (0.7 u), para que el asfalto dibujado coincida con el que usa `CarreraVueltas` también en el tramo de cierre de las pistas abiertas.
   - Usar luces de nivel similar a `VisorTestdriveRuta`: Ambient ≈ 1.2, sol ≈ 2.2 y relleno ≈ 0.5.
   - *Verificación:* en una captura 390×844 (`captura.mjs` con `--use-gl=angle`, `headless:false`, Xvfb), la luminancia media de una zona de asfalto delante del carro es **≥ 70/255** y **≥ 1.5×** la de Diseño General con la misma pista y cámara.
 - **RF-17** — **Línea central visible (D8).** Se dibuja una línea discontinua amarilla (`0xffee44`, ±0.22, y = 0.03, DASH 14 / GAP 10) en todo el recorrido. También se dibuja la línea de meta blanca (`-4..4`, índices 0..5). Ambas con caras hacia +Y (o `DoubleSide`) para que se vean desde arriba.
@@ -201,7 +226,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
   - *Verificación:* con `ControlTimon` y con `ControlTeclado` el carro acelera, frena y gira.
 - **RF-20** — Pose y pista expuestas solo para lectura:
   - Getters `px`, `pz`, `velocidad`, `velocidadMaxBase` (el `velMaxAdelante` original guardado al crear el carro) y `pasosUltimoFrame`.
-  - Método `muestrasRuta(n)` que devuelve `n` puntos `{x, z, angle}` **por longitud de arco** (`ruta.curve.getPointAt(i/n)` y `angle = atan2(t.x, t.z)` con `getTangentAt(i/n)`), para que el controlador alimente a `CarreraVueltas`.
+  - Método `muestrasRuta(n)` que devuelve `n` instancias de `MuestraRuta` **por longitud de arco** (`ruta.curve.getPointAt(i/n)` y `angulo = atan2(t.x, t.z)` con `getTangentAt(i/n)`), para que el controlador alimente a `CarreraVueltas`.
   - No expone `velocimetroModelo`: el controlador lo lee de `estado.velocimetroModelo` (RF-28).
   - *Verificación:* `visor.muestrasRuta(400).length === 400`, la muestra 0 coincide con `ruta.inicio` y la distancia entre muestras consecutivas es constante (±5 %) incluso en Cañón Rojo.
 - **RF-21** — **Aplicación del tope de pasto (D3) sin modificar `Carro`.** El método `aplicarTope(fraccion, factorArrastre)` solo **copia** valores que calculó el modelo (RF-07): `carro.velMaxAdelante = velocidadMaxBase × fraccion` y `carro.constArrastre = arrastreBase × factorArrastre`. El visor no decide la regla ni suaviza.
@@ -261,11 +286,11 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
     `#pantalla-carrera-solo.activa ~ #ctrl-timon, #pantalla-carrera-solo.activa ~ #ctrl-botones { left: 50%; right: auto; transform: translateX(-50%); width: min(100vw, 480px); }`
     y `#resultado-carrera-solo { position: fixed; z-index: 30; }`. Al quitar `.activa` (salir de la pantalla) los overlays recuperan automáticamente su estilo original de `style.css`, sin código de restauración.
   - Añadir `<script type="module" src="src/view/pistas/visor_carrera_solo.js?v=11">` en el bloque de módulos (L792-797).
-  - Añadir `cronometro.js`, `carrera_vueltas.js`, `hud_carrera.js` y `controlador_carrera_solo.js` como scripts clásicos antes de `aplicacion.js`, con `hud_carrera.js` después de los velocímetros.
+  - Añadir `muestra_ruta.js` (antes de `carrera_vueltas.js` y del módulo del visor), `cronometro.js`, `carrera_vueltas.js`, `hud_carrera.js` y `controlador_carrera_solo.js` como scripts clásicos antes de `aplicacion.js`, con `hud_carrera.js` después de los velocímetros.
   - *Verificación:* la consola no muestra errores 404 ni ReferenceError al cargar. Tras salir de la carrera, en Clásico 2D, Test Drive 3D y Circuito 3D, `getComputedStyle(#ctrl-timon).left === '0px'` y `transform === 'none'` (igual que antes del cambio).
 - **RF-37** — **Botón "Clásico 2D"** en `.ajustes-menu` de `pantalla-ajustes`, con la misma estructura que los demás `.ajuste-item` (`id="btn-clasico-2d"`, icono, texto "Clásico 2D" y flecha ›).
   *Verificación:* el botón se ve en ⚙ Ajustes.
-- **RF-38** — **aplicacion.js, `#btn-solo`:** pone `#estado.nombre` y `modoSolo = true`, llama a **`GestorOrientacion.liberar()`** (método existente; quita un posible bloqueo en horizontal que haya dejado Clásico 2D, por ejemplo al salir con el botón atrás en una PWA instalada), luego a `#mostrar('pantalla-carrera-solo')` y después crea y arranca `new ControladorCarreraSolo(this.#estado, this.#vistaConduccion, () => this.#mostrar('pantalla-inicio'))`. La instancia se guarda en un campo privado nuevo `#carreraSolo`.
+- **RF-38** — **aplicacion.js, `#btn-solo`:** pone `#estado.nombre` y `modoSolo = true`, llama a **`GestorOrientacion.liberar()`** (método existente; quita un posible bloqueo en horizontal que haya dejado Clásico 2D, por ejemplo al salir con el botón atrás en una PWA instalada), luego **crea** `new ControladorCarreraSolo(this.#estado, this.#vistaConduccion, () => this.#mostrar('pantalla-inicio'))` y lo guarda en un campo privado nuevo `#carreraSolo`, **después** llama a `#mostrar('pantalla-carrera-solo')` y por último a `iniciar()` del controlador. El orden importa: si `#carreraSolo` se asignara después de `#mostrar`, RF-40 redirigiría a Inicio. *(v2: orden corregido; el constructor del controlador no toca el DOM.)*
   *Verificación:* pulsar "Jugar Solo" no muestra `pantalla-espera` ni `pantalla-juego`.
 - **RF-39** — **aplicacion.js, `#btn-clasico-2d`:** pone `#estado.nombre` (desde `inp-nombre`, o "Jugador" si está vacío) y `modoSolo = true`, y llama a `#iniciarCuentaRegresiva()`, exactamente lo que hacía antes `btn-solo`.
   *Verificación:* el flujo y el resultado 2D son idénticos a los de la versión anterior, incluida la exigencia de horizontal.
@@ -286,18 +311,18 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 
 ## 7. Requerimientos no funcionales
 
-- **RNF-01 — POO estricta.** Todo es una clase instanciable. Prohibido usar funciones sueltas, objetos literales como entidades o `window.X = {…}`. Los `{}` solo se permiten como variables locales temporales dentro de un método. Por ejemplo, los estados de carrera son constantes de texto internas de `CarreraVueltas`, no un objeto global.
-- **RNF-02 — Una clase por archivo.** El nombre del archivo es el de la clase en snake_case español (`CarreraVueltas` → `carrera_vueltas.js`). Se crean exactamente 5 archivos nuevos de código.
+- **RNF-01 — POO estricta.** Todo es una clase instanciable. Prohibido usar funciones sueltas, objetos literales como entidades o `window.X = {…}`. Los `{}` solo se permiten como variables locales temporales dentro de un método. Las muestras de la ruta son instancias de `MuestraRuta`, **nunca** objetos `{x, z, angle}` guardados en otra clase. El estado de la carrera (`preparando`, `cuenta`, `corriendo`, `terminada`) lo lleva `ControladorCarreraSolo` en un campo privado como estado de pantalla; `CarreraVueltas` solo expone `terminada`.
+- **RNF-02 — Una clase por archivo.** El nombre del archivo es el de la clase en snake_case español (`CarreraVueltas` → `carrera_vueltas.js`). Se crean exactamente 6 archivos nuevos de código (D6).
 - **RNF-03 — Encapsulamiento.** Todo el estado interno va en `#privados`. Solo se exponen getters y setters que otra clase necesita. Únicas excepciones públicas: `entradaAcel` y `entradaDireccion` del visor, que exige la interfaz de `ControlEntrada` y `VistaConduccion`.
 - **RNF-04 — MVC.**
-  - Modelo (`CarreraVueltas`, `Cronometro`): sin Three.js ni DOM. Contiene **todas** las reglas de negocio y física nueva: vueltas, puntos de control, tiempos y la regla del pasto (umbral, fracción 0.4, suavizado 0.05 por paso, factor de arrastre ×3).
-  - Vista (`VisorCarreraSolo`, `HudCarrera`): sin reglas de vueltas, tiempos ni pasto. El visor solo integra el `Carro` existente con paso fijo y **copia** al `Carro` el tope que recibe (`aplicarTope`).
+  - Modelo (`CarreraVueltas`, `Cronometro`, `MuestraRuta`): sin Three.js ni DOM. Contiene **todas** las reglas de negocio y física nueva: vueltas, puntos de control, tiempos y la regla del pasto (umbral, fracción 0.4, suavizado 0.05 por paso, factor de arrastre ×3).
+  - Vista (`VisorCarreraSolo`, `HudCarrera`): sin reglas de vueltas, tiempos ni pasto. El visor solo integra el `Carro` existente con paso fijo y **copia** al `Carro` el tope que recibe (`aplicarTope`). **Excepción declarada:** el visor crea su `Ruta` y su `Carro` y avanza la física con paso fijo, igual que el patrón existente de `VisorTestdriveRuta`; no decide ninguna regla de negocio.
   - Controlador (`ControladorCarreraSolo`): sin física ni dibujo directo. El ajuste de los overlays en vertical se hace por CSS (RF-36), no desde el controlador.
 - **RNF-05 — Nombres en español.** Clases, archivos, métodos, atributos e ids nuevos en español. Inglés solo en APIs externas (Three.js), acrónimos (HUD, GLB) y miembros heredados existentes (`entradaAcel`, `camAereaActiva`…).
 - **RNF-06 — Herencia.** `VisorCarreraSolo extends VisorBase` y llama a `super()`. El orden de `<script>` garantiza que cada dependencia se carga antes que quien la usa.
 - **RNF-07 — Cambios mínimos (D7).** Solo se modifican `index.html` y `src/controller/aplicacion.js`, y solo en lo descrito en RF-36 a RF-40.
-  - No se tocan `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `src/style.css` ni **`CLAUDE.md`** (misma lista que la sección 4).
-  - *Verificación:* `git diff --stat` muestra solo esos 2 archivos modificados más los 5 nuevos (y este PRD). `CLAUDE.md` no aparece.
+  - No se toca ningún archivo de la **lista única de la sección 4** (Alcance → Out of scope).
+  - *Verificación:* `git diff --stat` muestra solo esos 2 archivos modificados más los 6 nuevos (y este PRD). `CLAUDE.md` no aparece.
 - **RNF-08 — Rendimiento.** ≥ 30 FPS sostenidos en un móvil de gama media en vertical. La búsqueda del punto más cercano usa una ventana local circular (±40 de 400), no recorre todas las muestras cada frame. La velocidad del juego no depende de los FPS (paso fijo de 60 Hz, RF-15). Sin fugas **dentro de una sesión de carrera**: tras 5 revanchas y salir, la memoria GPU vuelve al nivel previo. Las entradas y salidas repetidas a la pantalla heredan la fuga existente de `ControlTimon` (R12) y no forman parte de esta verificación.
 - **RNF-09 — Robustez.** Los errores de carga del GLB o de una pista inexistente no rompen la app: se usa `'ciudad'` como respaldo y el error se registra en la consola o en `window.__modelErrors`. Si el módulo del visor no carga en 6 s, se avisa y se vuelve a Inicio (RF-29). El controlador funciona aunque `window.RenderizadorVelocimetro` falte.
 - **RNF-10 — Compatibilidad.** Chrome/Safari móviles y Chrome/Edge/Firefox de escritorio. Funciona con `ControlTimon` (táctil) y `ControlTeclado` (flechas/WASD), según la preferencia de `VistaConduccion`.
@@ -318,7 +343,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 9. **Menú / Atrás:** Menú o el botón atrás del sistema vuelven a Inicio, liberan el visor y ocultan el timón y los botones. El botón "adelante" no deja una pantalla negra.
 10. **Layout:** en vertical se ve arriba vuelta y cronómetro; en el centro la pista; abajo a la izquierda el timón; abajo a la derecha ACEL/FRENO con el velocímetro encima. En PC con teclado, la misma composición en una columna centrada de ≤ 480 px, con los botones ◀ ▲▼ ▶ de `ControlTeclado` en la banda inferior y el velocímetro en la misma posición.
 11. **Clásico 2D:** ⚙ Ajustes muestra "Clásico 2D", que abre la carrera 2D actual en horizontal, idéntica a la versión anterior (controles en su posición original).
-12. **Archivos:** existen exactamente las 5 clases nuevas en sus archivos. Solo `index.html` y `aplicacion.js` tienen cambios (ni `style.css` ni `CLAUDE.md`), y no hay errores en la consola en todo el flujo.
+12. **Archivos:** existen exactamente las 6 clases nuevas en sus archivos. Solo `index.html` y `aplicacion.js` tienen cambios (ni `style.css` ni `CLAUDE.md`), y no hay errores en la consola en todo el flujo.
 
 ## 9. Riesgos y supuestos
 
@@ -333,7 +358,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 | R6 | Los overlays `#ctrl-timon` / `#ctrl-botones` son `position: fixed; left: 0; right: 0; height: 120px`, globales, hermanos al final del body y **fuera** de `#pantalla-carrera-solo`. No se puede tocar `style.css`. | Timón o botones mal colocados en vertical o en PC. | `<style>` nuevo en index.html con selector de hermano `#pantalla-carrera-solo.activa ~ #ctrl-…` (RF-36), que deja de aplicar solo al salir. Validar con capturas 390×844 y 1280×960, y comprobar que en otras pantallas el estilo no cambia. |
 | R7 | `#iniciarCircuito3D` pone `GestorOrientacion.saltarCheck = true` y no está claro que lo restaure. | Efectos cruzados de orientación. | La pantalla nueva no depende de `saltarCheck`: no está en `#PANTALLAS_LANDSCAPE`. No se toca. |
 | R8 | `aplicacion.js` (clásico) se ejecuta antes que los módulos ES. | `window.VisorCarreraSolo` no existe todavía. | Reintento con `setTimeout` limitado a 40 × 150 ms, cancelable desde `detener()` (RF-29, RF-35). |
-| R9 | La regla de CLAUDE.md "sin objetos literales" choca con `pista.decoraciones`, el retorno `{x, z, angle}` de `Ruta` y las muestras `{x, z, angle}` de `muestrasRuta`. | Discusión de cumplimiento. | Se mantiene el mismo formato que ya usa `Ruta` (datos de geometría, no entidades del juego). Se documenta como deuda existente. |
+| R9 | La regla de CLAUDE.md "sin objetos literales" choca con `pista.decoraciones` y el retorno `{x, z, angle}` de `Ruta.inicio`/`posicionEn`, que son código existente fuera de este PRD. | Discusión de cumplimiento. | Las muestras nuevas **sí** cumplen: son instancias de `MuestraRuta` (RF-43). Los literales de `Ruta` y `ConfigPista*` se leen como variables locales y no se guardan; quedan como deuda existente para otro PRD. |
 | R10 | Algunos listeners de aplicacion.js están duplicados (`btn-ir-vista-conduccion`). | Ninguno directo. | Fuera de alcance. No se corrige. |
 | R11 | `screen.orientation.lock('landscape')` de `GestorOrientacion.verificar()` puede quedar activo (sobre todo en PWA instalada) si se sale de Clásico 2D con el botón atrás, porque solo `btn-menu`, `btn-exit-td3d` y `btn-exit-cir3d` llaman a `liberar()`. | "Jugar Solo" se abriría bloqueado en horizontal. | `#btn-solo` llama a `GestorOrientacion.liberar()` antes de mostrar la pantalla (RF-38). |
 | R12 | Cada entrada a la carrera llama a `vistaConduccion.aplicarA` → `new ControlTimon`, y `ControlTimon.#setupCanvas` añade listeners anónimos a `#canvas-timon` y a `window` que `destruir()` no quita. `ControlTimon` no se puede modificar. | Fuga leve de listeners con muchas entradas/salidas a la pantalla. | Deuda existente (igual pasa en Test Drive y Circuito 3D). RF-33 evita repetir `aplicarA` en las revanchas; RNF-08 limita la verificación de fugas a una sesión de carrera. |
@@ -345,6 +370,6 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 - S1: `window.PISTAS[estado.pista]` existe para las claves de ⚙→Pistas. Si no, se usa `'ciudad'`.
 - S2: `VisorBase.cargarGLTF()` y `vehicles_pack.glb` están disponibles igual que en los otros visores.
 - S3: `VistaConduccion.aplicarA` funciona con cualquier objeto que exponga `entradaAcel`, `entradaDireccion`, `alturaCamara`, `camAereaActiva` y `toggleCamaraAerea()`.
-- S4: `ruta.curve` es un `THREE.CatmullRomCurve3` con `getPointAt(u)` y `getTangentAt(u)`, así que `muestrasRuta(n)` devuelve `n` puntos `{x, z, angle}` equiespaciados por distancia.
+- S4: `ruta.curve` es un `THREE.CatmullRomCurve3` con `getPointAt(u)` y `getTangentAt(u)`, así que `muestrasRuta(n)` devuelve `n` instancias de `MuestraRuta` (`x`, `z`, `angulo`) equiespaciadas por distancia.
 - S5: El cronómetro usa `performance.now()`. No hay pausa en el MVP: un cambio de pestaña o el bloqueo de pantalla no pausa la carrera y el tiempo sigue corriendo.
 - S6: Con paso fijo de 60 Hz (RF-15), tres vueltas en Ciudad (~1200 u por vuelta) duran entre 1 y 3 minutos en cualquier pantalla, una duración adecuada para una sesión casual.
