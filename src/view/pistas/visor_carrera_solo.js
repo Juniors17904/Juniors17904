@@ -70,9 +70,14 @@ class VisorCarreraSolo extends VisorBase {
     #factorArrastre   = 1;
     #alturaPreferida  = 2.8;
 
+    #entradaAcel      = 0;
+    #entradaDireccion = 0;
+
     // Interfaz de entrada exigida por ControlEntrada / VistaConduccion
-    entradaAcel      = 0;
-    entradaDireccion = 0;
+    get entradaAcel()        { return this.#entradaAcel; }
+    set entradaAcel(v)       { this.#entradaAcel = Number(v) || 0; }
+    get entradaDireccion()   { return this.#entradaDireccion; }
+    set entradaDireccion(v)  { this.#entradaDireccion = Number(v) || 0; }
 
     constructor(canvas, pista) {
         super();
@@ -477,7 +482,7 @@ class VisorCarreraSolo extends VisorBase {
             this.#grupoCarro.rotation.y = this.#carro.rotY;
         }
         if (this.#grupoInclina) this.#grupoInclina.rotation.z = this.#carro.carLean;
-        this.#camara?.actualizar(this.#carro.px, this.#carro.pz, this.#carro.velAngle, this.entradaDireccion);
+        this.#camara?.actualizar(this.#carro.px, this.#carro.pz, this.#carro.velAngle, this.#entradaDireccion);
     }
 
     // ── Bucle: pasos fijos de 60 Hz + callback + render ──────────
@@ -498,8 +503,8 @@ class VisorCarreraSolo extends VisorBase {
             this.#acumuladorMs += dt;
             while (this.#acumuladorMs >= VisorCarreraSolo.#MS_POR_PASO
                    && pasos < VisorCarreraSolo.#MAX_PASOS) {
-                this.#carro.entradaAcel      = this.entradaAcel;
-                this.#carro.entradaDireccion = this.entradaDireccion;
+                this.#carro.entradaAcel      = this.#entradaAcel;
+                this.#carro.entradaDireccion = this.#entradaDireccion;
                 this.#carro.actualizar(16);
                 this.#acumuladorMs -= VisorCarreraSolo.#MS_POR_PASO;
                 pasos++;

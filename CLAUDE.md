@@ -88,6 +88,7 @@ class NivelCiudad extends Nivel {
 - **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`). Sin lógica de vista.
 - **View** → dibujo, cámaras, controles UI (`CamaraSeguimiento`, `ControlTimon`, `Minimapa`). Sin lógica de negocio.
 - **Controller** → orquesta Model y View (`aplicacion.js`, `juego.js`). Sin física ni dibujo directo.
+- **Excepción permitida — visores 3D:** un visor de pista (subclase de `VisorBase`) puede crear su `Ruta` y su `Carro` y avanzar la física con paso fijo, porque la integración va atada al render. Las **reglas de negocio** (vueltas, tiempos, penalizaciones como el pasto) viven siempre en clases del modelo (`CarreraVueltas`, `Cronometro`…); el visor solo aplica lo que el modelo calcula.
 
 ### POO obligatorio — checklist antes de escribir cualquier código nuevo
 1. ¿Tiene nombre propio? → clase con ese nombre en español
@@ -139,7 +140,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `ConfigPista` | `ConfigPistaCiudad`, `ConfigPistaDesierto`, … | `nombre`, `tramos`, `totalSegs` |
 | `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
-| `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista` | (utilidades Three.js) |
+| `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo` | (utilidades Three.js) |
 | `MinimapBase` | `MinimapaConductor`, `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
@@ -158,8 +159,9 @@ Cada pantalla que muestra un circuito 3D tiene su propia clase. Nunca dos pantal
 | Test Drive 3D → Con Ruta | `VisorTestdriveRuta` | `pistas/visor_testdrive_ruta.js` |
 | Diseño de Pistas → Entrar | `VisorCarreraUrbana` | `pistas/visor_carrera_urbana.js` |
 | 🎨 Diseño General | `VisorDisenoPista` | `pistas/visor_diseno_pista.js` |
+| Jugar Solo (carrera 3D vertical) | `VisorCarreraSolo` | `pistas/visor_carrera_solo.js` |
 
-`Aplicacion` guarda cada instancia en su propio campo privado (`#td3d`, `#cir3d`, `#visorDG`, `#visorDO`). Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
+`Aplicacion` guarda cada instancia en su propio campo privado (`#td3d`, `#cir3d`, `#visorDG`, `#visorDO`). **Excepción:** cuando una pantalla tiene su propio controlador, el visor vive dentro de ese controlador y `Aplicacion` guarda el controlador en su campo privado (Jugar Solo: `#carreraSolo` → `ControladorCarreraSolo` → `VisorCarreraSolo`). Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
 
 ### Encapsulamiento — reglas estrictas
 

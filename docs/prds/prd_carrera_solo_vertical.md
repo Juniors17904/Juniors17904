@@ -4,7 +4,7 @@
 |---|---|
 | Producto | TURBO RACE (juego web, Three.js 0.164.1) |
 | Funcionalidad | Carrera 3D por vueltas desde "Jugar Solo", en orientación vertical |
-| Estado | v2 — corregido tras el Verificador PRD. Implementado en `f22daba`; RF-43 (`MuestraRuta`) implementado aparte |
+| Estado | v2 — corregido tras el Verificador PRD. Implementado en `f22daba`; RF-43 (`MuestraRuta`) implementado aparte · v3: `CLAUDE.md` actualizado con permiso del usuario |
 | Fecha | 2026-10-21 |
 
 ## Decisiones bloqueadas
@@ -19,13 +19,14 @@ Estas decisiones se tomaron con el usuario (PRD CREATOR, Prompts 1 y 2) y son de
 | D4 | Usuarios | Se usa la pista elegida en ⚙ → Pistas (por defecto Ciudad) y el carro, color, timón y velocímetro del garaje. |
 | D5 | Dominio | Una vuelta es válida solo si pasa 3 puntos de control en orden: 33 %, 66 % y meta. |
 | D6 | Dominio | Clases nuevas, una por archivo: `CarreraVueltas`, `Cronometro` y `MuestraRuta` (modelo); `VisorCarreraSolo` (extiende `VisorBase`) y `HudCarrera` (vista); `ControladorCarreraSolo` (controlador). *(v2: se añade `MuestraRuta`.)* |
-| D7 | Técnico | Cambios mínimos en archivos existentes: solo `index.html` (scripts nuevos, pantalla propia `pantalla-carrera-solo` con HUD y cuenta internos, botón "Clásico 2D") y `src/controller/aplicacion.js` (`btn-solo` llama a `ControladorCarreraSolo`; "Clásico 2D" abre la carrera 2D actual). Nada más se modifica. |
+| D7 | Técnico | Cambios mínimos en archivos existentes: solo `index.html` (scripts nuevos, pantalla propia `pantalla-carrera-solo` con HUD y cuenta internos, botón "Clásico 2D") y `src/controller/aplicacion.js` (`btn-solo` llama a `ControladorCarreraSolo`; "Clásico 2D" abre la carrera 2D actual). En `index.html` también se permite un `<style>` nuevo con selectores `#pantalla-carrera-solo.activa ~ …` (RF-36); en `aplicacion.js`, el campo `#carreraSolo` y su enganche en `#mostrar`/`popstate` (RF-40). Fuera del código del juego se permiten las pruebas de `pruebas/` y, con permiso del usuario (v3), en `CLAUDE.md`: las tablas de jerarquías y visores, la excepción MVC de visores 3D y la nota de visor dentro del controlador. Nada más se modifica. *(v3: ampliada.)* |
 | D8 | Técnico | `VisorCarreraSolo` reutiliza **sin modificar** `Ruta`, `Carro`, `CamaraSeguimiento`, `FabricaObjetoEscena`, los cielos y `RenderizadorVelocimetro`; sube la luz del asfalto y dibuja visible la línea central. |
 | D9 | Técnico | Orientación vertical: la carrera usa su propia pantalla `pantalla-carrera-solo`, que **no** pasa por `pantalla-espera` ni `pantalla-juego` (las que `GestorOrientacion` exige en horizontal). Así no aparece "GIRA TU CELULAR". `GestorOrientacion` no se modifica. |
 | D10 | Usuarios | Layout vertical: arriba vuelta X/3 y cronómetro; centro pista y carro; abajo a la izquierda el timón; abajo a la derecha ACEL/FRENO; velocímetro pequeño sobre los botones. En PC con teclado, misma composición centrada, con los botones de `ControlTeclado` (◀ ▲▼ ▶) en la banda inferior en vez del timón y ACEL/FRENO. *(v2: precisado.)* |
 
 ### Historial
 - **v1** (2026-10-21): primera versión e implementación (`f22daba`).
+- **v3** (2026-10-21): segunda pasada del Verificador PRD. Con permiso del usuario se actualiza `CLAUDE.md` (visor dentro del controlador y excepción MVC de visores 3D); D7 incluye el `<style>`, el enganche de navegación y las pruebas; `entradaAcel`/`entradaDireccion` pasan a `#privados` con getter/setter.
 - **v2** (2026-10-21): correcciones del Verificador PRD — se escriben D1–D10 en el documento; las muestras de la ruta pasan a ser instancias de `MuestraRuta` (RF-43) en vez de objetos literales; una sola lista de archivos intocables; se aclaran la densidad de la cinta (RF-16), la excepción MVC del visor (RNF-04) y quién lleva el estado de la carrera (RNF-01).
 
 ---
@@ -85,8 +86,7 @@ Todo se hace en **archivos nuevos**, con cambios mínimos solo en `index.html` y
 - Pausa de la carrera (ver S5).
 - Turbo en el HUD. No se añade botón; si `Carro` lo soporta internamente, no se expone.
 - Cerrar geométricamente las pistas abiertas (costa, desierto, montaña, volcán). Ver Riesgos (R1).
-- **Archivos y clases que NO se modifican** (**lista única**: RNF-07 la cita; la tabla 5.3 es solo el subconjunto de estas clases que se reutilizan): `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, cielos (`CieloSoleado`, `CieloNocturno`), `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas`, `src/style.css` y **`CLAUDE.md`**.
-- **Actualizar `CLAUDE.md`** (tabla de jerarquía `VisorBase` y tabla "Visores de pista: uno por pantalla"): no se hace en este MVP porque D7 dice que nada más se modifica. Queda como deuda de documentación (R13) para que el usuario decida después.
+- **Archivos y clases que NO se modifican** (**lista única**: RNF-07 la cita; la tabla 5.3 es solo el subconjunto de estas clases que se reutilizan): `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, cielos (`CieloSoleado`, `CieloNocturno`), `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` y `src/style.css`. *(v3: `CLAUDE.md` sale de la lista; el usuario permitió actualizar sus tablas.)*
 - Cambiar el flujo multijugador (`btn-crear` y unirse siguen usando `#iniciarCuentaRegresiva`).
 - Cualquier cambio en otros archivos existentes fuera de D7.
 - Modo horizontal para la carrera 3D nueva.
@@ -220,7 +220,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 - **RF-18** — La escena incluye el pasto (plano en y = −0.01), los pianos rojo/blanco en ±4..±4.7 **con el mismo orden de índices `a,b,c, b,d,c`** (caras hacia +Y), las decoraciones de `pista.decoraciones` mediante `FabricaObjetoEscena.crear`, y un cielo según `pista.tipoCielo` (`CieloSoleado` o `CieloNocturno`) actualizado cada frame.
   *Verificación:* la pista Ciudad muestra postes y flechas; Costa muestra cielo soleado; los pianos se ven rojo/blanco claros, no oscuros.
 - **RF-19** — Interfaz de entrada compatible con `VistaConduccion.aplicarA`:
-  - Campos públicos `entradaAcel = 0` y `entradaDireccion = 0`.
+  - Campos privados `#entradaAcel = 0` y `#entradaDireccion = 0`, con getter y setter públicos del mismo nombre (RNF-03).
   - Setter `alturaCamara`, getter `camAereaActiva` (siempre `false`) y método `toggleCamaraAerea()` (no hace nada en el MVP).
   - Antes de cada paso copia `entradaAcel` y `entradaDireccion` al `Carro`.
   - *Verificación:* con `ControlTimon` y con `ControlTeclado` el carro acelera, frena y gira.
@@ -313,16 +313,16 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 
 - **RNF-01 — POO estricta.** Todo es una clase instanciable. Prohibido usar funciones sueltas, objetos literales como entidades o `window.X = {…}`. Los `{}` solo se permiten como variables locales temporales dentro de un método. Las muestras de la ruta son instancias de `MuestraRuta`, **nunca** objetos `{x, z, angle}` guardados en otra clase. El estado de la carrera (`preparando`, `cuenta`, `corriendo`, `terminada`) lo lleva `ControladorCarreraSolo` en un campo privado como estado de pantalla; `CarreraVueltas` solo expone `terminada`.
 - **RNF-02 — Una clase por archivo.** El nombre del archivo es el de la clase en snake_case español (`CarreraVueltas` → `carrera_vueltas.js`). Se crean exactamente 6 archivos nuevos de código (D6).
-- **RNF-03 — Encapsulamiento.** Todo el estado interno va en `#privados`. Solo se exponen getters y setters que otra clase necesita. Únicas excepciones públicas: `entradaAcel` y `entradaDireccion` del visor, que exige la interfaz de `ControlEntrada` y `VistaConduccion`.
+- **RNF-03 — Encapsulamiento.** Todo el estado interno va en `#privados`. Solo se exponen getters y setters que otra clase necesita. `entradaAcel` y `entradaDireccion` del visor son campos `#privados` con getter y setter del mismo nombre, así `VistaConduccion` y los controles siguen escribiendo `visor.entradaAcel = x` sin cambios. *(v3)*
 - **RNF-04 — MVC.**
   - Modelo (`CarreraVueltas`, `Cronometro`, `MuestraRuta`): sin Three.js ni DOM. Contiene **todas** las reglas de negocio y física nueva: vueltas, puntos de control, tiempos y la regla del pasto (umbral, fracción 0.4, suavizado 0.05 por paso, factor de arrastre ×3).
-  - Vista (`VisorCarreraSolo`, `HudCarrera`): sin reglas de vueltas, tiempos ni pasto. El visor solo integra el `Carro` existente con paso fijo y **copia** al `Carro` el tope que recibe (`aplicarTope`). **Excepción declarada:** el visor crea su `Ruta` y su `Carro` y avanza la física con paso fijo, igual que el patrón existente de `VisorTestdriveRuta`; no decide ninguna regla de negocio.
+  - Vista (`VisorCarreraSolo`, `HudCarrera`): sin reglas de vueltas, tiempos ni pasto. El visor solo integra el `Carro` existente con paso fijo y **copia** al `Carro` el tope que recibe (`aplicarTope`). El visor crea su `Ruta` y su `Carro` y avanza la física con paso fijo, según la **excepción de visores 3D de `CLAUDE.md`** (sección MVC, v3); no decide ninguna regla de negocio.
   - Controlador (`ControladorCarreraSolo`): sin física ni dibujo directo. El ajuste de los overlays en vertical se hace por CSS (RF-36), no desde el controlador.
 - **RNF-05 — Nombres en español.** Clases, archivos, métodos, atributos e ids nuevos en español. Inglés solo en APIs externas (Three.js), acrónimos (HUD, GLB) y miembros heredados existentes (`entradaAcel`, `camAereaActiva`…).
 - **RNF-06 — Herencia.** `VisorCarreraSolo extends VisorBase` y llama a `super()`. El orden de `<script>` garantiza que cada dependencia se carga antes que quien la usa.
 - **RNF-07 — Cambios mínimos (D7).** Solo se modifican `index.html` y `src/controller/aplicacion.js`, y solo en lo descrito en RF-36 a RF-40.
   - No se toca ningún archivo de la **lista única de la sección 4** (Alcance → Out of scope).
-  - *Verificación:* `git diff --stat` muestra solo esos 2 archivos modificados más los 6 nuevos (y este PRD). `CLAUDE.md` no aparece.
+  - *Verificación:* en `git diff --stat`, del código del juego solo aparecen esos 2 archivos modificados más los 6 nuevos. Además pueden aparecer este PRD, `pruebas/` y `CLAUDE.md` (tablas de jerarquías y visores, excepción MVC de visores 3D y nota de visor dentro del controlador; v3).
 - **RNF-08 — Rendimiento.** ≥ 30 FPS sostenidos en un móvil de gama media en vertical. La búsqueda del punto más cercano usa una ventana local circular (±40 de 400), no recorre todas las muestras cada frame. La velocidad del juego no depende de los FPS (paso fijo de 60 Hz, RF-15). Sin fugas **dentro de una sesión de carrera**: tras 5 revanchas y salir, la memoria GPU vuelve al nivel previo. Las entradas y salidas repetidas a la pantalla heredan la fuga existente de `ControlTimon` (R12) y no forman parte de esta verificación.
 - **RNF-09 — Robustez.** Los errores de carga del GLB o de una pista inexistente no rompen la app: se usa `'ciudad'` como respaldo y el error se registra en la consola o en `window.__modelErrors`. Si el módulo del visor no carga en 6 s, se avisa y se vuelve a Inicio (RF-29). El controlador funciona aunque `window.RenderizadorVelocimetro` falte.
 - **RNF-10 — Compatibilidad.** Chrome/Safari móviles y Chrome/Edge/Firefox de escritorio. Funciona con `ControlTimon` (táctil) y `ControlTeclado` (flechas/WASD), según la preferencia de `VistaConduccion`.
@@ -343,7 +343,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 9. **Menú / Atrás:** Menú o el botón atrás del sistema vuelven a Inicio, liberan el visor y ocultan el timón y los botones. El botón "adelante" no deja una pantalla negra.
 10. **Layout:** en vertical se ve arriba vuelta y cronómetro; en el centro la pista; abajo a la izquierda el timón; abajo a la derecha ACEL/FRENO con el velocímetro encima. En PC con teclado, la misma composición en una columna centrada de ≤ 480 px, con los botones ◀ ▲▼ ▶ de `ControlTeclado` en la banda inferior y el velocímetro en la misma posición.
 11. **Clásico 2D:** ⚙ Ajustes muestra "Clásico 2D", que abre la carrera 2D actual en horizontal, idéntica a la versión anterior (controles en su posición original).
-12. **Archivos:** existen exactamente las 6 clases nuevas en sus archivos. Solo `index.html` y `aplicacion.js` tienen cambios (ni `style.css` ni `CLAUDE.md`), y no hay errores en la consola en todo el flujo.
+12. **Archivos:** existen exactamente las 6 clases nuevas en sus archivos. De los archivos existentes del juego solo `index.html` y `aplicacion.js` tienen cambios (no `style.css`); además pueden cambiar `pruebas/` y, en `CLAUDE.md`, lo permitido por D7, y no hay errores en la consola en todo el flujo.
 
 ## 9. Riesgos y supuestos
 
@@ -362,7 +362,7 @@ pantalla-ajustes --[Clásico 2D]--> pantalla-espera → pantalla-juego (horizont
 | R10 | Algunos listeners de aplicacion.js están duplicados (`btn-ir-vista-conduccion`). | Ninguno directo. | Fuera de alcance. No se corrige. |
 | R11 | `screen.orientation.lock('landscape')` de `GestorOrientacion.verificar()` puede quedar activo (sobre todo en PWA instalada) si se sale de Clásico 2D con el botón atrás, porque solo `btn-menu`, `btn-exit-td3d` y `btn-exit-cir3d` llaman a `liberar()`. | "Jugar Solo" se abriría bloqueado en horizontal. | `#btn-solo` llama a `GestorOrientacion.liberar()` antes de mostrar la pantalla (RF-38). |
 | R12 | Cada entrada a la carrera llama a `vistaConduccion.aplicarA` → `new ControlTimon`, y `ControlTimon.#setupCanvas` añade listeners anónimos a `#canvas-timon` y a `window` que `destruir()` no quita. `ControlTimon` no se puede modificar. | Fuga leve de listeners con muchas entradas/salidas a la pantalla. | Deuda existente (igual pasa en Test Drive y Circuito 3D). RF-33 evita repetir `aplicarA` en las revanchas; RNF-08 limita la verificación de fugas a una sesión de carrera. |
-| R13 | `CLAUDE.md` mantiene la tabla de jerarquía `VisorBase` y la tabla "Visores de pista: uno por pantalla" (donde además `Aplicacion` guarda cada visor). Con este MVP, `VisorCarreraSolo` no aparece y su instancia vive en `ControladorCarreraSolo` (guardado en `#carreraSolo` de `Aplicacion`). | Documentación del proyecto desactualizada. | D7 prohíbe tocar otros archivos, así que `CLAUDE.md` no se modifica en este MVP. Se propone al usuario actualizarlo en un cambio aparte (fila `Jugar Solo → VisorCarreraSolo → pistas/visor_carrera_solo.js`). |
+| R13 | `CLAUDE.md` no registraba `VisorCarreraSolo` ni el caso de un visor que vive dentro de un controlador de pantalla. | Documentación desactualizada. | **Resuelto en v3:** con permiso del usuario, `CLAUDE.md` añade `VisorCarreraSolo` a las tablas, la excepción "visor dentro del controlador" (`#carreraSolo`) y la excepción MVC de visores 3D. |
 | R14 | Con `ControlTeclado`, `mostrarOverlay()` muestra ◀ ▲▼ ▶ sin manejadores táctiles. | Un **móvil** con preferencia "teclado" queda sin controles funcionales. | Se documenta: en móvil se recomienda el modo timón (preferencia de `VistaConduccion`). No se modifica `ControlTeclado`. |
 | R15 | `CamaraSeguimiento` fija FOV vertical 55°; con aspecto 390/844 el FOV horizontal es ~27° y no cabe la pista. | Pista recortada, curvas invisibles. | FOV 78° y cámara más alejada cuando aspecto < 1, vía getter `camera` (RF-14). |
 
