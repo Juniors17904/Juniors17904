@@ -22,15 +22,9 @@ class ModosDisponibles {
         this.#ocultos      = Object.freeze([new ModoClasico2D(),    new ModoTestDrive2D()]);  // D1
     }
 
-    // ── Getters ─────────────────────────────────────────────────
-
-    get todos() { return [...this.#disponibles, ...this.#proximamente, ...this.#ocultos]; }
-
     // ── Estado de un modo (por clase, sin comparar textos) ──────
 
     estaDisponible(ClaseModo) { return this.#disponibles.some(m => m instanceof ClaseModo); }
-    estaProximamente(ClaseModo) { return this.#proximamente.some(m => m instanceof ClaseModo); }
-    estaOculto(ClaseModo)     { return this.#ocultos.some(m => m instanceof ClaseModo); }
 
     // ── Aplicar a la página ─────────────────────────────────────
 
@@ -43,21 +37,21 @@ class ModosDisponibles {
     // ── Pertenencia de pantallas (D3) ───────────────────────────
 
     // La pantalla es de algún modo que no se puede abrir (oculto o próximamente)
-    esPantallaDeModoNoDisponible(idPantalla) {
+    #esPantallaDeModoNoDisponible(idPantalla) {
         return this.#tienePantalla(this.#ocultos, idPantalla)
             || this.#tienePantalla(this.#proximamente, idPantalla);
     }
 
     // La pantalla también la usa un modo disponible (p. ej. pantalla-juego con Test Drive 3D)
-    esPantallaDeModoDisponible(idPantalla) {
+    #esPantallaDeModoDisponible(idPantalla) {
         return this.#tienePantalla(this.#disponibles, idPantalla);
     }
 
     // RF-08 / RF-09: true si al llegar a esta pantalla hay que mostrar Inicio.
     // hayVisor3D = hay un visor 3D cargado o arrancando.
     debeRedirigirAInicio(idPantalla, hayVisor3D) {
-        if (!this.esPantallaDeModoNoDisponible(idPantalla)) return false;
-        return !(hayVisor3D && this.esPantallaDeModoDisponible(idPantalla));
+        if (!this.#esPantallaDeModoNoDisponible(idPantalla)) return false;
+        return !(hayVisor3D && this.#esPantallaDeModoDisponible(idPantalla));
     }
 
     #tienePantalla(modos, idPantalla) {

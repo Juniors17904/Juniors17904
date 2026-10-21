@@ -22,12 +22,6 @@ class Modo {
         this.#idsPantallas = Object.freeze([...idsPantallas]);
     }
 
-    // ── Getters ─────────────────────────────────────────────────
-
-    get nombre()       { return this.#nombre; }
-    get idsBotones()   { return this.#idsBotones; }
-    get idsPantallas() { return this.#idsPantallas; }
-
     // ── Pertenencia ─────────────────────────────────────────────
 
     tienePantalla(idPantalla) {
@@ -36,16 +30,18 @@ class Modo {
 
     // ── Aplicar a la página ─────────────────────────────────────
 
-    // Oculto: el botón no se ve ni se puede tocar
+    // Oculto: el botón no se ve ni se puede tocar.
+    // El aspecto lo pone la Vista (CSS .modo-oculto en index.html).
     ocultarBotones(documento) {
         for (const boton of this.#botones(documento)) {
-            boton.hidden        = true;
-            boton.disabled      = true;
-            boton.style.display = 'none';
+            boton.hidden   = true;
+            boton.disabled = true;
+            boton.classList.add('modo-oculto');
         }
     }
 
-    // Próximamente: el botón se ve, desactivado y con el texto "Próximamente"
+    // Próximamente: el botón se ve, desactivado y con el texto "Próximamente".
+    // El aspecto lo pone la Vista (CSS .modo-proximamente en index.html).
     marcarProximamente(documento) {
         for (const boton of this.#botones(documento)) {
             if (!('proximamente' in boton.dataset)) {
@@ -55,8 +51,6 @@ class Modo {
             boton.disabled = true;
             boton.setAttribute('aria-disabled', 'true');
             boton.classList.add('modo-proximamente');
-            boton.style.opacity = '0.55';
-            boton.style.cursor  = 'not-allowed';
         }
     }
 

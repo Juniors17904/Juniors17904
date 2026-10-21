@@ -24,9 +24,11 @@ class Aplicacion {
     #dgTouchHandlers    = [];
     #visorDO            = null;
     #carreraSolo        = null;
+    #modos              = new ModosDisponibles();   // PRD 002 D8: decide qué modos se ven y se abren
 
     constructor() {
-        GestorOrientacion.iniciarListeners();
+        // PRD 002 D7: ya no se usa GestorOrientacion → "GIRA TU CELULAR" nunca se muestra
+        this.#modos.aplicarA(document);   // RF-01, RF-04, RF-05
         this.#inicializarEventos();
         history.replaceState({ pantalla: 'pantalla-inicio' }, '');
         this.#mostrar('pantalla-inicio');
@@ -47,6 +49,13 @@ class Aplicacion {
 
     // ── Navegación ──────────────────────────────────────────────
     #mostrar(id) {
+        // PRD 002 D3 / RF-08 / RF-09: pantallas de modos ocultos o "Próximamente" → Inicio.
+        // Se evalúa antes de limpiar nada: el visor 3D (o su arranque) ya debe estar marcado.
+        if (this.#modos.debeRedirigirAInicio(id, this.#hayVisor3D())) {
+            id = 'pantalla-inicio';
+            if (this.#backNav) history.replaceState({ pantalla: id }, '');
+        }
+
         // Carrera Solo 3D: liberar al salir y no mostrar la pantalla vacía sin controlador
         if (this.#carreraSolo && id !== 'pantalla-carrera-solo') {
             this.#carreraSolo.detener();
@@ -57,7 +66,10 @@ class Aplicacion {
             if (this.#backNav) history.replaceState({ pantalla: id }, '');
         }
 
-        if (id !== 'pantalla-juego') this.#td3dPending = false;
+        if (id !== 'pantalla-juego') {
+            this.#td3dPending      = false;
+            this.#cir3dArrancando  = false;
+        }
 
         // Ocultar overlays globales al salir del juego
         if (id !== 'pantalla-juego') {
@@ -92,6 +104,11 @@ class Aplicacion {
         if (!this.#backNav) {
             history.pushState({ pantalla: id }, '');
         }
+    }
+
+    // Hay un visor 3D cargado o arrancando en la pantalla de juego (RF-09)
+    #hayVisor3D() {
+        return Boolean(this.#td3d || this.#td3dPending || this.#cir3d || this.#cir3dArrancando);
     }
 
     // ── Utilidades ──────────────────────────────────────────────
@@ -133,7 +150,8 @@ class Aplicacion {
             this.#dibujarPreviewsTimon();
             this.#mostrar('pantalla-timon-diseno');
         });
-        document.querySelectorAll('.timon-card').forEach(card => {
+        // Las tarjetas del velocímetro también llevan la clase timon-card: se acota a su pantalla
+        document.querySelectorAll('#pantalla-timon-diseno .timon-card').forEach(card => {
             card.addEventListener('click', () => {
                 this.#estado.timonModelo = parseInt(card.dataset.modelo);
                 this.#estado.control     = 'timon';
@@ -161,7 +179,6 @@ class Aplicacion {
         document.getElementById('btn-solo').addEventListener('click', () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#estado.modoSolo = true;
-            GestorOrientacion.liberar();
             this.#carreraSolo?.detener();
             // Se crea antes de #mostrar para que la pantalla no se redirija a Inicio;
             // el constructor no toca el DOM: todo arranca en iniciar()
@@ -172,20 +189,26 @@ class Aplicacion {
             carrera.iniciar();
         });
 
+        // PRD 002 RF-01/RF-10: el botón está oculto; la guarda evita crear la carrera 2D
         document.getElementById('btn-clasico-2d').addEventListener('click', () => {
+            if (!this.#modos.estaDisponible(ModoClasico2D)) return;
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#estado.modoSolo = true;
             this.#iniciarCuentaRegresiva();
         });
 
+        // PRD 002 RF-04: "Próximamente" → al tocarlo no pasa nada
         document.getElementById('btn-crear').addEventListener('click', async () => {
+            if (!this.#modos.estaDisponible(ModoMultijugador)) return;
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#estado.modoSolo = false;
             this.#mostrar('pantalla-crear');
             await this.#iniciarCrearSala();
         });
 
+        // PRD 002 RF-05: "Próximamente" → al tocarlo no pasa nada
         document.getElementById('btn-unirse').addEventListener('click', () => {
+            if (!this.#modos.estaDisponible(ModoUnirse)) return;
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#mostrar('pantalla-unirse');
         });
@@ -195,7 +218,9 @@ class Aplicacion {
         document.getElementById('btn-volver-1').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
         document.getElementById('btn-volver-2').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
 
+        // PRD 002 RF-01/RF-10: el botón está oculto; la guarda evita crear la carrera 2D
         document.getElementById('btn-test-drive').addEventListener('click', () => {
+            if (!this.#modos.estaDisponible(ModoTestDrive2D)) return;
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
             this.#iniciarTestDrive();
         });
@@ -211,18 +236,15 @@ class Aplicacion {
             this.#iniciarTestDrive3D();
         });
         document.getElementById('btn-td3d-con-ruta').addEventListener('click', () => {
-            this.#mostrar('pantalla-juego');
-            this.#iniciarCircuito3D('ciudad', 'pantalla-td3d-selector');
+            this.#entrarCircuito3D('ciudad', 'pantalla-td3d-selector');
         });
 
         document.getElementById('btn-exit-td3d').addEventListener('click', () => {
             this.#limpiarTestDrive3D();
-            GestorOrientacion.liberar();
             this.#mostrar('pantalla-ajustes');
         });
         document.getElementById('btn-exit-cir3d').addEventListener('click', () => {
             this.#limpiarCircuito3D();
-            GestorOrientacion.liberar();
             this.#mostrar(this.#cir3dOrigen);
         });
 
@@ -353,8 +375,7 @@ class Aplicacion {
         document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
         document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
-            this.#mostrar('pantalla-juego');
-            this.#iniciarCircuito3D(this.#estado.pista, 'pantalla-detalle-pista');
+            this.#entrarCircuito3D(this.#estado.pista, 'pantalla-detalle-pista');
         });
         document.getElementById('pantalla-pista').addEventListener('click', e => {
             const card = e.target.closest('.pista-card');
@@ -390,7 +411,6 @@ class Aplicacion {
         });
 
         document.getElementById('btn-menu').addEventListener('click', async () => {
-            GestorOrientacion.liberar();
             if (window.multiJugador) await window.multiJugador.limpiar();
             window.multiJugador = null;
             this.#estado.juego = null;
@@ -500,7 +520,7 @@ class Aplicacion {
 
     // ── Timón: dibuja previews de los 4 modelos ──────────────────
     #dibujarPreviewsTimon() {
-        document.querySelectorAll('.timon-card').forEach((card, i) => {
+        document.querySelectorAll('#pantalla-timon-diseno .timon-card').forEach((card, i) => {
             const canvas = card.querySelector('.timon-preview');
             const ctx    = canvas.getContext('2d');
             const S      = Math.min(canvas.width, canvas.height);
@@ -516,7 +536,6 @@ class Aplicacion {
     // ── Juego ────────────────────────────────────────────────────
     #iniciarJuego() {
         this.#mostrar('pantalla-juego');
-        GestorOrientacion.verificar();
 
         const oponenteNombre = this.#estado.modoSolo
             ? null
@@ -551,7 +570,6 @@ class Aplicacion {
     // ── Test Drive ───────────────────────────────────────────────
     #iniciarTestDrive() {
         this.#mostrar('pantalla-juego');
-        GestorOrientacion.verificar();
         document.getElementById('ctrl-accel').style.display = 'flex';
         this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, 'testdrive');
         window.onCarreraTerminada = null;
@@ -564,7 +582,6 @@ class Aplicacion {
         if (!base) { this.#iniciarTestDrive(); return; }
         window.PISTAS['__td__'] = new PistaTestDriveLibre(base);
         this.#mostrar('pantalla-juego');
-        GestorOrientacion.verificar();
         document.getElementById('ctrl-accel').style.display = 'flex';
         this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, '__td__');
         window.onCarreraTerminada = null;
@@ -585,10 +602,10 @@ class Aplicacion {
             setTimeout(() => { if (this.#td3dPending) this.#iniciarTestDrive3D(tipoPista); }, 200);
             return;
         }
-        this.#td3dPending = false;
         this.#td3dPista = tipoPista;
         this.#limpiarPantallaJuego();
-        GestorOrientacion.saltarCheck = true;
+        // Lección 6: el arranque queda marcado ANTES de #mostrar para que no redirija a Inicio
+        this.#td3dPending = true;
         this.#mostrar('pantalla-juego');
 
         document.getElementById('canvas-td3d').style.display = 'block';
@@ -600,6 +617,7 @@ class Aplicacion {
         const canvas = document.getElementById('canvas-td3d');
         const td = new window.VisorTestdriveRecto(canvas);
         this.#td3d = td;
+        this.#td3dPending = false;
         td.cargar(this.#estado.tipoAuto, this.#estado.color);
         td.iniciar();
         const td3dInitRotY = td.rotY;
@@ -796,7 +814,6 @@ class Aplicacion {
             el.removeEventListener('touchend',   onEnd);
         }
         this.#td3dTouchHandlers = [];
-        GestorOrientacion.saltarCheck = false;
         document.getElementById('canvas-td3d').style.display = 'none';
         document.getElementById('titulo-td3d').style.display = 'none';
         document.getElementById('canvas-carro-3d').style.display = '';
@@ -821,19 +838,29 @@ class Aplicacion {
     #cir3dTouchHandlers = [];
     #cir3dCanvasTouchStart = null;
     #cir3dCanvasTouchMove  = null;
+    #cir3dArrancando       = false;   // PRD 002 RF-09: visor de circuito pedido pero aún no creado
+
+    // Entrada normal a un circuito 3D (Test Drive 3D con ruta y Diseño de Pistas → Entrar).
+    // Lección 6: se marca el arranque ANTES de #mostrar para que nunca redirija a Inicio.
+    #entrarCircuito3D(tipoPista, origen) {
+        this.#cir3dArrancando = true;
+        this.#mostrar('pantalla-juego');
+        this.#iniciarCircuito3D(tipoPista, origen);
+    }
 
     #iniciarCircuito3D(tipoPista = 'ciudad', origen = 'pantalla-detalle-pista') {
+        this.#cir3dArrancando = true;
         const ClaseVisor = origen === 'pantalla-td3d-selector'
             ? window.VisorTestdriveRuta
             : window.VisorCarreraUrbana;
         if (!ClaseVisor) {
-            setTimeout(() => this.#iniciarCircuito3D(tipoPista, origen), 150);
+            // Si el jugador salió de la pantalla mientras cargaba, #mostrar apaga el arranque
+            setTimeout(() => { if (this.#cir3dArrancando) this.#iniciarCircuito3D(tipoPista, origen); }, 150);
             return;
         }
         this.#cir3dTipoPista = tipoPista;
         this.#cir3dOrigen    = origen;
         this.#limpiarPantallaJuego();
-        GestorOrientacion.saltarCheck = true;
 
         this.#cir3dVisibilityHandler = () => {
             if (!document.hidden && this.#cir3d?.contextLost) {
@@ -870,6 +897,7 @@ class Aplicacion {
 
         const cir = new ClaseVisor(canvas, tipoPista);
         this.#cir3d = cir;
+        this.#cir3dArrancando = false;
         this.#vistaConduccion.aplicarA(cir, this.#estado.timonModelo);
         this.#vistaConduccion.mostrarOverlay();
         cir.cargar(this.#estado.tipoAuto, this.#estado.color);
@@ -1202,7 +1230,6 @@ class Aplicacion {
             this.#cir3dCanvasTouchStart = null;
             this.#cir3dCanvasTouchMove  = null;
         }
-        GestorOrientacion.saltarCheck=false;
         const _mmC = document.getElementById('minimap-td3d');
         const _trC = document.getElementById('trail-map');
         if (_mmC) { _mmC.style.pointerEvents='none'; _mmC.style.cursor=''; }

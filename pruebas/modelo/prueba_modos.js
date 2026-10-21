@@ -42,27 +42,29 @@ for (const nombre of SUBCLASES) {
     const C = ctx[nombre];
     comprobar(Object.getPrototypeOf(C) === ctx.Modo, `PRD 002 D8 ${nombre} extiende Modo`);
     const m = new C();
-    comprobar(m instanceof ctx.Modo && typeof m.nombre === 'string' && m.nombre.length > 0, `PRD 002 D8 ${nombre} tiene nombre`);
-    comprobar(m.idsBotones.length > 0 && m.idsPantallas.length > 0, `PRD 002 D8 ${nombre} conoce botones y pantallas`);
+    comprobar(m instanceof ctx.Modo && typeof m.tienePantalla === 'function', `PRD 002 D8 ${nombre} es un Modo`);
     comprobar(Object.keys(m).length === 0, `PRD 002 RNF-01 ${nombre} sin campos públicos`);
 }
 
 // ── D1/D2: estados ──────────────────────────────────────────────
 const md = new ctx.ModosDisponibles();
-const estados = c => [md.estaDisponible(c), md.estaProximamente(c), md.estaOculto(c)];
-const ESPERADO = {
-    ModoJugarSolo:    [true,  false, false],
-    ModoTestDrive3D:  [true,  false, false],
-    ModoClasico2D:    [false, false, true ],
-    ModoTestDrive2D:  [false, false, true ],
-    ModoMultijugador: [false, true,  false],
-    ModoUnirse:       [false, true,  false],
-};
-for (const nombre of SUBCLASES) {
-    comprobar(JSON.stringify(estados(ctx[nombre])) === JSON.stringify(ESPERADO[nombre]),
-        `PRD 002 ${ESPERADO[nombre][1] ? 'D2' : 'D1'} estado de ${nombre}`);
+// Disponibles: solo Jugar Solo y Test Drive 3D. Oculto y "Próximamente" se comprueban
+// más abajo por su efecto sobre los botones (aplicarA).
+for (const [nombre, disponible, d] of [
+    ['ModoJugarSolo', true, 'D1'], ['ModoTestDrive3D', true, 'D1'],
+    ['ModoClasico2D', false, 'D1'], ['ModoTestDrive2D', false, 'D1'],
+    ['ModoMultijugador', false, 'D2'], ['ModoUnirse', false, 'D2'],
+]) {
+    comprobar(md.estaDisponible(ctx[nombre]) === disponible, `PRD 002 ${d} ${nombre} ${disponible ? 'disponible' : 'no disponible'}`);
 }
-comprobar(md.todos.length === 6, 'PRD 002 D8 ModosDisponibles registra los 6 modos');
+// RNF-01: sin getters ni métodos públicos sin uso
+for (const [obj, permitidos] of [
+    [ctx.Modo.prototype, ['constructor', 'tienePantalla', 'ocultarBotones', 'marcarProximamente']],
+    [ctx.ModosDisponibles.prototype, ['constructor', 'estaDisponible', 'aplicarA', 'debeRedirigirAInicio']],
+]) {
+    const extra = Object.getOwnPropertyNames(obj).filter(n => !permitidos.includes(n));
+    comprobar(extra.length === 0, `PRD 002 RNF-01 ${obj.constructor.name} sin API pública sin uso ${extra.join(',')}`);
+}
 
 // ── D3: pertenencia de pantallas (RF-08 / RF-09) ────────────────
 for (const id of ['pantalla-crear', 'pantalla-unirse', 'pantalla-espera', 'pantalla-resultado']) {
@@ -79,8 +81,9 @@ for (const id of ['pantalla-inicio', 'pantalla-carrera-solo', 'pantalla-td3d-sel
 class BotonFalso {
     constructor(texto) {
         this.textContent = texto; this.hidden = false; this.disabled = false;
-        this.style = {}; this.dataset = {}; this.atributos = new Map(); this.clases = new Set();
+        this.dataset = {}; this.atributos = new Map(); this.clases = new Set();
         this.classList = { add: c => this.clases.add(c) };
+        this.style = new Proxy({}, { set: () => { throw new Error('el controlador no toca style (MVC)'); } });
     }
     setAttribute(n, v) { this.atributos.set(n, v); }
 }
@@ -101,16 +104,17 @@ md.aplicarA(doc);
 md.aplicarA(doc); // idempotente
 for (const id of ['btn-clasico-2d', 'btn-test-drive']) {
     const b = botones.get(id);
-    comprobar(b.style.display === 'none' && b.hidden && b.disabled, `PRD 002 RF-01 ${id} oculto`);
+    comprobar(b.clases.has('modo-oculto') && b.hidden && b.disabled, `PRD 002 RF-01 ${id} oculto`);
 }
 for (const id of ['btn-solo', 'btn-test-drive-3d']) {
     const b = botones.get(id);
-    comprobar(b.style.display === undefined && !b.disabled && !/Próximamente/.test(b.textContent), `PRD 002 RF-02/RF-03 ${id} intacto`);
+    comprobar(b.clases.size === 0 && !b.hidden && !b.disabled && !/Próximamente/.test(b.textContent), `PRD 002 RF-02/RF-03 ${id} intacto`);
 }
 for (const [id, rf] of [['btn-crear', 'RF-04'], ['btn-unirse', 'RF-05']]) {
     const b = botones.get(id);
     const veces = (b.textContent.match(/Próximamente/g) || []).length;
-    comprobar(veces === 1 && b.disabled && b.style.display === undefined && !b.textContent.includes('→'),
+    comprobar(veces === 1 && b.disabled && !b.hidden && b.clases.has('modo-proximamente') && !b.clases.has('modo-oculto')
+        && b.atributos.get('aria-disabled') === 'true' && !b.textContent.includes('→'),
         `PRD 002 ${rf} ${id} visible, desactivado y "Próximamente" (${b.textContent})`);
 }
 // Un documento sin esos botones no rompe

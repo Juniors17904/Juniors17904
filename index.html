@@ -20,6 +20,11 @@
         }
     }
     </script>
+    <!-- PRD 002: aspecto de los botones de modos ocultos y "Próximamente" (lo aplica ModosDisponibles) -->
+    <style>
+        .modo-oculto { display: none !important; }
+        .modo-proximamente { opacity: 0.55; cursor: not-allowed; }
+    </style>
     <!-- Carrera Solo 3D vertical: overlays centrados solo mientras la pantalla está activa -->
     <style>
         #pantalla-carrera-solo { background: #000; justify-content: flex-start; }
@@ -915,6 +920,15 @@
     <script src="src/controller/juego.js"></script>
     <script src="vista_conduccion.js"></script>
     <script src="src/controller/controlador_carrera_solo.js"></script>
+    <!-- Modos de juego (PRD 002 D8): superclase, subclases y registro -->
+    <script src="src/controller/modos/modo.js"></script>
+    <script src="src/controller/modos/modo_jugar_solo.js"></script>
+    <script src="src/controller/modos/modo_test_drive_3d.js"></script>
+    <script src="src/controller/modos/modo_clasico_2d.js"></script>
+    <script src="src/controller/modos/modo_test_drive_2d.js"></script>
+    <script src="src/controller/modos/modo_multijugador.js"></script>
+    <script src="src/controller/modos/modo_unirse.js"></script>
+    <script src="src/controller/modos/modos_disponibles.js"></script>
     <script src="src/controller/aplicacion.js"></script>
 </body>
 </html>
