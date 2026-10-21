@@ -1,12 +1,14 @@
-// Prueba de navegador: RF-03, RF-04, RF-07, RF-11, RF-13, RF-14, RF-15 y RNF-01
+// Prueba de navegador: RF-03, RF-04, RF-07, RF-09, RF-11, RF-12, RF-13, RF-14, RF-15 y RNF-01
 // del PRD docs/prds/prd_carrera_solo_vertical.md. Usa el visor y el controlador reales.
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULO || '/opt/node22/lib/node_modules/playwright/index.mjs');
 
 const URL_APP = 'http://localhost:8099/';
-const parchear = bloquearVisor => async route => {
+const parchear = (bloquearVisor, colgarGlb) => async route => {
   const url = route.request().url();
   if (url.startsWith('https://')) { await route.abort(); return; }
   if (bloquearVisor && url.includes('visor_carrera_solo.js')) { await route.abort(); return; }
+  // GLB colgado: la petición queda abierta para siempre (ni fulfill ni abort)
+  if (colgarGlb && /\.glb(\?|$)/.test(url)) return;
   try {
     const res = await route.fetch();
     const ct = res.headers()['content-type'] ?? '';
@@ -23,14 +25,14 @@ const check = (c, m) => { console.log(c ? 'OK   ' : 'FALLO', m); if (!c) fallos+
 
 const browser = await chromium.launch({ headless: false, args: ['--use-gl=angle', '--ignore-gpu-blocklist'] });
 
-async function abrir(viewport, { bloquearVisor = false, movil = true } = {}) {
+async function abrir(viewport, { bloquearVisor = false, colgarGlb = false, movil = true } = {}) {
   const ctx  = await browser.newContext({ viewport, hasTouch: movil, isMobile: movil });
   const page = await ctx.newPage();
   const errores = [];
   // Se ignoran el ServiceWorker (ruta de GitHub Pages, no existe en local) y las URLs https bloqueadas
   const ignorar = t => /ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)/.test(t);
   page.on('pageerror', e => { if (!ignorar(e.message)) errores.push(e.message); });
-  await page.route('**', parchear(bloquearVisor));
+  await page.route('**', parchear(bloquearVisor, colgarGlb));
   await page.goto(URL_APP, { waitUntil: 'load' });
   await page.waitForTimeout(2500);
   return { ctx, page, errores };
@@ -74,12 +76,12 @@ const leer    = (page, fn) => page.evaluate(fn);
   const fovMovil = await leer(page, () => window.__fovs.at(-1));
   check(fovMovil === 78, 'RF-14 FOV 78 con aspecto < 1 (fov ' + fovMovil + ')');
 
-  // RF-15: canvas al ancho de la columna y máximo 5 pasos por frame
+  // RF-09: canvas al ancho de la columna · RF-15: máximo 5 pasos por frame
   const lienzo = await leer(page, () => {
     const c = document.getElementById('canvas-carrera-solo');
     return { ancho: c.width, esperado: Math.min(innerWidth, 480) };
   });
-  check(lienzo.ancho === lienzo.esperado, 'RF-15 canvas al ancho de la columna ' + JSON.stringify(lienzo));
+  check(lienzo.ancho === lienzo.esperado, 'RF-09 canvas al ancho de la columna ' + JSON.stringify(lienzo));
   const maxPasos = await leer(page, async () => {
     let max = 0;
     for (let i = 0; i < 60; i++) { await new Promise(r => requestAnimationFrame(r)); max = Math.max(max, window.__visor.pasosUltimoFrame); }
@@ -87,7 +89,7 @@ const leer    = (page, fn) => page.evaluate(fn);
   });
   check(maxPasos >= 1 && maxPasos <= 5, 'RF-15 entre 1 y 5 pasos por frame (máx ' + maxPasos + ')');
 
-  // RNF-01 y RNF-01: muestras por longitud de arco, instancias de MuestraRuta
+  // RNF-01: muestras por longitud de arco, instancias de MuestraRuta
   const muestras = await leer(page, () => {
     const m = window.__visor.muestrasRuta(400);
     const d = [];
@@ -143,7 +145,7 @@ const leer    = (page, fn) => page.evaluate(fn);
   check(Math.hypot(reinicio.px - muestras.inicio[0], reinicio.pz - muestras.inicio[1]) < 0.5, 'RF-11 vuelve al inicio de la ruta');
   check(reinicio.velDespues <= reinicio.base * 0.4 + 1e-6, 'RF-11 reaplica el último tope (vel ' + reinicio.velDespues + ')');
 
-  // RF-15: detener() libera el contexto WebGL y es idempotente
+  // RF-12: detener() libera el contexto WebGL y es idempotente
   const fin = await leer(page, () => {
     const c = document.getElementById('canvas-carrera-solo');
     const gl = c.getContext('webgl2') || c.getContext('webgl');
@@ -152,7 +154,7 @@ const leer    = (page, fn) => page.evaluate(fn);
     try { window.__visor.detener(); } catch { doble = false; }
     return { perdido: gl?.isContextLost?.() ?? null, doble };
   });
-  check(fin.perdido === true, 'RF-15 detener() libera el contexto WebGL');
+  check(fin.perdido === true, 'RF-12 detener() libera el contexto WebGL');
   check(fin.doble, 'RF-12 detener() dos veces no falla');
 
   // RF-03: el controlador usa la pista y el carro del estado; clave inválida → ciudad
@@ -244,6 +246,41 @@ async function pasosEn2s(hz) {
   }));
   check(estado.activa === 'pantalla-inicio', 'RF-13 vuelve a Inicio si el visor no carga (' + estado.activa + ')');
   check(estado.error, 'RF-13 registra el error en __modelErrors');
+  await ctx.close();
+}
+
+// ── RF-13: si el GLB del carro se cuelga, a los 6 s avisa y vuelve a Inicio ──
+{
+  const { ctx, page } = await abrir({ width: 390, height: 844 }, { colgarGlb: true });
+  const errAntes = await leer(page, () => (window.__modelErrors || []).length);
+  await page.click('#btn-solo');
+  const enCarrera = await leer(page, () => document.querySelector('.pantalla.activa')?.id);
+  await esperar(page, 7000);
+  const estado = await leer(page, () => ({
+    activa:  document.querySelector('.pantalla.activa')?.id,
+    errores: (window.__modelErrors || []).slice(),
+  }));
+  const nuevos = estado.errores.slice(errAntes);
+  check(enCarrera === 'pantalla-carrera-solo', 'RF-13 entra a la carrera mientras el GLB carga (' + enCarrera + ')');
+  check(estado.activa === 'pantalla-inicio', 'RF-13 GLB colgado: vuelve a Inicio en ~7 s (' + estado.activa + ')');
+  check(nuevos.length > 0, 'RF-13 GLB colgado: registra el error en __modelErrors ' + JSON.stringify(nuevos));
+  await ctx.close();
+}
+
+// ── RF-13: módulo del visor lento + GLB colgado → un solo plazo de 6 s, no 6 + 6 ──
+{
+  const { ctx, page } = await abrir({ width: 390, height: 844 }, { colgarGlb: true });
+  // Simula un módulo lento: se quita VisorCarreraSolo y vuelve 4 s después del clic
+  await leer(page, () => {
+    const Visor = window.VisorCarreraSolo;
+    delete window.VisorCarreraSolo;
+    document.getElementById('btn-solo').addEventListener('click',
+      () => setTimeout(() => { window.VisorCarreraSolo = Visor; }, 4000), { once: true, capture: true });
+  });
+  await page.click('#btn-solo');
+  await esperar(page, 7000);
+  const activa = await leer(page, () => document.querySelector('.pantalla.activa')?.id);
+  check(activa === 'pantalla-inicio', 'RF-13 plazo único: módulo lento (4 s) + GLB colgado vuelve a Inicio en ~7 s (' + activa + ')');
   await ctx.close();
 }
 

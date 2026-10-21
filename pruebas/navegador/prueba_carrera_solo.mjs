@@ -70,6 +70,11 @@ await page.evaluate(()=>window.__forzarMeta=true); await page.waitForTimeout(400
 check(await page.evaluate(()=>getComputedStyle(document.getElementById('resultado-carrera-solo')).display)==='flex','panel resultado visible');
 check(await page.evaluate(()=>getComputedStyle(document.getElementById('ctrl-timon')).display)==='none','timón oculto en resultado');
 console.log('   texto resultado:', await page.evaluate(()=>document.getElementById('resultado-carrera-solo').innerText.replace(/\n/g,' | ')));
+// RF-10: el panel muestra tiempo total y mejor vuelta con formato m:ss.cc
+const res = await page.evaluate(()=>{ const p=document.getElementById('resultado-carrera-solo');
+  return { total:p.querySelector('.resultado-carrera-total')?.textContent??'', mejor:p.querySelector('.resultado-carrera-mejor')?.textContent??'' }; });
+check(/TIEMPO TOTAL/i.test(res.total) && /\b\d+:[0-5]\d\.\d{2}\b/.test(res.total),'RF-10 tiempo total con formato m:ss.cc ('+res.total+')');
+check(/MEJOR VUELTA/i.test(res.mejor) && /\b\d+:[0-5]\d\.\d{2}\b/.test(res.mejor),'RF-10 mejor vuelta con formato m:ss.cc ('+res.mejor+')');
 await page.screenshot({ path: SP+'/resultado_390.png' });
 const canvases0 = await page.evaluate(()=>document.querySelectorAll('canvas').length);
 // Revancha x2

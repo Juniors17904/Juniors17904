@@ -15,7 +15,7 @@ class ControladorCarreraSolo {
     static #TOTAL_VUELTAS       = 3;
     static #INTERVALO_CUENTA_MS = 900;
     static #REINTENTO_MS        = 150;
-    static #MAX_INTENTOS        = 40;
+    static #LIMITE_CARGA_MS     = 6000;
 
     // Estados de la carrera (constantes internas, no un objeto global)
     static #ESTADO_PREPARANDO = 'preparando';
@@ -39,8 +39,8 @@ class ControladorCarreraSolo {
     #estadoCarrera   = ControladorCarreraSolo.#ESTADO_PREPARANDO;
     #detenido        = false;
     #iniciado        = false;
-    #intentos        = 0;
     #idReintento     = null;
+    #idLimiteCarga   = null;
     #temporizadores  = [];
 
     constructor(estado, vistaConduccion, alSalir) {
@@ -49,16 +49,23 @@ class ControladorCarreraSolo {
         this.#alSalir         = typeof alSalir === 'function' ? alSalir : null;
     }
 
-    // ── Arranque (RF-29) ────────────────────────────────────────
+    // ── Arranque (RF-01, RF-03, RF-13) ──────────────────────────
     iniciar() {
         if (this.#detenido || this.#iniciado) return;
 
+        // RF-13: un único plazo de 6 s desde el primer intento cubre
+        // la carga del módulo del visor y la del GLB del carro juntas
+        if (this.#idLimiteCarga === null) {
+            this.#idLimiteCarga = setTimeout(() => {
+                this.#idLimiteCarga = null;
+                if (this.#detenido) return;
+                this.#fallarCarga(this.#iniciado
+                    ? 'el carro no cargó en 6 s'
+                    : 'el módulo VisorCarreraSolo no cargó en 6 s');
+            }, ControladorCarreraSolo.#LIMITE_CARGA_MS);
+        }
+
         if (typeof window.VisorCarreraSolo !== 'function') {
-            this.#intentos++;
-            if (this.#intentos > ControladorCarreraSolo.#MAX_INTENTOS) {
-                this.#fallarCarga('el módulo VisorCarreraSolo no cargó en 6 s');
-                return;
-            }
             this.#idReintento = setTimeout(() => {
                 this.#idReintento = null;
                 if (this.#detenido) return;
@@ -78,17 +85,20 @@ class ControladorCarreraSolo {
         // La cuenta arranca cuando el carro ya está en escena (cargar() nunca rechaza:
         // registra su propio error), así el 3-2-1 no se pierde mientras carga el GLB
         Promise.resolve(carga).finally(() => {
-            if (!this.#detenido) this.#lanzarCuenta();
+            if (this.#detenido) return;
+            this.#cancelarLimiteCarga();
+            this.#lanzarCuenta();
         });
     }
 
-    // ── Liberación (RF-35) — idempotente ────────────────────────
+    // ── Liberación (RF-12) — idempotente ────────────────────────
     detener() {
         if (this.#detenido) return;
         this.#detenido = true;
 
         if (this.#idReintento !== null) clearTimeout(this.#idReintento);
         this.#idReintento = null;
+        this.#cancelarLimiteCarga();
         this.#cancelarTemporizadores();
 
         this.#vistaConduccion?.ocultarOverlay();
@@ -154,13 +164,18 @@ class ControladorCarreraSolo {
         alSalir?.();
     }
 
+    #cancelarLimiteCarga() {
+        if (this.#idLimiteCarga !== null) clearTimeout(this.#idLimiteCarga);
+        this.#idLimiteCarga = null;
+    }
+
     #registrarError(mensaje) {
         window.__modelErrors = window.__modelErrors || [];
         window.__modelErrors.push('[ControladorCarreraSolo] ' + mensaje);
         console.error('[ControladorCarreraSolo]', mensaje);
     }
 
-    // ── Privados: cuenta regresiva (RF-30) ──────────────────────
+    // ── Privados: cuenta regresiva (RF-04) ──────────────────────
     #lanzarCuenta() {
         if (this.#detenido) return;
         this.#cancelarTemporizadores();
@@ -204,7 +219,7 @@ class ControladorCarreraSolo {
         this.#temporizadores = [];
     }
 
-    // ── Privados: bucle por frame (RF-31) ───────────────────────
+    // ── Privados: bucle por frame (RF-05, RF-06, RF-07) ─────────
     #alFrame() {
         if (this.#detenido || !this.#visor) return;
         const visor = this.#visor;
@@ -235,7 +250,7 @@ class ControladorCarreraSolo {
         );
     }
 
-    // ── Privados: fin de carrera (RF-32) ────────────────────────
+    // ── Privados: fin de carrera (RF-10) ────────────────────────
     #terminar() {
         this.#estadoCarrera = ControladorCarreraSolo.#ESTADO_TERMINADA;
         this.#cancelarTemporizadores();
@@ -252,7 +267,7 @@ class ControladorCarreraSolo {
             () => this.#irAlMenu());
     }
 
-    // ── Privados: Revancha (RF-33) ──────────────────────────────
+    // ── Privados: Revancha (RF-11) ──────────────────────────────
     #revancha() {
         if (this.#detenido) return;
         this.#hud.ocultarResultado();
@@ -263,7 +278,7 @@ class ControladorCarreraSolo {
         this.#lanzarCuenta();
     }
 
-    // ── Privados: Menú (RF-34) ──────────────────────────────────
+    // ── Privados: Menú (RF-11) ──────────────────────────────────
     #irAlMenu() {
         const alSalir = this.#alSalir;
         this.detener();

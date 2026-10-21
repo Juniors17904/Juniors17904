@@ -47,7 +47,7 @@ class HudCarrera {
         this.#dimensionar();
     }
 
-    // ── Dibujo por frame (RF-25) ────────────────────────────────
+    // ── Dibujo por frame (RF-05, RF-08) ──────────────────────────
     dibujar(vuelta, totalVueltas, textoCronometro, fraccionVel, indiceVelocimetro = 0) {
         if (this.#destruido || !this.#ctx) return;
         const ctx = this.#ctx;
@@ -58,7 +58,7 @@ class HudCarrera {
         this.#dibujarVelocimetro(ctx, fraccionVel, indiceVelocimetro);
     }
 
-    // ── Cuenta regresiva (RF-26) ────────────────────────────────
+    // ── Cuenta regresiva (RF-04) ────────────────────────────────
     mostrarCuenta(texto) {
         if (!this.#capaCuenta) return;
         this.#capaCuenta.textContent = String(texto ?? '');
@@ -71,7 +71,7 @@ class HudCarrera {
         this.#capaCuenta.textContent = '';
     }
 
-    // ── Panel de resultado (RF-27) ──────────────────────────────
+    // ── Panel de resultado (RF-10) ──────────────────────────────
     mostrarResultado(textoTotal, textoMejorVuelta, alRevancha, alMenu) {
         if (!this.#panelResultado) return;
         if (this.#textoTotal) this.#textoTotal.textContent = 'TIEMPO TOTAL  ' + (textoTotal ?? '');
@@ -95,7 +95,7 @@ class HudCarrera {
     }
 
     // La pantalla fija crea su propio contexto de apilamiento: para que el panel quede
-    // sobre .ctrl-overlay (RF-27) la pantalla entera sube de nivel mientras se ve
+    // sobre .ctrl-overlay (RF-10) la pantalla entera sube de nivel mientras se ve
     #marcarPantallaConResultado(activo) {
         const panel = this.#panelResultado;
         if (typeof panel?.closest !== 'function') return;

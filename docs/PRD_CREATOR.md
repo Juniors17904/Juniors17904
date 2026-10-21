@@ -42,3 +42,5 @@ Además (v2):
 ## Después del PRD
 
 Cuando el PRD esté implementado, verifícalo con el **Verificador PRD** (skill `verificador-prd`: "verifica los PRD" o `/verificador-prd`). Revisa que los PRD no se contradigan, que el código los cumpla y que las pruebas de `pruebas/` pasen.
+
+Antes de escribir o corregir un PRD, lee `docs/LECCIONES_APRENDIDAS.md` y, si aparece un error nuevo, agrégalo a esa tabla.

@@ -46,7 +46,7 @@ for ARCHIVO in $ARCHIVOS; do
     NOMBRE_BASE=$(basename "$ARCHIVO" .js)
     # snake_case → PascalCase:  config_pista_ciudad → ConfigPistaCiudad
     CLASE_ESPERADA=$(echo "$NOMBRE_BASE" \
-        | awk -F'_' '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); OFS=""; print}')
+        | awk -F'_' '{s=""; for(i=1;i<=NF;i++) s = s toupper(substr($i,1,1)) substr($i,2); print s}')
 
     if ! grep -qE "class\s+${CLASE_ESPERADA}(\s|$)" "$ARCHIVO" 2>/dev/null; then
         echo -e "${AMARILLO}⚠  [R3] $ARCHIVO${NC}"

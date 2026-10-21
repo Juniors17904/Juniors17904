@@ -66,3 +66,4 @@ Después del informe, cierra con un párrafo corto en palabras simples para algu
 ## Notas
 - Las pruebas viven en `pruebas/`. Usa `npm test` para las rápidas, `npm run test:navegador` para Chromium y `npm run test:todo` para todo. Si una prueba nueva es necesaria, va en `pruebas/modelo/` (node, sin DOM) o en `pruebas/navegador/` (Playwright), y termina con `process.exitCode = fallos ? 1 : 0`.
 - Los PRD se crean con el PRD CREATOR (`docs/PRD_CREATOR.md`). Este skill es su complemento: el PRD CREATOR define qué construir y el Verificador PRD comprueba que se cumpla.
+- Antes de revisar, lee `docs/LECCIONES_APRENDIDAS.md` y comprueba que no se repita ninguno; si encuentras un error nuevo, agrégalo a esa tabla.
