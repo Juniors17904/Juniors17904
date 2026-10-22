@@ -1,0 +1,86 @@
+'use strict';
+
+// ================================================================
+// CLASE: ControladorDisenoObjetos — pantalla Diseño de Objetos
+// (#visorDO, VisorDisenoObjetos): elegir un objeto, el color del
+// cielo y la vista previa de la cordillera (PRD 004 D6).
+// ================================================================
+class ControladorDisenoObjetos extends ControladorPantalla {
+    #visor = null;
+
+    constructor(navegar) {
+        super(navegar);
+    }
+
+    iniciar() {
+        document.getElementById('btn-ir-diseno-objetos').addEventListener('click', () => {
+            this.irA('pantalla-diseno-objetos');
+            this.#arrancarVisor();
+        });
+        document.getElementById('btn-volver-diseno-objetos').addEventListener('click', () => {
+            this.detener();
+            this.irA('pantalla-ajustes');
+        });
+    }
+
+    #arrancarVisor() {
+        if (!window.VisorDisenoObjetos) {
+            setTimeout(() => this.#arrancarVisor(), 200);
+            return;
+        }
+        if (this.#visor) return;
+
+        const canvas  = document.getElementById('canvas-do-visor');
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        this.#visor = new window.VisorDisenoObjetos(canvas);
+        this.#visor.iniciar();
+
+        const panelCielo   = document.getElementById('do-panel-cielo');
+        const inputCielo   = document.getElementById('do-color-cielo');
+        const panelMontana = document.getElementById('do-panel-montana');
+
+        document.querySelectorAll('.do-obj-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tipo = btn.dataset.tipo;
+                if (tipo === 'cielo') {
+                    panelCielo.style.display   = 'block';
+                    panelMontana.style.display  = 'none';
+                    this.#visor?.mostrarCielo(inputCielo.value);
+                } else if (tipo === 'montana') {
+                    panelCielo.style.display   = 'none';
+                    panelMontana.style.display  = 'block';
+                    this.#dibujarPreviewMontana();
+                } else {
+                    panelCielo.style.display   = 'none';
+                    panelMontana.style.display  = 'none';
+                    this.#visor?.mostrar(tipo);
+                }
+            });
+        });
+
+        inputCielo.addEventListener('input', e => {
+            this.#visor?.mostrarCielo(e.target.value);
+        });
+    }
+
+    // Libera el visor al salir de la pantalla (también con el botón atrás)
+    detener() {
+        if (!this.#visor) return;
+        document.getElementById('do-panel-cielo').style.display  = 'none';
+        document.getElementById('do-panel-montana').style.display = 'none';
+        this.#visor.detener();
+        this.#visor = null;
+    }
+
+    #dibujarPreviewMontana() {
+        const canvas = document.getElementById('do-canvas-montana');
+        if (!canvas) return;
+        if (!window.Cordillera) { setTimeout(() => this.#dibujarPreviewMontana(), 200); return; }
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#040d1e';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(new window.Cordillera().generarCanvas(), 0, 0, canvas.width, canvas.height);
+    }
+}

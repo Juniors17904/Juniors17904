@@ -1,4 +1,3 @@
-src/controller/aplicacion.js 1516
 src/view/pistas/visor_carrera_solo.js 531
 src/controller/garaje.js 435
 src/view/pistas/visor_diseno_pista.js 411
