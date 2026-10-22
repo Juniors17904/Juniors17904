@@ -17,14 +17,22 @@ class Aplicacion {
     };
 
     #backNav            = false;
-    #timonOrigen        = 'pantalla-inicio';
-    #velocimetroOrigen  = 'pantalla-ajustes';
     #vistaConduccion    = new VistaConduccion().cargar();
     #visorDG            = null;
     #dgTouchHandlers    = [];
     #visorDO            = null;
     #carreraSolo        = null;
     #modos              = new ModosDisponibles();   // PRD 002 D8: decide qué modos se ven y se abren
+
+    // PRD 004 D5/D6: un controlador por pantalla
+    #inicio                     = null;
+    #ajustes                    = null;
+    #giroscopio                 = null;
+    #pistas                     = null;
+    #controles                  = null;
+    #velocimetro                = null;
+    #controladorVistaConduccion = null;
+    #modo2D                     = null;
 
     constructor() {
         // PRD 002 D7: ya no se usa GestorOrientacion → "GIRA TU CELULAR" nunca se muestra
@@ -111,119 +119,9 @@ class Aplicacion {
         return Boolean(this.#td3d || this.#td3dPending || this.#cir3d || this.#cir3dArrancando);
     }
 
-    // ── Utilidades ──────────────────────────────────────────────
-    #formatearTiempo(ms) {
-        const s = Math.floor(ms / 1000);
-        const m = Math.floor(s / 60);
-        const seg = s % 60;
-        const cent = Math.floor((ms % 1000) / 10);
-        return `${m}:${seg.toString().padStart(2,'0')}.${cent.toString().padStart(2,'0')}`;
-    }
-
     // ── Eventos ─────────────────────────────────────────────────
     #inicializarEventos() {
-        document.getElementById('colores-grid').addEventListener('click', e => {
-            const btn = e.target.closest('.color-btn');
-            if (!btn) return;
-            document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('sel'));
-            btn.classList.add('sel');
-            this.#estado.color = btn.dataset.color;
-        });
-
-        document.getElementById('control-tabs').addEventListener('click', e => {
-            const btn = e.target.closest('.tab-btn');
-            if (!btn) return;
-            if (btn.dataset.ctrl === 'timon') {
-                this.#timonOrigen = 'pantalla-inicio';
-                this.#dibujarPreviewsTimon();
-                this.#mostrar('pantalla-timon-diseno');
-                return;
-            }
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sel'));
-            btn.classList.add('sel');
-            this.#estado.control = btn.dataset.ctrl;
-        });
-
-        document.getElementById('btn-volver-timon-diseno').addEventListener('click', () => this.#mostrar(this.#timonOrigen));
-        document.getElementById('btn-disenar-timon').addEventListener('click', () => {
-            this.#timonOrigen = 'pantalla-controles';
-            this.#dibujarPreviewsTimon();
-            this.#mostrar('pantalla-timon-diseno');
-        });
-        // Las tarjetas del velocímetro también llevan la clase timon-card: se acota a su pantalla
-        document.querySelectorAll('#pantalla-timon-diseno .timon-card').forEach(card => {
-            card.addEventListener('click', () => {
-                this.#estado.timonModelo = parseInt(card.dataset.modelo);
-                this.#estado.control     = 'timon';
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sel'));
-                document.querySelector('[data-ctrl="timon"]').classList.add('sel');
-                this.#mostrar('pantalla-inicio');
-            });
-        });
-
-        document.getElementById('btn-ir-velocimetro').addEventListener('click', () => {
-            this.#velocimetroOrigen = 'pantalla-ajustes';
-            this.#dibujarPreviewsVelocimetro();
-            this.#mostrar('pantalla-velocimetro-diseno');
-        });
-        document.getElementById('btn-volver-velocimetro-diseno').addEventListener('click', () => this.#mostrar(this.#velocimetroOrigen));
-        document.querySelectorAll('.velocimetro-card').forEach(card => {
-            card.addEventListener('click', () => {
-                this.#estado.velocimetroModelo = parseInt(card.dataset.modelo);
-                document.querySelectorAll('.velocimetro-card').forEach(c => c.classList.remove('sel'));
-                card.classList.add('sel');
-                this.#mostrar(this.#velocimetroOrigen);
-            });
-        });
-
-        document.getElementById('btn-solo').addEventListener('click', () => {
-            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
-            this.#estado.modoSolo = true;
-            this.#carreraSolo?.detener();
-            // Se crea antes de #mostrar para que la pantalla no se redirija a Inicio;
-            // el constructor no toca el DOM: todo arranca en iniciar()
-            const carrera = new ControladorCarreraSolo(
-                this.#estado, this.#vistaConduccion, () => this.#mostrar('pantalla-inicio'));
-            this.#carreraSolo = carrera;
-            this.#mostrar('pantalla-carrera-solo');
-            carrera.iniciar();
-        });
-
-        // PRD 002 RF-01/RF-10: el botón está oculto; la guarda evita crear la carrera 2D
-        document.getElementById('btn-clasico-2d').addEventListener('click', () => {
-            if (!this.#modos.estaDisponible(ModoClasico2D)) return;
-            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
-            this.#estado.modoSolo = true;
-            this.#iniciarCuentaRegresiva();
-        });
-
-        // PRD 002 RF-04: "Próximamente" → al tocarlo no pasa nada
-        document.getElementById('btn-crear').addEventListener('click', async () => {
-            if (!this.#modos.estaDisponible(ModoMultijugador)) return;
-            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
-            this.#estado.modoSolo = false;
-            this.#mostrar('pantalla-crear');
-            await this.#iniciarCrearSala();
-        });
-
-        // PRD 002 RF-05: "Próximamente" → al tocarlo no pasa nada
-        document.getElementById('btn-unirse').addEventListener('click', () => {
-            if (!this.#modos.estaDisponible(ModoUnirse)) return;
-            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
-            this.#mostrar('pantalla-unirse');
-        });
-
-        document.getElementById('btn-confirmar-unirse').addEventListener('click', () => this.#confirmarUnirse());
-
-        document.getElementById('btn-volver-1').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
-        document.getElementById('btn-volver-2').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
-
-        // PRD 002 RF-01/RF-10: el botón está oculto; la guarda evita crear la carrera 2D
-        document.getElementById('btn-test-drive').addEventListener('click', () => {
-            if (!this.#modos.estaDisponible(ModoTestDrive2D)) return;
-            this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
-            this.#iniciarTestDrive();
-        });
+        this.#crearControladoresDePantalla();
 
         document.getElementById('btn-test-drive-3d').addEventListener('click', () => {
             this.#estado.nombre = document.getElementById('inp-nombre').value.trim() || 'Jugador';
@@ -248,36 +146,10 @@ class Aplicacion {
             this.#mostrar(this.#cir3dOrigen);
         });
 
-        document.getElementById('btn-garage').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
-        document.getElementById('btn-volver-ajustes').addEventListener('click', () => this.#mostrar('pantalla-inicio'));
-        document.getElementById('btn-ir-controles').addEventListener('click', () => this.#mostrar('pantalla-controles'));
-        document.getElementById('btn-volver-controles').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
-
-        document.getElementById('btn-ir-vista-conduccion').addEventListener('click', () => {
-            this.#sincronizarPantallaVistaConduccion();
-            this.#mostrar('pantalla-vista-conduccion');
-        });
-        document.getElementById('btn-volver-vista-conduccion').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
         document.getElementById('btn-ir-garage').addEventListener('click', () => {
             this.#mostrar('pantalla-garage');
             Garaje.iniciar(this.#estado, id => this.#mostrar(id));
         });
-
-        const probadorGiroscopio = new ProbadorGiroscopio();
-        document.getElementById('btn-ir-giro').addEventListener('click', () => {
-            this.#mostrar('pantalla-giro');
-            probadorGiroscopio.iniciar();
-        });
-        document.getElementById('btn-volver-giro').addEventListener('click', () => {
-            probadorGiroscopio.detener();
-            this.#mostrar('pantalla-ajustes');
-        });
-
-        document.getElementById('btn-ir-vista-conduccion').addEventListener('click', () => {
-            this.#sincronizarPantallaVistaConduccion();
-            this.#mostrar('pantalla-vista-conduccion');
-        });
-        document.getElementById('btn-volver-vista-conduccion').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
 
         document.getElementById('btn-ir-diseno-general').addEventListener('click', () => {
             this.#mostrar('pantalla-diseno-general');
@@ -349,243 +221,43 @@ class Aplicacion {
         document.getElementById('tog-cielo').addEventListener('change', e => {
             if (this.#visorDG) this.#visorDG.mostrarCielo = e.target.checked;
         });
-
-        document.getElementById('vc-cam-chase').addEventListener('click', () => {
-            this.#vistaConduccion.tipoCamara = 'chase';
-            this.#actualizarSeleccionCamara();
-        });
-        document.getElementById('vc-cam-aerea').addEventListener('click', () => {
-            this.#vistaConduccion.tipoCamara = 'aerea';
-            this.#actualizarSeleccionCamara();
-        });
-        document.getElementById('vc-altura').addEventListener('input', e => {
-            this.#vistaConduccion.alturaCamara = +e.target.value;
-            document.getElementById('vc-altura-val').textContent = (+e.target.value).toFixed(1);
-        });
-        document.getElementById('vc-ctrl-timon').addEventListener('click', () => {
-            this.#vistaConduccion.tipoControl = 'timon';
-            this.#actualizarSeleccionControl();
-        });
-        document.getElementById('vc-ctrl-teclado').addEventListener('click', () => {
-            this.#vistaConduccion.tipoControl = 'teclado';
-            this.#actualizarSeleccionControl();
-        });
-
-        document.getElementById('btn-ir-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
-        document.getElementById('btn-volver-pista').addEventListener('click', () => this.#mostrar('pantalla-ajustes'));
-        document.getElementById('btn-volver-detalle-pista').addEventListener('click', () => this.#mostrar('pantalla-pista'));
-        document.getElementById('btn-seleccionar-pista').addEventListener('click', () => {
-            this.#entrarCircuito3D(this.#estado.pista, 'pantalla-detalle-pista');
-        });
-        document.getElementById('pantalla-pista').addEventListener('click', e => {
-            const card = e.target.closest('.pista-card');
-            if (!card) return;
-            document.querySelectorAll('.pista-card').forEach(c => c.classList.remove('sel'));
-            card.classList.add('sel');
-            this.#estado.pista = card.dataset.pista;
-            // Cada circuito tiene su timón predeterminado: ciudad → Clásico (0)
-            const timonDePista = { ciudad: 0 };
-            if (timonDePista[card.dataset.pista] !== undefined) {
-                this.#estado.timonModelo = timonDePista[card.dataset.pista];
-            }
-            // Cada circuito tiene su velocímetro predeterminado: ciudad → F1 (2)
-            const velocimetroDePista = { ciudad: 2 };
-            if (velocimetroDePista[card.dataset.pista] !== undefined) {
-                this.#estado.velocimetroModelo = velocimetroDePista[card.dataset.pista];
-            }
-            document.getElementById('detalle-pista-nombre').textContent =
-                card.querySelector('.pista-nombre').textContent;
-            document.getElementById('detalle-pista-desc').textContent =
-                card.querySelector('.pista-desc').textContent;
-            this.#dibujarMapaPista(card.dataset.pista);
-            this.#mostrar('pantalla-detalle-pista');
-        });
-
-        document.getElementById('btn-revancha').addEventListener('click', () => {
-            if (window.multiJugador?.salaId) {
-                this.#mostrar('pantalla-crear');
-                document.getElementById('codigo-display').textContent = window.multiJugador.salaId;
-            } else {
-                this.#mostrar('pantalla-inicio');
-            }
-        });
-
-        document.getElementById('btn-menu').addEventListener('click', async () => {
-            if (window.multiJugador) await window.multiJugador.limpiar();
-            window.multiJugador = null;
-            this.#estado.juego = null;
-            this.#limpiarTestDrive3D();
-            this.#mostrar('pantalla-inicio');
-        });
     }
 
-    // ── Crear sala ───────────────────────────────────────────────
-    async #iniciarCrearSala() {
-        window.multiJugador = new MultiJugador();
-        const codigo = await window.multiJugador.crearSala(this.#estado.nombre, this.#estado.color);
-        document.getElementById('codigo-display').textContent = codigo;
+    // PRD 004 D6: cada pantalla simple tiene su controlador; registran
+    // sus eventos en iniciar() y piden navegar con el callback
+    #crearControladoresDePantalla() {
+        const navegar = id => this.#mostrar(id);
+        this.#controles   = new ControladorControles(this.#estado, navegar);
+        this.#modo2D      = new ControladorModo2D(this.#estado, navegar, () => this.#limpiarTestDrive3D());
+        this.#inicio      = new ControladorInicio(this.#estado, navegar, this.#modos,
+            this.#controles, this.#modo2D, () => this.#iniciarCarreraSolo());
+        this.#ajustes     = new ControladorAjustes(navegar);
+        this.#velocimetro = new ControladorVelocimetro(this.#estado, navegar);
+        this.#giroscopio  = new ControladorGiroscopio(navegar);
+        this.#controladorVistaConduccion = new ControladorVistaConduccion(this.#vistaConduccion, navegar);
+        this.#pistas      = new ControladorPistas(this.#estado, navegar,
+            (tipoPista, origen) => this.#entrarCircuito3D(tipoPista, origen));
 
-        document.getElementById('btn-copiar').addEventListener('click', () => {
-            navigator.clipboard.writeText(codigo).catch(() => {});
-        });
-
-        window.multiJugador.suscribir(
-            (nombreOp, colorOp) => {
-                this.#prepararSalaEspera(this.#estado.nombre, this.#estado.color, nombreOp, colorOp);
-                this.#iniciarCuentaRegresiva();
-            },
-            progreso => {
-                if (this.#estado.juego) this.#estado.juego.actualizarOponente(progreso);
-            },
-            () => this.#mostrarResultado(false)
-        );
+        this.#inicio.iniciar();
+        this.#controles.iniciar();
+        this.#velocimetro.iniciar();
+        this.#modo2D.iniciar();
+        this.#ajustes.iniciar();
+        this.#giroscopio.iniciar();
+        this.#controladorVistaConduccion.iniciar();
+        this.#pistas.iniciar();
     }
 
-    // ── Unirse a sala ────────────────────────────────────────────
-    async #confirmarUnirse() {
-        const codigo = document.getElementById('inp-codigo').value.trim().toUpperCase();
-        const errEl = document.getElementById('error-unirse');
-        errEl.textContent = '';
-
-        if (codigo.length !== 4) {
-            errEl.textContent = 'El código debe tener 4 letras';
-            return;
-        }
-
-        try {
-            window.multiJugador = new MultiJugador();
-            const datos = await window.multiJugador.unirSala(codigo, this.#estado.nombre, this.#estado.color);
-
-            window.multiJugador.suscribir(
-                null,
-                progreso => {
-                    if (this.#estado.juego) this.#estado.juego.actualizarOponente(progreso);
-                },
-                () => this.#mostrarResultado(false)
-            );
-
-            this.#prepararSalaEspera(datos.j1_nombre, datos.j1_color, this.#estado.nombre, this.#estado.color);
-            this.#iniciarCuentaRegresiva();
-        } catch (err) {
-            errEl.textContent = err.message;
-        }
-    }
-
-    // ── Sala de espera ───────────────────────────────────────────
-    #prepararSalaEspera(nombre1, color1, nombre2, color2) {
-        this.#mostrar('pantalla-espera');
-        document.getElementById('nombre-j1').textContent = nombre1;
-        document.getElementById('dot-j1').style.cssText = `background:${color1};box-shadow:0 0 8px ${color1}`;
-        document.getElementById('nombre-j2').textContent = nombre2;
-        document.getElementById('dot-j2').style.cssText = `background:${color2};box-shadow:0 0 8px ${color2}`;
-    }
-
-    // ── Cuenta regresiva ─────────────────────────────────────────
-    #iniciarCuentaRegresiva() {
-        if (this.#estado.modoSolo) {
-            this.#mostrar('pantalla-espera');
-            document.getElementById('nombre-j1').textContent = this.#estado.nombre;
-            document.getElementById('dot-j1').style.background = this.#estado.color;
-            document.getElementById('nombre-j2').textContent = 'CPU / Sin oponente';
-            document.getElementById('dot-j2').style.background = '#475569';
-            document.querySelectorAll('.vs-sep').forEach(el => el.textContent = '');
-        }
-
-        const el = document.getElementById('cuenta-regresiva');
-        const pasos = ['3', '2', '1', '¡YA!'];
-        let i = 0;
-        this.#mostrar('pantalla-espera');
-
-        const intervalo = setInterval(() => {
-            el.textContent = pasos[i++];
-            if (i >= pasos.length) {
-                clearInterval(intervalo);
-                setTimeout(() => this.#iniciarJuego(), 300);
-            }
-        }, 900);
-    }
-
-    // ── Velocímetro: dibuja previews de los 4 modelos ────────────
-    #dibujarPreviewsVelocimetro() {
-        document.querySelectorAll('.velocimetro-card').forEach((card, i) => {
-            const canvas = card.querySelector('.velocimetro-preview');
-            const ctx    = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const cx = canvas.width / 2, cy = canvas.height / 2, r = canvas.width * 0.38;
-            window.RenderizadorVelocimetro.dibujar(ctx, cx, cy, r, 0.62, i);
-            card.querySelector('.velocimetro-nombre').textContent = window.RenderizadorVelocimetro.nombre(i);
-            card.classList.toggle('sel', i === this.#estado.velocimetroModelo);
-        });
-    }
-
-    // ── Timón: dibuja previews de los 4 modelos ──────────────────
-    #dibujarPreviewsTimon() {
-        document.querySelectorAll('#pantalla-timon-diseno .timon-card').forEach((card, i) => {
-            const canvas = card.querySelector('.timon-preview');
-            const ctx    = canvas.getContext('2d');
-            const S      = Math.min(canvas.width, canvas.height);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            window.RenderizadorTimon.dibujar(ctx, S, i);
-            ctx.restore();
-            card.classList.toggle('sel', i === this.#estado.timonModelo);
-        });
-    }
-
-    // ── Juego ────────────────────────────────────────────────────
-    #iniciarJuego() {
-        this.#mostrar('pantalla-juego');
-
-        const oponenteNombre = this.#estado.modoSolo
-            ? null
-            : (window.multiJugador?.jugadorNum === 1
-                ? document.getElementById('nombre-j2').textContent
-                : document.getElementById('nombre-j1').textContent);
-
-        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, this.#estado.pista, this.#estado.velocimetroModelo);
-
-        window.onCarreraTerminada = (tiempoMs, velMax) => {
-            if (!this.#estado.modoSolo && window.multiJugador) window.multiJugador.reportarGanador();
-            this.#mostrarResultado(true, tiempoMs, velMax);
-        };
-
-        this.#estado.juego.iniciar(oponenteNombre);
-    }
-
-    // ── Resultado ────────────────────────────────────────────────
-    #mostrarResultado(gane, tiempoMs = null, velMax = 0) {
-        if (this.#estado.juego) this.#estado.juego.detener();
-        this.#mostrar('pantalla-resultado');
-
-        const tituloEl = document.getElementById('titulo-resultado');
-        tituloEl.textContent = gane ? '¡GANASTE! 🏆' : '¡PERDISTE! 💨';
-        tituloEl.className = 'resultado-titulo ' + (gane ? 'gane' : 'perdi');
-
-        document.getElementById('stat-tutiempo').textContent = tiempoMs ? this.#formatearTiempo(tiempoMs) : '--';
-        document.getElementById('stat-eltiempo').textContent = '--';
-        document.getElementById('stat-velmax').textContent = Math.round((velMax / CFG.VEL_MAX) * 220) + ' km/h';
-    }
-
-    // ── Test Drive ───────────────────────────────────────────────
-    #iniciarTestDrive() {
-        this.#mostrar('pantalla-juego');
-        document.getElementById('ctrl-accel').style.display = 'flex';
-        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, 'testdrive');
-        window.onCarreraTerminada = null;
-        this.#estado.juego.iniciar(null);
-    }
-
-    #iniciarTestDrivePista(tipoPista) {
-        // Crea una versión libre de la pista (sin meta, sin fin)
-        const base = window.PISTAS?.[tipoPista];
-        if (!base) { this.#iniciarTestDrive(); return; }
-        window.PISTAS['__td__'] = new PistaTestDriveLibre(base);
-        this.#mostrar('pantalla-juego');
-        document.getElementById('ctrl-accel').style.display = 'flex';
-        this.#estado.juego = new Juego(this.#estado.color, this.#estado.control, this.#estado.tipoAuto, '__td__');
-        window.onCarreraTerminada = null;
-        this.#estado.juego.iniciar(null);
+    // ── Jugar Solo ───────────────────────────────────────────────
+    #iniciarCarreraSolo() {
+        this.#carreraSolo?.detener();
+        // Se crea antes de #mostrar para que la pantalla no se redirija a Inicio;
+        // el constructor no toca el DOM: todo arranca en iniciar()
+        const carrera = new ControladorCarreraSolo(
+            this.#estado, this.#vistaConduccion, () => this.#mostrar('pantalla-inicio'));
+        this.#carreraSolo = carrera;
+        this.#mostrar('pantalla-carrera-solo');
+        carrera.iniciar();
     }
 
     // ── Test Drive 3D ────────────────────────────────────────────
@@ -1252,107 +924,6 @@ class Aplicacion {
         document.getElementById('btn-toggle-minimap').style.display='none';
         document.getElementById('btn-toggle-trail').style.display='none';
         document.getElementById('ctrl-cam-height').style.display='none';
-    }
-
-    // ── Mapa de pista ────────────────────────────────────────────
-    #dibujarMapaPista(tipoPista) {
-        const canvas = document.getElementById('canvas-mapa-pista');
-        const ctx = canvas.getContext('2d');
-        const W = canvas.width, H = canvas.height;
-        ctx.clearRect(0, 0, W, H);
-
-        const pista = window.PISTAS?.[tipoPista];
-        if (!pista) {
-            ctx.fillStyle = '#1e1e40';
-            ctx.fillRect(0, 0, W, H);
-            ctx.fillStyle = '#4a4a70';
-            ctx.font = '13px Orbitron';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('PRÓXIMAMENTE', W / 2, H / 2);
-            return;
-        }
-
-        const puntos = [];
-        let x = 0, y = 0, angle = -Math.PI / 2;
-        for (let i = 0; i < pista.totalSegs; i++) {
-            const tramo = pista.tramos.find(([d, h]) => i >= d && i < h);
-            angle += (tramo ? tramo[2] : 0) * 0.045;
-            x -= Math.cos(angle) * 1.5;
-            y += Math.sin(angle) * 1.5;
-            puntos.push([x, y]);
-        }
-        const xs = puntos.map(p => p[0]), ys = puntos.map(p => p[1]);
-        const minX = Math.min(...xs), maxX = Math.max(...xs);
-        const minY = Math.min(...ys), maxY = Math.max(...ys);
-        const pad = 28;
-        const scl = Math.min((W - pad * 2) / (maxX - minX || 1), (H - pad * 2) / (maxY - minY || 1));
-        const ox = (W - (maxX - minX) * scl) / 2 - minX * scl;
-        const oy = (H - (maxY - minY) * scl) / 2 - minY * scl;
-        const sx = px => px * scl + ox;
-        const sy = py => py * scl + oy;
-
-        const traceSuave = () => {
-            const n = puntos.length;
-            const last = puntos[n - 1], first = puntos[0];
-            ctx.moveTo((sx(last[0]) + sx(first[0])) / 2, (sy(last[1]) + sy(first[1])) / 2);
-            for (let i = 0; i < n; i++) {
-                const [px0, py0] = puntos[i];
-                const [px1, py1] = puntos[(i + 1) % n];
-                ctx.quadraticCurveTo(sx(px0), sy(py0), (sx(px0) + sx(px1)) / 2, (sy(py0) + sy(py1)) / 2);
-            }
-            ctx.closePath();
-        };
-
-        ctx.strokeStyle = 'rgba(124,58,237,0.15)';
-        ctx.lineWidth = 10;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.beginPath();
-        traceSuave();
-        ctx.stroke();
-
-        ctx.strokeStyle = '#7c3aed';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        traceSuave();
-        ctx.stroke();
-
-        const [fx, fy] = puntos[0];
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(sx(fx), sy(fy), 5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#fbbf24';
-        ctx.font = 'bold 10px Orbitron';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('S/F', sx(fx) + 8, sy(fy));
-    }
-
-    #sincronizarPantallaVistaConduccion() {
-        const vc = this.#vistaConduccion;
-        document.getElementById('vc-check-chase').textContent = vc.tipoCamara === 'chase' ? '✓' : '';
-        document.getElementById('vc-check-aerea').textContent = vc.tipoCamara === 'aerea' ? '✓' : '';
-        const alturaInput = document.getElementById('vc-altura');
-        alturaInput.value = vc.alturaCamara;
-        document.getElementById('vc-altura-val').textContent = vc.alturaCamara.toFixed(1);
-        document.getElementById('vc-altura-wrap').style.display = vc.tipoCamara === 'chase' ? '' : 'none';
-        document.getElementById('vc-check-ctrl-timon').textContent  = vc.tipoControl === 'timon'   ? '✓' : '';
-        document.getElementById('vc-check-ctrl-teclado').textContent = vc.tipoControl === 'teclado' ? '✓' : '';
-    }
-
-    #actualizarSeleccionCamara() {
-        const vc = this.#vistaConduccion;
-        document.getElementById('vc-check-chase').textContent = vc.tipoCamara === 'chase' ? '✓' : '';
-        document.getElementById('vc-check-aerea').textContent = vc.tipoCamara === 'aerea' ? '✓' : '';
-        document.getElementById('vc-altura-wrap').style.display = vc.tipoCamara === 'chase' ? '' : 'none';
-    }
-
-    #actualizarSeleccionControl() {
-        const vc = this.#vistaConduccion;
-        document.getElementById('vc-check-ctrl-timon').textContent  = vc.tipoControl === 'timon'   ? '✓' : '';
-        document.getElementById('vc-check-ctrl-teclado').textContent = vc.tipoControl === 'teclado' ? '✓' : '';
     }
 
     // ── Visor 3D de Diseño General ───────────────────────────────
