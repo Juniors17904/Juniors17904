@@ -2,87 +2,90 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v1 — listo para implementar |
+| Estado | v2 — listo para implementar |
 | Fecha | 2026-10-22 |
 | Relacionado | PRD 001 y PRD 002 (no los reemplaza) |
 
 ## Decisiones bloqueadas
 
-Estas decisiones se acordaron con el usuario y no se cambian. Si un requerimiento choca con ellas, mandan las decisiones.
+Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimiento choca con alguna, manda la decisión.
 
 | # | Categoría | Decisión |
 |---|---|---|
-| D1 | Alcance | Ningún archivo de código puede pasar de **400 líneas**. |
-| D2 | Alcance | Este PRD solo crea la regla y el chequeo automático. Dividir los archivos que hoy pasan el límite queda para un PRD aparte (backlog B10). |
-| D3 | Usuarios | La regla afecta al desarrollador y a los agentes. El jugador no nota ningún cambio. |
-| D4 | Usuarios | Un archivo **nuevo** de más de 400 líneas **bloquea** el commit. Un archivo **existente** que ya pasaba el límite solo da **aviso**, hasta que se divida. |
-| D5 | Dominio | "Una sola responsabilidad": si para describir lo que hace una clase hay que decir "y además…", esa clase se divide. Esto se revisa a mano con el Verificador PRD. |
-| D6 | Dominio | MVC sigue igual. La regla nueva solo limita el tamaño y exige un controlador por pantalla. |
-| D7 | Técnico | La regla queda escrita en `CLAUDE.md`, en una sección nueva "Anti-monolito", y en el PRD CREATOR. |
-| D8 | Técnico | El chequeo automático (`verificar_arquitectura.sh` y `prueba_arquitectura.js`) cuenta las líneas. De paso se arregla el aviso falso de R3 con nombres que llevan número (`ModoClasico2D`). |
+| D1 | Alcance | Ningún archivo `.js` o `.mjs` del juego (`src/` y raíz) ni de `pruebas/` puede pasar de **400 líneas**. *(v2: también `pruebas/`)* |
+| D2 | Alcance | Este PRD solo crea la regla y el chequeo. Dividir los archivos grandes que ya existen es B10, en un PRD aparte. |
+| D3 | Usuarios | La regla afecta al desarrollador y a los agentes. El jugador no nota nada. |
+| D4 | Usuarios | **Solo los 4 archivos grandes listados en §5** pueden pasar de 400 líneas, y solo generan un aviso. **Cualquier otro archivo** que pase de 400 líneas **bloquea**, sea nuevo o existente. *(v2)* |
+| D5 | Dominio | Una clase tiene una sola responsabilidad: si para describirla hay que decir "y además…", se divide. Lo revisa a mano el Verificador PRD. |
+| D6 | Dominio | MVC sigue igual. **Cada pantalla tiene su propio controlador**: en `CLAUDE.md` pasa de excepción a regla. Las 4 pantallas que hoy no lo cumplen (Test Drive 3D, Diseño de Pistas, Diseño General y Diseño de Objetos) se aceptan como están hasta B10. *(v2)* |
+| D7 | Técnico | La regla queda escrita en `CLAUDE.md` (sección "Anti-monolito", que reemplaza la excepción de controladores) y en el PRD CREATOR. |
+| D8 | Técnico | El chequeo corre solo en cada commit (se instala con `npm install`) y también con `npm test`. De paso se corrige el aviso falso de R3 con nombres que llevan número (`ModoClasico2D`). |
 
 ## 1. Contexto y problema
-Algunos archivos crecieron hasta volverse monolitos: `aplicacion.js` tiene unas 1500 líneas y maneja todas las pantallas. Cuesta entenderlos, cualquier cambio puede romper otra cosa y los agentes cometen más errores en ellos. Hoy ninguna regla limita el tamaño de un archivo.
+Algunos archivos crecieron hasta convertirse en monolitos: `aplicacion.js` tiene 1516 líneas y maneja todas las pantallas. Cuesta entenderlos, cualquier cambio puede romper otra cosa y los agentes se equivocan más. Hoy no hay ninguna regla de tamaño, y el chequeo de arquitectura no está instalado en git, así que no bloquea ningún commit.
 
 ## 2. Objetivo
-Que ningún archivo nuevo se convierta en monolito, que el chequeo avise solo y que los archivos grandes que ya existen queden identificados para dividirlos después.
+Que ningún archivo nuevo ni ninguna prueba se conviertan en monolito, que el chequeo avise y bloquee por su cuenta, y que los archivos grandes que ya existen queden identificados para dividirlos después.
 
 ## 3. Público objetivo y usuarios
-- **Desarrollador:** sabe qué tamaño puede tener un archivo y recibe un aviso cuando se pasa.
-- **Agentes de Claude:** leen la regla en `CLAUDE.md` y la cumplen al escribir código.
-- **Jugador:** no nota nada; el juego funciona igual que antes.
+- **Desarrollador:** sabe cuánto puede medir un archivo y el commit se bloquea si lo pasa.
+- **Agentes de Claude:** leen la regla en `CLAUDE.md` y la cumplen al escribir código y pruebas.
+- **Jugador:** no nota nada.
 
 ## 4. Alcance
 **In scope:**
 - La sección "Anti-monolito" en `CLAUDE.md` y en el PRD CREATOR.
-- El conteo de líneas en el chequeo automático: bloquea los archivos nuevos y avisa en los existentes.
-- La lista de archivos existentes que pasan el límite.
-- El arreglo del aviso falso de R3.
-- Las ideas B10 (dividir monolitos) y B5 a B9 (top 5 de mejoras del juego) en el backlog.
+- El chequeo de líneas, que se instala solo en git.
+- La lista de los 4 archivos grandes que se aceptan.
+- La corrección del aviso de R3.
+- El Verificador PRD revisando la responsabilidad única.
+- B5 a B10 en el backlog.
 
-**Out of scope:** dividir `aplicacion.js` u otro archivo existente (B10); cambios en el juego.
+**Out of scope:** dividir archivos existentes o pantallas (B10); cualquier cambio en el juego.
 
-**Lista única de lo que NO se modifica:** todo `src/`, `index.html`, `vista_conduccion.js`, los PRD 001 y 002, y `src/style.css`. Solo cambian `CLAUDE.md`, `docs/PRD_CREATOR.md`, `docs/BACKLOG.md`, `docs/LECCIONES_APRENDIDAS.md`, `scripts/verificar_arquitectura.sh` y `pruebas/`.
+**Lista única de lo que NO se modifica:** todo `src/`, `index.html`, `vista_conduccion.js`, `src/style.css` y los PRD 001 y 002. Solo cambian `CLAUDE.md`, `package.json`, `scripts/`, `pruebas/`, `docs/PRD_CREATOR.md`, `docs/BACKLOG.md`, `docs/LECCIONES_APRENDIDAS.md` y `.claude/skills/verificador-prd/SKILL.md`.
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
 |---|---|
 | Monolito | Un archivo o una clase que hace demasiadas cosas y crece sin límite. |
-| Límite de líneas | 400 líneas por archivo de código (`.js` en `src/` y en la raíz). |
-| Archivo existente grande | Archivo que ya pasaba el límite cuando se creó esta regla: `aplicacion.js` (1516), `visor_carrera_solo.js` (531), `garaje.js` (435) y `visor_diseno_pista.js` (411). |
-| Responsabilidad única | Una clase hace una sola cosa que se describe sin decir "y además…". |
+| Límite de líneas | 400 líneas por archivo `.js` o `.mjs` en `src/`, en la raíz y en `pruebas/`. |
+| Archivo grande aceptado | Los únicos 4 que pueden pasar de 400 líneas hasta B10: `aplicacion.js` (1516), `visor_carrera_solo.js` (531), `garaje.js` (435) y `visor_diseno_pista.js` (411). |
+| Responsabilidad única | Lo que hace una clase se describe sin decir "y además…". |
 | Controlador por pantalla | Cada pantalla tiene su propio controlador, como `ControladorCarreraSolo`. |
 
 ## 6. Requerimientos funcionales
 - **RF-01 (D7):** `CLAUDE.md` tiene una sección "Anti-monolito" con el límite de 400 líneas, la responsabilidad única y el controlador por pantalla.
-- **RF-02 (D6):** esa sección aclara que MVC sigue igual.
+- **RF-02 (D6):** esa sección dice que MVC sigue igual, y el controlador por pantalla ya no aparece como excepción en `CLAUDE.md`.
 - **RF-03 (D7):** el PRD CREATOR pide que todo PRD nuevo respete el límite y la responsabilidad única.
-- **RF-04 (D4):** un commit que agrega un archivo nuevo de más de 400 líneas se bloquea con un mensaje claro.
-- **RF-05 (D4):** un commit que toca un archivo existente grande muestra un aviso, pero no se bloquea.
-- **RF-06 (D4):** si un archivo existente grande crece todavía más, el aviso lo dice.
-- **RF-07 (D8):** `npm test` falla si algún archivo nuevo pasa de 400 líneas.
-- **RF-08 (D8):** el aviso falso de R3 desaparece: `modo_clasico_2d.js` coincide con `ModoClasico2D`.
-- **RF-09 (D2):** el backlog tiene B10 (dividir los 4 archivos grandes, empezando por `aplicacion.js`) y B5 a B9 (top 5 de mejoras).
-- **RF-10 (D5):** el Verificador PRD revisa la responsabilidad única de las clases nuevas o cambiadas.
-- **RF-11 (D3):** el juego funciona igual que antes y las pruebas actuales siguen en verde.
+- **RF-04 (D8):** después de `npm install`, el chequeo se ejecuta solo en cada commit.
+- **RF-05 (D4):** un commit que deja un archivo de más de 400 líneas fuera de la lista de §5 se bloquea con un mensaje que nombra el archivo y el límite. Vale para archivos nuevos y existentes, incluidas las pruebas.
+- **RF-06 (D4):** un commit que toca uno de los 4 archivos aceptados muestra un aviso, pero no se bloquea. Si el archivo creció, el aviso lo dice.
+- **RF-07 (D8):** `npm test` falla si algún archivo fuera de la lista pasa de 400 líneas.
+- **RF-08 (D8):** desaparece el aviso falso de R3: `modo_clasico_2d.js` coincide con `ModoClasico2D`.
+- **RF-09 (D5):** el Verificador PRD revisa la responsabilidad única de las clases nuevas o cambiadas.
+- **RF-10 (D2):** el backlog tiene B10 (dividir los 4 archivos grandes y las 4 pantallas sin controlador propio, empezando por `aplicacion.js`) y B5 a B9 (el top 5 de mejoras).
+- **RF-11 (D3):** el juego funciona igual que antes.
 
 ## 7. Requerimientos no funcionales
-- **RNF-01, reglas del proyecto:** se cumple `CLAUDE.md` en todo lo que se agrega.
-- **RNF-02, pruebas:** `npm run test:todo` pasa en verde, con una prueba que confirma RF-04 a RF-08.
+- **RNF-01, reglas del proyecto:** todo lo que se agrega cumple `CLAUDE.md`, incluido el límite de 400 líneas.
+- **RNF-02, pruebas:** `npm run test:todo` termina en verde con una prueba nueva para RF-04 a RF-08, que usa un repo temporal en `/tmp` y no toca el repo real. Las 10 pruebas actuales siguen en verde.
 
 ## 8. Criterios de aceptación del MVP
-1. La regla está escrita en `CLAUDE.md` y en el PRD CREATOR.
-2. Un archivo nuevo de 401 líneas no se puede commitear.
-3. Los 4 archivos grandes existentes solo dan aviso.
-4. Ya no aparece el aviso falso de R3.
-5. Las ideas B5 a B10 están en el backlog.
-6. `npm run test:todo` pasa en verde y el Verificador PRD da ✅.
+1. La regla está escrita en `CLAUDE.md` y en el PRD CREATOR, y el controlador por pantalla ya no figura como excepción.
+2. Después de `npm install`, un archivo nuevo de 401 líneas, de juego o de prueba, no se puede commitear.
+3. Un archivo existente que crece de 380 a 420 líneas también se bloquea.
+4. Los 4 archivos aceptados solo dan aviso.
+5. Ya no sale el aviso falso de R3.
+6. B5 a B10 están en el backlog.
+7. `npm run test:todo` termina en verde y el Verificador PRD da ✅.
 
 ## 9. Riesgos y supuestos
-- **Archivos grandes que siguen ahí:** los 4 archivos existentes pasan el límite hasta B10. Se acepta por ahora.
-- **El límite también vale para el PRD 001:** `visor_carrera_solo.js` (531) nació antes de la regla. Cuenta como existente.
-- **Responsabilidad única:** no se puede medir con un número. Depende de la revisión del Verificador PRD.
-- **Pruebas y documentación:** el límite aplica solo al código del juego (`src/` y `.js` de la raíz), no a `pruebas/` ni a `docs/`.
+- **Archivos y pantallas aceptados:** los 4 archivos grandes y las 4 pantallas sin controlador propio siguen así hasta B10. Se acepta.
+- **Instalación del chequeo:** quien clone el repo y no corra `npm install` no tendrá el chequeo en sus commits. `npm test` lo revisa igual.
+- **Responsabilidad única:** no se puede medir con un número; depende de la revisión del Verificador PRD.
+- **Documentación:** el límite no aplica a `docs/`, porque los PRD ya tienen su propio límite de 2 páginas.
 
 ### Historial
-- **v1** (2026-10-22): primera versión, con el límite de 400 líneas que decidió el usuario.
+- **v1** (2026-10-22): primera versión, con límite de 400 líneas.
+- **v2** (2026-10-22): correcciones de 3 agentes revisores, aprobadas por el usuario. D1 incluye `pruebas/`. D4: solo los 4 archivos listados pueden pasar el límite y cualquier otro bloquea. D6: el controlador por pantalla pasa a ser regla y reemplaza la excepción de `CLAUDE.md`. D8: el chequeo se instala solo. Se agregan `package.json` y el Verificador PRD a la lista de lo que cambia.
