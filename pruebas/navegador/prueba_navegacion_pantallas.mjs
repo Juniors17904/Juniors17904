@@ -37,6 +37,9 @@ const visible = (page, id) => page.evaluate(i=>{ const b=document.getElementById
 const clic = (page, id) => page.evaluate(i=>document.getElementById(i).click(), id);
 const clicSelector = (page, sel) => page.evaluate(s=>document.querySelector(s).click(), sel);
 const esperar = (page, ms) => page.waitForTimeout(ms);
+// Espera (máx. 3 s) a que la pantalla activa deje de ser `id`, y un respiro para que termine de pintar
+const cambio = (page, id) => page.waitForFunction(i=>document.querySelector('.pantalla.activa')?.id!==i, id, { timeout:3000 })
+  .catch(()=>{}).then(()=>esperar(page, 300));
 const esperarYa = page => page.waitForFunction(()=>document.getElementById('cuenta-carrera-solo')?.textContent==='¡YA!',
   null, { timeout:12000 }).then(()=>true,()=>false);
 
@@ -47,17 +50,16 @@ const esperarYa = page => page.waitForFunction(()=>document.getElementById('cuen
 // adelante: pantalla que muestra "adelante" tras volver atrás (PRD 002 redirige pantalla-juego a Inicio)
 // volver:   botón volver de la pantalla y la pantalla a la que lleva (null = solo atrás del navegador)
 // espera:   ms tras entrar (las pantallas 3D tardan en cargar)
-// recargar: abre de nuevo el juego antes de cada entrada a una pantalla 3D. Hoy, al salir de
-//           Diseño General su visor pierde el contexto WebGL del lienzo y una segunda entrada en la
-//           misma sesión falla ("reading 'precision'"); además Chrome limita los contextos WebGL
-//           por página. Cada entrada 3D se prueba así en una sesión limpia.
+// recargar: abre de nuevo el juego antes de cada entrada. Hoy, al salir de Diseño General su visor
+//           pierde el contexto WebGL del lienzo y una segunda entrada en la misma sesión falla
+//           ("reading 'precision'"): cada entrada se prueba en una sesión limpia.
 const PASOS = [
   { nombre:'inicio', pantalla:'pantalla-inicio' },
   { nombre:'ajustes', desde:'inicio', entrar:'btn-garage', pantalla:'pantalla-ajustes',
     volver:['btn-volver-ajustes','pantalla-inicio'] },
   { nombre:'garaje', desde:'ajustes', entrar:'btn-ir-garage', pantalla:'pantalla-garage',
     volver:['btn-volver-garage','pantalla-inicio'] },
-  { nombre:'vista-previa', recargar:true, desde:'garaje', entrar:'btn-ver-carro', pantalla:'pantalla-preview', espera:3000,
+  { nombre:'vista-previa', desde:'garaje', entrar:'btn-ver-carro', pantalla:'pantalla-preview', espera:3000,
     volver:['btn-volver-preview','pantalla-garage'] },
   { nombre:'giroscopio', desde:'ajustes', entrar:'btn-ir-giro', pantalla:'pantalla-giro',
     volver:['btn-volver-giro','pantalla-ajustes'] },
@@ -65,13 +67,13 @@ const PASOS = [
     volver:['btn-volver-pista','pantalla-ajustes'] },
   { nombre:'detalle-pista', desde:'pistas', entrar:p=>clicSelector(p,'.pista-card[data-pista="ciudad"]'),
     pantalla:'pantalla-detalle-pista', volver:['btn-volver-detalle-pista','pantalla-pista'] },
-  { nombre:'diseno-pistas-entrar', recargar:true, desde:'detalle-pista', entrar:'btn-seleccionar-pista', pantalla:'pantalla-juego',
+  { nombre:'diseno-pistas-entrar', desde:'detalle-pista', entrar:'btn-seleccionar-pista', pantalla:'pantalla-juego',
     lienzo:'canvas-cir3d', espera:3500, adelante:'pantalla-inicio', volver:['btn-exit-cir3d','pantalla-detalle-pista'] },
   { nombre:'test-drive-3d', desde:'ajustes', entrar:'btn-test-drive-3d', pantalla:'pantalla-td3d-selector',
     volver:['btn-volver-td3d-selector','pantalla-ajustes'] },
-  { nombre:'test-drive-3d-simple', recargar:true, desde:'test-drive-3d', entrar:'btn-td3d-simple', pantalla:'pantalla-juego',
+  { nombre:'test-drive-3d-simple', desde:'test-drive-3d', entrar:'btn-td3d-simple', pantalla:'pantalla-juego',
     lienzo:'canvas-td3d', espera:3500, adelante:'pantalla-juego', volver:['btn-exit-td3d','pantalla-ajustes'] },
-  { nombre:'test-drive-3d-con-ruta', recargar:true, desde:'test-drive-3d', entrar:'btn-td3d-con-ruta', pantalla:'pantalla-juego',
+  { nombre:'test-drive-3d-con-ruta', desde:'test-drive-3d', entrar:'btn-td3d-con-ruta', pantalla:'pantalla-juego',
     lienzo:'canvas-cir3d', espera:3500, adelante:'pantalla-inicio', volver:['btn-exit-cir3d','pantalla-td3d-selector'] },
   { nombre:'controles', desde:'ajustes', entrar:'btn-ir-controles', pantalla:'pantalla-controles',
     volver:['btn-volver-controles','pantalla-ajustes'] },
@@ -85,7 +87,7 @@ const PASOS = [
     volver:['btn-volver-vista-conduccion','pantalla-ajustes'] },
   { nombre:'diseno-general', recargar:true, desde:'ajustes', entrar:'btn-ir-diseno-general', pantalla:'pantalla-diseno-general', espera:5000,
     volver:['btn-volver-diseno-general','pantalla-ajustes'] },
-  { nombre:'diseno-objetos', recargar:true, desde:'ajustes', entrar:'btn-ir-diseno-objetos', pantalla:'pantalla-diseno-objetos', espera:5000,
+  { nombre:'diseno-objetos', desde:'ajustes', entrar:'btn-ir-diseno-objetos', pantalla:'pantalla-diseno-objetos', espera:5000,
     volver:['btn-volver-diseno-objetos','pantalla-ajustes'] },
   { nombre:'jugar-solo', desde:'inicio', entrar:'btn-solo', pantalla:'pantalla-carrera-solo', ya:true,
     adelante:'pantalla-inicio', volver:null },
@@ -145,11 +147,11 @@ async function revisarPaso(page, paso, orientacion) {
   //    registran su botón más de una vez y dejan entradas repetidas en el historial: se aceptan
   //    hasta 4 "atrás" seguidos, siempre que no se pase por otra pantalla.
   let pasadas = [];
-  for (let i=0;i<4 && await activa(page)===paso.pantalla;i++) { await page.goBack(); await esperar(page, 500); pasadas.push(await activa(page)); }
+  for (let i=0;i<4 && await activa(page)===paso.pantalla;i++) { await page.goBack(); await cambio(page, paso.pantalla); pasadas.push(await activa(page)); }
   check(await activa(page)===origen, `PRD 004 RF-04 ${et}: atrás vuelve a ${origen} (${pasadas.join(' → ')})`);
 
   // 3) Adelante del navegador (PRD 002 redirige a Inicio las pantallas sin visor)
-  await page.goForward(); await esperar(page, 500);
+  await page.goForward(); await cambio(page, origen);
   const adelante = paso.adelante ?? paso.pantalla;
   check(await activa(page)===adelante, `PRD 004 RF-04 ${et}: adelante muestra ${adelante} (${await activa(page)})`);
 
@@ -167,7 +169,7 @@ async function revisarPaso(page, paso, orientacion) {
 
 // Abre el juego desde cero y espera a que carguen los módulos de los visores 3D
 async function cargar(page) {
-  await page.goto(URL_JUEGO, { waitUntil:'domcontentloaded', timeout:60000 });
+  await page.goto(URL_JUEGO, { waitUntil:'load', timeout:60000 });
   await page.waitForFunction(()=>window.VisorTestdriveRecto && window.VisorTestdriveRuta, null, { timeout:15000 }).catch(()=>{});
   await esperar(page, 500);
 }
