@@ -27,7 +27,7 @@ Si no hay ningún PRD en `docs/prds/`, avísalo y corre solo las pruebas.
 Lanza en **un solo mensaje** tres llamadas al tool Agent para que corran a la vez. Cada una usa uno de estos `subagent_type` definidos en `.claude/agents/`:
 
 1. **`revisor-contradicciones-prd`**: compara los PRD entre sí y contra `CLAUDE.md`. Prompt: "Revisa contradicciones en todos los PRD de docs/prds/."
-2. **`revisor-codigo-prd`**: compara los cambios contra los PRD. Prompt: "Revisa los cambios del rango `<rango>` (más los cambios sin commitear si aplica) contra los PRD de docs/prds/."
+2. **`revisor-codigo-prd`**: compara los cambios contra los PRD. Prompt: "Revisa los cambios del rango `<rango>` (más los cambios sin commitear si aplica) contra los PRD de docs/prds/. Revisa también la responsabilidad única de cada clase nueva o cambiada (si para describirla hay que decir \"y además…\", se divide) y que ningún archivo `.js`/`.mjs` de `src/`, la raíz o `pruebas/` pase de 400 líneas fuera de la lista de `scripts/archivos_grandes_aceptados.txt` (regla anti-monolito de `CLAUDE.md`)."
 3. **`revisor-pruebas-prd`**: corre `npm run test:todo` y revisa la cobertura de los RF. Prompt: "Corre todas las pruebas y revisa la cobertura de RF de los PRD de docs/prds/."
 
 Si los tipos de agente no aparecen disponibles, por ejemplo en una sesión iniciada antes de crear los archivos, usa `general-purpose` y pega en el prompt el contenido del archivo `.claude/agents/<nombre>.md` correspondiente.

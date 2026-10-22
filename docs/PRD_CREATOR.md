@@ -37,6 +37,7 @@ Además (v2):
 - **Máximo 2 páginas (unas 100 líneas) y unos 15 requerimientos funcionales.** El PRD dice **qué** hace el producto y **por qué**, no **cómo** se programa. Escribe cada RF como un comportamiento que se puede observar (por ejemplo, "en el pasto la velocidad máxima baja al 40 %"), sin nombres de métodos, campos, fórmulas, milisegundos internos ni números de línea. Ese detalle vive en el código y en `pruebas/`.
 - No escribas pasos de verificación por cada RF. Las pruebas de `pruebas/` son la verificación y citan el número de RF que cubren.
 - Al corregir un PRD, **reemplaza** el texto en vez de agregar. Si al corregirlo pasa de 2 páginas, recórtalo.
+- Todo PRD nuevo respeta la **regla anti-monolito** de `CLAUDE.md`: máximo 400 líneas por archivo, responsabilidad única por clase y un controlador por pantalla.
 - Antes de guardar, revisa el PRD contra `CLAUDE.md`: ningún RF puede pedir objetos literales `{ }` guardados, funciones sueltas, más de una clase por archivo ni nombres en inglés. Si el diseño necesita una excepción, decláralo explícitamente en el RNF correspondiente; no la dejes solo como "deuda" en los riesgos.
 
 ---

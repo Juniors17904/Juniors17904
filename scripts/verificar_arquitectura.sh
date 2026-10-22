@@ -15,11 +15,53 @@ NC='\033[0m'
 echo ""
 echo "Verificando arquitectura POO (CLAUDE.md)..."
 
+# ── Regla 4: anti-monolito, máximo 400 líneas (PRD 003) ─────────
+# Aplica a .js/.mjs en staging de src/, la raíz y pruebas/ (añadidos o
+# modificados). Se evalúa antes de la salida temprana de R1-R3.
+LIMITE_LINEAS=400
+RAIZ_REPO=$(git rev-parse --show-toplevel)
+LISTA_ACEPTADOS="$RAIZ_REPO/scripts/archivos_grandes_aceptados.txt"
+
+ARCHIVOS_LINEAS=$(git diff --cached --name-only --diff-filter=AM \
+    | grep -E '^(src/.+|pruebas/.+|[^/]+)\.(js|mjs)$')
+
+for ARCHIVO in $ARCHIVOS_LINEAS; do
+    # Se cuentan las líneas de la versión en staging (lo que se commitea)
+    LINEAS=$(git show ":$ARCHIVO" 2>/dev/null | wc -l | tr -d ' ')
+    [ "$LINEAS" -le "$LIMITE_LINEAS" ] && continue
+
+    LINEAS_LISTA=""
+    if [ -f "$LISTA_ACEPTADOS" ]; then
+        LINEAS_LISTA=$(awk -v r="$ARCHIVO" '$1 == r { print $2; exit }' "$LISTA_ACEPTADOS")
+    fi
+
+    if [ -z "$LINEAS_LISTA" ]; then
+        echo -e "${ROJO}❌ [R4] $ARCHIVO${NC}"
+        echo "   Tiene $LINEAS líneas. El límite es $LIMITE_LINEAS líneas por archivo (CLAUDE.md, anti-monolito)."
+        ERRORES=$((ERRORES + 1))
+    elif [ "$LINEAS" -gt "$LINEAS_LISTA" ]; then
+        echo -e "${AMARILLO}⚠  [R4] $ARCHIVO${NC}"
+        echo "   Archivo grande aceptado hasta B10: creció de $LINEAS_LISTA a $LINEAS líneas (límite $LIMITE_LINEAS)."
+        # Solo advertencia — no bloquea el commit
+    else
+        echo -e "${AMARILLO}⚠  [R4] $ARCHIVO${NC}"
+        echo "   Archivo grande aceptado hasta B10: tiene $LINEAS líneas (límite $LIMITE_LINEAS)."
+        # Solo advertencia — no bloquea el commit
+    fi
+done
+
 # Solo archivos JS dentro de src/ que están en el staging area
 ARCHIVOS=$(git diff --cached --name-only --diff-filter=ACM | grep '^src/.*\.js$')
 
 if [ -z "$ARCHIVOS" ]; then
-    echo -e "${VERDE}✓ Sin archivos JS en src/ que verificar.${NC}"
+    echo -e "${VERDE}✓ Sin archivos JS en src/ para R1-R3.${NC}"
+    if [ "$ERRORES" -gt 0 ]; then
+        echo ""
+        echo -e "${ROJO}Commit BLOQUEADO — $ERRORES error(es) de arquitectura.${NC}"
+        echo "Corrige los errores y vuelve a hacer commit."
+        echo ""
+        exit 1
+    fi
     echo ""
     exit 0
 fi
@@ -45,8 +87,21 @@ for ARCHIVO in $ARCHIVOS; do
     # ── Regla 3: nombre del archivo coincide con nombre de clase ─
     NOMBRE_BASE=$(basename "$ARCHIVO" .js)
     # snake_case → PascalCase:  config_pista_ciudad → ConfigPistaCiudad
+    # La letra que sigue a un número también va en mayúscula:
+    # modo_clasico_2d → ModoClasico2D, modo_test_drive_3d → ModoTestDrive3D
     CLASE_ESPERADA=$(echo "$NOMBRE_BASE" \
-        | awk -F'_' '{s=""; for(i=1;i<=NF;i++) s = s toupper(substr($i,1,1)) substr($i,2); print s}')
+        | awk -F'_' '{
+            s = ""
+            for (i = 1; i <= NF; i++) {
+                p = toupper(substr($i, 1, 1))
+                for (j = 2; j <= length($i); j++) {
+                    c = substr($i, j, 1); a = substr($i, j - 1, 1)
+                    p = p ((a ~ /[0-9]/) ? toupper(c) : c)
+                }
+                s = s p
+            }
+            print s
+        }')
 
     if ! grep -qE "class\s+${CLASE_ESPERADA}(\s|$)" "$ARCHIVO" 2>/dev/null; then
         echo -e "${AMARILLO}⚠  [R3] $ARCHIVO${NC}"

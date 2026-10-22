@@ -100,6 +100,21 @@ class NivelCiudad extends Nivel {
 
 ---
 
+## 📏 ANTI-MONOLITO
+
+- **Máximo 400 líneas** por archivo `.js` o `.mjs` en `src/`, en la raíz y en `pruebas/`. No aplica a `docs/`.
+- **Responsabilidad única:** si para describir lo que hace una clase hay que decir "y además…", se divide en dos clases.
+- **Cada pantalla tiene su propio controlador** (por ejemplo, Jugar Solo → `ControladorCarreraSolo`). `Aplicacion` solo guarda el controlador de cada pantalla.
+- **MVC sigue igual:** Model, View y Controller como dice la sección "MVC obligatorio".
+
+**Excepciones temporales hasta B10** (`docs/BACKLOG.md`), las únicas permitidas:
+- Archivos que pueden pasar de 400 líneas (lista en `scripts/archivos_grandes_aceptados.txt`; solo dan aviso): `aplicacion.js` (1516), `visor_carrera_solo.js` (531), `garaje.js` (435) y `visor_diseno_pista.js` (411). Si crecen, el aviso lo dice.
+- Pantallas sin controlador propio: Test Drive 3D (`#td3d`), Diseño de Pistas (`#cir3d`), Diseño General (`#visorDG`) y Diseño de Objetos (`#visorDO`). Su visor sigue guardado directo en `Aplicacion`.
+
+Cualquier otro archivo de más de 400 líneas, nuevo o existente, bloquea el commit. El chequeo corre solo en cada commit (se instala con `npm install`) y también con `npm test`.
+
+---
+
 ## 🏗️ HERENCIA Y ENCAPSULAMIENTO — REGLA OBLIGATORIA EN ESTE PROYECTO
 
 ### Cuándo crear una superclase (clase padre)
@@ -161,7 +176,7 @@ Cada pantalla que muestra un circuito 3D tiene su propia clase. Nunca dos pantal
 | 🎨 Diseño General | `VisorDisenoPista` | `pistas/visor_diseno_pista.js` |
 | Jugar Solo (carrera 3D vertical) | `VisorCarreraSolo` | `pistas/visor_carrera_solo.js` |
 
-`Aplicacion` guarda cada instancia en su propio campo privado (`#td3d`, `#cir3d`, `#visorDG`, `#visorDO`). **Excepción:** cuando una pantalla tiene su propio controlador, el visor vive dentro de ese controlador y `Aplicacion` guarda el controlador en su campo privado (Jugar Solo: `#carreraSolo` → `ControladorCarreraSolo` → `VisorCarreraSolo`). Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
+**Regla: cada pantalla tiene su propio controlador.** El visor vive dentro de ese controlador y `Aplicacion` guarda el controlador en su campo privado (Jugar Solo: `#carreraSolo` → `ControladorCarreraSolo` → `VisorCarreraSolo`). Los visores guardados directo en `Aplicacion` (`#td3d`, `#cir3d`, `#visorDG`, `#visorDO`) son las excepciones temporales hasta B10 de la sección "📏 ANTI-MONOLITO". Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
 
 ### Encapsulamiento — reglas estrictas
 
