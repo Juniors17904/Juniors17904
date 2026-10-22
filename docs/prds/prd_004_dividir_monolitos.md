@@ -2,31 +2,32 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v1 — listo para implementar |
+| Estado | v2 — listo para implementar |
 | Fecha | 2026-10-22 |
 | Backlog | B10 (`docs/BACKLOG.md`) |
-| Relacionado | PRD 003 (regla anti-monolito). No reemplaza ningún PRD. |
+| Reemplaza | Ver D9 |
 
 ## Decisiones bloqueadas
 
-Estas decisiones se tomaron con el usuario y son definitivas. Si algún requerimiento choca con ellas, mandan las decisiones.
+Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimiento choca con alguna de ellas, manda la decisión.
 
 | # | Categoría | Decisión |
 |---|---|---|
-| D1 | Alcance | Se dividen los 4 archivos grandes (`aplicacion.js`, `visor_carrera_solo.js`, `garaje.js` y `visor_diseno_pista.js`) en fases, empezando por `aplicacion.js`. |
-| D2 | Alcance | No se cambia ninguna funcionalidad: solo se reorganiza el código por dentro. |
+| D1 | Alcance | Se dividen los 4 archivos grandes (`aplicacion.js`, `visor_carrera_solo.js`, `garaje.js`, `visor_diseno_pista.js`) en fases, empezando por `aplicacion.js`. |
+| D2 | Alcance | No cambia ninguna funcionalidad: solo se reordena el código por dentro. |
 | D3 | Usuarios | El jugador no nota nada: las pantallas, los botones y el comportamiento son los mismos. |
-| D4 | Usuarios | Se comprueba con las pruebas actuales en verde y con capturas de cada pantalla tomadas antes y después. |
-| D5 | Dominio | `Aplicacion` solo se encarga de navegar entre pantallas y de guardar un controlador por cada una. |
-| D6 | Dominio | Controladores nuevos: `ControladorTestDrive3D`, `ControladorDisenoPistas`, `ControladorDisenoGeneral` y `ControladorDisenoObjetos`. |
-| D7 | Técnico | `Garaje` deja de ser todo `static`: pasa a ser una clase instanciable dividida en partes con una sola responsabilidad. |
-| D8 | Técnico | B10 se cierra cuando ningún archivo pasa de 400 líneas, `scripts/archivos_grandes_aceptados.txt` queda vacío y `CLAUDE.md` ya no tiene excepciones temporales. |
+| D4 | Usuarios | Se comprueba con las pruebas actuales en verde y con capturas de cada pantalla antes y después. |
+| D5 | Dominio | `Aplicacion` solo navega entre pantallas y guarda un controlador por pantalla. |
+| D6 | Dominio | **Cada pantalla de `index.html` tiene su controlador** (v2): `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje` (garaje y vista previa), `ControladorGiroscopio`, `ControladorPistas` (lista y detalle de pista), `ControladorDisenoPistas`, `ControladorTestDrive3D` (selector y carrera), `ControladorControles` (controles y diseño del timón), `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos`, `ControladorCarreraSolo` (ya existe) y `ControladorModo2D` (crear, unirse, espera, juego y resultado 2D, que siguen ocultos por el PRD 002). |
+| D7 | Técnico | `Garaje` deja de ser todo `static`: pasa a ser una clase instanciable, dividida en partes con una sola responsabilidad. |
+| D8 | Técnico | B10 se cierra cuando ningún archivo pasa de 400 líneas, `scripts/archivos_grandes_aceptados.txt` queda vacío y `CLAUDE.md` no tiene excepciones temporales. |
+| D9 | Dominio | **Reemplaza** (v2): en las listas de lo que no se modifica de los PRD 001 y 002, quedan fuera `VisorDisenoPista`, `VisorCarreraSolo` y `Garaje`, solo para reordenarlos por dentro. Esos PRD llevan una nota que lo indica. |
 
 ## 1. Contexto y problema
-El PRD 003 prohibió crear monolitos nuevos, pero dejó 4 archivos grandes con permiso temporal. `aplicacion.js` tiene 1516 líneas y maneja casi todas las pantallas. Cuatro pantallas no tienen controlador propio. Cualquier cambio en esas zonas es lento y arriesgado.
+El PRD 003 prohibió crear monolitos nuevos, pero dejó 4 archivos grandes con permiso temporal. `aplicacion.js` tiene 1516 líneas y maneja casi todas las pantallas. Solo Jugar Solo tiene un controlador propio. Por eso cualquier cambio en esas partes es lento y arriesgado.
 
 ## 2. Objetivo
-Que todos los archivos cumplan la regla anti-monolito sin excepciones y que cada pantalla tenga su propio controlador, sin que el jugador note ningún cambio.
+Que todos los archivos cumplan la regla anti-monolito sin excepciones y que cada pantalla tenga su propio controlador, sin que el jugador note nada.
 
 ## 3. Público objetivo y usuarios
 - **Desarrollador y agentes:** trabajan con archivos chicos, cada uno con una sola tarea.
@@ -35,66 +36,63 @@ Que todos los archivos cumplan la regla anti-monolito sin excepciones y que cada
 ## 4. Alcance
 **In scope:**
 - Dividir los 4 archivos grandes.
-- Crear los 4 controladores de pantalla.
+- Crear los controladores de D6.
 - Convertir `Garaje` en una clase instanciable.
 - Vaciar la lista de archivos grandes aceptados.
 - Quitar las excepciones temporales de `CLAUDE.md`.
-- Agregar las pruebas y capturas necesarias.
+- Poner las notas de D9 en los PRD 001 y 002.
+- Agregar las pruebas y capturas.
 
-**Out of scope:**
-- Funcionalidades nuevas o cambios visuales.
-- Las ideas B2 a B9 del backlog.
-- Borrar el motor 2D (B2).
-- Cambiar las reglas de MVC.
+**Out of scope:** las ideas B2 a B9 del backlog y todo lo que figura en la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- El comportamiento del juego.
-- Los PRD 001, 002 y 003.
+- El comportamiento y el aspecto del juego.
+- Las decisiones de los PRD 001, 002 y 003 (solo se agregan las notas de D9).
 - `src/style.css`.
-- Las clases del modelo de la carrera: `CarreraVueltas`, `Cronometro` y `MuestraRuta`.
-- Las clases de modo: `Modo` y `ModosDisponibles`.
-- El motor 2D.
-
-Todo lo demás puede cambiar siempre que el juego funcione igual.
+- `CarreraVueltas`, `Cronometro` y `MuestraRuta`.
+- `Modo` y sus subclases, y `ModosDisponibles`.
+- El motor 2D (`Juego`, `Pista`, `Carro2D` y sus renderizadores).
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
 |---|---|
-| Monolito | Archivo de más de 400 líneas o clase con más de una responsabilidad. |
+| Monolito | Archivo de más de 400 líneas, o clase que tiene más de una responsabilidad. |
 | Controlador de pantalla | Clase que maneja una sola pantalla. `Aplicacion` la crea al entrar y la detiene al salir. |
-| Navegación | Pasar de una pantalla a otra, incluidos los botones de atrás y adelante. Es lo único que queda en `Aplicacion`. |
-| Fase | Un archivo grande dividido y probado antes de pasar al siguiente. |
+| Navegación | Pasar de una pantalla a otra, incluidos los botones atrás y adelante. Es lo único que queda en `Aplicacion`. |
+| Fase | Un archivo grande ya dividido y probado, antes de pasar al siguiente. |
 
 ## 6. Requerimientos funcionales
-- **RF-01 (D5):** `Aplicacion` solo navega entre pantallas y guarda un controlador por cada una.
-- **RF-02 (D6):** Test Drive 3D, Diseño de Pistas, Diseño General y Diseño de Objetos tienen cada uno su propio controlador.
-- **RF-03 (D3):** cada pantalla se ve igual que antes. La captura de antes y la de después coinciden.
-- **RF-04 (D3):** los botones de atrás y adelante funcionan igual en todas las pantallas, incluida la redirección del PRD 002.
-- **RF-05 (D1):** `visor_carrera_solo.js` y `visor_diseno_pista.js` quedan por debajo de 400 líneas, y la carrera y el Diseño General funcionan igual.
-- **RF-06 (D7):** el garaje funciona igual: se puede elegir un carro y el color, y el carro se ve en 3D.
-- **RF-07 (D7):** `Garaje` y sus partes no usan métodos `static` para su estado.
-- **RF-08 (D8):** ningún archivo `.js` o `.mjs` pasa de 400 líneas y `scripts/archivos_grandes_aceptados.txt` queda vacío.
-- **RF-09 (D8):** `CLAUDE.md` ya no tiene excepciones temporales en las secciones "Anti-monolito" y "Visores de pista".
-- **RF-10 (D8):** el backlog marca B10 como hecho, con un enlace a este PRD.
+- **RF-01 (D5):** `Aplicacion` solo navega entre pantallas y guarda un controlador por pantalla.
+- **RF-02 (D6):** cada pantalla de `index.html` tiene el controlador que le asigna D6.
+- **RF-03 (D3, D4):** cada pantalla se ve igual que antes. Las capturas de antes y después coinciden en vertical y en horizontal.
+- **RF-04 (D3):** los botones atrás y adelante funcionan igual en todas las pantallas, incluida la redirección del PRD 002.
+- **RF-05 (D1):** `visor_carrera_solo.js` y `visor_diseno_pista.js` quedan por debajo de 400 líneas, y la carrera y Diseño General funcionan igual.
+- **RF-06 (D7):** el garaje funciona igual: se elige el carro y el color, y se ve en 3D.
+- **RF-07 (D7):** `Garaje` y sus partes no guardan su estado en métodos `static`.
+- **RF-08 (D8):** ningún archivo `.js` o `.mjs` pasa de 400 líneas, y `scripts/archivos_grandes_aceptados.txt` queda vacío.
+- **RF-09 (D8):** `CLAUDE.md` ya no tiene excepciones temporales en "Anti-monolito" ni en "Visores de pista".
+- **RF-10 (D8, D9):** el backlog marca B10 como hecho y los PRD 001 y 002 tienen la nota de D9.
 - **RF-11 (D2):** no aparecen errores nuevos en la consola en ninguna pantalla.
 
 ## 7. Requerimientos no funcionales
-- **RNF-01, reglas del proyecto:** todo lo nuevo cumple `CLAUDE.md`: una clase por archivo, nombres en español, campos `#privados`, MVC y la regla anti-monolito.
-- **RNF-02, pruebas:** `npm run test:todo` pasa en verde después de **cada fase**, no solo al final. Se agrega una prueba de navegación que entra y sale de todas las pantallas.
-- **RNF-03, entrega por fases:** cada fase se lleva a `main` solo cuando sus pruebas están en verde (lecciones 6 y 13).
+- **RNF-01 (D2), reglas del proyecto:** todo lo nuevo cumple `CLAUDE.md` (una clase por archivo, español, `#privados`, MVC y la regla anti-monolito).
+- **RNF-02 (D4), pruebas:** `npm run test:todo` termina en verde **después de cada fase**. Se agrega una prueba que entra y sale de todas las pantallas en un navegador real, en vertical y en horizontal (lección 13).
+- **RNF-03 (D1), entrega por fases:** cada fase se lleva a `main` solo cuando cumple la lista "Antes de llevar algo a main" de `docs/LECCIONES_APRENDIDAS.md`.
 
 ## 8. Criterios de aceptación del MVP
-1. Las 11 pruebas actuales y las nuevas pasan en verde.
-2. Las capturas de antes y después de cada pantalla coinciden.
+1. Las 11 pruebas actuales y las nuevas terminan en verde.
+2. Las capturas de cada pantalla coinciden antes y después.
 3. Ningún archivo pasa de 400 líneas y la lista de aceptados está vacía.
-4. `CLAUDE.md` no tiene excepciones temporales.
+4. Cada pantalla tiene su controlador y `CLAUDE.md` no tiene excepciones.
 5. El Verificador PRD da ✅.
 
 ## 9. Riesgos y supuestos
-- **Romper la navegación:** `aplicacion.js` es el centro de todo, así que un error ahí afecta a varias pantallas. Por eso se trabaja por fases, con pruebas en cada una.
-- **Orden al arrancar los visores:** el arranque de Test Drive 3D y de Diseño de Pistas depende del orden de los pasos (lección 6). Se prueba en un navegador real.
-- **Capturas:** algunas pantallas 3D pueden verse con pequeñas diferencias de luz entre una captura y otra. Lo que se compara es la composición de la pantalla, no cada píxel.
+- **Romper la navegación:** `aplicacion.js` es el centro de todo. Por eso se trabaja por fases y con pruebas.
+- **Orden al arrancar los visores:** Test Drive 3D y Diseño de Pistas dependen del orden de los pasos (lección 6). Se prueban en un navegador real.
+- **Capturas 3D:** la luz puede variar un poco de una captura a otra. Se compara la composición, no cada píxel.
 - **Garaje:** es la pieza más vieja y menos probada. Se le agrega una prueba antes de dividirlo.
+- **Muchos controladores:** D6 tiene 14. Algunos son chicos, y eso es lo esperado con la regla de una sola responsabilidad.
 
 ### Historial
-- **v1** (2026-10-22): primera versión, sin cambios a las decisiones propuestas.
+- **v1** (2026-10-22): primera versión.
+- **v2** (2026-10-22): correcciones de 2 agentes revisores, aprobadas por el usuario. D6 da un controlador a cada pantalla (opción a). Se agrega D9 (reemplaza partes de las listas de lo que no se modifica de los PRD 001 y 002). Los RNF citan su decisión. Se quitan las repeticiones del Out of scope. RNF-03 cita la lista correcta de las lecciones.
