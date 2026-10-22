@@ -16,17 +16,19 @@ echo ""
 echo "Verificando arquitectura POO (CLAUDE.md)..."
 
 # ── Regla 4: anti-monolito, máximo 400 líneas (PRD 003) ─────────
-# Aplica a .js/.mjs en staging de src/, la raíz y pruebas/ (añadidos o
-# modificados). Se evalúa antes de la salida temprana de R1-R3.
+# Revisa TODOS los .js/.mjs de src/, la raíz y pruebas/ tal como quedan en el
+# commit (el índice), así cubre archivos nuevos, modificados, renombrados,
+# copiados y no tocados. Los aceptados solo avisan si están en staging.
+# Se evalúa antes de la salida temprana de R1-R3.
 LIMITE_LINEAS=400
 RAIZ_REPO=$(git rev-parse --show-toplevel)
 LISTA_ACEPTADOS="$RAIZ_REPO/scripts/archivos_grandes_aceptados.txt"
+PATRON_LINEAS='^(src/.+|pruebas/.+|[^/]+)\.(js|mjs)$'
+EN_STAGING=$(git -c core.quotePath=false diff --cached --name-only --diff-filter=ACMR)
 
-ARCHIVOS_LINEAS=$(git diff --cached --name-only --diff-filter=AM \
-    | grep -E '^(src/.+|pruebas/.+|[^/]+)\.(js|mjs)$')
-
-for ARCHIVO in $ARCHIVOS_LINEAS; do
-    # Se cuentan las líneas de la versión en staging (lo que se commitea)
+while IFS= read -r ARCHIVO; do
+    [ -z "$ARCHIVO" ] && continue
+    # Se cuentan las líneas de la versión en el índice (lo que se commitea)
     LINEAS=$(git show ":$ARCHIVO" 2>/dev/null | wc -l | tr -d ' ')
     [ "$LINEAS" -le "$LIMITE_LINEAS" ] && continue
 
@@ -39,6 +41,8 @@ for ARCHIVO in $ARCHIVOS_LINEAS; do
         echo -e "${ROJO}❌ [R4] $ARCHIVO${NC}"
         echo "   Tiene $LINEAS líneas. El límite es $LIMITE_LINEAS líneas por archivo (CLAUDE.md, anti-monolito)."
         ERRORES=$((ERRORES + 1))
+    elif ! printf '%s\n' "$EN_STAGING" | grep -qxF "$ARCHIVO"; then
+        continue   # aceptado y no tocado en este commit: sin aviso
     elif [ "$LINEAS" -gt "$LINEAS_LISTA" ]; then
         echo -e "${AMARILLO}⚠  [R4] $ARCHIVO${NC}"
         echo "   Archivo grande aceptado hasta B10: creció de $LINEAS_LISTA a $LINEAS líneas (límite $LIMITE_LINEAS)."
@@ -48,10 +52,10 @@ for ARCHIVO in $ARCHIVOS_LINEAS; do
         echo "   Archivo grande aceptado hasta B10: tiene $LINEAS líneas (límite $LIMITE_LINEAS)."
         # Solo advertencia — no bloquea el commit
     fi
-done
+done < <(git -c core.quotePath=false ls-files | grep -E "$PATRON_LINEAS")
 
 # Solo archivos JS dentro de src/ que están en el staging area
-ARCHIVOS=$(git diff --cached --name-only --diff-filter=ACM | grep '^src/.*\.js$')
+ARCHIVOS=$(git -c core.quotePath=false diff --cached --name-only --diff-filter=ACMR | grep '^src/.*\.js$')
 
 if [ -z "$ARCHIVOS" ]; then
     echo -e "${VERDE}✓ Sin archivos JS en src/ para R1-R3.${NC}"
@@ -66,7 +70,7 @@ if [ -z "$ARCHIVOS" ]; then
     exit 0
 fi
 
-for ARCHIVO in $ARCHIVOS; do
+while IFS= read -r ARCHIVO; do
 
     # ── Regla 1: máximo 1 clase por archivo ──────────────────────
     NUM_CLASES=$(grep -cE '^\s*(export\s+)?class\s+' "$ARCHIVO" 2>/dev/null || echo 0)
@@ -109,7 +113,7 @@ for ARCHIVO in $ARCHIVOS; do
         # Solo advertencia — no bloquea el commit
     fi
 
-done
+done <<< "$ARCHIVOS"
 
 echo ""
 if [ "$ERRORES" -gt 0 ]; then

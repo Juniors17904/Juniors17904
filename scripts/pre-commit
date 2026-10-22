@@ -1,6 +1,6 @@
 #!/bin/bash
 # Hook pre-commit: corre el chequeo de arquitectura y sale con su código.
-# Se instala con "npm install" (script "prepare": git config core.hooksPath scripts).
+# Se instala con "npm install" (script "prepare" de package.json: git config core.hooksPath scripts).
 RAIZ=$(git rev-parse --show-toplevel)
 bash "$RAIZ/scripts/verificar_arquitectura.sh"
 exit $?

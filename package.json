@@ -9,6 +9,6 @@
     "test": "node pruebas/ejecutor_pruebas.mjs modelo",
     "test:navegador": "node pruebas/ejecutor_pruebas.mjs navegador",
     "test:todo": "node pruebas/ejecutor_pruebas.mjs todo",
-    "prepare": "git config core.hooksPath scripts"
+    "prepare": "git config core.hooksPath scripts || true"
   }
 }
