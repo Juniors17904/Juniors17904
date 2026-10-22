@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — listo para implementar |
+| Estado | v2 — cerrado y verificado (Verificador PRD ✅). Listo para implementar |
 | Fecha | 2026-10-22 |
 | Relacionado | PRD 001 y PRD 002 (no los reemplaza) |
 
@@ -55,8 +55,8 @@ Que ningún archivo nuevo ni ninguna prueba se conviertan en monolito, que el ch
 | Controlador por pantalla | Cada pantalla tiene su propio controlador, como `ControladorCarreraSolo`. |
 
 ## 6. Requerimientos funcionales
-- **RF-01 (D7):** `CLAUDE.md` tiene una sección "Anti-monolito" con el límite de 400 líneas, la responsabilidad única y el controlador por pantalla.
-- **RF-02 (D6):** esa sección dice que MVC sigue igual, y el controlador por pantalla ya no aparece como excepción en `CLAUDE.md`.
+- **RF-01 (D7):** `CLAUDE.md` tiene una sección "Anti-monolito" con el límite de 400 líneas, la responsabilidad única y el controlador por pantalla. La sección nombra los 4 archivos grandes y las 4 pantallas sin controlador propio como **excepciones temporales hasta B10**, así no quedan como deuda (lección 3).
+- **RF-02 (D6):** esa sección dice que MVC sigue igual, y la sección "Visores de pista" de `CLAUDE.md` deja de presentar el controlador por pantalla como excepción y remite a las excepciones temporales de RF-01.
 - **RF-03 (D7):** el PRD CREATOR pide que todo PRD nuevo respete el límite y la responsabilidad única.
 - **RF-04 (D8):** después de `npm install`, el chequeo se ejecuta solo en cada commit.
 - **RF-05 (D4):** un commit que deja un archivo de más de 400 líneas fuera de la lista de §5 se bloquea con un mensaje que nombra el archivo y el límite. Vale para archivos nuevos y existentes, incluidas las pruebas.
@@ -89,3 +89,4 @@ Que ningún archivo nuevo ni ninguna prueba se conviertan en monolito, que el ch
 ### Historial
 - **v1** (2026-10-22): primera versión, con límite de 400 líneas.
 - **v2** (2026-10-22): correcciones de 3 agentes revisores, aprobadas por el usuario. D1 incluye `pruebas/`. D4: solo los 4 archivos listados pueden pasar el límite y cualquier otro bloquea. D6: el controlador por pantalla pasa a ser regla y reemplaza la excepción de `CLAUDE.md`. D8: el chequeo se instala solo. Se agregan `package.json` y el Verificador PRD a la lista de lo que cambia.
+- **Cierre** (2026-10-22): pasada final del Verificador PRD. RF-01 y RF-02 piden que `CLAUDE.md` nombre las excepciones temporales (lección 3); no cambia ninguna decisión.
