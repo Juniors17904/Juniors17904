@@ -2,12 +2,13 @@
 
 // ================================================================
 // CLASE: ControladorControles — pantallas de controles y de diseño
-// del timón (PRD 004 D6). Muestra las vistas previas de los timones
+// del timón (PRD 004 D6). Pide a GaleriaTimones las vistas previas
 // y guarda el modelo elegido en el estado compartido de Aplicacion.
 // ================================================================
 class ControladorControles extends ControladorPantalla {
     #estado      = null;
     #timonOrigen = 'pantalla-inicio';
+    #galeria     = new GaleriaTimones();
 
     constructor(estado, navegar) {
         super(navegar);
@@ -36,22 +37,7 @@ class ControladorControles extends ControladorPantalla {
     // Abre el diseño del timón; "origen" es la pantalla a la que vuelve
     abrirDisenoTimon(origen) {
         this.#timonOrigen = origen;
-        this.#dibujarPreviewsTimon();
+        this.#galeria.dibujar(this.#estado.timonModelo);
         this.irA('pantalla-timon-diseno');
-    }
-
-    // Pide a RenderizadorTimon la vista previa de cada modelo
-    #dibujarPreviewsTimon() {
-        document.querySelectorAll('#pantalla-timon-diseno .timon-card').forEach((card, i) => {
-            const canvas = card.querySelector('.timon-preview');
-            const ctx    = canvas.getContext('2d');
-            const S      = Math.min(canvas.width, canvas.height);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(canvas.width / 2, canvas.height / 2);
-            window.RenderizadorTimon.dibujar(ctx, S, i);
-            ctx.restore();
-            card.classList.toggle('sel', i === this.#estado.timonModelo);
-        });
     }
 }

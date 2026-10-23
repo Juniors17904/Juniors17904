@@ -3,16 +3,14 @@
 // ================================================================
 // CLASE: PanelDatosTestDriveRecto — panel de depuración (#debug-td3d)
 // del Test Drive 3D simple: velocidad, entradas, posición, cámara,
-// física y FPS (PRD 004 D6, sacado de Aplicacion sin cambios).
+// física y FPS (PRD 004 D6). Los FPS los cuenta PanelDatos.
 // ================================================================
-class PanelDatosTestDriveRecto {
+class PanelDatosTestDriveRecto extends PanelDatos {
     #visor       = null;
     #rotYInicial = 0;
-    #ultimo      = performance.now();
-    #cuadros     = 0;
-    #fps         = 60;
 
     constructor(visor) {
+        super();
         this.#visor       = visor;
         this.#rotYInicial = visor.rotY;
     }
@@ -21,8 +19,7 @@ class PanelDatosTestDriveRecto {
         document.getElementById('debug-td3d').style.display = 'flex';
     }
 
-    actualizar() {
-        this.#contarCuadro();
+    escribir(fps) {
         const td = this.#visor;
         const s = td.velocidad, a = td.aceleracion;
         const kmh = Math.round(Math.abs(s) * 216);
@@ -39,7 +36,7 @@ class PanelDatosTestDriveRecto {
         document.getElementById('dbg-rotx').textContent   = (0).toFixed(1);
         document.getElementById('dbg-rumbo').textContent  = (((td.rotY - this.#rotYInicial) * 180 / Math.PI % 360 + 360) % 360).toFixed(1);
         document.getElementById('dbg-rotz').textContent   = (td.rotZ * 180 / Math.PI).toFixed(1);
-        document.getElementById('dbg-fps').textContent    = this.#fps;
+        document.getElementById('dbg-fps').textContent    = fps;
         document.getElementById('dbg-camh').textContent   = td.alturaCamara.toFixed(2);
         document.getElementById('dbg-cam-roty').textContent = (td.camRotY * 180 / Math.PI).toFixed(1);
         document.getElementById('dbg-cam-dist').textContent = td.physics.camDist;
@@ -50,14 +47,5 @@ class PanelDatosTestDriveRecto {
         document.getElementById('dbg-f-steer').textContent  = ph.constDireccion;
         document.getElementById('dbg-f-maxfwd').textContent = ph.velMaxAdelante;
         document.getElementById('dbg-f-maxrev').textContent = ph.velMaxReversa;
-    }
-
-    #contarCuadro() {
-        this.#cuadros++;
-        const ahora = performance.now();
-        if (ahora - this.#ultimo >= 500) {
-            this.#fps = Math.round(this.#cuadros * 1000 / (ahora - this.#ultimo));
-            this.#cuadros = 0; this.#ultimo = ahora;
-        }
     }
 }

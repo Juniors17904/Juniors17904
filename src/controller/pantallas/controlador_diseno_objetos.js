@@ -6,7 +6,8 @@
 // cielo y la vista previa de la cordillera (PRD 004 D6).
 // ================================================================
 class ControladorDisenoObjetos extends ControladorPantalla {
-    #visor = null;
+    #visor      = null;
+    #cordillera = new VistaPreviaCordillera();
 
     constructor(navegar) {
         super(navegar);
@@ -21,6 +22,7 @@ class ControladorDisenoObjetos extends ControladorPantalla {
             this.detener();
             this.irA('pantalla-ajustes');
         });
+        this.#conectarPanel();
     }
 
     #arrancarVisor() {
@@ -36,7 +38,11 @@ class ControladorDisenoObjetos extends ControladorPantalla {
 
         this.#visor = new window.VisorDisenoObjetos(canvas);
         this.#visor.iniciar();
+    }
 
+    // Botones de objeto y color del cielo: se registran una sola vez y
+    // actúan sobre el visor que esté activo
+    #conectarPanel() {
         const panelCielo   = document.getElementById('do-panel-cielo');
         const inputCielo   = document.getElementById('do-color-cielo');
         const panelMontana = document.getElementById('do-panel-montana');
@@ -51,7 +57,7 @@ class ControladorDisenoObjetos extends ControladorPantalla {
                 } else if (tipo === 'montana') {
                     panelCielo.style.display   = 'none';
                     panelMontana.style.display  = 'block';
-                    this.#dibujarPreviewMontana();
+                    this.#cordillera.dibujar();
                 } else {
                     panelCielo.style.display   = 'none';
                     panelMontana.style.display  = 'none';
@@ -72,15 +78,5 @@ class ControladorDisenoObjetos extends ControladorPantalla {
         document.getElementById('do-panel-montana').style.display = 'none';
         this.#visor.detener();
         this.#visor = null;
-    }
-
-    #dibujarPreviewMontana() {
-        const canvas = document.getElementById('do-canvas-montana');
-        if (!canvas) return;
-        if (!window.Cordillera) { setTimeout(() => this.#dibujarPreviewMontana(), 200); return; }
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#040d1e';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(new window.Cordillera().generarCanvas(), 0, 0, canvas.width, canvas.height);
     }
 }

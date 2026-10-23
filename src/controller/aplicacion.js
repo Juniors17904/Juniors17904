@@ -6,17 +6,7 @@
 // ModosDisponibles) y guarda un controlador por pantalla.
 // ================================================================
 class Aplicacion {
-    #estado = {
-        nombre: 'Jugador',
-        color: '#ef4444',
-        control: 'botones',
-        timonModelo: 0,
-        velocimetroModelo: 0,
-        modoSolo: true,
-        tipoAuto: 'deportivo',
-        pista: 'ciudad',
-        juego: null,
-    };
+    #estado = new EstadoJuego();   // lo que eligió el jugador, compartido por las pantallas
 
     #backNav            = false;
     #vistaConduccion    = new VistaConduccion().cargar();
@@ -129,7 +119,7 @@ class Aplicacion {
         this.#disenoPistas  = new ControladorDisenoPistas(this.#estado, this.#vistaConduccion,
             navegar, limpiarPantallaJuego);
         this.#testDrive3D   = new ControladorTestDrive3D(this.#estado, navegar,
-            (tipoPista, origen) => this.#disenoPistas.entrar(tipoPista, origen), limpiarPantallaJuego);
+            (tipoPista, destino) => this.#disenoPistas.entrar(tipoPista, destino), limpiarPantallaJuego);
         this.#limpiadorJuego = new LimpiadorPantallaJuego(this.#testDrive3D, this.#disenoPistas);
         this.#garaje        = new ControladorGaraje(this.#estado, navegar);
         this.#disenoGeneral = new ControladorDisenoGeneral(this.#estado, this.#vistaConduccion, navegar);
@@ -143,7 +133,7 @@ class Aplicacion {
         this.#giroscopio  = new ControladorGiroscopio(navegar);
         this.#controladorVistaConduccion = new ControladorVistaConduccion(this.#vistaConduccion, navegar);
         this.#pistas      = new ControladorPistas(this.#estado, navegar,
-            (tipoPista, origen) => this.#disenoPistas.entrar(tipoPista, origen));
+            (tipoPista, destino) => this.#disenoPistas.entrar(tipoPista, destino));
 
         this.#inicio.iniciar();
         this.#controles.iniciar();

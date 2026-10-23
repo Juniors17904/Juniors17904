@@ -107,11 +107,9 @@ class NivelCiudad extends Nivel {
 - **Cada pantalla tiene su propio controlador** (por ejemplo, Jugar Solo → `ControladorCarreraSolo`). `Aplicacion` solo guarda el controlador de cada pantalla.
 - **MVC sigue igual:** Model, View y Controller como dice la sección "MVC obligatorio".
 
-**Excepciones temporales hasta B10** (`docs/BACKLOG.md`), las únicas permitidas:
-- Archivos que pueden pasar de 400 líneas: `aplicacion.js`, `visor_carrera_solo.js`, `garaje.js` y `visor_diseno_pista.js`. Solo dan aviso y, si crecen, el aviso lo dice. La lista única, con la ruta y las líneas de cada uno, es `scripts/archivos_grandes_aceptados.txt`.
-- Pantallas sin controlador propio: Test Drive 3D (`#td3d`), Diseño de Pistas (`#cir3d`), Diseño General (`#visorDG`) y Diseño de Objetos (`#visorDO`). Su visor sigue guardado directo en `Aplicacion`.
+No hay excepciones: `scripts/archivos_grandes_aceptados.txt` está vacío (B10 cerrado por el PRD 004).
 
-Cualquier otro archivo de más de 400 líneas, nuevo o existente (también renombrado o copiado), bloquea el commit. El chequeo corre solo en cada commit (se instala con `npm install`) y también con `npm test`.
+Cualquier archivo de más de 400 líneas, nuevo o existente (también renombrado o copiado), bloquea el commit. El chequeo corre solo en cada commit (se instala con `npm install`) y también con `npm test`.
 
 ---
 
@@ -157,11 +155,19 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
 | `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo` | (utilidades Three.js) |
 | `MinimapBase` | `MinimapaConductor`, `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
+| `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos`, `ControladorModo2D` | `iniciar()`, `detener()`, `irA(id)` |
+| `ControladorPantallaJuego` (hereda de `ControladorPantalla`) | `ControladorTestDrive3D`, `ControladorDisenoPistas` | `tieneVisor`, `ocupaPantallaJuego`, `cancelarArranque()` |
+| `DestinoCircuito3D` | `DestinoCarreraUrbana`, `DestinoTestDriveRuta` | `claseVisor`, `titulo`, `origen` |
+| `MapaConduccion` | `MinimapaCircuito3D`, `RecorridoCircuito3D`, `MinimapaTestDriveRecto`, `RecorridoTestDriveRecto` | `mostrar()`, `dibujar(visor)`, `visible` |
+| `ParMapasConduccion` | `MapasCircuito3D`, `MapasTestDriveRecto` | `mostrar()`, `dibujar(visor)` |
+| `PanelDatos` | `PanelDatosCircuito3D`, `PanelDatosTestDriveRecto`, `PanelDatosDisenoGeneral` | `mostrar()`, `actualizar()` |
+| `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
 - `src/view/controles/` → `ControlEntrada` + subclases + timones
 - `src/view/velocimetros/` → `Velocimetro` + subclases
-- `src/view/minimapas/` → `MinimapBase` + subclases
+- `src/view/minimapas/` → `MinimapBase` + subclases, y `MapaConduccion` / `ParMapasConduccion` + subclases
+- `src/view/paneles/` → `PanelDatos` + subclases
 - `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes)
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes
@@ -176,7 +182,7 @@ Cada pantalla que muestra un circuito 3D tiene su propia clase. Nunca dos pantal
 | 🎨 Diseño General | `VisorDisenoPista` | `pistas/visor_diseno_pista.js` |
 | Jugar Solo (carrera 3D vertical) | `VisorCarreraSolo` | `pistas/visor_carrera_solo.js` |
 
-**Regla: cada pantalla tiene su propio controlador.** El visor vive dentro de ese controlador y `Aplicacion` guarda el controlador en su campo privado (Jugar Solo: `#carreraSolo` → `ControladorCarreraSolo` → `VisorCarreraSolo`). Las pantallas que todavía guardan su visor directo en `Aplicacion` son las excepciones temporales hasta B10 de la sección "📏 ANTI-MONOLITO". Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
+**Regla: cada pantalla tiene su propio controlador.** El visor vive dentro de ese controlador y `Aplicacion` guarda el controlador en su campo privado (Jugar Solo: `#carreraSolo` → `ControladorCarreraSolo` → `VisorCarreraSolo`). Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
 
 ### Encapsulamiento — reglas estrictas
 

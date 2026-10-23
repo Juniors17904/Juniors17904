@@ -3,18 +3,15 @@
 // ================================================================
 // CLASE: PanelDatosCircuito3D — paneles de depuración (#debug-td3d y
 // #debug-path) del circuito 3D: velocidad, entradas, posición,
-// cámara, física, recorrido sobre la ruta y FPS (PRD 004 D6, sacado
-// de Aplicacion sin cambios).
+// cámara, física, recorrido sobre la ruta y FPS (PRD 004 D6). Los FPS los cuenta PanelDatos.
 // ================================================================
-class PanelDatosCircuito3D {
+class PanelDatosCircuito3D extends PanelDatos {
     #visor       = null;
     #pista       = null;
     #rotYInicial = 0;
-    #ultimo      = performance.now();
-    #cuadros     = 0;
-    #fps         = 60;
 
     constructor(visor, pista) {
+        super();
         this.#visor       = visor;
         this.#pista       = pista;
         this.#rotYInicial = visor.rotY;
@@ -25,8 +22,7 @@ class PanelDatosCircuito3D {
         document.getElementById('debug-path').style.display = 'block';
     }
 
-    actualizar() {
-        this.#contarCuadro();
+    escribir(fps) {
         const cir = this.#visor, pistaCfg = this.#pista, cirInitRotY = this.#rotYInicial;
         const s=cir.velocidad, a=cir.aceleracion, kmh=Math.round(Math.abs(s)*216);
         document.getElementById('dbg-vel').textContent   = Math.abs(s).toFixed(3);
@@ -40,7 +36,7 @@ class PanelDatosCircuito3D {
         document.getElementById('dbg-rotz').textContent  = (cir.rotZ*180/Math.PI).toFixed(1);
         document.getElementById('dbg-px').textContent    = cir.px.toFixed(1);
         document.getElementById('dbg-pz').textContent    = cir.pz.toFixed(1);
-        document.getElementById('dbg-fps').textContent   = this.#fps;
+        document.getElementById('dbg-fps').textContent   = fps;
         document.getElementById('dbg-camh').textContent      = cir.alturaCamara.toFixed(2);
         document.getElementById('dbg-cam-rotx').textContent  = (cir.camRotX*180/Math.PI).toFixed(1);
         document.getElementById('dbg-cam-roty').textContent  = (cir.camRotY*180/Math.PI|0);
@@ -66,14 +62,5 @@ class PanelDatosCircuito3D {
         document.getElementById('dbg-path-z').textContent = pp.z.toFixed(1);
         document.getElementById('dbg-off').textContent    = off.toFixed(2);
         document.getElementById('dbg-lat').textContent    = cir.lateral.toFixed(2);
-    }
-
-    #contarCuadro() {
-        this.#cuadros++;
-        const ahora = performance.now();
-        if (ahora - this.#ultimo >= 500) {
-            this.#fps = Math.round(this.#cuadros * 1000 / (ahora - this.#ultimo));
-            this.#cuadros = 0; this.#ultimo = ahora;
-        }
     }
 }

@@ -1,7 +1,8 @@
 // ================================================================
 // CLASE: PruebaReglaAntiMonolito — PRD docs/prds/prd_003_regla_anti_monolito.md
 //   RF-01..RF-03 y RF-10: los textos de la regla existen en CLAUDE.md,
-//   docs/PRD_CREATOR.md y docs/BACKLOG.md.
+//   docs/PRD_CREATOR.md y docs/BACKLOG.md. Desde el PRD 004 (D8, RF-08..RF-10)
+//   la lista de aceptados está vacía y CLAUDE.md no tiene excepciones.
 //   RF-04..RF-08 (RNF-02): en un repo git temporal (os.tmpdir) se copian
 //   scripts/verificar_arquitectura.sh y scripts/pre-commit, se escribe una
 //   lista de aceptados propia (así la prueba sigue valiendo cuando B10 vacíe
@@ -73,31 +74,27 @@ class PruebaReglaAntiMonolito {
         const claude = this.#leerReal('CLAUDE.md');
         const regla  = this.#seccion(claude, 'ANTI-MONOLITO');
         this.#comprobar(regla.length > 0, 'PRD 003 RF-01 CLAUDE.md tiene la sección Anti-monolito');
-        for (const texto of ['400 líneas', 'Responsabilidad única', 'propio controlador',
-                             'Excepciones temporales hasta B10']) {
+        for (const texto of ['400 líneas', 'Responsabilidad única', 'propio controlador']) {
             this.#comprobar(regla.includes(texto), 'PRD 003 RF-01 la sección dice "' + texto + '"');
         }
-        // D4: como mucho los 4 de §5; B10 la irá vaciando (lección 4: la sección
-        // nombra los archivos y remite a la lista, sin copiar las líneas)
-        this.#comprobar(this.#aceptados.size <= 4,
-            'PRD 003 RF-01 la lista de aceptados no pasa de 4 archivos (' + this.#aceptados.size + ')');
+        // PRD 004 D8 / RF-08: B10 cerrado, la lista única de aceptados queda vacía
+        this.#comprobar(this.#aceptados.size === 0,
+            'PRD 004 RF-08 la lista de aceptados está vacía (' + this.#aceptados.size + ')');
         this.#comprobar(regla.includes('scripts/archivos_grandes_aceptados.txt'),
             'PRD 003 RF-01 la sección remite a la lista única');
-        for (const archivo of this.#aceptados.keys()) {
-            const nombre = '`' + path.basename(archivo) + '`';
-            this.#comprobar(regla.includes(nombre), 'PRD 003 RF-01 la sección nombra ' + nombre);
-        }
-        for (const pantalla of ['Test Drive 3D', 'Diseño de Pistas', 'Diseño General', 'Diseño de Objetos']) {
-            this.#comprobar(regla.includes(pantalla), 'PRD 003 RF-01 la sección nombra la pantalla ' + pantalla);
-        }
+        // PRD 004 D8 / RF-09: sin excepciones temporales en "Anti-monolito"
+        this.#comprobar(!/excepciones temporales/i.test(regla),
+            'PRD 004 RF-09 la sección Anti-monolito no tiene excepciones temporales');
+        this.#comprobar(regla.includes('No hay excepciones'),
+            'PRD 004 RF-09 la sección dice "No hay excepciones"');
         this.#comprobar(regla.includes('MVC sigue igual'), 'PRD 003 RF-02 la sección dice que MVC sigue igual');
         const visores = this.#seccion(claude, 'Visores de pista');
         this.#comprobar(visores.includes('Regla: cada pantalla tiene su propio controlador'),
             'PRD 003 RF-02 "Visores de pista" presenta el controlador por pantalla como regla');
         this.#comprobar(!/Excepción:\*\*\s*cuando una pantalla tiene su propio controlador/.test(claude),
             'PRD 003 RF-02 ya no figura el controlador por pantalla como excepción');
-        this.#comprobar(visores.includes('excepciones temporales hasta B10'),
-            'PRD 003 RF-02 "Visores de pista" remite a las excepciones temporales');
+        this.#comprobar(visores.length > 0 && !/excepciones temporales/i.test(visores),
+            'PRD 004 RF-09 "Visores de pista" no remite a excepciones temporales');
 
         const creador = this.#leerReal('docs/PRD_CREATOR.md');
         for (const texto of ['anti-monolito', '400 líneas', 'responsabilidad única']) {
@@ -112,6 +109,8 @@ class PruebaReglaAntiMonolito {
         const b10 = (backlog.match(/^\| B10 \|.*$/m) || [''])[0];
         this.#comprobar(b10.includes('aplicacion.js') && b10.includes('Diseño de Objetos'),
             'PRD 003 RF-10 B10 incluye los archivos grandes y las pantallas sin controlador');
+        this.#comprobar(b10.includes('✅ Hecho') && b10.includes('prd_004_dividir_monolitos.md'),
+            'PRD 004 RF-10 B10 figura como hecho y enlaza el PRD 004');
     }
 
     // ── Repo temporal ──────────────────────────────────────────────

@@ -6,10 +6,11 @@
 //   RF-04 → atrás / adelante del navegador y el botón volver
 //   RF-11 → sin errores de consola
 // Capturas: /tmp/capturas_prd004/<CAPTURAS_FASE>/<pantalla>-<orientación>.png
-//   CAPTURAS_FASE=antes|despues (por defecto "antes").
+//   CAPTURAS_FASE=antes|despues. Sin la variable van a "actual", así
+//   correr las pruebas nunca pisa las capturas de referencia de "antes".
 // ================================================================
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULO || '/opt/node22/lib/node_modules/playwright/index.mjs');
-const FASE = process.env.CAPTURAS_FASE === 'despues' ? 'despues' : 'antes';
+const FASE = ['antes', 'despues'].includes(process.env.CAPTURAS_FASE) ? process.env.CAPTURAS_FASE : 'actual';
 const SP = `/tmp/capturas_prd004/${FASE}`; (await import('fs')).mkdirSync(SP, { recursive: true });
 const URL_JUEGO = 'http://localhost:8099/';
 const parchear = async route => {

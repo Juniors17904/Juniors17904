@@ -2,21 +2,21 @@
 
 // ================================================================
 // CLASE: ControladorTestDrive3D — selector de Test Drive 3D y el
-// Test Drive 3D simple (VisorTestdriveRecto) con su teclado, botones
-// táctiles, altura de cámara, minimapa, recorrido y panel de datos
-// (PRD 004 D6). "Con ruta" abre el circuito 3D, que maneja
+// Test Drive 3D simple (VisorTestdriveRecto) (PRD 004 D6). Orquesta
+// las piezas del simple: TecladoConduccion, BotonesTactilesConduccion,
+// DeslizadorAlturaCamara, MapasTestDriveRecto y PanelDatosTestDriveRecto.
+// "Con ruta" abre el circuito 3D (DestinoTestDriveRuta), que maneja
 // ControladorDisenoPistas: aquí solo se pide entrar.
 // ================================================================
-class ControladorTestDrive3D extends ControladorPantalla {
-    #estado              = null;
-    #alEntrarConRuta     = null;
+class ControladorTestDrive3D extends ControladorPantallaJuego {
+    #estado               = null;
+    #alEntrarConRuta      = null;
     #limpiarPantallaJuego = null;
 
-    #visor       = null;
-    #teclaAbajo  = null;
-    #teclaArriba = null;
-    #botones     = new BotonesTactilesConduccion();
-    #arrancando  = false;   // PRD 002 RF-09: visor pedido pero aún no creado
+    #visor      = null;
+    #teclado    = new TecladoConduccion();
+    #botones    = new BotonesTactilesConduccion();
+    #deslizador = new DeslizadorAlturaCamara();
 
     constructor(estado, navegar, alEntrarConRuta, limpiarPantallaJuego) {
         super(navegar);
@@ -37,7 +37,7 @@ class ControladorTestDrive3D extends ControladorPantalla {
             this.#arrancar();
         });
         document.getElementById('btn-td3d-con-ruta').addEventListener('click', () => {
-            this.#alEntrarConRuta('ciudad', 'pantalla-td3d-selector');
+            this.#alEntrarConRuta('ciudad', new DestinoTestDriveRuta());
         });
         document.getElementById('btn-exit-td3d').addEventListener('click', () => {
             this.detener();
@@ -45,25 +45,19 @@ class ControladorTestDrive3D extends ControladorPantalla {
         });
     }
 
-    // Hay un visor cargado o arrancando en la pantalla de juego (PRD 002 RF-09)
-    get ocupaPantallaJuego() {
-        return Boolean(this.#visor || this.#arrancando);
-    }
-
-    // Aplicacion lo llama al navegar fuera de la pantalla de juego
-    cancelarArranque() {
-        this.#arrancando = false;
+    get tieneVisor() {
+        return Boolean(this.#visor);
     }
 
     #arrancar() {
-        this.#arrancando = true;
+        this.marcarArranque();
         if (!window.VisorTestdriveRecto) {
-            setTimeout(() => { if (this.#arrancando) this.#arrancar(); }, 200);
+            setTimeout(() => { if (this.arrancando) this.#arrancar(); }, 200);
             return;
         }
         this.#limpiarPantallaJuego();
         // Lección 6: el arranque queda marcado ANTES de mostrar para que no redirija a Inicio
-        this.#arrancando = true;
+        this.marcarArranque();
         this.irA('pantalla-juego');
 
         document.getElementById('canvas-td3d').style.display = 'block';
@@ -75,20 +69,14 @@ class ControladorTestDrive3D extends ControladorPantalla {
         const canvas = document.getElementById('canvas-td3d');
         const td = new window.VisorTestdriveRecto(canvas);
         this.#visor = td;
-        this.#arrancando = false;
+        this.cancelarArranque();
         td.cargar(this.#estado.tipoAuto, this.#estado.color);
         td.iniciar();
         const datos = new PanelDatosTestDriveRecto(td);
 
-        this.#conectarTeclado(td);
+        this.#teclado.conectar(td);
         this.#botones.conectar(td);
-
-        // Slider altura de cámara
-        const sliderCam = document.getElementById('slider-cam-height');
-        const ctrlCam   = document.getElementById('ctrl-cam-height');
-        sliderCam.value = '2.8';
-        ctrlCam.style.display = 'flex';
-        sliderCam.addEventListener('input', e => { td.alturaCamara = parseFloat(e.target.value); });
+        this.#deslizador.conectar(altura => { td.alturaCamara = altura; });
 
         const mapas = new MapasTestDriveRecto();
         mapas.mostrar();
@@ -103,45 +91,19 @@ class ControladorTestDrive3D extends ControladorPantalla {
         requestAnimationFrame(bucle);
     }
 
-    #conectarTeclado(td) {
-        this.#teclaAbajo = e => {
-            if (e.key === 'ArrowUp'    || e.key === 'w') td.entradaAcel =  1;
-            if (e.key === 'ArrowDown'  || e.key === 's') td.entradaAcel = -1;
-            if (e.key === 'ArrowLeft'  || e.key === 'a') td.entradaDireccion = -1;
-            if (e.key === 'ArrowRight' || e.key === 'd') td.entradaDireccion =  1;
-        };
-        this.#teclaArriba = e => {
-            if (e.key === 'ArrowUp'   || e.key === 'w' ||
-                e.key === 'ArrowDown' || e.key === 's') td.entradaAcel = 0;
-            if (e.key === 'ArrowLeft' || e.key === 'a' ||
-                e.key === 'ArrowRight'|| e.key === 'd') td.entradaDireccion = 0;
-        };
-        window.addEventListener('keydown', this.#teclaAbajo);
-        window.addEventListener('keyup',   this.#teclaArriba);
-    }
-
     // Libera el visor y oculta lo que el Test Drive simple mostró
     detener() {
-        this.#arrancando = false;
+        this.cancelarArranque();
         if (!this.#visor) return;
         this.#visor.detener();
         this.#visor = null;
-        if (this.#teclaAbajo)  window.removeEventListener('keydown', this.#teclaAbajo);
-        if (this.#teclaArriba) window.removeEventListener('keyup',   this.#teclaArriba);
-        this.#teclaAbajo  = null;
-        this.#teclaArriba = null;
+        this.#teclado.desconectar();
         this.#botones.desconectar();
-        document.getElementById('canvas-td3d').style.display = 'none';
-        document.getElementById('titulo-td3d').style.display = 'none';
+        this.#deslizador.desconectar();
+        const ocultos = ['canvas-td3d', 'titulo-td3d', 'ctrl-botones', 'ctrl-accel', 'btn-exit-td3d',
+            'debug-td3d', 'minimap-td3d', 'trail-map', 'btn-toggle-minimap', 'btn-toggle-trail',
+            'ctrl-cam-height'];
+        for (const id of ocultos) document.getElementById(id).style.display = 'none';
         document.getElementById('canvas-carro-3d').style.display = '';
-        document.getElementById('ctrl-botones').style.display = 'none';
-        document.getElementById('ctrl-accel').style.display = 'none';
-        document.getElementById('btn-exit-td3d').style.display = 'none';
-        document.getElementById('debug-td3d').style.display = 'none';
-        document.getElementById('minimap-td3d').style.display = 'none';
-        document.getElementById('trail-map').style.display = 'none';
-        document.getElementById('btn-toggle-minimap').style.display = 'none';
-        document.getElementById('btn-toggle-trail').style.display = 'none';
-        document.getElementById('ctrl-cam-height').style.display = 'none';
     }
 }

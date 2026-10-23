@@ -61,6 +61,9 @@ class ControladorDisenoGeneral extends ControladorPantalla {
                 if (this.#visor) this.#visor[propiedad] = e.target.checked;
             });
         }
+        document.getElementById('tog-datos-dg').addEventListener('change', e => {
+            document.getElementById('debug-dg').style.display = e.target.checked ? 'flex' : 'none';
+        });
         document.getElementById('tog-botones').addEventListener('change', e => {
             if (e.target.checked) this.#vistaConduccion.mostrarOverlay();
             else                  this.#vistaConduccion.ocultarOverlay();
@@ -91,10 +94,6 @@ class ControladorDisenoGeneral extends ControladorPantalla {
 
         this.#iniciarPanelDatos();
 
-        document.getElementById('tog-datos-dg').addEventListener('change', e => {
-            document.getElementById('debug-dg').style.display = e.target.checked ? 'flex' : 'none';
-        });
-
         // Activar control (teclado o timón según preferencia)
         this.#vistaConduccion.aplicarA(this.#visor, this.#estado.timonModelo);
 
@@ -104,34 +103,15 @@ class ControladorDisenoGeneral extends ControladorPantalla {
         this.#botones.conectar(this.#visor);
     }
 
-    // Panel de debug — loop RAF que actualiza datos si el panel está visible
+    // Bucle del panel de datos: corre mientras haya visor
     #iniciarPanelDatos() {
-        let _dgFps = 60, _dgFrames = 0, _dgFpsLast = performance.now();
-        const _dgDbgLoop = () => {
+        const datos = new PanelDatosDisenoGeneral(this.#visor);
+        const bucle = () => {
             if (!this.#visor) return;
-            _dgFrames++;
-            const now = performance.now();
-            if (now - _dgFpsLast >= 500) {
-                _dgFps = Math.round(_dgFrames * 1000 / (now - _dgFpsLast));
-                _dgFrames = 0; _dgFpsLast = now;
-            }
-            const panel = document.getElementById('debug-dg');
-            if (panel?.style.display !== 'none') {
-                const dg  = this.#visor;
-                const kmh = Math.round(Math.abs(dg.velocidad) * 216);
-                document.getElementById('dgd-kmh').textContent   = kmh;
-                document.getElementById('dgd-vmax').textContent  = Math.round(dg.velocidadMax * 216);
-                document.getElementById('dgd-gas').textContent   = dg.entradaAcel ===  1 ? '⬆ GAS'
-                                                                 : dg.entradaAcel === -1 ? '⬇ FREN' : 'NEUTRO';
-                document.getElementById('dgd-steer').textContent = dg.entradaDireccion < -0.1 ? '◀ IZQ'
-                                                                 : dg.entradaDireccion >  0.1 ? 'DER ▶' : 'RECTO';
-                document.getElementById('dgd-px').textContent    = dg.px.toFixed(1);
-                document.getElementById('dgd-pz').textContent    = dg.pz.toFixed(1);
-                document.getElementById('dgd-fps').textContent   = _dgFps;
-            }
-            requestAnimationFrame(_dgDbgLoop);
+            datos.actualizar();
+            requestAnimationFrame(bucle);
         };
-        requestAnimationFrame(_dgDbgLoop);
+        requestAnimationFrame(bucle);
     }
 
     // Libera el visor al salir de la pantalla (también con el botón atrás)

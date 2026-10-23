@@ -881,6 +881,9 @@
     <script src="src/model/muestra_ruta.js"></script>
     <script src="src/model/cronometro.js"></script>
     <script src="src/model/carrera_vueltas.js"></script>
+    <script src="src/model/punto_mundo.js"></script>
+    <script src="src/model/historial_recorrido.js"></script>
+    <script src="src/model/estado_juego.js"></script>
 
     <!-- View: controles base -->
     <script src="src/view/controles/control_entrada.js"></script>
@@ -893,6 +896,7 @@
     <script src="src/view/controles/timon_f1.js"></script>
     <script src="src/view/controles/timon_retro.js"></script>
     <script src="src/view/controles/renderizador_timon.js"></script>
+    <script src="src/view/controles/galeria_timones.js"></script>
     <script src="src/view/controles/control_timon.js"></script>
 
     <!-- View: velocímetros -->
@@ -902,12 +906,28 @@
     <script src="src/view/velocimetros/velocimetro_f1.js"></script>
     <script src="src/view/velocimetros/velocimetro_retro.js"></script>
     <script src="src/view/velocimetros/renderizador_velocimetro.js"></script>
+    <script src="src/view/velocimetros/galeria_velocimetros.js"></script>
     <script src="src/view/hud_carrera.js"></script>
 
     <!-- View: minimapas (jerarquía: MinimapBase → subclases) -->
     <script src="src/view/minimapas/minimapa_base.js"></script>
     <script src="src/view/minimapas/minimapa_conductor.js"></script>
     <script src="src/view/minimapas/minimapa_diseno_general.js"></script>
+    <script src="src/view/minimapas/punto_minimapa.js"></script>
+    <script src="src/view/minimapas/mapa_conduccion.js"></script>
+    <script src="src/view/minimapas/minimapa_circuito_3d.js"></script>
+    <script src="src/view/minimapas/recorrido_circuito_3d.js"></script>
+    <script src="src/view/minimapas/minimapa_test_drive_recto.js"></script>
+    <script src="src/view/minimapas/recorrido_test_drive_recto.js"></script>
+    <script src="src/view/minimapas/arrastre_lienzo.js"></script>
+    <script src="src/view/minimapas/par_mapas_conduccion.js"></script>
+    <script src="src/view/minimapas/mapas_circuito_3d.js"></script>
+    <script src="src/view/minimapas/mapas_test_drive_recto.js"></script>
+    <script src="src/view/minimapas/mapa_detalle_pista.js"></script>
+    <script src="src/view/paneles/panel_datos.js"></script>
+    <script src="src/view/paneles/panel_datos_circuito_3d.js"></script>
+    <script src="src/view/paneles/panel_datos_test_drive_recto.js"></script>
+    <script src="src/view/paneles/panel_datos_diseno_general.js"></script>
     <script src="src/view/renderizador_pista.js"></script>
     <script src="src/view/renderizador_auto.js"></script>
     <script src="src/view/pantalla_juego.js"></script>
@@ -923,6 +943,7 @@
     <script src="src/view/perfiles_carro/catalogo_perfiles_carro.js"></script>
     <script src="src/view/galeria_miniaturas_carro.js"></script>
     <script src="src/view/vista_previa_carro.js"></script>
+    <script src="src/view/vista_previa_cordillera.js"></script>
 
     <!-- Controller -->
     <script src="src/controller/probador_giroscopio.js"></script>
@@ -944,6 +965,10 @@
     <script src="src/controller/modos/modos_disponibles.js"></script>
     <!-- PRD 004 D6: un controlador por pantalla (superclase primero) -->
     <script src="src/controller/pantallas/controlador_pantalla.js"></script>
+    <script src="src/controller/pantallas/controlador_pantalla_juego.js"></script>
+    <script src="src/controller/pantallas/destinos/destino_circuito_3d.js"></script>
+    <script src="src/controller/pantallas/destinos/destino_carrera_urbana.js"></script>
+    <script src="src/controller/pantallas/destinos/destino_test_drive_ruta.js"></script>
     <script src="src/controller/pantallas/controlador_inicio.js"></script>
     <script src="src/controller/pantallas/controlador_ajustes.js"></script>
     <script src="src/controller/pantallas/controlador_giroscopio.js"></script>
@@ -954,12 +979,10 @@
     <script src="src/controller/pantallas/controlador_modo_2d.js"></script>
     <script src="src/controller/pantallas/toque_boton_conduccion.js"></script>
     <script src="src/controller/pantallas/botones_tactiles_conduccion.js"></script>
-    <script src="src/controller/pantallas/panel_datos_test_drive_recto.js"></script>
-    <script src="src/controller/pantallas/mapas_test_drive_recto.js"></script>
+    <script src="src/controller/pantallas/teclado_conduccion.js"></script>
+    <script src="src/controller/pantallas/deslizador_altura_camara.js"></script>
+    <script src="src/controller/pantallas/gestos_camara_aerea.js"></script>
     <script src="src/controller/pantallas/controlador_test_drive_3d.js"></script>
-    <script src="src/controller/pantallas/panel_datos_circuito_3d.js"></script>
-    <script src="src/controller/pantallas/punto_minimapa.js"></script>
-    <script src="src/controller/pantallas/mapas_circuito_3d.js"></script>
     <script src="src/controller/pantallas/controles_circuito_3d.js"></script>
     <script src="src/controller/pantallas/controlador_diseno_pistas.js"></script>
     <script src="src/controller/pantallas/limpiador_pantalla_juego.js"></script>
