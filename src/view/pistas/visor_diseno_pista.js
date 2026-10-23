@@ -8,6 +8,8 @@ import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
 import { CieloSoleado }  from '../cielo_soleado.js';
 import { CieloNocturno } from '../cielo_nocturno.js';
+import { MallaPistaDiseno } from './diseno_pista/malla_pista_diseno.js';
+import { LunaDisenoPista }  from './diseno_pista/luna_diseno_pista.js';
 
 // ================================================================
 // CLASS: VisorDisenoGeneral — vista 3D con cámara trasera del circuito
@@ -150,7 +152,7 @@ class VisorDisenoPista extends VisorBase {
             : new CieloNocturno(colorCielo, { sinLuna: true });
         this.#cielo.construir(this.#scene);
 
-        if (tipoCielo === 'nocturno') this.#agregarLuna3D();
+        if (tipoCielo === 'nocturno') new LunaDisenoPista().agregarA(this.#scene);
 
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
 
@@ -167,24 +169,6 @@ class VisorDisenoPista extends VisorBase {
 
         this.#resizeObs = new ResizeObserver(() => this.#resize());
         this.#resizeObs.observe(this.#canvas);
-    }
-
-    #agregarLuna3D() {
-        const pos = new THREE.Vector3(-60, 200, -400);
-
-        // Anillo oscuro grueso — contraste fuerte para definir el borde
-        const ringMat = new THREE.MeshBasicMaterial({ color: 0x04080f, depthWrite: false, side: THREE.DoubleSide });
-        const ring    = new THREE.Mesh(new THREE.RingGeometry(11.5, 14.5, 64), ringMat);
-        ring.position.copy(pos);
-        ring.lookAt(0, pos.y, 0);
-        this.#scene.add(ring);
-
-        // Disco lunar — color crema medio (no blanco puro) para evitar bloom del toneMapping
-        const discoMat = new THREE.MeshBasicMaterial({ color: 0xff0000, depthWrite: false, side: THREE.DoubleSide });
-        const disco    = new THREE.Mesh(new THREE.CircleGeometry(11.5, 64), discoMat);
-        disco.position.copy(pos);
-        disco.lookAt(0, pos.y, 0);
-        this.#scene.add(disco);
     }
 
     #resize() {
@@ -208,44 +192,6 @@ class VisorDisenoPista extends VisorBase {
         const inicio = this.#ruta.inicio;
         this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
 
-        const DIV = 800;
-        const cp  = curve.getPoints(DIV);
-
-        const _perp = i => {
-            const a = cp[i], b = cp[(i + 1) % cp.length];
-            let tx = b.x - a.x, tz = b.z - a.z;
-            let L  = Math.sqrt(tx*tx + tz*tz);
-            if (L < 0.0001) {
-                const prev = cp[(i - 1 + cp.length) % cp.length];
-                tx = a.x - prev.x; tz = a.z - prev.z;
-                L  = Math.sqrt(tx*tx + tz*tz) || 1;
-            }
-            return { px: -tz / L, pz: tx / L };
-        };
-
-        const _ribbon = (lo, ro, y, i0, i1) => {
-            const pos = [], nor = [], uv = [], idx = [];
-            for (let i = i0; i <= i1; i++) {
-                const q = cp[i % cp.length];
-                const { px, pz } = _perp(i % cp.length);
-                const u = (i - i0) / (i1 - i0 || 1);
-                pos.push(q.x + px*lo, y, q.z + pz*lo,
-                         q.x + px*ro, y, q.z + pz*ro);
-                nor.push(0,1,0, 0,1,0);
-                uv.push(0,u, 1,u);
-            }
-            for (let i = 0; i < i1 - i0; i++) {
-                const a = i*2, b = a+1, c = a+2, d = a+3;
-                idx.push(a,c,b, b,c,d);
-            }
-            const g = new THREE.BufferGeometry();
-            g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            g.setAttribute('normal',   new THREE.Float32BufferAttribute(nor, 3));
-            g.setAttribute('uv',       new THREE.Float32BufferAttribute(uv, 2));
-            g.setIndex(idx);
-            return g;
-        };
-
         // ── Capa 1: pasto ────────────────────────────────────────
         const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
         this.#meshPasto = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), grassMat);
@@ -256,57 +202,7 @@ class VisorDisenoPista extends VisorBase {
         this.#scene.add(this.#meshPasto);
 
         // ── Capa 2: pista ────────────────────────────────────────
-        const grupoPista = new THREE.Group();
-
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
-        const road    = new THREE.Mesh(_ribbon(-4, 4, 0, 0, DIV), roadMat);
-        road.receiveShadow = true;
-        grupoPista.add(road);
-
-        const curbW = 0.7, BAND = 10;
-        const redMat = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.3, emissive: 0xaa0000, emissiveIntensity: 0.25, side: THREE.DoubleSide });
-        const whtMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25, emissive: 0xffffff, emissiveIntensity: 0.2,  side: THREE.DoubleSide });
-
-        const _buildCurbs = (lo, ro) => {
-            const rPos=[], rNor=[], rIdx=[], wPos=[], wNor=[], wIdx=[];
-            for (let b = 0; b * BAND <= DIV; b++) {
-                const i0 = b * BAND, i1 = Math.min((b+1)*BAND, DIV);
-                const pos = b%2===0 ? rPos : wPos;
-                const nor = b%2===0 ? rNor : wNor;
-                const idx = b%2===0 ? rIdx : wIdx;
-                const v0  = pos.length / 3;
-                for (let i = i0; i <= i1; i++) {
-                    const q = cp[i % cp.length];
-                    const { px, pz } = _perp(i % cp.length);
-                    pos.push(q.x + px*lo, 0.04, q.z + pz*lo);
-                    pos.push(q.x + px*ro, 0.04, q.z + pz*ro);
-                    nor.push(0,1,0, 0,1,0);
-                }
-                for (let j = 0; j < i1-i0; j++) {
-                    const a = v0+j*2, b2 = a+1, c = a+2, d = a+3;
-                    idx.push(a,c,b2, b2,c,d);
-                }
-            }
-            const _geo = (p, n, i) => {
-                const g = new THREE.BufferGeometry();
-                g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
-                g.setAttribute('normal',   new THREE.Float32BufferAttribute(n, 3));
-                g.setIndex(i);
-                return g;
-            };
-            if (rPos.length) grupoPista.add(new THREE.Mesh(_geo(rPos, rNor, rIdx), redMat));
-            if (wPos.length) grupoPista.add(new THREE.Mesh(_geo(wPos, wNor, wIdx), whtMat));
-        };
-        _buildCurbs(-4 - curbW, -4);
-        _buildCurbs(4, 4 + curbW);
-
-        const dashMat = new THREE.MeshBasicMaterial({ color: 0xffee44 });
-        const DASH = 14, GAP = 10;
-        for (let i = 0; i < DIV; i += DASH + GAP) {
-            grupoPista.add(new THREE.Mesh(_ribbon(-0.22, 0.22, 0.03, i, Math.min(i+DASH, DIV)), dashMat));
-        }
-        grupoPista.add(new THREE.Mesh(_ribbon(-4, 4, 0.015, 0, 5), new THREE.MeshBasicMaterial({ color: 0xffffff })));
-
+        const grupoPista = new MallaPistaDiseno(curve).construir();
         grupoPista.visible = false;
         this.#grupoPista   = grupoPista;
         this.#scene.add(grupoPista);

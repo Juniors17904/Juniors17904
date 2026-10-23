@@ -2,11 +2,12 @@
 
 // ================================================================
 // CLASE: ControladorGaraje — pantallas de garaje y vista previa del
-// carro (PRD 004 D6). Por ahora usa la clase Garaje tal cual: al
-// entrar le pasa el estado y la forma de navegar (D7 la dividirá).
+// carro (PRD 004 D6). Crea una instancia de Garaje (D7) y la hace
+// entrar cada vez que se abre el garaje desde ⚙.
 // ================================================================
 class ControladorGaraje extends ControladorPantalla {
     #estado = null;
+    #garaje = null;
 
     constructor(estado, navegar) {
         super(navegar);
@@ -14,9 +15,10 @@ class ControladorGaraje extends ControladorPantalla {
     }
 
     iniciar() {
+        this.#garaje = new Garaje(this.#estado, id => this.irA(id));
         document.getElementById('btn-ir-garage').addEventListener('click', () => {
             this.irA('pantalla-garage');
-            Garaje.iniciar(this.#estado, id => this.irA(id));
+            this.#garaje.entrar();
         });
     }
 }
