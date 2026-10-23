@@ -87,7 +87,7 @@ class MapasCircuito3D {
         const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
         const scl=Math.min((MM_W-MM_PAD*2)/(maxX-minX||1),(MM_H-MM_PAD*2)/(maxY-minY||1));
         const ox=(MM_W-(maxX-minX)*scl)/2-minX*scl, oy=(MM_H-(maxY-minY)*scl)/2-minY*scl;
-        return pts.map(([px,py])=>({x:px*scl+ox, y:py*scl+oy}));
+        return pts.map(([px,py])=>new PuntoMinimapa(px*scl+ox, py*scl+oy));
     }
 
     #calcularEscalaRecorrido() {

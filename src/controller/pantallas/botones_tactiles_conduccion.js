@@ -7,10 +7,10 @@
 // Diseño General (PRD 004 D6).
 // ================================================================
 class BotonesTactilesConduccion {
-    #manejadores = [];
+    #toques = [];
 
     conectar(visor) {
-        this.#manejadores = [];
+        this.#toques = [];
         this.#agregar('btn-gas', () => { visor.entradaAcel =  1; }, () => { visor.entradaAcel = 0; });
         this.#agregar('btn-rev', () => { visor.entradaAcel = -1; }, () => { visor.entradaAcel = 0; });
         this.#agregar('btn-izq', () => { visor.entradaDireccion = -1; }, () => { visor.entradaDireccion = 0; });
@@ -18,17 +18,13 @@ class BotonesTactilesConduccion {
     }
 
     desconectar() {
-        for (const { el, alTocar, alSoltar } of this.#manejadores) {
-            el.removeEventListener('touchstart', alTocar);
-            el.removeEventListener('touchend',   alSoltar);
-        }
-        this.#manejadores = [];
+        for (const toque of this.#toques) toque.desconectar();
+        this.#toques = [];
     }
 
     #agregar(id, alTocar, alSoltar) {
-        const el = document.getElementById(id);
-        el.addEventListener('touchstart', alTocar, { passive: true });
-        el.addEventListener('touchend',   alSoltar);
-        this.#manejadores.push({ el, alTocar, alSoltar });
+        const toque = new ToqueBotonConduccion(id, alTocar, alSoltar);
+        toque.conectar();
+        this.#toques.push(toque);
     }
 }
