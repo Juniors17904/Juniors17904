@@ -162,6 +162,8 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `ParMapasConduccion` | `MapasCircuito3D`, `MapasTestDriveRecto` | `mostrar()`, `dibujar(visor)` |
 | `PanelDatos` | `PanelDatosCircuito3D`, `PanelDatosTestDriveRecto`, `PanelDatosDisenoGeneral` | `mostrar()`, `actualizar()` |
 | `Carro` | `CarroDeportivo`, `CarroSUV`, `CarroMusculo`, `CarroFormula`, `CarroPickup`, `CarroClasico` (las crea `RegistroCarros`) | `actualizar(dtMs)`, `constantes` (`ConstantesFisica`) |
+| `Superficie` | `SuperficieAsfalto`, `SuperficiePiano`, `SuperficiePasto` (las entrega `DetectorSuperficie`) | `nombre`, `rozamiento`, `esPasto` |
+| `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida` (los crea `DetectorChoques`) | `x`, `z`, `radio`, `tipo` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
@@ -171,6 +173,8 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/view/paneles/` → `PanelDatos` + subclases
 - `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes); `src/view/pistas/comun/` → piezas que comparten (`BuclePasoFijo`, `ConductorPasoFijo`)
 - `src/model/carros/` → `Carro` + subclases, `ConstantesFisica` y `RegistroCarros`
+- `src/model/superficies/` → `Superficie` + subclases y `DetectorSuperficie`
+- `src/model/choques/` → `ObjetoSolido` + subclases y `DetectorChoques`
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes
 

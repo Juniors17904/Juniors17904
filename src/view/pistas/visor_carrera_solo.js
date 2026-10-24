@@ -3,6 +3,7 @@
 import * as THREE              from 'three';
 import { Ruta }                from '../../model/ruta.js';
 import { RegistroCarros }      from '../../model/carros/registro_carros.js';
+import { DetectorChoques }     from '../../model/choques/detector_choques.js';
 import { VisorBase }           from '../visor_base.js';
 import { CamaraSeguimiento }   from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
@@ -15,8 +16,8 @@ import { ConstructorCircuitoCarreraSolo } from './carrera_solo/constructor_circu
 // VIEW — VisorCarreraSolo: escena 3D de la carrera "Jugar Solo" en vertical.
 //   - La superficie de la pista la arma ConstructorCircuitoCarreraSolo.
 //   - Mueve el Carro con pasos fijos de 60 Hz (ConductorPasoFijo).
-//   - NO decide reglas de carrera: solo copia el tope que le pasa el
-//     controlador (aplicarTope).
+//   - NO decide reglas de carrera: aplica la superficie que le pasa el
+//     controlador y los choques que calcula DetectorChoques (modelo).
 // ================================================================
 class VisorCarreraSolo extends VisorBase {
     // ── Constantes internas de la vista ──────────────────────────
@@ -47,10 +48,10 @@ class VisorCarreraSolo extends VisorBase {
     #observador   = null;
     #detenido     = false;
 
-    #conductor        = new ConductorPasoFijo();
+    #conductor        = new ConductorPasoFijo((carro, px, pz) => this.#choques?.resolver(carro, px, pz));
+    #choques          = null;   // DetectorChoques (modelo)
     #tipoAuto         = null;
-    #fraccionTope     = 1;
-    #factorArrastre   = 1;
+    #superficie       = null;
     #congelado        = false;
     #callbackFrame    = null;
 
@@ -112,11 +113,10 @@ class VisorCarreraSolo extends VisorBase {
         this.#callbackFrame = typeof fn === 'function' ? fn : null;
     }
 
-    // ── Copia el tope calculado por el modelo (sin decidir la regla)
-    aplicarTope(fraccion, factorArrastre) {
-        if (Number.isFinite(fraccion))       this.#fraccionTope   = fraccion;
-        if (Number.isFinite(factorArrastre)) this.#factorArrastre = factorArrastre;
-        this.#carro?.aplicarTope(this.#fraccionTope, this.#factorArrastre);
+    // ── Aplica la superficie que calcula el modelo (sin decidir la regla)
+    aplicarSuperficie(superficie) {
+        this.#superficie = superficie ?? null;
+        this.#carro?.pisar(this.#superficie);
     }
 
     congelar(valor) {
@@ -133,7 +133,7 @@ class VisorCarreraSolo extends VisorBase {
     reiniciarCarro() {
         const inicio = this.#ruta.curve ? this.#ruta.inicio : { x: 0, z: 0, angle: 0 };
         this.#conductor.carro = new RegistroCarros().crear(this.#tipoAuto, inicio.x, inicio.z, inicio.angle);
-        this.#carro.aplicarTope(this.#fraccionTope, this.#factorArrastre);
+        this.#carro.pisar(this.#superficie);
         this.#sincronizarCarroYCamara();
     }
 
@@ -308,6 +308,7 @@ class VisorCarreraSolo extends VisorBase {
         const curva = this.#ruta.curve;
         if (!curva) return;
 
+        this.#choques  = new DetectorChoques(this.#pista.decoraciones, this.#ruta);
         this.#circuito = new ConstructorCircuitoCarreraSolo(this.#escena);
         this.#circuito.construir(curva);
 

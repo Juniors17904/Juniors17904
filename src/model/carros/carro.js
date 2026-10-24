@@ -8,6 +8,7 @@ import { ConstantesFisica } from './constantes_fisica.js';
 //     cerrado y rápido da una curva más abierta.
 //   - Al soltar el pedal frena la rodadura más el aire (crece con v²).
 //   - La aceleración baja al acercarse al tope.
+//   - La superficie que pisa frena con su rozamiento (PRD 008).
 //   - actualizar(dtMs) escala todo por el tiempo real del paso.
 //   Los números viven en ConstantesFisica (uno por tipo de carro).
 // ================================================================
@@ -35,8 +36,7 @@ export class Carro {
     #velAngle        = 0;
     #driftAngle      = 0;
     #turboTimer      = 0;
-    #fraccionTope    = 1;
-    #factorArrastre  = 1;
+    #superficie      = null;   // Superficie del modelo (sin rozamiento = asfalto)
     #velocimetroModelo = 2;  // F1 por defecto
 
     constructor(px = 0, pz = 0, rotY = 0, constantes = new ConstantesFisica()) {
@@ -61,10 +61,15 @@ export class Carro {
 
     setPosicion(px, pz) { this.#px = px; this.#pz = pz; }
 
-    // Tope y arrastre que calcula el modelo de la carrera (pasto)
-    aplicarTope(fraccion, factorArrastre) {
-        if (Number.isFinite(fraccion))       this.#fraccionTope   = fraccion;
-        if (Number.isFinite(factorArrastre)) this.#factorArrastre = factorArrastre;
+    get superficie()       { return this.#superficie; }
+
+    // Superficie que calcula el modelo de la carrera (asfalto, piano o pasto)
+    pisar(superficie) { this.#superficie = superficie ?? null; }
+
+    // Choque: el modelo deja el carro fuera del objeto y le cambia la velocidad
+    rebotar(px, pz, factorVelocidad) {
+        this.#px = px; this.#pz = pz;
+        this.#velocidad *= factorVelocidad;
     }
 
     activarTurbo() {
@@ -81,7 +86,7 @@ export class Carro {
         this.#actualizarTurbo(dtMs);
 
         const prev = this.#velocidad;
-        this.#velocidad = this.#nuevaVelocidad(k);
+        this.#velocidad = this.#frenarPorSuperficie(this.#nuevaVelocidad(k), k);
         this.#aceleracion = this.#velocidad - prev;
         if (Math.abs(this.#velocidad) > this.#velocidadMax) this.#velocidadMax = Math.abs(this.#velocidad);
 
@@ -105,21 +110,30 @@ export class Carro {
         const c      = this.#constantes;
         const turboK = this.turboActivo ? this.turboMultiplicador : 1;
         const vMax   = c.velMaxAdelante * turboK;
-        const tope   = vMax * this.#fraccionTope;
         const v      = this.#velocidad;
 
         if (this.entradaAcel === 1) {
             const u      = Math.max(0, v) / vMax;
             const empuje = c.aceleracion * turboK / c.masa * (1 - Carro.#EMPUJE_EN_TOPE * u * u);
-            return Math.min(tope, v + empuje * k);
+            return Math.min(vMax, v + empuje * k);
         }
         if (this.entradaAcel === -1) {
             if (v > 0.01) return Math.max(0, v - c.freno / c.masa * k);
             return Math.max(-c.velMaxReversa, v - c.aceleracion * 0.6 / c.masa * k);
         }
         const u = v / c.velMaxAdelante;
-        const arrastre = (c.rodadura + c.aire * u * u) * this.#factorArrastre / c.masa * k;
+        const arrastre = (c.rodadura + c.aire * u * u) / c.masa * k;
         return v > 0 ? Math.max(0, v - arrastre) : Math.min(0, v + arrastre);
+    }
+
+    // Rozamiento de la superficie: proporcional al motor del carro y a su
+    // velocidad, así en el pasto todos se estabilizan cerca del 40 %
+    #frenarPorSuperficie(v, k) {
+        const r = this.#superficie?.rozamiento ?? 0;
+        if (!(r > 0) || v === 0) return v;
+        const c = this.#constantes;
+        const freno = r * c.aceleracion / c.masa * Math.abs(v) / c.velMaxAdelante * k;
+        return v > 0 ? Math.max(0, v - freno) : Math.min(0, v + freno);
     }
 
     // Velocidad angular: 0 detenido, crece hasta velGiroPleno y luego

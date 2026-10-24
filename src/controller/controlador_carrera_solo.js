@@ -227,7 +227,7 @@ class ControladorCarreraSolo {
         const cronometro = this.#cronometro;
 
         if (this.#estadoCarrera === ControladorCarreraSolo.#ESTADO_CORRIENDO) {
-            const evento = carrera.actualizar(visor.px, visor.pz, visor.pasosUltimoFrame);
+            const evento = carrera.actualizar(visor.px, visor.pz);
             if (evento === ControladorCarreraSolo.#EVENTO_VUELTA) {
                 cronometro.marcarVuelta();
             } else if (evento === ControladorCarreraSolo.#EVENTO_META) {
@@ -237,7 +237,7 @@ class ControladorCarreraSolo {
             }
         }
 
-        visor.aplicarTope(carrera.fraccionTope, carrera.factorArrastre);
+        visor.aplicarSuperficie(carrera.superficie);
 
         const base = visor.velocidadMaxBase;
         const fraccionVel = base > 0 ? Math.min(1, Math.abs(visor.velocidad) / base) : 0;

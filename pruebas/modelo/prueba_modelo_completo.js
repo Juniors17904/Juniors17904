@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm');
 const R=require('path').join(__dirname,'../../src/')+'model/';
 const ctx={console,performance,Math,Object,Array,Number,String,Error,Infinity};ctx.window=ctx;vm.createContext(ctx);
-for(const f of ['muestra_ruta.js','cronometro.js','carrera_vueltas.js'])vm.runInContext(fs.readFileSync(R+f,'utf8'),ctx,{filename:f});
+for(const f of ['muestra_ruta.js','cronometro.js','superficies/superficie.js','superficies/superficie_asfalto.js','superficies/superficie_piano.js','superficies/superficie_pasto.js','superficies/detector_superficie.js','carrera_vueltas.js'])vm.runInContext(fs.readFileSync(R+f,'utf8'),ctx,{filename:f});
 const fallos=[];const ok=(c,m)=>{if(!c)fallos.push(m);};
 ok(!ctx.__modelErrors,'modelErrors '+ctx.__modelErrors);
 const C=ctx.Cronometro, CV=ctx.CarreraVueltas, M=ctx.MuestraRuta;
@@ -44,10 +44,10 @@ cv=new CV(cuad);cv.actualizar(5,50);ok(cv.enPasto===true,'RF-07 mitad seg 5u');
 const recta=[];for(let i=0;i<20;i++)recta.push(new M(0,i*20,0));
 cv=new CV(recta);cv.actualizar(3,10);ok(!cv.enPasto,'RF-07 recta 3u '+cv.lateral);cv=new CV(recta);cv.actualizar(3,30);ok(!cv.enPasto,'RF-07 recta 3u b '+cv.lateral);
 // pasto
-cv=new CV(m100);p=pt(m100,0,6);cv.actualizar(...p,60);ok(cv.fraccionTope<=0.43,'RF-07 60 '+cv.fraccionTope);ok(cv.factorArrastre===3,'arrastre3');
-cv.actualizar(...p,60);ok(cv.fraccionTope<0.41,'RF-07 120');const fp=cv.fraccionTope;
-cv.actualizar(m100[0].x,m100[0].z,1);ok(Math.abs(cv.fraccionTope-(fp+(1-fp)*0.05))<1e-12,'RF-07 sube ley');ok(cv.factorArrastre===1,'arrastre1');
-cv=new CV(m100);cv.actualizar(...pt(m100,0,6),0);ok(cv.fraccionTope===1,'pasos 0');cv.actualizar(...pt(m100,0,6));ok(Math.abs(cv.fraccionTope-0.97)<1e-12,'pasos default '+cv.fraccionTope);
+// PRD 008 RF-01/RF-03: la superficie cambia al salir y volver al asfalto
+cv=new CV(m100);p=pt(m100,0,6);cv.actualizar(...p);ok(cv.superficie.nombre==='pasto','PRD 008 RF-01 pasto a 6u');
+cv.actualizar(m100[0].x,m100[0].z);ok(cv.superficie.nombre==='asfalto','PRD 008 RF-03 vuelve al asfalto');
+cv=new CV(m100);cv.actualizar(...pt(m100,0,4.3));ok(cv.superficie.nombre==='piano','PRD 008 RF-04 piano a 4.3u');
 // secuencias con progreso
 function irA(cv,m,desde,hasta,dir){const n=m.length;let x=desde;const ev=[];const step=0.05*dir;let cnt=0;
  while(true){let next=x+step;let fin=false;const dist=dir>0?((hasta-x)%1+1)%1:((x-hasta)%1+1)%1;if(dist<=0.05+1e-9){next=hasta;fin=true;}
@@ -68,7 +68,7 @@ cv=new CV(m400);ev=[];for(let v=0;v<3;v++)for(const [a,b] of [[0.01,0.34],[0.34,
 const lv=ev.filter(e=>e==='vuelta'||e==='meta');ok(JSON.stringify(lv)==='["vuelta","vuelta","meta"]','RF-06 '+lv);ok(cv.terminada&&cv.vueltaActual===3,'RF-06');
 for(let v=0;v<2;v++)for(const [a,b] of [[0.01,0.34],[0.34,0.67],[0.67,0.99],[0.99,0.01]])irA(cv,m400,a,b,1).forEach(e=>ok(e==='nada','post-meta evento '+e));ok(cv.vueltaActual===3,'RF-06 fijo');
 ok([1,2,3].includes(cv.puntoControlSiguiente),'pcs');
-cv.reiniciar();ok(cv.vueltaActual===1&&cv.progreso===0&&!cv.terminada&&cv.fraccionTope===1&&cv.puntoControlSiguiente===1,'RF-06');
+cv.reiniciar();ok(cv.vueltaActual===1&&cv.progreso===0&&!cv.terminada&&cv.superficie.nombre==='asfalto'&&cv.puntoControlSiguiente===1,'RF-06');
 // puntoControlSiguiente
 cv=new CV(m400);irA(cv,m400,0,0.34,1);ok(cv.puntoControlSiguiente===2,'pcs2');irA(cv,m400,0.34,0.67,1);ok(cv.puntoControlSiguiente===3,'pcs3');
 // meta: mover justo a la muestra 0 (exacta) cuenta

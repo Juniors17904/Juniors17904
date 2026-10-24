@@ -1,5 +1,6 @@
-// Prueba de navegador: RF-03, RF-04, RF-07, RF-09, RF-11, RF-12, RF-13, RF-14, RF-15 y RNF-01
-// del PRD docs/prds/prd_001_carrera_solo_vertical.md. Usa el visor y el controlador reales.
+// Prueba de navegador: RF-03, RF-04, RF-09, RF-11, RF-12, RF-13, RF-14, RF-15 y RNF-01
+// del PRD docs/prds/prd_001_carrera_solo_vertical.md y RF-01/RF-02 del PRD 008 (pasto, que
+// reemplaza al RF-07 del PRD 001). Usa el visor y el controlador reales.
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULO || '/opt/node22/lib/node_modules/playwright/index.mjs');
 
 const URL_APP = 'http://localhost:8099/';
@@ -118,32 +119,32 @@ const leer    = (page, fn) => page.evaluate(fn);
   });
   check(congelado.movio === 0 && congelado.pasos === 0, 'RF-04 congelado no se mueve ' + JSON.stringify(congelado));
 
-  // RF-07: el tope copiado limita la velocidad; al quitarlo vuelve a subir
+  // PRD 008 RF-01/RF-02: el pasto que aplica el modelo frena aunque se acelere
   const tope = await leer(page, async () => {
     const v = window.__visor;
     v.congelar(false); v.entradaAcel = 1;
-    await new Promise(r => setTimeout(r, 3000));
+    await new Promise(r => setTimeout(r, 2000));
     const libre = v.velocidad;
-    v.aplicarTope(0.4, 3);
-    await new Promise(r => setTimeout(r, 1500));
+    v.aplicarSuperficie(new window.SuperficiePasto());
+    await new Promise(r => setTimeout(r, 2500));
     const conTope = v.velocidad;
     return { base: v.velocidadMaxBase, libre, conTope };
   });
-  check(tope.libre > tope.base * 0.4, 'RF-07 sin tope supera el 40 % ' + JSON.stringify(tope));
-  check(tope.conTope <= tope.base * 0.4 + 1e-6, 'RF-07 con tope 0.4 no pasa del 40 % de la base');
+  check(tope.libre > tope.base * 0.45, 'PRD 008 RF-01 en asfalto supera el 45 % ' + JSON.stringify(tope));
+  check(tope.conTope < tope.libre && tope.conTope <= tope.base * 0.45, 'PRD 008 RF-02 en el pasto baja hacia el 40 % aunque acelere');
 
-  // RF-11: reiniciarCarro vuelve al inicio con velocidad 0 y reaplica el tope
+  // RF-11: reiniciarCarro vuelve al inicio con velocidad 0 y reaplica la superficie
   const reinicio = await leer(page, async () => {
     const v = window.__visor;
     v.reiniciarCarro();
     const tras = { vel: v.velocidad, px: v.px, pz: v.pz };
     v.congelar(false); v.entradaAcel = 1;
-    await new Promise(r => setTimeout(r, 2500));
+    await new Promise(r => setTimeout(r, 3000));
     return { ...tras, velDespues: v.velocidad, base: v.velocidadMaxBase };
   });
   check(reinicio.vel === 0, 'RF-11 velocidad 0 tras reiniciar');
   check(Math.hypot(reinicio.px - muestras.inicio[0], reinicio.pz - muestras.inicio[1]) < 0.5, 'RF-11 vuelve al inicio de la ruta');
-  check(reinicio.velDespues <= reinicio.base * 0.4 + 1e-6, 'RF-11 reaplica el último tope (vel ' + reinicio.velDespues + ')');
+  check(reinicio.velDespues <= reinicio.base * 0.45, 'RF-11 reaplica la última superficie (vel ' + reinicio.velDespues + ')');
 
   // RF-12: detener() libera el contexto WebGL y es idempotente
   const fin = await leer(page, () => {

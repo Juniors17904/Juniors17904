@@ -1,6 +1,8 @@
 const fs = require('fs');
 global.window = {};
 eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/muestra_ruta.js', 'utf8'));
+for (const f of ['superficie', 'superficie_asfalto', 'superficie_piano', 'superficie_pasto', 'detector_superficie'])
+  eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/superficies/' + f + '.js', 'utf8'));
 eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/carrera_vueltas.js', 'utf8'));
 const M = window.MuestraRuta;
 if (window.__modelErrors) { console.error(window.__modelErrors); process.exit(1); }
@@ -51,13 +53,14 @@ recorrer(c, 0, 0.98, -1);
 afirmar(c.progreso === 0.98, 'RF-06 llegar a 0.98 => ' + c.progreso);
 { const [x, z] = pos(0, 0.01); c.actualizar(x, z); afirmar(c.progreso === 0.01, 'RF-06 envolvimiento 98->1 => ' + c.progreso); }
 
-// RF-07 pasto
+// PRD 008 RF-01/RF-04 (D5): superficie bajo el carro según la distancia lateral
 c = new C(c100);
 { let [x, z] = pos(0, 0.1); c.actualizar(x, z); }
 recorrer(c, 0, 0.1, 1);
-{ const [x, z] = pos(0, 0.1, 5); c.actualizar(x, z, 0); afirmar(c.enPasto === true && c.factorArrastre === 3, 'RF-07 5u => pasto (lat ' + c.lateral + ')'); }
-{ const [x, z] = pos(0, 0.1, -5); c.actualizar(x, z, 0); afirmar(c.enPasto === true, 'RF-07 -5u => pasto'); }
-{ const [x, z] = pos(0, 0.1, 3); c.actualizar(x, z, 0); afirmar(c.enPasto === false && c.factorArrastre === 1, 'RF-07 3u => no pasto'); }
+{ const [x, z] = pos(0, 0.1, 5); c.actualizar(x, z); afirmar(c.enPasto === true && c.superficie.nombre === 'pasto', 'PRD 008 RF-01 5u => pasto (lat ' + c.lateral + ')'); }
+{ const [x, z] = pos(0, 0.1, -5); c.actualizar(x, z); afirmar(c.enPasto === true, 'PRD 008 RF-01 -5u => pasto'); }
+{ const [x, z] = pos(0, 0.1, 3); c.actualizar(x, z); afirmar(c.enPasto === false && c.superficie.nombre === 'asfalto', 'PRD 008 RF-03 3u => asfalto'); }
+{ const [x, z] = pos(0, 0.1, 4.4); c.actualizar(x, z); afirmar(c.superficie.nombre === 'piano' && !c.enPasto, 'PRD 008 RF-04 4.4u => piano'); }
 // segmento largo: 20 muestras R=200 (espaciado ~63)
 {
   const n = 20, R = 200;
@@ -67,21 +70,18 @@ recorrer(c, 0, 0.1, 1);
   const mx = (a.x + b.x) / 2, mz = (a.z + b.z) / 2;
   const L = Math.hypot(b.x - a.x, b.z - a.z), ux = (b.x - a.x) / L, uz = (b.z - a.z) / L;
   // perpendicular (uz, -ux)
-  cc.actualizar(mx + 3 * uz, mz - 3 * ux, 0);
-  afirmar(cc.enPasto === false && Math.abs(Math.abs(cc.lateral) - 3) < 1e-6, 'RF-07 mitad segmento 3u => no pasto (lat ' + cc.lateral + ')');
-  cc.actualizar(mx - 5 * uz, mz + 5 * ux, 0);
-  afirmar(cc.enPasto === true, 'RF-07 mitad segmento 5u => pasto');
+  cc.actualizar(mx + 3 * uz, mz - 3 * ux);
+  afirmar(cc.enPasto === false && Math.abs(Math.abs(cc.lateral) - 3) < 1e-6, 'PRD 008 RF-01 mitad segmento 3u => no pasto (lat ' + cc.lateral + ')');
+  cc.actualizar(mx - 5 * uz, mz + 5 * ux);
+  afirmar(cc.enPasto === true, 'PRD 008 RF-01 mitad segmento 5u => pasto');
 }
-// fracción de tope
-c = new C(c100);
-{ const [x, z] = pos(0, 0, 6);
-  c.actualizar(x, z, 60); afirmar(c.fraccionTope <= 0.43, 'RF-07 60 pasos <= 0.43: ' + c.fraccionTope);
-  c.actualizar(x, z, 60); afirmar(c.fraccionTope < 0.41, 'RF-07 120 pasos < 0.41: ' + c.fraccionTope);
-  const [x2, z2] = pos(0, 0); let prev = c.fraccionTope;
-  c.actualizar(x2, z2, 1); const esperado = prev + (1 - prev) * 0.05;
-  afirmar(Math.abs(c.fraccionTope - esperado) < 1e-12, 'RF-07 vuelta asfalto misma ley');
-  c.actualizar(x2, z2, 200); afirmar(c.fraccionTope > 0.9999 && c.fraccionTope <= 1, 'RF-07 sube a 1');
-  c.actualizar(x, z, 0); afirmar(c.fraccionTope > 0.9999, 'RF-07 0 pasos no cambia');
+// La superficie es una jerarquía de clases y el rozamiento ordena asfalto < piano < pasto
+{
+  const d = new window.DetectorSuperficie();
+  const [asf, pia, pas] = [d.superficieEn(0), d.superficieEn(4.4), d.superficieEn(6)];
+  afirmar([asf, pia, pas].every(x => x instanceof window.Superficie), 'PRD 008 D5 superficies son clases');
+  afirmar(asf.rozamiento < pia.rozamiento && pia.rozamiento < pas.rozamiento, 'PRD 008 RF-04 rozamiento asfalto < piano < pasto');
+  c = new C(c100); afirmar(c.superficie.nombre === 'asfalto', 'PRD 008 reiniciar empieza en asfalto');
 }
 
 // RF-06
@@ -131,7 +131,7 @@ afirmar(c.terminada === true && c.vueltaActual === 3, 'RF-06 terminada');
 ev = []; for (let v = 0; v < 2; v++) { recorrer(c, 0, 0.5, 1, ev); recorrer(c, 0.5, 0, 1, ev); }
 afirmar(c.vueltaActual === 3 && ev.every(e => e === 'nada'), 'RF-06 no cambia tras terminar');
 c.reiniciar();
-afirmar(c.vueltaActual === 1 && c.progreso === 0 && c.terminada === false && c.fraccionTope === 1 && c.puntoControlSiguiente === 1, 'RF-06 reiniciar');
+afirmar(c.vueltaActual === 1 && c.progreso === 0 && c.terminada === false && c.superficie.nombre === 'asfalto' && c.puntoControlSiguiente === 1, 'RF-06 reiniciar');
 ev = []; recorrer(c, 0, 0.5, 1, ev); recorrer(c, 0.5, 0, 1, ev);
 afirmar(c.vueltaActual === 2, 'RF-06 vuelve a contar tras reiniciar');
 // totalVueltas personalizado

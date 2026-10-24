@@ -1,9 +1,10 @@
 'use strict';
 
 // ================================================================
-// MODEL — CarreraVueltas: progreso, pasto, puntos de control y vueltas
+// MODEL — CarreraVueltas: progreso, superficie, puntos de control y vueltas
 // Recibe las muestras de la ruta (instancias de MuestraRuta por longitud de arco)
 // y cada frame la posición del carro. Sin Three.js ni DOM.
+// La superficie bajo el carro la decide DetectorSuperficie (PRD 008).
 // ================================================================
 
 try {
@@ -12,12 +13,6 @@ class CarreraVueltas {
     // ── Constantes internas (reglas de negocio) ─────────────────
     static #PC1             = 0.33;
     static #PC2             = 0.66;
-    static #LIMITE_PASTO    = 4.7;
-    static #TOPE_PASTO      = 0.4;
-    static #TOPE_ASFALTO    = 1;
-    static #SUAVIZADO       = 0.05;
-    static #ARRASTRE_PASTO  = 3;
-    static #ARRASTRE_NORMAL = 1;
     static #FRACCION_VENTANA = 0.1;
 
     static #EVENTO_NADA          = 'nada';
@@ -33,8 +28,8 @@ class CarreraVueltas {
 
     #indice             = 0;
     #lateral            = 0;
-    #enPasto            = false;
-    #fraccionTope       = 1;
+    #detector           = new window.DetectorSuperficie();
+    #superficie         = null;
 
     #vueltaActual       = 1;
     #vueltasCompletadas = 0;
@@ -61,11 +56,8 @@ class CarreraVueltas {
     get totalVueltas()   { return this.#totalVueltas; }
     get progreso()       { return this.#indice / this.#totalMuestras; }
     get lateral()        { return this.#lateral; }
-    get enPasto()        { return this.#enPasto; }
-    get fraccionTope()   { return this.#fraccionTope; }
-    get factorArrastre() {
-        return this.#enPasto ? CarreraVueltas.#ARRASTRE_PASTO : CarreraVueltas.#ARRASTRE_NORMAL;
-    }
+    get superficie()     { return this.#superficie; }
+    get enPasto()        { return this.#superficie.esPasto; }
     get terminada()      { return this.#terminada; }
     get puntoControlSiguiente() {
         if (!this.#pc1Marcado) return 1;
@@ -77,8 +69,7 @@ class CarreraVueltas {
     reiniciar() {
         this.#indice             = 0;
         this.#lateral            = 0;
-        this.#enPasto            = false;
-        this.#fraccionTope       = CarreraVueltas.#TOPE_ASFALTO;
+        this.#superficie         = this.#detector.superficieEn(0);
         this.#vueltaActual       = 1;
         this.#vueltasCompletadas = 0;
         this.#pc1Marcado         = false;
@@ -86,12 +77,11 @@ class CarreraVueltas {
         this.#terminada          = false;
     }
 
-    actualizar(px, pz, pasos = 1) {
+    actualizar(px, pz) {
         const indiceAnterior = this.#indice;
         this.#indice = this.#buscarIndiceCercano(px, pz, indiceAnterior);
         this.#lateral = this.#calcularLateral(px, pz, this.#indice);
-        this.#enPasto = Math.abs(this.#lateral) > CarreraVueltas.#LIMITE_PASTO;
-        this.#suavizarTope(pasos);
+        this.#superficie = this.#detector.superficieEn(this.#lateral);
 
         if (this.#terminada) return CarreraVueltas.#EVENTO_NADA;
         return this.#evaluarCruces(indiceAnterior, this.#indice);
@@ -142,17 +132,6 @@ class CarreraVueltas {
         const dx = px - inicio.x;
         const dz = pz - inicio.z;
         return dx * uz + dz * (-ux);
-    }
-
-    // ── Regla del pasto: lerp 0.05 por paso hacia 0.4 (pasto) o 1 ──
-    #suavizarTope(pasos) {
-        const objetivo = this.#enPasto ? CarreraVueltas.#TOPE_PASTO : CarreraVueltas.#TOPE_ASFALTO;
-        const total = Math.max(0, Math.floor(Number(pasos) || 0));
-        for (let i = 0; i < total; i++) {
-            this.#fraccionTope += (objetivo - this.#fraccionTope) * CarreraVueltas.#SUAVIZADO;
-        }
-        this.#fraccionTope = Math.min(CarreraVueltas.#TOPE_ASFALTO,
-                             Math.max(CarreraVueltas.#TOPE_PASTO, this.#fraccionTope));
     }
 
     // ── Puntos de control y meta ────────────────────────────────
