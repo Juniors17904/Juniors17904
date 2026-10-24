@@ -49,11 +49,11 @@ class PruebaSuperficieChoques {
     #ok(condicion, mensaje) { if (!condicion) this.#fallos.push(mensaje); }
 
     #cargarClasicos() {
-        const ctx = { console, Math }; ctx.window = ctx; ctx.PISTAS = {};
+        const ctx = { console, Math }; ctx.window = ctx;
         vm.createContext(ctx);
         const archivos = ['superficies/superficie.js', 'superficies/superficie_asfalto.js', 'superficies/superficie_piano.js',
             'superficies/superficie_pasto.js', 'superficies/detector_superficie.js',
-            'pistas/config_pista.js', 'pistas/config_pista_ciudad.js', 'pistas/config_pista_costa.js'];
+            'registro_pistas.js', 'pistas/config_pista.js', 'pistas/config_pista_ciudad.js', 'pistas/config_pista_costa.js'];
         for (const f of archivos) {
             vm.runInContext(fs.readFileSync(path.join(PruebaSuperficieChoques.#RAIZ, 'src/model', f), 'utf8'), ctx, { filename: f });
         }
@@ -129,14 +129,14 @@ class PruebaSuperficieChoques {
     }
 
     #probarObjetosDePista() {
-        const ciudad = this.#ctx.PISTAS.ciudad;
+        const ciudad = this.#ctx.registroPistas.obtener('ciudad');
         const detector = new this.#DetectorChoques(ciudad.decoraciones, this.#rutaDe(ciudad));
         const tipos = new Set(detector.objetos.map(o => o.tipo));
         const esperados = ciudad.decoraciones.filter(d => ['arbol', 'poste', 'senal_curva'].includes(d.tipo)).length;
         this.#ok(detector.objetos.length === esperados, `RF-05 un objeto sólido por árbol, poste y señal (${detector.objetos.length}/${esperados})`);
         this.#ok(tipos.has('arbol') && tipos.has('poste') && tipos.has('senal_curva') && !tipos.has('flecha'),
             'RF-05/RF-06 sólidos: árbol, poste y señal; flechas no: ' + [...tipos]);
-        const costa = this.#ctx.PISTAS.costa;
+        const costa = this.#ctx.registroPistas.obtener('costa');
         const enCosta = new this.#DetectorChoques(costa.decoraciones, this.#rutaDe(costa)).objetos;
         this.#ok(enCosta.length > 0 && enCosta.every(o => o.tipo === 'senal_curva'), 'RF-05 en Costa solo hay señales sólidas');
 
@@ -234,7 +234,7 @@ class PruebaSuperficieChoques {
     }
 
     #probarRendimiento() {
-        const ciudad = this.#ctx.PISTAS.ciudad;
+        const ciudad = this.#ctx.registroPistas.obtener('ciudad');
         const detector = new this.#DetectorChoques(ciudad.decoraciones, this.#rutaDe(ciudad));
         const carro = new this.#Carro(0, 0, 0);
         const inicio = process.hrtime.bigint();

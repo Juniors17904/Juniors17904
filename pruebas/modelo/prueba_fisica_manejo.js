@@ -118,14 +118,15 @@ class PruebaFisicaManejo {
     }
 
     #rutaCiudad() {
-        const ctx = { console, Math }; ctx.window = ctx; ctx.PISTAS = {};
+        const ctx = { console, Math }; ctx.window = ctx;
         vm.createContext(ctx);
-        for (const f of ['config_pista.js', 'config_pista_ciudad.js']) {
+        for (const f of ['../registro_pistas.js', 'config_pista.js', 'config_pista_ciudad.js']) {
             const archivo = path.join(PruebaFisicaManejo.#RAIZ, 'src/model/pistas', f);
             vm.runInContext(fs.readFileSync(archivo, 'utf8'), ctx, { filename: f });
         }
         const ruta = new this.#Ruta();
-        ruta.construir(ctx.PISTAS.ciudad.tramos, ctx.PISTAS.ciudad.totalSegs);
+        const ciudad = ctx.registroPistas.obtener('ciudad');
+        ruta.construir(ciudad.tramos, ciudad.totalSegs);
         return ruta;
     }
 

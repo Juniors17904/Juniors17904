@@ -62,7 +62,7 @@ await page.waitForTimeout(300);
 const arbol = await page.evaluate(async () => {
   const { Ruta } = await import('/src/model/ruta.js');
   const { DetectorChoques } = await import('/src/model/choques/detector_choques.js');
-  const pista = window.PISTAS.ciudad, ruta = new Ruta();
+  const pista = window.registroPistas.obtener('ciudad'), ruta = new Ruta();
   ruta.construir(pista.tramos, pista.totalSegs);
   const a = new DetectorChoques(pista.decoraciones, ruta).objetos.find(o => o.tipo === 'arbol');
   const c = window.__carro;
