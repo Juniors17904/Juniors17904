@@ -21,7 +21,6 @@ class Aplicacion {
     #controles                  = null;
     #velocimetro                = null;
     #controladorVistaConduccion = null;
-    #modo2D                     = null;
     #testDrive3D                = null;
     #disenoPistas               = null;
     #garaje                     = null;
@@ -30,7 +29,6 @@ class Aplicacion {
     #limpiadorJuego             = null;   // vacía la pantalla de juego que comparten Test Drive y circuito
 
     constructor() {
-        // PRD 002 D7: ya no se usa GestorOrientacion → "GIRA TU CELULAR" nunca se muestra
         this.#modos.aplicarA(document);   // RF-01, RF-04, RF-05
         this.#crearControladoresDePantalla();
         history.replaceState({ pantalla: 'pantalla-inicio' }, '');
@@ -52,6 +50,12 @@ class Aplicacion {
 
     // ── Navegación ──────────────────────────────────────────────
     #mostrar(id) {
+        // PRD 005 D3 / RF-03: una pantalla que no existe lleva a Inicio, nunca a una página en blanco
+        if (!document.getElementById(id)) {
+            id = 'pantalla-inicio';
+            if (this.#backNav) history.replaceState({ pantalla: id }, '');
+        }
+
         // PRD 002 D3 / RF-08 / RF-09: pantallas de modos ocultos o "Próximamente" → Inicio.
         // Se evalúa antes de limpiar nada: el visor 3D (o su arranque) ya debe estar marcado.
         if (this.#modos.debeRedirigirAInicio(id, this.#hayVisor3D())) {
@@ -125,9 +129,8 @@ class Aplicacion {
         this.#disenoGeneral = new ControladorDisenoGeneral(this.#estado, this.#vistaConduccion, navegar);
         this.#disenoObjetos = new ControladorDisenoObjetos(navegar);
         this.#controles   = new ControladorControles(this.#estado, navegar);
-        this.#modo2D      = new ControladorModo2D(this.#estado, navegar, () => this.#testDrive3D.detener());
-        this.#inicio      = new ControladorInicio(this.#estado, navegar, this.#modos,
-            this.#controles, this.#modo2D, () => this.#iniciarCarreraSolo());
+        this.#inicio      = new ControladorInicio(this.#estado, navegar,
+            this.#controles, () => this.#iniciarCarreraSolo());
         this.#ajustes     = new ControladorAjustes(navegar);
         this.#velocimetro = new ControladorVelocimetro(this.#estado, navegar);
         this.#giroscopio  = new ControladorGiroscopio(navegar);
@@ -138,7 +141,6 @@ class Aplicacion {
         this.#inicio.iniciar();
         this.#controles.iniciar();
         this.#velocimetro.iniciar();
-        this.#modo2D.iniciar();
         this.#ajustes.iniciar();
         this.#giroscopio.iniciar();
         this.#controladorVistaConduccion.iniciar();

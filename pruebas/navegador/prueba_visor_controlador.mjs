@@ -50,7 +50,7 @@ async function crearVisor(page, clavePista = 'ciudad') {
       return orig.call(this);
     };
     const canvas = document.getElementById('canvas-carrera-solo');
-    window.__visor = new window.VisorCarreraSolo(canvas, window.PISTAS[clave]);
+    window.__visor = new window.VisorCarreraSolo(canvas, window.registroPistas.obtener(clave));
     await window.__visor.cargar('deportivo', '#ef4444');
     window.__visor.iniciar();
     return true;
@@ -178,8 +178,8 @@ const leer    = (page, fn) => page.evaluate(fn);
     const invalida = await probar({ pista: 'no-existe', tipoAuto: 'deportivo', color: '#00ff00' });
     window.VisorCarreraSolo = Original;
     return {
-      montana: montana.pista === window.PISTAS.montana && montana.tipo === 'suv' && montana.color === '#ff0000',
-      respaldo: invalida.pista === window.PISTAS.ciudad,
+      montana: montana.pista === window.registroPistas.obtener('montana') && montana.tipo === 'suv' && montana.color === '#ff0000',
+      respaldo: invalida.pista === window.registroPistas.obtener('ciudad'),
       error: (window.__modelErrors || []).length > errAntes,
     };
   });

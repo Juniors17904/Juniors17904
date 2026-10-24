@@ -17,9 +17,9 @@ Las decisiones se tomaron con el usuario y son definitivas. Si algún requerimie
 | D4 | Se usan la pista elegida en ⚙ → Pistas (Ciudad por defecto) y el carro, el color, el timón y el velocímetro del garaje. *(Ampliado por PRD 007, D8: el carro también trae su física.)* |
 | D5 | Una vuelta solo vale si se pasan 3 puntos de control en orden: 33 %, 66 % y meta. |
 | D6 | Clases nuevas, una por archivo: `CarreraVueltas`, `Cronometro` y `MuestraRuta` en el modelo; `VisorCarreraSolo` y `HudCarrera` en la vista; `ControladorCarreraSolo` en el controlador. |
-| D7 | De los archivos existentes del juego solo cambian `index.html` y `aplicacion.js`. También pueden cambiar `pruebas/`, `package.json` (comandos `npm test`) y, con permiso del usuario, `CLAUDE.md`. |
+| D7 | De los archivos existentes del juego solo cambian `index.html` y `aplicacion.js`. También pueden cambiar `pruebas/`, `package.json` (comandos `npm test`) y, con permiso del usuario, `CLAUDE.md`. *(Limita solo la entrega del PRD 001; los PRD 004 y 005 cambian otros archivos según sus decisiones.)* |
 | D8 | Se reutilizan sin modificarlas `Ruta`, `Carro`, la cámara, los objetos de escena, los cielos y el velocímetro. *(`Carro` reemplazado por PRD 006, D8.)* |
-| D9 | La carrera tiene su propia pantalla, así que nunca aparece "GIRA TU CELULAR". `GestorOrientacion` no se modifica. |
+| D9 | La carrera tiene su propia pantalla, así que nunca aparece "GIRA TU CELULAR". `GestorOrientacion` no se modifica. *(Reemplazado por PRD 005, D9: `GestorOrientacion` se borra.)* |
 | D10 | Distribución en vertical: arriba la vuelta y el tiempo, al centro la pista, abajo el timón a la izquierda y ACEL/FRENO a la derecha, con el velocímetro encima. En PC es igual, centrado, y usa los botones del teclado. |
 
 ## 1. Contexto y problema
@@ -38,7 +38,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 
 **Out of scope:** rivales, récords guardados, choques o daños *(choques reemplazados por PRD 008, D8)*, pausa, turbo en el HUD, modo horizontal de la carrera nueva, cerrar las pistas abiertas y cambios en el multijugador.
 
-**No se modifican:** `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, los cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` ni `src/style.css`. *(`Carro` y `VisorDisenoPista` salen de esta lista según el PRD 006, D8; `VisorDisenoPista` y `src/style.css` —solo agregar estilos— según el PRD 007, D8.)* *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9.)*
+**No se modifican:** `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, los cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` ni `src/style.css`. *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9. `Juego`, `GestorOrientacion` y `ConfigPista*` quedan fuera de esta lista según el PRD 005, D9.)* *(`Carro` y `VisorDisenoPista` salen de esta lista según el PRD 006, D8; `VisorDisenoPista` y `src/style.css` —solo agregar estilos— según el PRD 007, D8.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

@@ -1,14 +1,15 @@
 'use strict';
 
 // ================================================================
-// CONTROLLER — ModoMultijugador: crear sala multijugador (corre en 2D) (PRD 002 D8)
+// CONTROLLER — ModoMultijugador: crear sala multijugador (PRD 002 D8)
+// PRD 005 D7: solo conserva pantalla-juego, para que sin visor 3D lleve a Inicio
 // ================================================================
 
 try {
 
 class ModoMultijugador extends Modo {
     constructor() {
-        super('Multijugador', ['btn-crear'], ['pantalla-crear', 'pantalla-espera', 'pantalla-juego', 'pantalla-resultado']);
+        super('Multijugador', ['btn-crear'], ['pantalla-juego']);
     }
 }
 

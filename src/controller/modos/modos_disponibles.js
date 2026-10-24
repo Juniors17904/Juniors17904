@@ -1,11 +1,11 @@
 'use strict';
 
 // ================================================================
-// CONTROLLER — ModosDisponibles: registro de modos (PRD 002 D8)
+// CONTROLLER — ModosDisponibles: registro de modos (PRD 002 D8, PRD 005 D7)
 // Es el ÚNICO lugar que decide el estado de cada modo:
 //   disponible    → se ve y se abre
 //   próximamente  → se ve pero no se abre (D2)
-//   oculto        → ni se ve ni se abre (D1)
+//   oculto        → ni se ve ni se abre (vacío hoy; queda para modos futuros)
 // Para cambiar el estado de un modo basta con moverlo de lista aquí.
 // ================================================================
 
@@ -19,7 +19,7 @@ class ModosDisponibles {
     constructor() {
         this.#disponibles  = Object.freeze([new ModoJugarSolo(),    new ModoTestDrive3D()]);  // D1
         this.#proximamente = Object.freeze([new ModoMultijugador(), new ModoUnirse()]);       // D2
-        this.#ocultos      = Object.freeze([new ModoClasico2D(),    new ModoTestDrive2D()]);  // D1
+        this.#ocultos      = Object.freeze([]);   // PRD 005 D7: sin modos ocultos por ahora
     }
 
     // ── Estado de un modo (por clase, sin comparar textos) ──────

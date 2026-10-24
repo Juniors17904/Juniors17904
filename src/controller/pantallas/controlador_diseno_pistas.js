@@ -79,7 +79,7 @@ class ControladorDisenoPistas extends ControladorPantallaJuego {
         cir.setVelocimetroModelo(this.#estado.velocimetroModelo);
         cir.iniciar();
 
-        const pistaCfg = window.PISTAS?.[tipoPista];
+        const pistaCfg = window.registroPistas?.obtener(tipoPista);
         const datos = new PanelDatosCircuito3D(cir, pistaCfg);
         const mapas = new MapasCircuito3D(cir, pistaCfg);
         this.#mapas = mapas;
@@ -134,7 +134,6 @@ class ControladorDisenoPistas extends ControladorPantallaJuego {
         hudCir.style.display = 'block';
         hudCir.width  = window.innerWidth;
         hudCir.height = window.innerHeight;
-        document.getElementById('canvas-carro-3d').style.display = 'none';
         const tituloCir = document.getElementById('titulo-cir3d');
         tituloCir.textContent = destino.titulo;
         tituloCir.style.display = 'block';
@@ -163,6 +162,5 @@ class ControladorDisenoPistas extends ControladorPantallaJuego {
             'btn-mov-libre', 'ctrl-timon', 'debug-td3d', 'debug-path', 'minimap-td3d',
             'trail-map', 'btn-toggle-minimap', 'btn-toggle-trail', 'ctrl-cam-height'];
         for (const id of ocultos) document.getElementById(id).style.display = 'none';
-        document.getElementById('canvas-carro-3d').style.display = '';
     }
 }

@@ -86,8 +86,8 @@ class NivelCiudad extends Nivel {
 
 ### MVC obligatorio
 - **Model** → datos y física (`Carro`, `Ruta`, `CarreraVueltas`). Sin lógica de vista.
-- **View** → dibujo, cámaras, controles UI (`CamaraSeguimiento`, `ControlTimon`, `Minimapa`). Sin lógica de negocio.
-- **Controller** → orquesta Model y View (`aplicacion.js`, `juego.js`). Sin física ni dibujo directo.
+- **View** → dibujo, cámaras, controles UI (`CamaraSeguimiento`, `ControlTimon`, `MapaDetallePista`). Sin lógica de negocio.
+- **Controller** → orquesta Model y View (`aplicacion.js`, `controlador_carrera_solo.js`). Sin física ni dibujo directo.
 - **Excepción permitida — visores 3D:** un visor de pista (subclase de `VisorBase`) puede crear su `Ruta` y su `Carro` y avanzar la física con paso fijo, porque la integración va atada al render. Las **reglas de negocio** (vueltas, tiempos, penalizaciones como el pasto) viven siempre en clases del modelo (`CarreraVueltas`, `Cronometro`…); el visor solo aplica lo que el modelo calcula.
 
 ### POO obligatorio — checklist antes de escribir cualquier código nuevo
@@ -154,8 +154,8 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
 | `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo` | (utilidades Three.js) |
-| `MinimapBase` | `MinimapaConductor`, `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
-| `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos`, `ControladorModo2D` | `iniciar()`, `detener()`, `irA(id)` |
+| `MinimapBase` | `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
+| `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos` | `iniciar()`, `detener()`, `irA(id)` |
 | `ControladorPantallaJuego` (hereda de `ControladorPantalla`) | `ControladorTestDrive3D`, `ControladorDisenoPistas` | `tieneVisor`, `ocupaPantallaJuego`, `cancelarArranque()` |
 | `DestinoCircuito3D` | `DestinoCarreraUrbana`, `DestinoTestDriveRuta` | `claseVisor`, `titulo`, `origen` |
 | `MapaConduccion` | `MinimapaCircuito3D`, `RecorridoCircuito3D`, `MinimapaTestDriveRecto`, `RecorridoTestDriveRecto` | `mostrar()`, `dibujar(visor)`, `visible` |

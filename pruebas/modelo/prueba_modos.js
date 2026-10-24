@@ -1,8 +1,8 @@
 // ================================================================
 // PRUEBA: modos de juego — PRD 002 (docs/prds/prd_002_ocultar_modo_2d.md)
-// Node, sin DOM (vm). Verifica D8/RNF-01 (jerarquía), D1/D2 (estados),
-// D3 (pertenencia de pantallas, RF-08/RF-09) y RF-01/RF-04/RF-05 sobre
-// un documento falso.
+// y PRD 005 D7 (sin modos 2D). Node, sin DOM (vm). Verifica D8/RNF-01
+// (jerarquía), D1/D2 (estados), D3 (pertenencia de pantallas, RF-09) y
+// RF-04/RF-05 sobre un documento falso.
 // ================================================================
 'use strict';
 const vm = require('vm'), fs = require('fs'), path = require('path');
@@ -12,8 +12,6 @@ const ARCHIVOS = [
     ['modo.js',               'Modo'],
     ['modo_jugar_solo.js',    'ModoJugarSolo'],
     ['modo_test_drive_3d.js', 'ModoTestDrive3D'],
-    ['modo_clasico_2d.js',    'ModoClasico2D'],
-    ['modo_test_drive_2d.js', 'ModoTestDrive2D'],
     ['modo_multijugador.js',  'ModoMultijugador'],
     ['modo_unirse.js',        'ModoUnirse'],
     ['modos_disponibles.js',  'ModosDisponibles'],
@@ -37,7 +35,7 @@ for (const [archivo, clase] of ARCHIVOS) {
 }
 
 // ── D8: jerarquía ───────────────────────────────────────────────
-const SUBCLASES = ['ModoJugarSolo', 'ModoTestDrive3D', 'ModoClasico2D', 'ModoTestDrive2D', 'ModoMultijugador', 'ModoUnirse'];
+const SUBCLASES = ['ModoJugarSolo', 'ModoTestDrive3D', 'ModoMultijugador', 'ModoUnirse'];
 for (const nombre of SUBCLASES) {
     const C = ctx[nombre];
     comprobar(Object.getPrototypeOf(C) === ctx.Modo, `PRD 002 D8 ${nombre} extiende Modo`);
@@ -46,13 +44,21 @@ for (const nombre of SUBCLASES) {
     comprobar(Object.keys(m).length === 0, `PRD 002 RNF-01 ${nombre} sin campos públicos`);
 }
 
+// ── PRD 005 D7: ModosDisponibles registra exactamente 4 modos ───
+const codigoMd = fs.readFileSync(DIR + 'modos_disponibles.js', 'utf8').replace(/\/\/.*$/gm, '');
+const registrados = (codigoMd.match(/\bnew\s+Modo\w+\s*\(/g) || []).map(t => t.replace(/new\s+|\s*\(/g, ''));
+comprobar(registrados.length === 4 && new Set(registrados).size === 4
+    && SUBCLASES.every(n => registrados.includes(n)),
+    `PRD 005 D7 ModosDisponibles registra exactamente 4 modos (${registrados.join(', ')})`);
+comprobar(!/Clasico2D|TestDrive2D/.test(codigoMd), 'PRD 005 D7 ModosDisponibles sin modos 2D');
+comprobar(/#ocultos\s*=\s*Object\.freeze\(\[\s*\]\)/.test(codigoMd), 'PRD 005 D7 conserva la lista de ocultos, vacía');
+
 // ── D1/D2: estados ──────────────────────────────────────────────
 const md = new ctx.ModosDisponibles();
 // Disponibles: solo Jugar Solo y Test Drive 3D. Oculto y "Próximamente" se comprueban
 // más abajo por su efecto sobre los botones (aplicarA).
 for (const [nombre, disponible, d] of [
     ['ModoJugarSolo', true, 'D1'], ['ModoTestDrive3D', true, 'D1'],
-    ['ModoClasico2D', false, 'D1'], ['ModoTestDrive2D', false, 'D1'],
     ['ModoMultijugador', false, 'D2'], ['ModoUnirse', false, 'D2'],
 ]) {
     comprobar(md.estaDisponible(ctx[nombre]) === disponible, `PRD 002 ${d} ${nombre} ${disponible ? 'disponible' : 'no disponible'}`);
@@ -67,8 +73,12 @@ for (const [obj, permitidos] of [
 }
 
 // ── D3: pertenencia de pantallas (RF-08 / RF-09) ────────────────
-for (const id of ['pantalla-crear', 'pantalla-unirse', 'pantalla-espera', 'pantalla-resultado']) {
-    comprobar(md.debeRedirigirAInicio(id, false) && md.debeRedirigirAInicio(id, true), `PRD 002 RF-08 ${id} → Inicio`);
+// PRD 005 D7: Multijugador y Únete solo conservan pantalla-juego
+for (const nombre of ['ModoMultijugador', 'ModoUnirse']) {
+    const m = new ctx[nombre]();
+    comprobar(m.tienePantalla('pantalla-juego'), `PRD 005 D7 ${nombre} conserva pantalla-juego`);
+    for (const id of ['pantalla-crear', 'pantalla-unirse', 'pantalla-espera', 'pantalla-resultado'])
+        comprobar(!m.tienePantalla(id), `PRD 005 D7 ${nombre} ya no lista ${id}`);
 }
 comprobar(md.debeRedirigirAInicio('pantalla-juego', false), 'PRD 002 RF-09 pantalla-juego sin visor 3D → Inicio');
 comprobar(!md.debeRedirigirAInicio('pantalla-juego', true), 'PRD 002 RF-09 pantalla-juego con visor 3D no redirige');
@@ -94,18 +104,12 @@ class DocumentoFalso {
 const botones = new Map([
     ['btn-solo',          new BotonFalso('Jugar Solo')],
     ['btn-test-drive-3d', new BotonFalso('Test Drive 3D')],
-    ['btn-clasico-2d',    new BotonFalso('Clásico 2D')],
-    ['btn-test-drive',    new BotonFalso('Test Drive')],
     ['btn-crear',         new BotonFalso('Multijugador')],
     ['btn-unirse',        new BotonFalso('¿Tienes un código? Únete →')],
 ]);
 const doc = new DocumentoFalso(botones);
 md.aplicarA(doc);
 md.aplicarA(doc); // idempotente
-for (const id of ['btn-clasico-2d', 'btn-test-drive']) {
-    const b = botones.get(id);
-    comprobar(b.clases.has('modo-oculto') && b.hidden && b.disabled, `PRD 002 RF-01 ${id} oculto`);
-}
 for (const id of ['btn-solo', 'btn-test-drive-3d']) {
     const b = botones.get(id);
     comprobar(b.clases.size === 0 && !b.hidden && !b.disabled && !/Próximamente/.test(b.textContent), `PRD 002 RF-02/RF-03 ${id} intacto`);

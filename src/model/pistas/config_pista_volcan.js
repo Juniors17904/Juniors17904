@@ -24,16 +24,9 @@ class ConfigPistaVolcan extends ConfigPista {
 
     get nombre()          { return 'Valle del Volcán'; }
     get totalSegs()       { return 300; }
-    get distMeta()        { return 1800; }
     get tramos()          { return this.#tramos; }
-    get obstFrecuencia()  { return 0.15; }
-    get obstTipos()       { return ['bache','bache','carro','carro','turbo']; }
-    get coloresTrafico()  { return ['#ef4444','#dc2626','#f97316','#6b7280']; }
 
     get cielo()   { return ['#1a0a00', '#3a1400']; }
-    get cesped()  { return ['#2a0a00', '#1a0800']; }
-    get asfalto() { return ['#3a2a2a', '#2a1a1a']; }
-    get borde()   { return '#ef4444'; }
 
     get decoraciones() {
         return [
@@ -49,7 +42,7 @@ class ConfigPistaVolcan extends ConfigPista {
     }
 }
 
-window.PISTAS.volcan = new ConfigPistaVolcan();
+window.registroPistas.registrar('volcan', new ConfigPistaVolcan());
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

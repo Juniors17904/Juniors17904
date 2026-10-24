@@ -42,7 +42,8 @@ await page.evaluate(()=>{ window.__linea=[]; const c=document.getElementById('cu
     if(!u||u[0]!==v) window.__linea.push([v, Math.round(performance.now()-t0)]); }).observe(c,{childList:true,attributes:true,characterData:true,subtree:true}); });
 await page.evaluate(()=>document.getElementById('btn-solo').click());
 check(await activa()==='pantalla-carrera-solo','pantalla activa carrera-solo');
-check(await page.evaluate(()=>getComputedStyle(document.getElementById('pantalla-rotar')).display)==='none','RF-01 sin pantalla-rotar');
+// "GIRA TU CELULAR" ya no existe (PRD 005 RF-02): vale que no exista o que no se vea
+check(await page.evaluate(()=>{ const r=document.getElementById('pantalla-rotar'); return !r || getComputedStyle(r).display==='none'; }),'RF-01 / PRD 005 RF-02 sin pantalla-rotar');
 check(await page.evaluate(()=>getComputedStyle(document.getElementById('ctrl-timon')).display)!=='none','timón visible');
 const t = await page.evaluate(()=>{const cs=getComputedStyle(document.getElementById('ctrl-timon'));return cs.transform+' '+cs.width;});
 console.log('   ctrl-timon en carrera:', t);
@@ -109,11 +110,11 @@ check(await activa()!=='pantalla-carrera-solo','atrás a mitad de carrera sale: 
 check(await page.evaluate(()=>getComputedStyle(document.getElementById('ctrl-timon')).display)==='none','timón oculto tras atrás');
 const n1 = await page.evaluate(()=>window.__llamadas); await page.waitForTimeout(500);
 check(await page.evaluate(()=>window.__llamadas)===n1,'sin frames tras salir');
-// Clásico 2D ya no se ve (PRD 002 reemplaza el RF-02 del PRD 001)
+// Clásico 2D ya no se ve (PRD 002 RF-01); con el PRD 005 RF-02 el botón ya no existe, y eso también vale
 await page.evaluate(()=>document.getElementById('btn-garage').click()); await page.waitForTimeout(300);
 const clasicoVisible = await page.evaluate(()=>{ const b=document.getElementById('btn-clasico-2d');
   if(!b) return false; const r=b.getBoundingClientRect(); return !b.hidden && getComputedStyle(b).display!=='none' && r.width>0 && r.height>0; });
-check(!clasicoVisible,'PRD 002 RF-01 el botón Clásico 2D ya no es visible en ⚙');
+check(!clasicoVisible,'PRD 002 RF-01 / PRD 005 RF-02 el botón Clásico 2D no existe o no es visible en ⚙');
 console.log('__modelErrors:', JSON.stringify(await page.evaluate(()=>window.__modelErrors)));
 // Errores ajenos a la carrera: ServiceWorker con ruta de GitHub Pages y URLs https bloqueadas a propósito
 const erroresReales = errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)/.test(t));

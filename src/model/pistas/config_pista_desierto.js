@@ -20,17 +20,10 @@ class ConfigPistaDesierto extends ConfigPista {
 
     get nombre()          { return 'Autopista Solar'; }
     get totalSegs()       { return 300; }
-    get distMeta()        { return 1800; }
     get tramos()          { return this.#tramos; }
-    get obstFrecuencia()  { return 0.10; }
-    get obstTipos()       { return ['bache','bache','carro','turbo']; }
-    get coloresTrafico()  { return ['#d4a050','#c47a2b','#8b6914']; }
 
     get tipoCielo() { return 'soleado'; }
     get cielo()   { return ['#7c4a1e', '#c47a2b']; }
-    get cesped()  { return ['#8b6914', '#7a5c10']; }
-    get asfalto() { return ['#c4a44a', '#b8943a']; }
-    get borde()   { return '#d4a050'; }
 
     get decoraciones() {
         return [
@@ -44,7 +37,7 @@ class ConfigPistaDesierto extends ConfigPista {
     }
 }
 
-window.PISTAS.desierto = new ConfigPistaDesierto();
+window.registroPistas.registrar('desierto', new ConfigPistaDesierto());
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];
