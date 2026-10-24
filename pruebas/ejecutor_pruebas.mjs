@@ -48,7 +48,11 @@ class EjecutorPruebas {
     }
 
     async #levantarServidor() {
-        this.#servidor = spawn('python3', ['-m', 'http.server', String(this.#puerto)],
+        // Cola de conexiones grande: con la cola de 5 de `python3 -m http.server`, las pruebas
+        // que abren dos páginas a la vez pierden archivos .js al azar y el juego no arranca.
+        const servidor = 'import http.server as h; h.ThreadingHTTPServer.request_queue_size = 128; '
+            + `h.test(HandlerClass=h.SimpleHTTPRequestHandler, ServerClass=h.ThreadingHTTPServer, port=${this.#puerto})`;
+        this.#servidor = spawn('python3', ['-c', servidor],
             { cwd: this.#raiz, stdio: 'ignore' });
         await new Promise(r => setTimeout(r, 1000));
     }
