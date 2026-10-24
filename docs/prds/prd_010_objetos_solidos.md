@@ -45,7 +45,7 @@ Que el árbol, el poste y la señal de curva tengan tamaño real, choquen exacta
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`.
 - La forma, los tramos, el nombre, los colores y los árboles de cada pista: de `ConfigPista*` solo cambia de dónde sale la distancia de postes y señales (D7). *(La distancia de las flechas cambia según el PRD 011, D11.)*
 - `FlechaCurvaEscena`, `BalizaChevronEscena`, `MetaEscena`, `SalidaEscena`, `BarreraEscena`, `GuardarrailEscena` y `AvisoEscena`. *(Cambian según el PRD 011, D11; `BalizaChevronEscena` se borra.)*
-- La cámara de las pantallas de manejo, los cielos, `HudCarrera` y `src/style.css`. De los visores solo cambia la lectura de las medidas nuevas y, en `VisorDisenoObjetos`, el encuadre (D2).
+- La cámara de las pantallas de manejo, los cielos, `HudCarrera` y `src/style.css`. De los visores solo cambia la lectura de las medidas nuevas y, en `VisorDisenoObjetos`, el encuadre (D2). *(Los visores también cambian cómo dibujan el piso según el PRD 012, D11.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

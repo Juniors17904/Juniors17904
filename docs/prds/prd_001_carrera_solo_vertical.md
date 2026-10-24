@@ -63,7 +63,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 - **RF-11:** Revancha reinicia la carrera desde la salida, con velocidad 0 y en la misma pantalla. Menú vuelve a Inicio.
 - **RF-12:** Al salir con Menú o con el botón atrás no queda nada corriendo, y volver con "adelante" no deja una pantalla vacía.
 - **RF-13:** Si la carrera no carga en 6 s, aparece un aviso y se vuelve a Inicio.
-- **RF-14:** La pista se ve bien en vertical: asfalto iluminado, línea central amarilla, línea de meta, pianos, decoraciones y cielo. *(Ampliado por PRD 009, D12: el carro se ve a escala real.)* *(Ampliado por PRD 011, D11: arco de meta.)*
+- **RF-14:** La pista se ve bien en vertical: asfalto iluminado, línea central amarilla, línea de meta, pianos, decoraciones y cielo. *(Ampliado por PRD 009, D12: el carro se ve a escala real.)* *(Ampliado por PRD 011, D11: arco de meta.)* *(Ampliado por PRD 012, D11: piso con relieve, líneas y meta a cuadros.)*
 - **RF-15:** El juego va a la misma velocidad en cualquier pantalla, sea de 30, 60 o 120 Hz.
 
 ## 7. Requerimientos no funcionales
