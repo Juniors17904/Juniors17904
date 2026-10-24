@@ -43,8 +43,8 @@ Que el árbol, el poste y la señal de curva tengan tamaño real, choquen exacta
 **Lista única de lo que NO se modifica:**
 - La física (`Carro`, `ConstantesFisica` y las 6 físicas) y la forma de choque del carro (PRD 009, D6).
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`.
-- La forma, los tramos, el nombre, los colores y los árboles de cada pista: de `ConfigPista*` solo cambia de dónde sale la distancia de postes y señales (D7).
-- `FlechaCurvaEscena`, `BalizaChevronEscena`, `MetaEscena`, `SalidaEscena`, `BarreraEscena`, `GuardarrailEscena` y `AvisoEscena`.
+- La forma, los tramos, el nombre, los colores y los árboles de cada pista: de `ConfigPista*` solo cambia de dónde sale la distancia de postes y señales (D7). *(La distancia de las flechas cambia según el PRD 011, D11.)*
+- `FlechaCurvaEscena`, `BalizaChevronEscena`, `MetaEscena`, `SalidaEscena`, `BarreraEscena`, `GuardarrailEscena` y `AvisoEscena`. *(Cambian según el PRD 011, D11; `BalizaChevronEscena` se borra.)*
 - La cámara de las pantallas de manejo, los cielos, `HudCarrera` y `src/style.css`. De los visores solo cambia la lectura de las medidas nuevas y, en `VisorDisenoObjetos`, el encuadre (D2).
 
 ## 5. Conceptos de dominio

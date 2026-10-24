@@ -15,11 +15,11 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | # | Categoría | Decisión |
 |---|---|---|
 | D1 | Alcance | El pasto frena con rozamiento según la superficie, en vez del tope al 40 % más el arrastre ×3 de hoy. |
-| D2 | Alcance | Hay choques contra los objetos sólidos junto a la pista: árboles, postes y señales de curva. Las flechas de curva **no** son sólidas, porque quedan sobre el piano. El carro rebota y pierde velocidad. No hay daños ni reinicio. *(v2, aprobado por el usuario)* *(Los tamaños de choque cambian según el PRD 010, D9.)* |
+| D2 | Alcance | Hay choques contra los objetos sólidos junto a la pista: árboles, postes y señales de curva. Las flechas de curva **no** son sólidas, porque quedan sobre el piano. El carro rebota y pierde velocidad. No hay daños ni reinicio. *(v2, aprobado por el usuario)* *(Los tamaños de choque cambian según el PRD 010, D9.)* *(Las flechas pasan a ser sólidas según el PRD 011, D11.)* |
 | D3 | Usuarios | Salirse al pasto cuesta más o menos lo mismo que hoy: el carro queda cerca del 40 % de su velocidad máxima. |
 | D4 | Usuarios | Al chocar, el carro nunca atraviesa el objeto ni queda atrapado en él. |
 | D5 | Dominio | La superficie (asfalto, piano o pasto) es una jerarquía de clases (`Superficie` y subclases) que el modelo consulta. Qué superficie hay bajo el carro (incluido el ancho del piano) lo calcula una clase nueva del modelo, sin tocar `Ruta`. *(v4 aprobado por el usuario)* *(Dónde viven las medidas de la superficie cambia según el PRD 009, D12: pasan a `MedidasEscena`.)* |
-| D6 | Técnico | Los choques los calcula el modelo; el visor solo los aplica (MVC). El modelo crea una instancia por cada objeto, a partir de los datos de la pista, **sin cambiar esos datos**. `ObjetoSolido` es la superclase, con una subclase por tipo: árbol, poste y señal de curva (`CLAUDE.md`: variantes → subclases). *(v2; v3 aclara)* *(Solo la distancia de postes y señales cambia según el PRD 010, D9.)* |
+| D6 | Técnico | Los choques los calcula el modelo; el visor solo los aplica (MVC). El modelo crea una instancia por cada objeto, a partir de los datos de la pista, **sin cambiar esos datos**. `ObjetoSolido` es la superclase, con una subclase por tipo: árbol, poste y señal de curva (`CLAUDE.md`: variantes → subclases). *(v2; v3 aclara)* *(Solo la distancia de postes y señales cambia según el PRD 010, D9.)* *(La distancia de las flechas cambia según el PRD 011, D11.)* |
 | D7 | Técnico | Solo para Jugar Solo. Las otras 4 pantallas del PRD 006 (D2) quedan como están. |
 | D8 | Dominio | **Reemplaza:** del PRD 001, la D3 ("no hay choques"), el RF-07 (el pasto como tope) y "choques o daños" de su Out of scope. Del PRD 002, `CarreraVueltas`, `VisorCarreraSolo` y `ControladorCarreraSolo` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego" (solo el pasto y los choques) y `CarreraVueltas`. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el pasto y los choques), `CarreraVueltas`, `VisorCarreraSolo` y `ControladorCarreraSolo`. Los PRD 006 y 007 ya dejan el pasto fuera de su alcance. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
 | D9 | Técnico | `Superficie` y `ObjetoSolido` se agregan a la tabla de jerarquías de `CLAUDE.md`. Lo nuevo va en clases aparte; el visor solo las llama, para no pasar de 400 líneas. *(v2)* |
@@ -42,7 +42,7 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 **Lista única de lo que NO se modifica:**
 - Las reglas de física del PRD 006 y las físicas por carro del PRD 007.
 - Las vueltas, los puntos de control, `Cronometro`, `MuestraRuta` y el resultado.
-- Los datos de cada pista (`ConfigPista*`) y `FabricaObjetoEscena`. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)*
+- Los datos de cada pista (`ConfigPista*`) y `FabricaObjetoEscena`. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)* *(También según el PRD 011, D11: flechas.)*
 - `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana` y `VisorDisenoPista` (D7). *(Estos visores cambian según el PRD 009, D12: tamaño del carro y cámara.)*
 - `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos, los velocímetros y `src/style.css`. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)*
 
@@ -60,7 +60,7 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 - **RF-03 (D1):** al volver al asfalto, el carro recupera la aceleración normal.
 - **RF-04 (D5):** el piano frena poco: menos que el pasto y algo más que el asfalto.
 - **RF-05 (D2):** el carro no puede atravesar ningún árbol, poste ni señal de curva.
-- **RF-06 (D2):** las flechas de curva no detienen al carro.
+- **RF-06 (D2):** las flechas de curva no detienen al carro. *(Reemplazado por PRD 011, D11: las flechas son sólidas.)*
 - **RF-07 (D2):** al chocar, el carro rebota hacia afuera del objeto y pierde velocidad; más rápido = más pérdida.
 - **RF-08 (D4):** después de un choque, el carro siempre puede seguir manejando: nunca queda atrapado dentro del objeto.
 - **RF-09 (D2):** chocar no reinicia la carrera, no daña el carro y no detiene el cronómetro.

@@ -47,7 +47,7 @@ Que `main` solo tenga el juego 3D, con el código 2D guardado en una rama de arc
 **Out of scope:** el multijugador 3D (B3), conectar el selector de control al 3D (B4), las ideas B5 a B9 y todo lo de la lista única.
 
 **Lista única de lo que NO se modifica:**
-- El comportamiento y el aspecto del juego 3D. *(El manejo cambia según el PRD 006, D8; el manejo y el garaje según el PRD 007, D8; el pasto y los choques según el PRD 008, D8.)* *(El tamaño del carro, la cámara y el piano de la recta cambian según el PRD 009, D12.)* *(El aspecto del árbol, el poste y la señal cambia según el PRD 010, D9.)*
+- El comportamiento y el aspecto del juego 3D. *(El manejo cambia según el PRD 006, D8; el manejo y el garaje según el PRD 007, D8; el pasto y los choques según el PRD 008, D8.)* *(El tamaño del carro, la cámara y el piano de la recta cambian según el PRD 009, D12.)* *(El aspecto del árbol, el poste y la señal cambia según el PRD 010, D9.)* *(La señalética cambia según el PRD 011, D11.)*
 - `MultiJugador`, los timones y los velocímetros.
 - Los datos de cada pista que usa el 3D: forma, tramos, nombre y colores de la escena 3D.
 - `CarreraVueltas`, `Cronometro` y `MuestraRuta`. *(`CarreraVueltas` sale de esta lista según el PRD 008, D8.)*
