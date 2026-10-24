@@ -49,7 +49,7 @@ Que `main` solo tenga el juego 3D, con el motor 2D guardado en una etiqueta de g
 - El comportamiento y el aspecto del juego 3D.
 - `MultiJugador`, los timones, los velocímetros y los elementos dibujados en 2D del juego 3D.
 - Los datos de cada pista (`ConfigPista*`): solo cambia cómo se registran.
-- `CarreraVueltas`, `Cronometro`, `MuestraRuta` y los visores 3D.
+- `CarreraVueltas`, `Cronometro`, `MuestraRuta` y los visores 3D. *(Los visores 3D salen de esta lista según el PRD 007, D8, y `CarreraVueltas` y los visores 3D según el PRD 008, D8.)*
 - `src/style.css`.
 
 ## 5. Conceptos de dominio
