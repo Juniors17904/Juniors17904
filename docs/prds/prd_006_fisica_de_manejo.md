@@ -19,9 +19,9 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D3 | Usuarios | La velocidad máxima y el tiempo de una vuelta en Ciudad quedan casi igual que hoy (±10 %). |
 | D4 | Usuarios | El derrape y la inclinación se sienten como ahora: se ajustan números, no la idea. |
 | D5 | Dominio | La física usa el tiempo real de cada paso, no "por paso". El paso fijo de 60 Hz se mantiene. |
-| D6 | Técnico | Se borra `MovimientoLibre` (nadie lo usa) y su reexportación en `model_fisica.js`. |
+| D6 | Técnico | Se borra `MovimientoLibre` (`movimiento_libre.js`, nadie lo crea) y su reexportación en `model_fisica.js`. El ejemplo MVC de `CLAUDE.md` que lo nombra pasa a nombrar `Carro`. |
 | D7 | Técnico | Las constantes de la física viven en una clase propia del modelo, para que `Carro` no crezca. |
-| D8 | Dominio | **Reemplaza:** del PRD 001, `Carro` en la D8 y en su lista de lo que no se modifica. El PRD 001 lleva una nota que lo indica. |
+| D8 | Dominio | **Reemplaza:** del PRD 001, `Carro` en la D8 y en su lista de lo que no se modifica. Del PRD 005, `model_fisica.js` y `movimiento_libre.js` de su lista de lo que no se modifica. Los PRD 001 y 005 llevan una nota que lo indica. |
 
 ## 1. Contexto y problema
 Hoy el carro se maneja como un arcade simple: acelera, frena y se frena solo con valores fijos, y gira igual a 10 km/h que a 200 km/h. Se siente plano y poco creíble. Además, `MovimientoLibre` es una copia vieja de `Carro` que nadie usa.
@@ -43,6 +43,8 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - Los controles (`ControlTimon`, `ControlTeclado`), la cámara, los cielos y los velocímetros.
 - El HUD, la cuenta 3-2-1 y el resultado de Jugar Solo.
 - Los visores 3D, salvo lo mínimo para usar la física nueva.
+- El modo "movimiento libre" de Test Drive con ruta (botón y tecla M): es otra cosa y no depende de la clase `MovimientoLibre`.
+- `Ruta` y su reexportación en `model_fisica.js`.
 - `src/style.css`.
 
 ## 5. Conceptos de dominio
@@ -64,8 +66,8 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - **RF-08 (D4):** el carro sigue derrapando en curvas rápidas y se inclina hacia afuera de la curva.
 - **RF-09 (D5):** con el mismo recorrido, el carro llega al mismo lugar en una pantalla de 30, 60 o 120 Hz (PRD 001, RF-15).
 - **RF-10 (D2):** Jugar Solo, Test Drive recto, Test Drive con ruta y Diseño General usan la física nueva.
-- **RF-11 (D6):** en el proyecto no queda `MovimientoLibre`.
-- **RF-12 (D8):** el PRD 001 tiene la nota de D8 y el backlog enlaza B11 con este PRD.
+- **RF-11 (D6):** en el proyecto no queda la clase `MovimientoLibre`, y el botón de movimiento libre de Test Drive con ruta sigue funcionando.
+- **RF-12 (D8):** los PRD 001 y 005 tienen la nota de D8 y el backlog enlaza B11 con este PRD.
 
 ## 7. Requerimientos no funcionales
 - **RNF-01 (D7), reglas del proyecto:** todo lo nuevo cumple `CLAUDE.md`: una clase por archivo, español, `#privados`, sin `{ }` como entidad, MVC y la regla anti-monolito.
@@ -84,4 +86,4 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - **Timón táctil:** se supone que la entrada sigue llegando de -1 a 1; si no, se anota y no se cambia aquí.
 
 ### Historial
-- **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario y el choque con el PRD 001 resuelto en D8.
+- **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario y los choques con los PRD 001 y 005 resueltos en D8.
