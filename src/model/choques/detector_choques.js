@@ -20,16 +20,15 @@ export class DetectorChoques {
     static #IMPACTO_FRENTE = 0.6;
     static #REBOTE         = -0.3;
     static #PERDIDA_ROCE   = 0.6;
-    static #LARGO_BASICO   = 4.5;   // si nadie dice qué carro se maneja
-    static #ANCHO_BASICO   = 2.07;
 
     #objetos = [];
-    #medioLargo = DetectorChoques.#LARGO_BASICO / 2;
-    #medioAncho = DetectorChoques.#ANCHO_BASICO / 2;
+    #medioLargo = 0;
+    #medioAncho = 0;
 
+    // Sin carro, usa el básico de MedidasEscena (el único lugar con medidas, PRD 009 D5)
     constructor(decoraciones, ruta, medidaCarro = null) {
         this.#objetos = new FabricaObjetosSolidos().crear(decoraciones, ruta);
-        this.usarCarro(medidaCarro);
+        this.usarCarro(medidaCarro ?? new globalThis.MedidasEscena().medidaCarro());
     }
 
     get objetos() { return [...this.#objetos]; }

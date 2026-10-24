@@ -258,7 +258,7 @@ class VisorTestdriveRuta extends VisorBase {
     async cargar(tipo, color) {
         const i = this.#ruta.curve ? this.#ruta.inicio : null;
         if (i) this.#conductor.carro = new RegistroCarros().crear(tipo, i.x, i.z, i.angle);
-        this.#camaraChase.escala = this.#medidas.escalaCamara(tipo); this.#giroRuedas = 6 / this.#medidas.escalaCamara(tipo);
+        this.#camaraChase.escala = this.#medidas.escalaCarro(tipo); this.#giroRuedas = 6 / this.#medidas.escalaCarro(tipo);
         try {
             this.#setCar(await VisorBase.cargarGLTF(), tipo, color);
         } catch(e) { console.error('VisorJuego:', e); }

@@ -48,8 +48,8 @@ class VisorTestdriveRecto extends VisorBase {
 
     async cargar(tipo, color) {
         this.#conductor.carro = new RegistroCarros().crear(tipo, -2, 0, 0);
-        this.#camaraChase.escala = this.#medidas.escalaCamara(tipo);
-        this.#giroRuedas = 6 / this.#medidas.escalaCamara(tipo);
+        this.#camaraChase.escala = this.#medidas.escalaCarro(tipo);
+        this.#giroRuedas = 6 / this.#medidas.escalaCarro(tipo);
         try {
             const gltf = await VisorBase.cargarGLTF();
             this.#setCar(gltf, tipo, color);

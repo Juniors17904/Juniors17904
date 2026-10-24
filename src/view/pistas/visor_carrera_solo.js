@@ -143,7 +143,7 @@ class VisorCarreraSolo extends VisorBase {
     async cargar(tipoAuto, color) {
         if (tipoAuto !== this.#tipoAuto) { this.#tipoAuto = tipoAuto; this.reiniciarCarro(); }
         this.#choques?.usarCarro(this.#medidas.medidaCarro(tipoAuto));
-        if (this.#camara) this.#camara.escala = this.#medidas.escalaCamara(tipoAuto);
+        if (this.#camara) this.#camara.escala = this.#medidas.escalaCarro(tipoAuto);
         try {
             const gltf    = await VisorBase.cargarGLTF();
             if (this.#detenido || !this.#escena) return;
@@ -270,7 +270,7 @@ class VisorCarreraSolo extends VisorBase {
                 altura:    VisorCarreraSolo.#ALTURA_VERTICAL,
             })
             : new CamaraSeguimiento(aspecto);
-        this.#camara.escala = this.#medidas.escalaCamara(this.#tipoAuto);
+        this.#camara.escala = this.#medidas.escalaCarro(this.#tipoAuto);
         this.#aplicarReglaFov(aspecto);
         this.#aplicarAlturaCamara();
     }

@@ -48,6 +48,7 @@ class PruebaEscalaCarroPista {
             vm.runInContext(this.#leer('src/model/' + f), ctx, { filename: f });
         }
         this.#ctx = ctx;
+        globalThis.MedidasEscena = ctx.MedidasEscena;   // DetectorChoques (módulo) lee el carro básico de aquí
     }
 
     #probarCarros(medidas) {
@@ -105,7 +106,7 @@ class PruebaEscalaCarroPista {
             'src/view/pistas/visor_testdrive_ruta.js':                           /_ribbon\(-4, 4|curbW *= 0\.7|3\.8/,
             'src/view/minimapas/recorrido_test_drive_recto.js':                  /3\.8/,
             'src/model/superficies/detector_superficie.js':                      /= 4;|= 4\.7/,
-            'src/model/choques/detector_choques.js':                             /RADIO_CARRO/,
+            'src/model/choques/detector_choques.js':                             /RADIO_CARRO|LARGO_BASICO|ANCHO_BASICO|= 4\.5|2\.07/,
         };
         for (const [archivo, prohibido] of Object.entries(archivos)) {
             this.#ok(!prohibido.test(this.#leer(archivo)), `RNF-01 ${archivo} no repite medidas de la pista ni del carro`);

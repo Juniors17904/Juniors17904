@@ -30,15 +30,15 @@ class MedidasEscena {
     get limitePiano()       { return MedidasEscena.#MEDIO_ANCHO_ASFALTO + MedidasEscena.#ANCHO_PIANO; }
     get limiteSuave()       { return MedidasEscena.#MEDIO_ANCHO_ASFALTO - MedidasEscena.#MARGEN_LIMITE_SUAVE; }
     get lineaBorde()        { return MedidasEscena.#MEDIO_ANCHO_ASFALTO - MedidasEscena.#MARGEN_LINEA_BORDE; }
-    get tipos()             { return [...this.#carros.keys()]; }
 
     // Sin tipo o con un tipo desconocido se usan las del deportivo (carro básico)
     medidaCarro(tipo) {
         return this.#carros.get(tipo) ?? this.#carros.get('deportivo');
     }
 
-    // Cuánto más grande es el carro que antes: la cámara se aleja en proporción (D7)
-    escalaCamara(tipo) {
+    // Cuánto más grande es el carro que antes: la cámara se aleja y las ruedas
+    // giran más lento en proporción (D7)
+    escalaCarro(tipo) {
         return this.medidaCarro(tipo).largo / MedidasEscena.#LARGO_REFERENCIA;
     }
 }

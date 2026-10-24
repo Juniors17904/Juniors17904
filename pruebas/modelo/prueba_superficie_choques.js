@@ -60,6 +60,7 @@ class PruebaSuperficieChoques {
             vm.runInContext(fs.readFileSync(path.join(PruebaSuperficieChoques.#RAIZ, 'src/model', f), 'utf8'), ctx, { filename: f });
         }
         this.#ctx = ctx;
+        globalThis.MedidasEscena = ctx.MedidasEscena;   // DetectorChoques (módulo) lee el carro básico de aquí
     }
 
     #superficie(nombre) {
