@@ -46,10 +46,10 @@ Que todos los archivos cumplan la regla anti-monolito sin excepciones y que cada
 **Out of scope:** las ideas B2 a B9 del backlog y todo lo que figura en la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- El comportamiento y el aspecto del juego.
+- El comportamiento y el aspecto del juego. *(El manejo cambia según el PRD 006, D8; el manejo y el garaje según el PRD 007, D8; el pasto y los choques según el PRD 008, D8.)*
 - Las decisiones de los PRD 001, 002 y 003 (solo se agregan las notas de D9).
-- `src/style.css`.
-- `CarreraVueltas`, `Cronometro` y `MuestraRuta`.
+- `src/style.css`. *(Solo agregar estilos de las barras del garaje, según el PRD 007, D8.)*
+- `CarreraVueltas`, `Cronometro` y `MuestraRuta`. *(`CarreraVueltas` sale según el PRD 008, D8.)*
 - `Modo` y sus subclases, y `ModosDisponibles`.
 - El motor 2D (`Juego`, `Pista`, `Carro2D` y sus renderizadores).
 

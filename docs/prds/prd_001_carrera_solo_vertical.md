@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v4 — implementado y con pruebas en `pruebas/`. Partes reemplazadas por el PRD 002 (D6) |
+| Estado | v4 — implementado y con pruebas en `pruebas/`. Partes reemplazadas por los PRD 002 (D6), 004 (D9), 005 (D9), 006 (D8), 007 (D8) y 008 (D8) |
 | Fecha | 2026-10-21 |
 
 ## Decisiones bloqueadas
@@ -38,7 +38,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 
 **Out of scope:** rivales, récords guardados, choques o daños *(choques reemplazados por PRD 008, D8)*, pausa, turbo en el HUD, modo horizontal de la carrera nueva, cerrar las pistas abiertas y cambios en el multijugador.
 
-**No se modifican:** `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, los cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` ni `src/style.css`. *(`Carro` sale de esta lista según el PRD 006, D8.)* *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9.)*
+**No se modifican:** `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, los cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` ni `src/style.css`. *(`Carro` y `VisorDisenoPista` salen de esta lista según el PRD 006, D8; `VisorDisenoPista` y `src/style.css` —solo agregar estilos— según el PRD 007, D8.)* *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

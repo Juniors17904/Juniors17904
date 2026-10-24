@@ -47,13 +47,13 @@ Que `main` solo tenga el juego 3D, con el código 2D guardado en una etiqueta de
 **Out of scope:** el multijugador 3D (B3), conectar el selector de control al 3D (B4), las ideas B5 a B9 y todo lo de la lista única.
 
 **Lista única de lo que NO se modifica:**
-- El comportamiento y el aspecto del juego 3D.
+- El comportamiento y el aspecto del juego 3D. *(El manejo cambia según el PRD 006, D8; el manejo y el garaje según el PRD 007, D8; el pasto y los choques según el PRD 008, D8.)*
 - `MultiJugador`, los timones y los velocímetros.
 - Los datos de cada pista que usa el 3D: forma, tramos, nombre y colores de la escena 3D.
 - `CarreraVueltas`, `Cronometro` y `MuestraRuta`. *(`CarreraVueltas` sale de esta lista según el PRD 008, D8.)*
 - `model_fisica.js` y `movimiento_libre.js`. *(Salen de esta lista según el PRD 006, D8.)*
-- `src/style.css`. Sus reglas del 2D quedan sin uso y se aceptan.
-- En los visores 3D, los minimapas y los controladores que se conservan, solo cambia cómo piden una pista (D4) y, donde está, el uso de `canvas-carro-3d`. *(Los visores 3D también cambian según el PRD 007, D8, y el PRD 008, D8.)*
+- `src/style.css`. Sus reglas del 2D quedan sin uso y se aceptan. *(Solo agregar estilos de las barras del garaje, según el PRD 007, D8.)*
+- En los visores 3D, los minimapas y los controladores que se conservan, solo cambia cómo piden una pista (D4) y, donde está, el uso de `canvas-carro-3d`. *(`VisorCarreraSolo`, `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana` y `VisorDisenoPista` también cambian según los PRD 006 y 007, D8; `VisorCarreraSolo` según el PRD 008, D8.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
