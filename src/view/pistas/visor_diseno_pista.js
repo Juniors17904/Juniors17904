@@ -40,6 +40,7 @@ class VisorDisenoPista extends VisorBase {
 
     #meshPasto  = null;
     #grupoPista = null;
+    #malla      = null;   // MallaPistaDiseno (piso del PRD 012)
     #carGroup   = null;
     #leanGroup  = null;
 
@@ -199,13 +200,14 @@ class VisorDisenoPista extends VisorBase {
         const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
         this.#meshPasto = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), grassMat);
         this.#meshPasto.rotation.x = -Math.PI / 2;
-        this.#meshPasto.position.y = -0.01;
+        this.#meshPasto.position.y = 0;   // pasto a nivel 0; el asfalto queda arriba (PRD 012, D4)
         this.#meshPasto.receiveShadow = true;
         this.#meshPasto.visible = false;
         this.#scene.add(this.#meshPasto);
 
         // ── Capa 2: pista ────────────────────────────────────────
-        const grupoPista = new MallaPistaDiseno(curve).construir();
+        this.#malla = new MallaPistaDiseno(curve);
+        const grupoPista = this.#malla.construir();
         grupoPista.visible = false;
         this.#grupoPista   = grupoPista;
         this.#scene.add(grupoPista);
@@ -281,6 +283,7 @@ class VisorDisenoPista extends VisorBase {
         for (const obj of this.#objetosPostes)   obj.destruir(this.#scene);
         this.#objetos = []; this.#objetosSenales = []; this.#objetosFlechas = []; this.#objetosPostes = [];
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
+        this.#malla?.liberar(); this.#malla = null; this.#grupoPista = null;
         const gl = this.#renderer?.getContext();
         this.#renderer?.dispose();
         this.#renderer = null;
@@ -296,7 +299,7 @@ class VisorDisenoPista extends VisorBase {
             this.#conductor.avanzar(marca, this.entradaAcel, this.entradaDireccion);
 
             if (this.#carGroup) {
-                this.#carGroup.position.set(this.#mov.px, 0, this.#mov.pz);
+                this.#carGroup.position.set(this.#mov.px, this.#medidas.alturaAsfalto, this.#mov.pz);
                 this.#carGroup.rotation.y = this.#mov.rotY;
             }
             if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
