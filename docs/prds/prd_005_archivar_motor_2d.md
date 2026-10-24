@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v5 — verificado (Verificador PRD ✅), listo para implementar |
+| Estado | v5 — implementado y verificado (Verificador PRD ✅) |
 | Fecha | 2026-10-24 |
 | Backlog | B2 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D9 |
@@ -99,3 +99,4 @@ Que `main` solo tenga el juego 3D, con el código 2D guardado en una rama de arc
   - Decisiones aprobadas por el usuario: borrar `viewer3d.js` y los botones 2D; los campos de D5; `RegistroPistas` como instancia única; conservar el estado "oculto"; limpiar MVC en `CLAUDE.md`; no tocar `model_fisica.js`.
 - **v4** (2026-10-24): Reparador PRD, vuelta 2 (solo detalles). D7 nombra `ModoMultijugador` y `ModoUnirse` y conserva `pantalla-juego` en sus listas. D9 libera también los elementos dibujados en 2D del PRD 002. La lista única permite los cambios de D3, D5 y D7. RNF-01 se limita a lo nuevo o modificado. Vuelta 3: se aclara que se borra `garage.js` y no `garaje.js`; Verificador ✅.
 - **v5** (2026-10-24): D2 pasa de etiqueta a rama de archivo `archivo/v-clasico-2d`, porque GitHub rechaza subir etiquetas desde la sesión (403). Aprobado por el usuario.
+- **Cierre** (2026-10-24): implementado en 3 fases (commits a4357f8, 37a8d30 y 77948bd). Verificador PRD ✅; nota en la D7 del PRD 001, que solo limitaba su propia entrega.

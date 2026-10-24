@@ -17,7 +17,7 @@ Las decisiones se tomaron con el usuario y son definitivas. Si algún requerimie
 | D4 | Se usan la pista elegida en ⚙ → Pistas (Ciudad por defecto) y el carro, el color, el timón y el velocímetro del garaje. |
 | D5 | Una vuelta solo vale si se pasan 3 puntos de control en orden: 33 %, 66 % y meta. |
 | D6 | Clases nuevas, una por archivo: `CarreraVueltas`, `Cronometro` y `MuestraRuta` en el modelo; `VisorCarreraSolo` y `HudCarrera` en la vista; `ControladorCarreraSolo` en el controlador. |
-| D7 | De los archivos existentes del juego solo cambian `index.html` y `aplicacion.js`. También pueden cambiar `pruebas/`, `package.json` (comandos `npm test`) y, con permiso del usuario, `CLAUDE.md`. |
+| D7 | De los archivos existentes del juego solo cambian `index.html` y `aplicacion.js`. También pueden cambiar `pruebas/`, `package.json` (comandos `npm test`) y, con permiso del usuario, `CLAUDE.md`. *(Limita solo la entrega del PRD 001; los PRD 004 y 005 cambian otros archivos según sus decisiones.)* |
 | D8 | Se reutilizan sin modificarlas `Ruta`, `Carro`, la cámara, los objetos de escena, los cielos y el velocímetro. |
 | D9 | La carrera tiene su propia pantalla, así que nunca aparece "GIRA TU CELULAR". `GestorOrientacion` no se modifica. *(Reemplazado por PRD 005, D9: `GestorOrientacion` se borra.)* |
 | D10 | Distribución en vertical: arriba la vuelta y el tiempo, al centro la pista, abajo el timón a la izquierda y ACEL/FRENO a la derecha, con el velocímetro encima. En PC es igual, centrado, y usa los botones del teclado. |
