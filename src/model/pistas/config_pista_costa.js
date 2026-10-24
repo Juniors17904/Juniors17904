@@ -27,13 +27,14 @@ class ConfigPistaCosta extends ConfigPista {
     get cielo()   { return ['#0a3a6a', '#1a6aaa']; }
 
     get decoraciones() {
+        const dist = this._distanciaPostesYSenales();   // postes y señales (PRD 010, D7)
         return [
             ...this._flechasEnCurvas(),
-            { tipo: 'senal_curva', prog: 0.08, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.28, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.48, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.68, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.88, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.08, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.28, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.48, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.68, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.88, lado: 1, dist,      direccion: 'derecha'   },
         ];
     }
 }

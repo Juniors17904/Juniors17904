@@ -2,7 +2,8 @@
 
 // ================================================================
 // MODEL — ObjetoSolido: algo junto a la pista que el carro no puede
-// atravesar (PRD 008, D2 y D6). Cada tipo define su radio; la posición
+// atravesar (PRD 008, D2 y D6). Cada tipo define su radio, que sale de
+// MedidasEscena (PRD 010, D6); la posición
 // la calcula el modelo a partir de los datos de la pista.
 // ================================================================
 export class ObjetoSolido {

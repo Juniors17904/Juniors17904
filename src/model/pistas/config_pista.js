@@ -10,9 +10,17 @@ class ConfigPista {
     get tramos()          { return []; }
     get decoraciones()    { return []; }
 
+    // Metros del centro de la pista a postes y señales de curva (PRD 010, D5 y D7).
+    // Se lee de MedidasEscena recién al pedir las decoraciones: las pistas se
+    // cargan antes que MedidasEscena, así que no se lee al crearlas.
+    _distanciaPostesYSenales() {
+        return new window.MedidasEscena().distanciaPostesYSenales;
+    }
+
     // Genera postes de alumbrado cada `cadaSegs` segmentos, alternando lados.
     // Las subclases llaman this._postesEnPista() en su get decoraciones().
-    _postesEnPista(cadaSegs = 2, dist = 5.5) {
+    _postesEnPista(cadaSegs = 2) {
+        const dist = this._distanciaPostesYSenales();
         const resultado = [];
         let idx = 0;
         for (let i = 0; i < this.totalSegs; i += cadaSegs) {

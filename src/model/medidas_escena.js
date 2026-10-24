@@ -5,8 +5,10 @@
 // (PRD 009, D5). Escala: 1 unidad = 1 metro.
 //   - Medidas de cada tipo de carro (MedidaCarro).
 //   - Ancho del asfalto y del piano, y los bordes que salen de ellos.
-//   La usan la vista (carro, pista, cámara, minimapa) y el modelo
-//   (DetectorSuperficie y DetectorChoques).
+//   - Medidas del árbol, el poste y la señal de curva, y la distancia de
+//     postes y señales a la pista (PRD 010, D3, D5 y D6).
+//   La usan la vista (carro, pista, objetos, cámara, minimapa) y el modelo
+//   (DetectorSuperficie, DetectorChoques, objetos sólidos y pistas).
 // ================================================================
 class MedidasEscena {
     static #MEDIO_ANCHO_ASFALTO = 4;
@@ -14,6 +16,20 @@ class MedidasEscena {
     static #MARGEN_LIMITE_SUAVE = 0.2;   // el límite suave de los Test Drive, antes del borde
     static #MARGEN_LINEA_BORDE  = 0.1;   // la línea blanca del borde, dentro del asfalto
     static #LARGO_REFERENCIA    = 2.6;   // largo con que se dibujaba el carro antes del PRD 009
+
+    // Objetos junto a la pista (PRD 010, D3): el árbol con tamaño propio 1
+    static #ALTO_ARBOL          = 7;
+    static #RADIO_TRONCO_ARBOL  = 0.3;
+    static #ALTURA_MINIMA_COPA  = 2.3;   // la copa nunca empieza más abajo, con cualquier tamaño propio
+    static #ALTO_POSTE          = 8;
+    static #RADIO_POSTE         = 0.15;
+    static #LARGO_BRAZO_POSTE   = 1.5;
+    static #RADIO_LAMPARA       = 0.25;
+    static #ALTO_PALO_SENAL     = 2.2;
+    static #RADIO_PALO_SENAL    = 0.05;
+    static #LADO_CARTEL_SENAL   = 0.7;
+    static #GROSOR_CARTEL_SENAL = 0.03;
+    static #DISTANCIA_POSTES_Y_SENALES = 6.0;   // del centro de la pista (PRD 010, D5)
 
     // Largo real (D3) y proporciones ancho/largo y alto/largo de cada modelo GLB
     #carros = new Map([
@@ -30,6 +46,26 @@ class MedidasEscena {
     get limitePiano()       { return MedidasEscena.#MEDIO_ANCHO_ASFALTO + MedidasEscena.#ANCHO_PIANO; }
     get limiteSuave()       { return MedidasEscena.#MEDIO_ANCHO_ASFALTO - MedidasEscena.#MARGEN_LIMITE_SUAVE; }
     get lineaBorde()        { return MedidasEscena.#MEDIO_ANCHO_ASFALTO - MedidasEscena.#MARGEN_LINEA_BORDE; }
+
+    // Árbol (tamaño propio 1: alto y radio se multiplican por el tamaño propio)
+    get altoArbol()         { return MedidasEscena.#ALTO_ARBOL; }
+    get radioTroncoArbol()  { return MedidasEscena.#RADIO_TRONCO_ARBOL; }
+    get alturaMinimaCopa()  { return MedidasEscena.#ALTURA_MINIMA_COPA; }
+
+    // Poste de alumbrado
+    get altoPoste()         { return MedidasEscena.#ALTO_POSTE; }
+    get radioPoste()        { return MedidasEscena.#RADIO_POSTE; }
+    get largoBrazoPoste()   { return MedidasEscena.#LARGO_BRAZO_POSTE; }
+    get radioLampara()      { return MedidasEscena.#RADIO_LAMPARA; }
+
+    // Señal de curva
+    get altoPaloSenal()     { return MedidasEscena.#ALTO_PALO_SENAL; }
+    get radioPaloSenal()    { return MedidasEscena.#RADIO_PALO_SENAL; }
+    get ladoCartelSenal()   { return MedidasEscena.#LADO_CARTEL_SENAL; }
+    get grosorCartelSenal() { return MedidasEscena.#GROSOR_CARTEL_SENAL; }
+
+    // Metros del centro de la pista a postes y señales de curva
+    get distanciaPostesYSenales() { return MedidasEscena.#DISTANCIA_POSTES_Y_SENALES; }
 
     // Sin tipo o con un tipo desconocido se usan las del deportivo (carro básico)
     medidaCarro(tipo) {

@@ -66,12 +66,15 @@ const arbol = await page.evaluate(async () => {
   ruta.construir(pista.tramos, pista.totalSegs);
   const a = new DetectorChoques(pista.decoraciones, ruta).objetos.find(o => o.tipo === 'arbol');
   const c = window.__carro;
-  window.__arbol = { x: a.x, z: a.z, radio: a.radio };
+  const dec = pista.decoraciones.find(d => d.tipo === 'arbol');
+  window.__arbol = { x: a.x, z: a.z, radio: a.radio, escala: dec.escala ?? 1 };
   c.setPosicion(a.x - Math.sin(c.velAngle) * 8, a.z - Math.cos(c.velAngle) * 8);
   window.__distMin = Infinity;
   return window.__arbol;
 });
 check(!!arbol, 'hay un árbol sólido en Ciudad');
+// PRD 010 RF-06: el árbol choca con su tronco (0,3 m × su tamaño propio), no con el radio fijo viejo de 0,9 m
+check(Math.abs(arbol.radio - 0.3 * arbol.escala) < 1e-9, `PRD 010 RF-06 el árbol choca con el radio de su tronco (${arbol.radio.toFixed(2)} m = 0,3 × ${arbol.escala})`);
 
 // Ficha del carro antes del choque: mismas constantes = sin daño (RF-09)
 const fichaCarro = () => page.evaluate(() => {
@@ -90,7 +93,9 @@ const r = await page.evaluate(() => ({
   pantalla: document.querySelector('.pantalla.activa')?.id,
 }));
 check(r.rebotes.length > 0, `RF-05 el carro choca con el árbol (${r.rebotes.length} choques)`);
-check(r.distMin >= arbol.radio + 0.8 - 1e-6, `RF-05 nunca entra en el árbol (distancia mínima ${r.distMin.toFixed(2)})`);
+// El centro del carro nunca queda más cerca del tronco que su radio más medio ancho del
+// carro más angosto (0,8 m; PRD 009). Con el tronco del PRD 010 (RF-05) el radio es 0,3 × tamaño propio.
+check(r.distMin >= arbol.radio + 0.8 - 1e-6, `RF-05 / PRD 010 RF-05 nunca entra en el tronco del árbol (distancia mínima ${r.distMin.toFixed(2)})`);
 check(r.rebotes.some(x => x.factor < 0), 'RF-07 de frente rebota hacia atrás');
 check(r.pantalla === 'pantalla-carrera-solo', 'RF-09 la carrera sigue en pantalla (sin reinicio)');
 check(r.tiempo > t0 + 2000, `RF-09 el cronómetro sigue corriendo (${t0} → ${r.tiempo} ms)`);

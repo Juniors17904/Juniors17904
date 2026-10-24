@@ -26,13 +26,14 @@ class ConfigPistaDesierto extends ConfigPista {
     get cielo()   { return ['#7c4a1e', '#c47a2b']; }
 
     get decoraciones() {
+        const dist = this._distanciaPostesYSenales();   // postes y señales (PRD 010, D7)
         return [
             ...this._flechasEnCurvas(),
-            { tipo: 'senal_curva', prog: 0.12, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.32, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.52, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.72, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.92, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.12, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.32, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.52, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.72, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.92, lado: 1, dist,      direccion: 'derecha'   },
         ];
     }
 }

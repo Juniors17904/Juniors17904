@@ -26,13 +26,14 @@ class ConfigPistaMontana extends ConfigPista {
     get cielo()   { return ['#1a2a3a', '#2d4a5a']; }
 
     get decoraciones() {
+        const dist = this._distanciaPostesYSenales();   // postes y señales (PRD 010, D7)
         return [
             ...this._flechasEnCurvas(),
-            { tipo: 'senal_curva', prog: 0.05, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.22, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.38, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.58, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.78, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.05, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.22, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.38, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.58, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.78, lado: 1, dist,      direccion: 'derecha'   },
         ];
     }
 }

@@ -29,15 +29,16 @@ class ConfigPistaVolcan extends ConfigPista {
     get cielo()   { return ['#1a0a00', '#3a1400']; }
 
     get decoraciones() {
+        const dist = this._distanciaPostesYSenales();   // postes y señales (PRD 010, D7)
         return [
             ...this._flechasEnCurvas(),
-            { tipo: 'senal_curva', prog: 0.05, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.17, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.30, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.45, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.58, lado: 1, dist: 5.5, direccion: 'derecha'   },
-            { tipo: 'senal_curva', prog: 0.78, lado: 1, dist: 5.5, direccion: 'izquierda' },
-            { tipo: 'senal_curva', prog: 0.93, lado: 1, dist: 5.5, direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.05, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.17, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.30, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.45, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.58, lado: 1, dist,      direccion: 'derecha'   },
+            { tipo: 'senal_curva', prog: 0.78, lado: 1, dist,      direccion: 'izquierda' },
+            { tipo: 'senal_curva', prog: 0.93, lado: 1, dist,      direccion: 'derecha'   },
         ];
     }
 }

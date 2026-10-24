@@ -30,7 +30,18 @@ class VisorDisenoObjetos extends VisorBase {
     #resizeObs     = null;
     #funcionAnimacion = () => this.#tick();
     #grupoPiso     = null;
+    #esquinasObjeto = null;   // caja del objeto a encuadrar (null si es flotante)
     static #TIPOS_NOCHE = new Set(['nube', 'luna']);
+
+    // Encuadre al abrir (PRD 010, D2/RF-04). El punto al que mira la órbita y
+    // la distancia máxima son los de ControlOrbitaObjeto (target y maxDistance).
+    static #FOV_BASE        = 50;
+    static #FOV_MAXIMO      = 80;
+    static #OBJETIVO_ORBITA = new THREE.Vector3(0, 1.5, 0);
+    static #DISTANCIA_MIN   = 3;
+    static #DISTANCIA_MAX   = 20;
+    static #MARGEN_PANTALLA = 0.85;            // el objeto ocupa hasta el 85 % del alto/ancho
+    static #ELEVACIONES     = [25, 15, 5, 0];  // grados sobre el horizonte, de más alta a más baja
 
     constructor(canvas) {
         super();
@@ -55,7 +66,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#cieloActivo = this.#cielo;
         this.#scene.fog = null;
 
-        this.#camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 200);
+        this.#camera = new THREE.PerspectiveCamera(VisorDisenoObjetos.#FOV_BASE, W / H, 0.1, 200);
         this.#camera.position.set(8, 6, 8);
 
         this.#controlOrbita = new ControlOrbitaObjeto();
@@ -135,6 +146,7 @@ class VisorDisenoObjetos extends VisorBase {
         this.#camera.aspect = W / H;
         this.#camera.updateProjectionMatrix();
         this.#renderer?.setSize(W, H, false);
+        this.#encuadrar();   // con otra proporción de pantalla, el objeto debe seguir entrando
     }
 
     // ── Cambiar fondo según el tipo de objeto ────────────────────
@@ -170,12 +182,74 @@ class VisorDisenoObjetos extends VisorBase {
         this.#cambiarCielo(nocturno);
         this.#camera.position.set(flotante ? 6 : 8, flotante ? 7 : 6, flotante ? 6 : 8);
 
+        this.#camera.fov = VisorDisenoObjetos.#FOV_BASE;
+        this.#camera.updateProjectionMatrix();
+
         this.#objeto = this.#fabrica.crear(tipo, 0, 0,
             { escala: tipo === 'arbol' ? 1.4 : 1, texto: 'STOP', direccion: 'derecha' });
+        const antes = new Set(this.#scene.children);
         await this.#objeto?.construir(this.#scene);
+        this.#esquinasObjeto = flotante ? null
+            : this.#esquinasDe(this.#scene.children.filter(h => !antes.has(h)));
+        this.#encuadrar();
+    }
+
+    // ── Encuadre: aleja la cámara hasta que la caja del objeto entra entera ──
+    // Lo nuevo en la escena tras construir() es el objeto (y su luz, que no
+    // tiene geometría y no cuenta en la caja).
+    #encuadrar() {
+        const esquinas = this.#esquinasObjeto;
+        if (!esquinas) return;
+        this.#camera.fov = VisorDisenoObjetos.#FOV_BASE;
+        this.#camera.updateProjectionMatrix();
+
+        for (const grados of VisorDisenoObjetos.#ELEVACIONES) {
+            for (let d = VisorDisenoObjetos.#DISTANCIA_MIN; d <= VisorDisenoObjetos.#DISTANCIA_MAX; d += 0.25) {
+                this.#ubicarCamara(grados, d);
+                if (this.#entra(esquinas)) return;
+            }
+        }
+        // No entra ni a la distancia máxima: se abre el ángulo de la cámara
+        this.#ubicarCamara(0, VisorDisenoObjetos.#DISTANCIA_MAX);
+        while (!this.#entra(esquinas) && this.#camera.fov < VisorDisenoObjetos.#FOV_MAXIMO) {
+            this.#camera.fov += 1;
+            this.#camera.updateProjectionMatrix();
+        }
+    }
+
+    // Cámara en diagonal (como antes, desde +X +Z) mirando al objetivo de la órbita
+    #ubicarCamara(grados, distancia) {
+        const elev = THREE.MathUtils.degToRad(grados);
+        const horiz = Math.cos(elev) * distancia / Math.SQRT2;
+        const obj = VisorDisenoObjetos.#OBJETIVO_ORBITA;
+        this.#camera.position.set(obj.x + horiz, obj.y + Math.sin(elev) * distancia, obj.z + horiz);
+        this.#camera.lookAt(obj);
+        this.#camera.updateMatrixWorld(true);
+    }
+
+    #entra(esquinas) {
+        const m = VisorDisenoObjetos.#MARGEN_PANTALLA;
+        const p = new THREE.Vector3();
+        return esquinas.every(e => {
+            p.copy(e).project(this.#camera);
+            return p.z < 1 && Math.abs(p.x) <= m && Math.abs(p.y) <= m;
+        });
+    }
+
+    #esquinasDe(nuevos) {
+        const caja = new THREE.Box3();
+        nuevos.forEach(h => caja.expandByObject(h));
+        if (caja.isEmpty()) return null;
+        const { min, max } = caja;
+        const lista = [];
+        for (const x of [min.x, max.x])
+            for (const y of [min.y, max.y])
+                for (const z of [min.z, max.z]) lista.push(new THREE.Vector3(x, y, z));
+        return lista;
     }
 
     mostrarCielo() {
+        this.#esquinasObjeto = null;
         if (this.#objeto) { this.#objeto.destruir(this.#scene); this.#objeto = null; }
     }
 

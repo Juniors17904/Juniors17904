@@ -8,6 +8,7 @@ import { SenalCurvaSolida } from './senal_curva_solida.js';
 // MODEL — FabricaObjetosSolidos: crea un ObjetoSolido por cada árbol,
 // poste o señal de curva de los datos de la pista, sin cambiarlos
 // (PRD 008, D2 y D6). Las flechas y lo demás no son sólidos.
+// Al árbol le pasa su tamaño propio (la escala de la decoración, PRD 010 D3).
 // ================================================================
 export class FabricaObjetosSolidos {
     #clases = new Map([
@@ -27,6 +28,7 @@ export class FabricaObjetosSolidos {
             objetos.push(new Clase(
                 pos.x + Math.cos(pos.angle) * dec.dist * dec.lado,
                 pos.z - Math.sin(pos.angle) * dec.dist * dec.lado,
+                dec.escala ?? 1,   // solo lo usa el árbol
             ));
         }
         return objetos;
