@@ -22,10 +22,8 @@ class PilotoAutomatico {
         const n = PilotoAutomatico.#MUESTRAS;
         let recorrido = 0;
         for (let paso = 1; paso <= maxPasos; paso++) {
-            this.#conducir(carro);
-            carro.actualizar(1000 / 60);
             const antes = this.#indice;
-            this.#ubicar(carro);
+            this.pasoAutomatico(carro);
             let delta = this.#indice - antes;
             if (delta < -n / 2) delta += n;
             if (delta > n / 2) delta -= n;
@@ -34,6 +32,18 @@ class PilotoAutomatico {
         }
         return null;
     }
+
+    // Un paso de 1/60 s: decide las entradas, mueve el carro y lo ubica en la ruta
+    pasoAutomatico(carro, alPaso = null) {
+        const px = carro.px, pz = carro.pz;
+        this.#conducir(carro);
+        carro.actualizar(1000 / 60);
+        alPaso?.(carro, px, pz);
+        this.#ubicar(carro);
+    }
+
+    // Vuelve a ubicarse en la ruta tras mover el carro a mano
+    reubicar(carro) { this.#ubicar(carro); }
 
     #ubicar(carro) {
         const n = PilotoAutomatico.#MUESTRAS;

@@ -6,12 +6,14 @@
 //   RF-05 no atraviesa árboles, postes ni señales (también a máxima velocidad)
 //   RF-06 las flechas no son sólidas · RF-07 rebota y pierde más si va más rápido
 //   RF-08 nunca queda atrapado · RF-10 los otros visores no usan choques ni superficie
+//   RF-11 una vuelta con choque y pasto cuenta los puntos de control y la vuelta
 //   RNF-01 una clase por tipo · RNF-03 detectar choques es barato
 // ================================================================
 'use strict';
 const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
+const { PilotoAutomatico } = require('./piloto_automatico.cjs');
 
 class PruebaSuperficieChoques {
     static #RAIZ = path.join(__dirname, '..', '..');
@@ -39,6 +41,7 @@ class PruebaSuperficieChoques {
         this.#probarChoques();
         this.#probarNoAtrapado();
         this.#probarSoloJugarSolo();
+        this.#probarVueltaConChoquesYPasto();
         this.#probarRendimiento();
 
         for (const f of this.#fallos) console.log('❌ ' + f);
@@ -51,8 +54,8 @@ class PruebaSuperficieChoques {
     #cargarClasicos() {
         const ctx = { console, Math }; ctx.window = ctx;
         vm.createContext(ctx);
-        const archivos = ['superficies/superficie.js', 'superficies/superficie_asfalto.js', 'superficies/superficie_piano.js',
-            'superficies/superficie_pasto.js', 'superficies/detector_superficie.js',
+        const archivos = ['muestra_ruta.js', 'superficies/superficie.js', 'superficies/superficie_asfalto.js', 'superficies/superficie_piano.js',
+            'superficies/superficie_pasto.js', 'superficies/detector_superficie.js', 'carrera_vueltas.js',
             'registro_pistas.js', 'pistas/config_pista.js', 'pistas/config_pista_ciudad.js', 'pistas/config_pista_costa.js'];
         for (const f of archivos) {
             vm.runInContext(fs.readFileSync(path.join(PruebaSuperficieChoques.#RAIZ, 'src/model', f), 'utf8'), ctx, { filename: f });
@@ -173,9 +176,11 @@ class PruebaSuperficieChoques {
         return { dentro, choco, vAntes, vDespues, carro };
     }
 
+    // Un detector con un solo objeto del mismo tipo en (0, 0)
     #resolverContra(carro, objeto, px, pz) {
-        const detector = new this.#DetectorChoques([], null);
-        return detector.resolverObjeto(carro, objeto, px, pz);
+        const enOrigen = { posicionEn: () => ({ x: 0, z: 0, angle: 0 }) };
+        const detector = new this.#DetectorChoques([{ tipo: objeto.tipo, prog: 0, lado: 1, dist: 0 }], enOrigen);
+        return detector.resolver(carro, px, pz);
     }
 
     #probarChoques() {
@@ -231,6 +236,50 @@ class PruebaSuperficieChoques {
         }
         const solo = fs.readFileSync(path.join(carpeta, 'visor_carrera_solo.js'), 'utf8');
         this.#ok(/DetectorChoques/.test(solo) && /pisar\(/.test(solo), 'D7 Jugar Solo usa choques y superficie');
+    }
+
+    // RF-11: el piloto da una vuelta en Ciudad; cerca del inicio se lo lleva contra
+    // un árbol (en el pasto) y luego retoma. Deben salir 2 puntos de control y la vuelta.
+    #probarVueltaConChoquesYPasto() {
+        const pista = this.#ctx.registroPistas.obtener('ciudad'), ruta = this.#rutaDe(pista);
+        const muestras = Array.from({ length: 400 }, (_, i) => {
+            const p = ruta.posicionEn(i / 400);
+            return new this.#ctx.MuestraRuta(p.x, p.z, p.angle);
+        });
+        const carrera  = new this.#ctx.CarreraVueltas(muestras, 1);
+        const detector = new this.#DetectorChoques(pista.decoraciones, ruta);
+        const arbol    = detector.objetos.find(o => o.tipo === 'arbol');
+        const inicio   = ruta.inicio, carro = new this.#Carro(inicio.x, inicio.z, inicio.angle);
+        const piloto   = new PilotoAutomatico(ruta);
+        const eventos = [];
+        let choques = 0, pisoPasto = false, forzado = false;
+        const alPaso = (c, px, pz) => { if (detector.resolver(c, px, pz)) choques++; };
+
+        for (let paso = 0; paso < 60 * 200 && !eventos.includes('meta'); paso++) {
+            if (!forzado && piloto.progreso > 0.02) {
+                forzado = true;
+                carro.setPosicion(arbol.x - Math.sin(carro.velAngle) * 8, arbol.z - Math.cos(carro.velAngle) * 8);
+                carro.entradaAcel = 1; carro.entradaDireccion = 0;
+                for (let i = 0; i < 90; i++) {
+                    const px = carro.px, pz = carro.pz;
+                    carro.actualizar(PruebaSuperficieChoques.#PASO);
+                    alPaso(carro, px, pz);
+                    const ev = carrera.actualizar(carro.px, carro.pz);
+                    carro.pisar(carrera.superficie);
+                    pisoPasto ||= carrera.enPasto;
+                    if (ev !== 'nada') eventos.push(ev);
+                }
+                piloto.reubicar(carro);
+            }
+            piloto.pasoAutomatico(carro, alPaso);
+            const ev = carrera.actualizar(carro.px, carro.pz);
+            carro.pisar(carrera.superficie);
+            pisoPasto ||= carrera.enPasto;
+            if (ev !== 'nada') eventos.push(ev);
+        }
+        this.#ok(choques > 0 && pisoPasto, `RF-11 hubo choque (${choques}) y pasto (${pisoPasto})`);
+        const esperados = ['puntoControl', 'puntoControl', 'meta'];
+        this.#ok(JSON.stringify(eventos) === JSON.stringify(esperados), `RF-11 eventos de la vuelta: ${eventos}`);
     }
 
     #probarRendimiento() {

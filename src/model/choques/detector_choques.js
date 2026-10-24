@@ -1,14 +1,11 @@
 'use strict';
 
-import { ArbolSolido }      from './arbol_solido.js';
-import { PosteSolido }      from './poste_solido.js';
-import { SenalCurvaSolida } from './senal_curva_solida.js';
+import { FabricaObjetosSolidos } from './fabrica_objetos_solidos.js';
 
 // ================================================================
 // MODEL — DetectorChoques: choques del carro contra los objetos sólidos
 // de la pista (PRD 008, D2, D4 y D6).
-//   - Crea un ObjetoSolido por cada árbol, poste o señal de curva de los
-//     datos de la pista, sin cambiarlos. Las flechas no son sólidas.
+//   - Los objetos los crea FabricaObjetosSolidos (las flechas no son sólidas).
 //   - Revisa el tramo recorrido en el paso (no solo el punto final), así
 //     el carro no salta un objeto aunque vaya rápido.
 //   - Al chocar deja el carro fuera del objeto: de frente rebota hacia
@@ -24,37 +21,23 @@ export class DetectorChoques {
     #objetos = [];
 
     constructor(decoraciones, ruta) {
-        for (const dec of decoraciones ?? []) {
-            const Clase = this.#claseDe(dec?.tipo);
-            if (!Clase || !ruta) continue;
-            const pos = ruta.posicionEn(dec.prog);
-            const x = pos.x + Math.cos(pos.angle) * dec.dist * dec.lado;
-            const z = pos.z - Math.sin(pos.angle) * dec.dist * dec.lado;
-            this.#objetos.push(new Clase(x, z));
-        }
+        this.#objetos = new FabricaObjetosSolidos().crear(decoraciones, ruta);
     }
 
     get objetos() { return [...this.#objetos]; }
-
-    #claseDe(tipo) {
-        if (tipo === 'arbol')       return ArbolSolido;
-        if (tipo === 'poste')       return PosteSolido;
-        if (tipo === 'senal_curva') return SenalCurvaSolida;
-        return null;
-    }
 
     // Revisa el paso de (pxAntes, pzAntes) a la posición actual del carro.
     // Devuelve true si chocó.
     resolver(carro, pxAntes, pzAntes) {
         let choco = false;
         for (const objeto of this.#objetos) {
-            if (this.resolverObjeto(carro, objeto, pxAntes, pzAntes)) choco = true;
+            if (this.#resolverObjeto(carro, objeto, pxAntes, pzAntes)) choco = true;
         }
         return choco;
     }
 
     // Choque contra un solo objeto
-    resolverObjeto(carro, objeto, pxAntes, pzAntes) {
+    #resolverObjeto(carro, objeto, pxAntes, pzAntes) {
         const minimo = objeto.radio + DetectorChoques.#RADIO_CARRO;
         const mx = carro.px - pxAntes, mz = carro.pz - pzAntes;
         const largo2 = mx * mx + mz * mz;

@@ -85,22 +85,40 @@ for (const [ancho, alto, nombre] of [[390, 844, 'vertical'], [844, 390, 'horizon
   await page.close();
 }
 
-// RF-02: guardar "pickup" y manejar en Test Drive con su física
-{
+// RF-02: guardar "pickup" y manejar en las 5 pantallas con su física.
+// Espía el Carro real (mismo módulo que usan los visores) para leer sus constantes.
+const PANTALLAS = [
+  ['Test Drive simple',   ['btn-garage', 'btn-test-drive-3d', 'btn-td3d-simple']],
+  ['Test Drive con ruta', ['btn-garage', 'btn-test-drive-3d', 'btn-td3d-con-ruta']],
+  ['Diseño de Pistas',    ['btn-garage', 'btn-ir-pista', '.pista-card[data-pista="ciudad"]', 'btn-seleccionar-pista']],
+  ['Diseño General',      ['btn-garage', 'btn-ir-diseno-general']],
+  ['Jugar Solo',          ['btn-solo']],
+];
+for (const [nombre, pasos] of PANTALLAS) {
   const { page, errores } = await abrir(844, 390);
+  await page.evaluate(async () => {
+    const { Carro } = await import('/src/model/carros/carro.js');
+    const actualizar = Carro.prototype.actualizar;
+    Carro.prototype.actualizar = function (dt) { window.__carro = this; return actualizar.call(this, dt); };
+  });
   await marcar(page, 'pickup');
   await clic(page, 'btn-ver-carro'); await page.waitForTimeout(800);
   await clic(page, 'btn-seleccionar-carro'); await page.waitForTimeout(400);
-  await clic(page, 'btn-garage'); await page.waitForTimeout(300);
-  await clic(page, 'btn-test-drive-3d'); await page.waitForTimeout(300);
-  await clic(page, 'btn-td3d-simple'); await page.waitForTimeout(3500);
-  const mostrado = parseFloat(await page.evaluate(() => document.getElementById('dbg-f-accel').textContent));
-  const esperado = await page.evaluate(async () => {
+  for (const paso of pasos) {
+    if (paso.startsWith('.')) await page.evaluate(s => document.querySelector(s).click(), paso);
+    else await clic(page, paso);
+    await page.waitForTimeout(400);
+  }
+  await page.waitForTimeout(nombre === 'Jugar Solo' ? 6000 : 4000);
+  await page.keyboard.down('ArrowUp'); await page.waitForTimeout(500); await page.keyboard.up('ArrowUp');
+  const r = await page.evaluate(async () => {
     const { RegistroCarros } = await import('/src/model/carros/registro_carros.js');
-    return new RegistroCarros().constantesDe('pickup').aceleracion;
+    return { usada: window.__carro?.constantes?.aceleracion, clase: window.__carro?.constructor?.name,
+             esperada: new RegistroCarros().constantesDe('pickup').aceleracion };
   });
-  check(Math.abs(mostrado - esperado) < 1e-9, `RF-02 Test Drive maneja con la física del carro guardado (${mostrado} = ${esperado})`);
-  check(reales(errores).length === 0, `RF-02 sin errores de consola ${reales(errores).join(' | ')}`);
+  check(r.usada === r.esperada && r.clase === 'CarroPickup',
+    `RF-02 ${nombre} maneja con la física del carro guardado (${r.clase}, ${r.usada} = ${r.esperada})`);
+  check(reales(errores).length === 0, `RF-02 ${nombre} sin errores de consola ${reales(errores).join(' | ')}`);
   await page.close();
 }
 

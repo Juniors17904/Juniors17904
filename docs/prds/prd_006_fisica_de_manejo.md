@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v4 — cerrado con el usuario, listo para implementar |
+| Estado | v5 — implementado y verificado (Verificador PRD ✅), con pruebas en `pruebas/` |
 | Fecha | 2026-10-24 |
 | Backlog | B11 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D8 |
@@ -21,7 +21,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D5 | Dominio | La física usa el tiempo real de cada paso. Los 5 visores avanzan con paso fijo de 60 Hz reutilizando `BuclePasoFijo`, que se mueve de `src/view/pistas/carrera_solo/` a `src/view/pistas/comun/`; hoy solo Jugar Solo lo usa. *(v2; v4 aprobado por el usuario)* |
 | D6 | Técnico | Se borra la clase `MovimientoLibre` (`movimiento_libre.js`, nadie la crea) y su reexportación en `model_fisica.js`. Se quita de `CLAUDE.md` (ejemplo MVC) y de los comentarios de `carro.js` que la nombran. |
 | D7 | Técnico | Las constantes de la física viven en una clase propia del modelo. Se borran sus copias en `get physics()` de `VisorTestdriveRecto` y `VisorTestdriveRuta` (la distancia de cámara `camDist` se queda en el visor), y los paneles de depuración (`PanelDatosTestDriveRecto`, `PanelDatosCircuito3D`) leen las del carro activo. *(v2)* |
-| D8 | Dominio | **Reemplaza:** del PRD 001, `Carro` en la D8 y `Carro` y `VisorDisenoPista` en su lista de lo que no se modifica. Del PRD 002, `VisorCarreraSolo` y `BuclePasoFijo` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego", solo en el manejo. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el manejo), `model_fisica.js`, `movimiento_libre.js` y los 5 visores de D2. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
+| D8 | Dominio | **Reemplaza:** del PRD 001, `Carro` en la D8 y `Carro` y `VisorDisenoPista` en su lista de lo que no se modifica. Del PRD 002, `VisorCarreraSolo` y `BuclePasoFijo` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego", solo en el manejo. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el manejo), `model_fisica.js`, `movimiento_libre.js` y los 5 visores de D2; también `ControlesCircuito3D` (solo el renombre de RNF-02). Del PRD 002, también `PanelDatosTestDriveRecto` y `PanelDatosCircuito3D` dentro de "los elementos dibujados en 2D" (D7). Esos PRD llevan una nota que lo indica. *(v2: completa; v5 suma controles y paneles)* |
 | D9 | Técnico | Lo nuevo va en clases aparte; los visores solo las llaman, para no pasar de 400 líneas. *(v2)* |
 
 ## 1. Contexto y problema
@@ -94,3 +94,4 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: D3 aplica al carro básico, D2 suma Diseño de Pistas, D5 da paso fijo a los 5 visores, D7 borra las copias de constantes y conecta los paneles, D9 clases aparte. Detalles: D8 completa con los PRD 002 y 004; RF-11 de código pasa a RNF-02.
 - **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: `camDist` se queda, D8 entra al In scope, turbo de `Carro` fuera de alcance, nota del PRD 007 en `src/style.css`, RNF-02 aclara los nombres del modo, riesgos de lecturas públicas y de `BuclePasoFijo`.
 - **v4** (2026-10-24): cierre con el usuario. Decisiones aprobadas: `BuclePasoFijo` se mueve a `src/view/pistas/comun/` (D5) y el método en inglés del modo movimiento libre pasa a español (RNF-02). Detalles: D8 nombra `Carro` en la lista del PRD 001 y `BuclePasoFijo` en el PRD 002; historial ordenado.
+- **v5** (2026-10-24): implementado. Verificador PRD: D8 nombra `ControlesCircuito3D` y los dos paneles de datos; estado al día.

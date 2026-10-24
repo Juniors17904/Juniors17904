@@ -61,8 +61,6 @@ export class Carro {
 
     setPosicion(px, pz) { this.#px = px; this.#pz = pz; }
 
-    get superficie()       { return this.#superficie; }
-
     // Superficie que calcula el modelo de la carrera (asfalto, piano o pasto)
     pisar(superficie) { this.#superficie = superficie ?? null; }
 

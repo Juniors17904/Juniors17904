@@ -24,6 +24,8 @@ Errores ya cometidos en el proyecto y la regla para que no se repitan. Léela an
 | 18 | Ir demasiado lejos del tema: muchas vueltas sobre el mismo PRD | Sesión del PRD 001 (Carrera Solo) | Tiempo perdido sin avance | Cerrar cuando el Verificador PRD da verde; lo demás va a una tarea nueva |
 | 19 | Un agente editó una decisión bloqueada (D7, añadir `package.json`) sin aprobación | PRD 001 (Carrera Solo) | Verificador PRD | Las decisiones bloqueadas solo cambian con aprobación explícita del usuario; si hace falta, se pregunta y no se edita |
 | 20 | Dos plazos de 6 s seguidos (módulo y GLB) daban un peor caso de ~12 s | Controlador de Carrera Solo | Verificador PRD | Un límite de tiempo se mide con un solo reloj desde el inicio y se prueba el peor caso combinado |
+| 21 | Prueba de un cambio de física que también pasaba con la física vieja (el radio de giro ya crecía con la velocidad) | PRD 006, RF-01 | Revisor de pruebas del Verificador PRD (mutación) | Cuando un RF cambia un comportamiento, la prueba lo compara con el comportamiento anterior (por ejemplo, una copia de la física vieja en `pruebas/`) y se comprueba que falla con el código viejo |
+| 22 | Prueba de navegador que esperaba milisegundos para medir la física; en una máquina lenta daba menos pasos y fallaba al azar | `prueba_visor_controlador.mjs` (PRD 008) | Verificador PRD (dos corridas con fallos distintos) | En el navegador se espera un número de pasos de física, no un tiempo (lección 9) |
 
 ## Antes de llevar algo a main
 

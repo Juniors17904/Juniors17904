@@ -31,13 +31,8 @@ const numero = async (page, id) => parseFloat(await texto(page, id));
 // Aceleración esperada: la del carro guardado en el garaje (PRD 007) o la del básico (PRD 006)
 const esperada = page => page.evaluate(async () => {
   const tipo = window.aplicacion?.estado?.tipoAuto ?? document.querySelector('.carro-card.sel')?.dataset.tipo;
-  try {
-    const { RegistroCarros } = await import('/src/model/carros/registro_carros.js');
-    return new RegistroCarros().constantesDe(tipo).aceleracion;
-  } catch {
-    const { ConstantesFisica } = await import('/src/model/carros/constantes_fisica.js');
-    return new ConstantesFisica().aceleracion;
-  }
+  const { RegistroCarros } = await import('/src/model/carros/registro_carros.js');
+  return new RegistroCarros().constantesDe(tipo).aceleracion;
 });
 
 async function abrir() {

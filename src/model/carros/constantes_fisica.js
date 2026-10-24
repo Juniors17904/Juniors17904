@@ -56,4 +56,6 @@ export class ConstantesFisica {
     get subviraje()      { return this.#subviraje; }
     get masa()           { return this.#masa; }
     get agarre()         { return this.#agarre; }
+    // Fuerza del motor por unidad de masa: cuánto empuja de verdad
+    get empuje()         { return this.#aceleracion / this.#masa; }
 }

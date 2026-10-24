@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v4 — cerrado con el usuario, listo para implementar |
+| Estado | v5 — implementado y verificado (Verificador PRD ✅), con pruebas en `pruebas/` |
 | Fecha | 2026-10-24 |
 | Backlog | B12 (`docs/BACKLOG.md`) |
 | Depende de | PRD 006 (física de manejo) |
@@ -91,3 +91,4 @@ Que elegir carro sea una decisión de juego: cada uno se maneja distinto y el ga
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: D1 suma Diseño de Pistas, D4 marcado/guardado, D9 solo agregar estilos, D10 tabla de `CLAUDE.md` y clases aparte. Detalles: D6 nombra las subclases y su arreglo, D8 completa con los PRD 001, 002, 004 y 006.
 - **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: D8 libera los controladores del PRD 005, D8 entra al In scope, RF-09 de código pasa a RNF-02, riesgo de orden de carga en los 5 visores y del modelo de velocímetro.
 - **v4** (2026-10-24): cierre con el usuario. Detalles: D8 libera `ControladorCarreraSolo` del PRD 002, riesgo de orden de carga con 4 visores, historial ordenado.
+- **v5** (2026-10-24): implementado y verificado con el Verificador PRD; estado al día.

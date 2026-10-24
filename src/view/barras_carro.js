@@ -23,10 +23,9 @@ class BarrasCarro {
         const todas = this.#registro.tipos.map(t => this.#registro.constantesDe(t));
         const c     = this.#registro.constantesDe(tipo);
         const mejor = medir => Math.max(...todas.map(medir));
-        const empuje = x => x.aceleracion / x.masa;
         const filas = [
             ['Velocidad',   c.velMaxAdelante / mejor(x => x.velMaxAdelante)],
-            ['Aceleración', empuje(c)        / mejor(empuje)],
+            ['Aceleración', c.empuje         / mejor(x => x.empuje)],
             ['Agarre',      c.agarre         / mejor(x => x.agarre)],
         ];
 

@@ -34,6 +34,7 @@ class PruebaFisicaManejo {
         this.#probarComparacionV1();
         this.#probarFrecuencias();
         this.#probarSinMovimientoLibre();
+        this.#probarVisoresConPasoFijo();
 
         for (const f of this.#fallos) console.log('❌ ' + f);
         console.log(this.#fallos.length ? `${this.#fallos.length} fallo(s)` : 'Todo OK');
@@ -45,8 +46,8 @@ class PruebaFisicaManejo {
     #pasos(carro, n) { for (let i = 0; i < n; i++) carro.actualizar(PruebaFisicaManejo.#PASO); }
 
     // Lleva el carro a una velocidad y mide el radio de giro con el timón al máximo
-    #radioGiro(velocidad) {
-        const carro = new this.#Carro(0, 0, 0);
+    #radioGiro(velocidad, Clase = this.#Carro) {
+        const carro = new Clase(0, 0, 0);
         carro.entradaAcel = 1;
         while (carro.velocidad < velocidad) carro.actualizar(PruebaFisicaManejo.#PASO);
         carro.entradaAcel = 0;
@@ -58,8 +59,14 @@ class PruebaFisicaManejo {
     }
 
     #probarGiro() {
-        const lento = this.#radioGiro(0.1), rapido = this.#radioGiro(0.7);
-        this.#ok(lento < rapido, `RF-01 radio lento ${lento.toFixed(1)} < rápido ${rapido.toFixed(1)}`);
+        const lento = this.#radioGiro(0.1), medio = this.#radioGiro(0.35), rapido = this.#radioGiro(0.7);
+        this.#ok(lento < medio && medio < rapido, `RF-01 radio lento ${lento.toFixed(1)} < medio ${medio.toFixed(1)} < rápido ${rapido.toFixed(1)}`);
+        // Con la física v1 el radio crecía solo en proporción a la velocidad (giro fijo por paso).
+        // La nueva abre la curva MÁS que eso a alta velocidad (subviraje) y la cierra a poca velocidad.
+        const proporcional = medio * 0.7 / 0.35;
+        this.#ok(rapido > proporcional * 1.03, `RF-01 a alta velocidad la curva es más abierta que con giro fijo (${rapido.toFixed(1)} > ${proporcional.toFixed(1)})`);
+        const v1Lento = this.#radioGiro(0.1, CarroReferenciaV1);
+        this.#ok(lento > v1Lento, `RF-01 a poca velocidad ya no gira en el lugar como la v1 (${lento.toFixed(1)} > ${v1Lento.toFixed(1)})`);
         const quieto = new this.#Carro(0, 0, 0);
         quieto.entradaDireccion = 1;
         this.#pasos(quieto, 60);
@@ -160,6 +167,19 @@ class PruebaFisicaManejo {
         const a = this.#recorrido(30), b = this.#recorrido(60), c = this.#recorrido(120);
         const maxDif = Math.max(Math.hypot(a.px - b.px, a.pz - b.pz), Math.hypot(c.px - b.px, c.pz - b.pz));
         this.#ok(maxDif < 1.5, 'RF-09 mismo lugar a 30/60/120 Hz, diferencia ' + maxDif.toFixed(3));
+    }
+
+    // RF-09/RF-10: los visores manejan el carro solo a través de ConductorPasoFijo
+    #probarVisoresConPasoFijo() {
+        const carpeta = path.join(PruebaFisicaManejo.#RAIZ, 'src/view/pistas');
+        for (const archivo of ['visor_carrera_solo.js', 'visor_testdrive_recto.js', 'visor_testdrive_ruta.js', 'visor_diseno_pista.js']) {
+            const texto = fs.readFileSync(path.join(carpeta, archivo), 'utf8');
+            this.#ok(/new ConductorPasoFijo\(/.test(texto), `RF-10 ${archivo} usa ConductorPasoFijo`);
+            this.#ok(!/\.actualizar\(\s*(16)?\s*\)\s*;/.test(texto.replace(/#?\w*(cielo|camara|camaraChase|camAerea)\??\.actualizar\([^)]*\)/gi, '')),
+                `RF-09 ${archivo} no mueve el carro por cuadro`);
+        }
+        const urbana = fs.readFileSync(path.join(carpeta, 'visor_carrera_urbana.js'), 'utf8');
+        this.#ok(/extends VisorTestdriveRuta/.test(urbana), 'RF-10 VisorCarreraUrbana hereda la física de VisorTestdriveRuta');
     }
 
     #probarSinMovimientoLibre() {
