@@ -43,8 +43,8 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 - Las reglas de física del PRD 006 y las físicas por carro del PRD 007.
 - Las vueltas, los puntos de control, `Cronometro`, `MuestraRuta` y el resultado.
 - Los datos de cada pista (`ConfigPista*`) y `FabricaObjetoEscena`.
-- `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana` y `VisorDisenoPista` (D7).
-- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos, los velocímetros y `src/style.css`.
+- `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana` y `VisorDisenoPista` (D7). *(Estos visores cambian según el PRD 009, D9: tamaño del carro y cámara.)*
+- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos, los velocímetros y `src/style.css`. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D9.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
