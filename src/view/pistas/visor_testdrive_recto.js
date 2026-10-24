@@ -1,6 +1,7 @@
 'use strict';
 import * as THREE from 'three';
 import { Carro } from '../../model/carros/carro.js';
+import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { VisorBase } from '../visor_base.js';
 import { CieloSoleado } from '../cielo_soleado.js';
@@ -11,9 +12,9 @@ import { CieloSoleado } from '../cielo_soleado.js';
 class VisorTestdriveRecto extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #carGroup = null; #idAnimacion = 0; #sun = null; #cielo = null;
-    #funcionAnimacion = () => this.#tick();
+    #funcionAnimacion = marca => this.#tick(marca);
     #resizeHandler = null;
-    #carro = null;
+    #conductor = new ConductorPasoFijo(carro => this.#limitarPista(carro));
     #leanGroup = null;
     #wheels = [];
 
@@ -25,7 +26,9 @@ class VisorTestdriveRecto extends VisorBase {
     get aceleracion()  { return this.#carro?.aceleracion  ?? 0; }
     get velocidadMax() { return this.#carro?.velocidadMax ?? 0; }
     get camRotY()  { return 0; }
-    get physics()  { return { velMaxAdelante:0.74, velMaxReversa:0.28, constAceleracion:0.006, constFreno:0.026, constArrastre:0.009, constDireccion:0.010, camDist:7 }; }
+    get constantesFisica() { return this.#carro?.constantes ?? null; }
+    get camDist()  { return 7; }
+    get #carro()   { return this.#conductor.carro; }
     get px()       { return this.#carro?.px       ?? -2; }
     get pz()       { return this.#carro?.pz       ?? 0; }
     get rotY()     { return this.#carro?.rotY     ?? 0; }
@@ -36,7 +39,7 @@ class VisorTestdriveRecto extends VisorBase {
         this.#canvas = canvas;
         this.#canvas.width  = window.innerWidth;
         this.#canvas.height = window.innerHeight;
-        this.#carro = new Carro(-2, 0, 0);
+        this.#conductor.carro = new Carro(-2, 0, 0);
         this.#init();
     }
 
@@ -60,6 +63,7 @@ class VisorTestdriveRecto extends VisorBase {
             window.addEventListener('orientationchange', () => {
                 setTimeout(this.#resizeHandler, 120);
             });
+            this.#conductor.reiniciar();
             this.#tick();
         }
     }
@@ -310,9 +314,9 @@ class VisorTestdriveRecto extends VisorBase {
         }
     }
 
-    #tick() {
+    #tick(marca) {
         this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
-        this.#updatePhysics();
+        this.#updatePhysics(marca);
         this.#camaraChase.altura = this.alturaCamara;
         this.#camaraChase.actualizar(this.#carro.px, this.#carro.pz, 0);
         this.#sun.position.set(this.#carro.px + 10, 20, this.#carro.pz + 10);
@@ -322,15 +326,15 @@ class VisorTestdriveRecto extends VisorBase {
         this.#renderer.render(this.#scene, this.#camaraChase.camera);
     }
 
-    #updatePhysics() {
-        this.#carro.entradaAcel      = this.entradaAcel;
-        this.#carro.entradaDireccion = this.entradaDireccion;
-        this.#carro.actualizar();
+    // Bordes de la recta y vuelta al inicio, después de cada paso fijo
+    #limitarPista(carro) {
+        if (Math.abs(carro.px) > 3.8) carro.setPosicion(carro.px * 0.90, carro.pz);
+        if (carro.pz >  950) carro.setPosicion(carro.px, carro.pz - 1900);
+        if (carro.pz < -950) carro.setPosicion(carro.px, carro.pz + 1900);
+    }
 
-        const px = this.#carro.px, pz = this.#carro.pz;
-        if (Math.abs(px) > 3.8)  this.#carro.setPosicion(px * 0.90, pz);
-        if (this.#carro.pz >  950) this.#carro.setPosicion(this.#carro.px, this.#carro.pz - 1900);
-        if (this.#carro.pz < -950) this.#carro.setPosicion(this.#carro.px, this.#carro.pz + 1900);
+    #updatePhysics(marca) {
+        this.#conductor.avanzar(marca, this.entradaAcel, this.entradaDireccion);
 
         if (this.#carGroup) {
             this.#carGroup.position.set(this.#carro.px, 0, this.#carro.pz);

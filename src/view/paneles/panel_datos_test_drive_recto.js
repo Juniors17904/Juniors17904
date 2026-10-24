@@ -39,13 +39,13 @@ class PanelDatosTestDriveRecto extends PanelDatos {
         document.getElementById('dbg-fps').textContent    = fps;
         document.getElementById('dbg-camh').textContent   = td.alturaCamara.toFixed(2);
         document.getElementById('dbg-cam-roty').textContent = (td.camRotY * 180 / Math.PI).toFixed(1);
-        document.getElementById('dbg-cam-dist').textContent = td.physics.camDist;
-        const ph = td.physics;
-        document.getElementById('dbg-f-accel').textContent  = ph.constAceleracion;
-        document.getElementById('dbg-f-brake').textContent  = ph.constFreno;
-        document.getElementById('dbg-f-drag').textContent   = ph.constArrastre;
-        document.getElementById('dbg-f-steer').textContent  = ph.constDireccion;
-        document.getElementById('dbg-f-maxfwd').textContent = ph.velMaxAdelante;
-        document.getElementById('dbg-f-maxrev').textContent = ph.velMaxReversa;
+        document.getElementById('dbg-cam-dist').textContent = td.camDist;
+        const ph = td.constantesFisica;
+        document.getElementById('dbg-f-accel').textContent  = ph?.aceleracion;
+        document.getElementById('dbg-f-brake').textContent  = ph?.freno;
+        document.getElementById('dbg-f-drag').textContent   = ph?.rodadura;
+        document.getElementById('dbg-f-steer').textContent  = ph?.direccion;
+        document.getElementById('dbg-f-maxfwd').textContent = ph?.velMaxAdelante;
+        document.getElementById('dbg-f-maxrev').textContent = ph?.velMaxReversa;
     }
 }

@@ -1,31 +1,32 @@
 'use strict';
 
-// ================================================================
-// MODEL — Carro 3D (física de movimiento libre)
-// Reemplaza MovimientoLibre para los modos 3D (ManejoLibre3D, CircuitoUrbano).
-// Misma interfaz pública que MovimientoLibre + turbo.
-// ================================================================
+import { ConstantesFisica } from './constantes_fisica.js';
 
+// ================================================================
+// MODEL — Carro 3D: física de manejo con tiempo real (PRD 006)
+//   - El giro depende de la velocidad: detenido no gira, lento gira
+//     cerrado y rápido da una curva más abierta.
+//   - Al soltar el pedal frena la rodadura más el aire (crece con v²).
+//   - La aceleración baja al acercarse al tope.
+//   - actualizar(dtMs) escala todo por el tiempo real del paso.
+//   Los números viven en ConstantesFisica (uno por tipo de carro).
+// ================================================================
 export class Carro {
-    // Física configurable (pueden sobreescribirse en subclases)
-    velMaxAdelante = 0.74;
-    velMaxReversa  = 0.28;
-    constAceleracion = 0.006;
-    constFreno     = 0.026;
-    constArrastre  = 0.009;
-    constDireccion = 0.010;
+    static #MS_REFERENCIA = 1000 / 60;
+    static #EMPUJE_EN_TOPE = 0.7;   // la aceleración cae un 70 % cerca del tope
 
-    // Turbo
+    // Turbo (sin uso en 3D; fuera de alcance hasta B9)
     turboMaximo    = 3;
     turbosLeft     = 3;
     turboActivo    = false;
     turboDuracion  = 3000;
     turboMultiplicador = 1.75;
 
-    // Inputs
+    // Entradas
     entradaAcel      = 0;
     entradaDireccion = 0;
 
+    #constantes;
     #px; #pz; #rotY;
     #velocidad       = 0;
     #aceleracion     = 0;
@@ -34,13 +35,18 @@ export class Carro {
     #velAngle        = 0;
     #driftAngle      = 0;
     #turboTimer      = 0;
+    #fraccionTope    = 1;
+    #factorArrastre  = 1;
     #velocimetroModelo = 2;  // F1 por defecto
 
-    constructor(px = 0, pz = 0, rotY = 0) {
+    constructor(px = 0, pz = 0, rotY = 0, constantes = new ConstantesFisica()) {
         this.#px = px; this.#pz = pz; this.#rotY = rotY;
-        this.#velAngle = rotY;
+        this.#velAngle   = rotY;
+        this.#constantes = constantes instanceof ConstantesFisica ? constantes : new ConstantesFisica();
     }
 
+    get constantes()       { return this.#constantes; }
+    get velMaxAdelante()   { return this.#constantes.velMaxAdelante; }
     get px()               { return this.#px; }
     get pz()               { return this.#pz; }
     get rotY()             { return this.#rotY; }
@@ -55,6 +61,12 @@ export class Carro {
 
     setPosicion(px, pz) { this.#px = px; this.#pz = pz; }
 
+    // Tope y arrastre que calcula el modelo de la carrera (pasto)
+    aplicarTope(fraccion, factorArrastre) {
+        if (Number.isFinite(fraccion))       this.#fraccionTope   = fraccion;
+        if (Number.isFinite(factorArrastre)) this.#factorArrastre = factorArrastre;
+    }
+
     activarTurbo() {
         if (this.turbosLeft > 0 && !this.turboActivo) {
             this.turboActivo  = true;
@@ -63,44 +75,73 @@ export class Carro {
         }
     }
 
-    actualizar(dt = 16) {
-        if (this.turboActivo) {
-            this.#turboTimer -= dt;
-            if (this.#turboTimer <= 0) this.turboActivo = false;
-        }
-        const turboK = this.turboActivo ? this.turboMultiplicador : 1;
-        const maxFwd = this.velMaxAdelante * turboK;
-        const prev   = this.#velocidad;
+    actualizar(dtMs = Carro.#MS_REFERENCIA) {
+        const k = Math.min(5, Math.max(0, (Number(dtMs) || 0) / Carro.#MS_REFERENCIA));
+        if (k === 0) return;
+        this.#actualizarTurbo(dtMs);
 
-        if (this.entradaAcel === 1)
-            this.#velocidad = Math.min(maxFwd, this.#velocidad + this.constAceleracion * turboK);
-        else if (this.entradaAcel === -1) {
-            if (this.#velocidad > 0.01) this.#velocidad = Math.max(0, this.#velocidad - this.constFreno);
-            else                        this.#velocidad = Math.max(-this.velMaxReversa, this.#velocidad - this.constAceleracion * 0.6);
-        } else {
-            if (this.#velocidad > 0) this.#velocidad = Math.max(0, this.#velocidad - this.constArrastre);
-            else                     this.#velocidad = Math.min(0, this.#velocidad + this.constArrastre);
-        }
-
+        const prev = this.#velocidad;
+        this.#velocidad = this.#nuevaVelocidad(k);
         this.#aceleracion = this.#velocidad - prev;
         if (Math.abs(this.#velocidad) > this.#velocidadMax) this.#velocidadMax = Math.abs(this.#velocidad);
 
-        if (Math.abs(this.#velocidad) > 0.005)
-            this.#rotY -= this.entradaDireccion * this.constDireccion * Math.sign(this.#velocidad);
+        this.#rotY -= this.#giro() * k;
+        this.#seguirDerrape(k);
 
-        // Derrape: velAngle sigue a rotY con lag proporcional a velocidad y giro
-        const sf = Math.abs(this.#velocidad) / this.velMaxAdelante;
-        const grip = 1 - sf * Math.abs(this.entradaDireccion) * 0.92;
-        this.#velAngle += (this.#rotY - this.#velAngle) * Math.min(0.10, Math.max(0.04, grip));
+        this.#px += Math.sin(this.#velAngle) * this.#velocidad * k;
+        this.#pz += Math.cos(this.#velAngle) * this.#velocidad * k;
+
+        const sf = Math.abs(this.#velocidad) / this.#constantes.velMaxAdelante;
+        this.#carLean += (-this.entradaDireccion * 0.22 * sf - this.#carLean) * (1 - Math.pow(0.92, k));
+    }
+
+    #actualizarTurbo(dtMs) {
+        if (!this.turboActivo) return;
+        this.#turboTimer -= dtMs;
+        if (this.#turboTimer <= 0) this.turboActivo = false;
+    }
+
+    #nuevaVelocidad(k) {
+        const c      = this.#constantes;
+        const turboK = this.turboActivo ? this.turboMultiplicador : 1;
+        const vMax   = c.velMaxAdelante * turboK;
+        const tope   = vMax * this.#fraccionTope;
+        const v      = this.#velocidad;
+
+        if (this.entradaAcel === 1) {
+            const u      = Math.max(0, v) / vMax;
+            const empuje = c.aceleracion * turboK / c.masa * (1 - Carro.#EMPUJE_EN_TOPE * u * u);
+            return Math.min(tope, v + empuje * k);
+        }
+        if (this.entradaAcel === -1) {
+            if (v > 0.01) return Math.max(0, v - c.freno / c.masa * k);
+            return Math.max(-c.velMaxReversa, v - c.aceleracion * 0.6 / c.masa * k);
+        }
+        const u = v / c.velMaxAdelante;
+        const arrastre = (c.rodadura + c.aire * u * u) * this.#factorArrastre / c.masa * k;
+        return v > 0 ? Math.max(0, v - arrastre) : Math.min(0, v + arrastre);
+    }
+
+    // Velocidad angular: 0 detenido, crece hasta velGiroPleno y luego
+    // baja con el subviraje a alta velocidad
+    #giro() {
+        const c = this.#constantes;
+        const v = Math.abs(this.#velocidad);
+        if (v <= 0.005) return 0;
+        const arranque  = Math.min(1, v / c.velGiroPleno);
+        const u         = v / c.velMaxAdelante;
+        const subviraje = 1 / (1 + c.subviraje * u * u);
+        return this.entradaDireccion * c.direccion * arranque * subviraje * Math.sign(this.#velocidad);
+    }
+
+    // Derrape: velAngle sigue a rotY con un retraso que crece con la
+    // velocidad y el giro, y baja con el agarre
+    #seguirDerrape(k) {
+        const c     = this.#constantes;
+        const sf    = Math.abs(this.#velocidad) / c.velMaxAdelante;
+        const grip  = 1 - sf * Math.abs(this.entradaDireccion) * 0.92 / c.agarre;
+        const f     = Math.min(0.10, Math.max(0.04, grip));
+        this.#velAngle  += (this.#rotY - this.#velAngle) * (1 - Math.pow(1 - f, k));
         this.#driftAngle = this.#rotY - this.#velAngle;
-
-        this.#px += Math.sin(this.#velAngle) * this.#velocidad;
-        this.#pz += Math.cos(this.#velAngle) * this.#velocidad;
-
-        this.#carLean += (-this.entradaDireccion * 0.22 * sf - this.#carLean) * 0.08;
     }
 }
-
-// CarroDeportivo → carro_deportivo.js
-// CarroSUV       → carro_suv.js
-// CarroMusculo   → carro_musculo.js

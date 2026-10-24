@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { Ruta } from '../../model/ruta.js';
 import { Carro } from '../../model/carros/carro.js';
+import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { CieloSoleado }  from '../cielo_soleado.js';
 import { CieloNocturno } from '../cielo_nocturno.js';
@@ -14,14 +15,14 @@ import { VisorBase } from '../visor_base.js';
 class VisorTestdriveRuta extends VisorBase {
     #renderer = null; #scene = null; #camaraChase = null;
     #canvas; #hudCanvas = null; #hudCtx = null; #idAnimacion = 0; #sun = null;
-    #funcionAnimacion = () => this.#tick();
+    #funcionAnimacion = marca => this.#tick(marca);
     #carGroup = null; #leanGroup = null; #wheels = []; #cielo = null;
     #resizeHandler = null;
 
     #ruta = new Ruta();
     #camAerea = null;
     #camAereaActiva = false;
-    #mov = null;
+    #conductor = new ConductorPasoFijo(carro => this.#seguirRuta(carro));
     #dirLine  = null;
     #camPunto = null;
 
@@ -44,14 +45,16 @@ class VisorTestdriveRuta extends VisorBase {
     get camRotX()      { return this.#camaraChase?.camRotX ?? 0; }
     get camRotY()      { return this.#camaraChase?.camRotY ?? 0; }
     get camRotZ()      { return this.#camaraChase?.camRotZ ?? 0; }
-    get physics()      { return { velMaxAdelante:0.74, velMaxReversa:0.28, constAceleracion:0.006, constFreno:0.026, constArrastre:0.009, constDireccion:0.010, camDist:7 }; }
+    get constantesFisica() { return this.#mov?.constantes ?? null; }
+    get camDist()      { return 7; }
+    get #mov()         { return this.#conductor.carro; }
     get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
     get lateral()      { return this.#lateral; }
     get pathLen()      { return this.#ruta.longitud; }
     get camAereaActiva()    { return this.#camAereaActiva; }
     get camAerea()          { return this.#camAerea; }
     get movimientoLibre()   { return this.#movimientoLibre; }
-    toggleMovimientoLibre() { this.#movimientoLibre = !this.#movimientoLibre; return this.#movimientoLibre; }
+    alternarMovimientoLibre() { this.#movimientoLibre = !this.#movimientoLibre; return this.#movimientoLibre; }
     get camaraChasePos() {
         const p = this.#camaraChase?.camera?.position;
         return p ? { x: p.x, z: p.z } : null;
@@ -130,7 +133,7 @@ class VisorTestdriveRuta extends VisorBase {
             }
             this.#ruta.construir(pista.tramos, pista.totalSegs);
             const inicio = this.#ruta.inicio;
-            this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
+            this.#conductor.carro = new Carro(inicio.x, inicio.z, inicio.angle);
             if (pista.cielo && this.#cielo) {
                 this.#cielo.destruir(this.#scene);
                 this.#cielo = pista.tipoCielo === 'soleado'
@@ -285,6 +288,7 @@ class VisorTestdriveRuta extends VisorBase {
             };
             window.addEventListener('resize', this.#resizeHandler);
             window.addEventListener('orientationchange', () => setTimeout(this.#resizeHandler, 120));
+            this.#conductor.reiniciar();
             this.#tick();
         }
     }
@@ -299,9 +303,9 @@ class VisorTestdriveRuta extends VisorBase {
         this.#renderer?.dispose(); this.#renderer = null;
     }
 
-    #tick() {
+    #tick(marca) {
         this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
-        this.#updatePhysics();
+        this.#updatePhysics(marca);
         this.#camaraChase.altura = this.alturaCamara;
         this.#camaraChase.actualizar(this.#mov.px, this.#mov.pz, this.#mov.velAngle, this.entradaDireccion);
         if (this.#camAereaActiva) {
@@ -355,27 +359,22 @@ class VisorTestdriveRuta extends VisorBase {
     }
 
     // ── Física ───────────────────────────────────────────────────
-    #updatePhysics() {
-        this.#mov.entradaAcel = this.entradaAcel;
-        this.#mov.entradaDireccion = this.entradaDireccion;
-        this.#mov.actualizar();
+    // Avance por la ruta y límite suave, después de cada paso fijo
+    #seguirRuta(carro) {
+        if (this.#movimientoLibre || this.#ruta.longitud <= 0) return;
+        this.#progress = ((this.#progress + carro.velocidad / this.#ruta.longitud) % 1 + 1) % 1;
 
-        if (!this.#movimientoLibre && this.#ruta.longitud > 0) {
-            this.#progress = ((this.#progress + this.#mov.velocidad / this.#ruta.longitud) % 1 + 1) % 1;
+        // Límite suave: empujar de vuelta si se aleja más de 3.8 del trazado
+        const p = this.#ruta.posicionEn(this.#progress);
+        const dx = carro.px - p.x, dz = carro.pz - p.z;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        this.#lateral = dx * Math.cos(p.angle) + dz * -Math.sin(p.angle);
+        if (dist > 3.8) carro.setPosicion(p.x + (dx / dist) * 3.8 * 0.90, p.z + (dz / dist) * 3.8 * 0.90);
+    }
 
-            // Límite suave: empujar de vuelta si se aleja más de 3.8 del trazado
-            const p = this.#ruta.posicionEn(this.#progress);
-            const dx = this.#mov.px - p.x, dz = this.#mov.pz - p.z;
-            const dist = Math.sqrt(dx * dx + dz * dz);
-            const perpX = Math.cos(p.angle), perpZ = -Math.sin(p.angle);
-            this.#lateral = dx * perpX + dz * perpZ;
-            if (dist > 3.8) {
-                this.#mov.setPosicion(
-                    p.x + (dx / dist) * 3.8 * 0.90,
-                    p.z + (dz / dist) * 3.8 * 0.90
-                );
-            }
-        }
+    #updatePhysics(marca) {
+        if (!this.#mov) return;
+        this.#conductor.avanzar(marca, this.entradaAcel, this.entradaDireccion);
 
         if (this.#carGroup) {
             this.#carGroup.position.set(this.#mov.px, 0, this.#mov.pz);

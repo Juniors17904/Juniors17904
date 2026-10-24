@@ -69,7 +69,7 @@ class ControlesCircuito3D {
     }
 
     #alternarMovimientoLibre(btnMovLibre) {
-        const libre = this.#visor.toggleMovimientoLibre();
+        const libre = this.#visor.alternarMovimientoLibre();
         btnMovLibre.textContent = libre ? 'LIBRE' : 'PATH';
         btnMovLibre.style.color = libre ? '#34d399' : '#a78bfa';
     }

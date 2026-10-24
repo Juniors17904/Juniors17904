@@ -3,6 +3,7 @@
 import * as THREE    from 'three';
 import { Ruta } from '../../model/ruta.js';
 import { Carro }             from '../../model/carros/carro.js';
+import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
 import { VisorBase }         from '../visor_base.js';
 import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
@@ -24,7 +25,7 @@ class VisorDisenoPista extends VisorBase {
     #idAnimacion         = 0;
     #cielo       = null;
     #ruta        = new Ruta();
-    #mov         = null;
+    #conductor   = new ConductorPasoFijo();
     #sol         = null;
     #resizeObs   = null;
 
@@ -33,7 +34,7 @@ class VisorDisenoPista extends VisorBase {
     #objetosSenales = [];
     #objetosFlechas = [];
     #objetosPostes  = [];
-    #funcionAnimacion     = () => this.#tick();
+    #funcionAnimacion     = marca => this.#tick(marca);
 
     #meshPasto  = null;
     #grupoPista = null;
@@ -190,7 +191,7 @@ class VisorDisenoPista extends VisorBase {
         if (!curve) return;
 
         const inicio = this.#ruta.inicio;
-        this.#mov = new Carro(inicio.x, inicio.z, inicio.angle);
+        this.#conductor.carro = new Carro(inicio.x, inicio.z, inicio.angle);
 
         // ── Capa 1: pasto ────────────────────────────────────────
         const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
@@ -259,7 +260,9 @@ class VisorDisenoPista extends VisorBase {
 
     // ── Loop de render ───────────────────────────────────────────
     iniciar() {
-        if (!this.#idAnimacion) this.#tick();
+        if (this.#idAnimacion) return;
+        this.#conductor.reiniciar();
+        this.#tick();
     }
 
     detener() {
@@ -279,13 +282,13 @@ class VisorDisenoPista extends VisorBase {
         gl?.getExtension('WEBGL_lose_context')?.loseContext();
     }
 
-    #tick() {
+    get #mov() { return this.#conductor.carro; }
+
+    #tick(marca) {
         this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
 
         if (this.#mov) {
-            this.#mov.entradaAcel = this.entradaAcel;
-            this.#mov.entradaDireccion = this.entradaDireccion;
-            this.#mov.actualizar();
+            this.#conductor.avanzar(marca, this.entradaAcel, this.entradaDireccion);
 
             if (this.#carGroup) {
                 this.#carGroup.position.set(this.#mov.px, 0, this.#mov.pz);

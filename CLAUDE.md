@@ -85,7 +85,7 @@ class NivelCiudad extends Nivel {
 - Nunca como propiedad persistente de otra clase ni como `window.X`
 
 ### MVC obligatorio
-- **Model** → datos y física (`Carro`, `Ruta`, `MovimientoLibre`). Sin lógica de vista.
+- **Model** → datos y física (`Carro`, `Ruta`, `CarreraVueltas`). Sin lógica de vista.
 - **View** → dibujo, cámaras, controles UI (`CamaraSeguimiento`, `ControlTimon`, `Minimapa`). Sin lógica de negocio.
 - **Controller** → orquesta Model y View (`aplicacion.js`, `juego.js`). Sin física ni dibujo directo.
 - **Excepción permitida — visores 3D:** un visor de pista (subclase de `VisorBase`) puede crear su `Ruta` y su `Carro` y avanzar la física con paso fijo, porque la integración va atada al render. Las **reglas de negocio** (vueltas, tiempos, penalizaciones como el pasto) viven siempre en clases del modelo (`CarreraVueltas`, `Cronometro`…); el visor solo aplica lo que el modelo calcula.

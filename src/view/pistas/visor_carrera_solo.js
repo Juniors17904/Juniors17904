@@ -8,13 +8,13 @@ import { CamaraSeguimiento }   from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
 import { CieloSoleado }        from '../cielo_soleado.js';
 import { CieloNocturno }       from '../cielo_nocturno.js';
-import { BuclePasoFijo }       from './carrera_solo/bucle_paso_fijo.js';
+import { ConductorPasoFijo }   from './comun/conductor_paso_fijo.js';
 import { ConstructorCircuitoCarreraSolo } from './carrera_solo/constructor_circuito_carrera_solo.js';
 
 // ================================================================
 // VIEW — VisorCarreraSolo: escena 3D de la carrera "Jugar Solo" en vertical.
 //   - La superficie de la pista la arma ConstructorCircuitoCarreraSolo.
-//   - Mueve el Carro existente con pasos fijos de 60 Hz (BuclePasoFijo).
+//   - Mueve el Carro con pasos fijos de 60 Hz (ConductorPasoFijo).
 //   - NO decide reglas de carrera: solo copia el tope que le pasa el
 //     controlador (aplicarTope).
 // ================================================================
@@ -34,7 +34,6 @@ class VisorCarreraSolo extends VisorBase {
     #cielo        = null;
     #sol          = null;
     #ruta         = new Ruta();
-    #carro        = null;
     #fabrica      = new FabricaObjetoEscena();
     #objetos      = [];
     #circuito     = null;   // ConstructorCircuitoCarreraSolo
@@ -48,15 +47,12 @@ class VisorCarreraSolo extends VisorBase {
     #observador   = null;
     #detenido     = false;
 
-    #bucle            = new BuclePasoFijo();
-    #pasosUltimoFrame = 0;
+    #conductor        = new ConductorPasoFijo();
+    #fraccionTope     = 1;
+    #factorArrastre   = 1;
     #congelado        = false;
     #callbackFrame    = null;
 
-    #velocidadMaxBase = 0;
-    #arrastreBase     = 0;
-    #fraccionTope     = 1;
-    #factorArrastre   = 1;
     #alturaPreferida  = 2.8;
 
     #entradaAcel      = 0;
@@ -91,8 +87,9 @@ class VisorCarreraSolo extends VisorBase {
     get px()               { return this.#carro?.px        ?? 0; }
     get pz()               { return this.#carro?.pz        ?? 0; }
     get velocidad()        { return this.#carro?.velocidad ?? 0; }
-    get velocidadMaxBase() { return this.#velocidadMaxBase; }
-    get pasosUltimoFrame() { return this.#pasosUltimoFrame; }
+    get velocidadMaxBase() { return this.#carro?.velMaxAdelante ?? 0; }
+    get pasosUltimoFrame() { return this.#conductor.pasosUltimoCuadro; }
+    get #carro()           { return this.#conductor.carro; }
 
     // ── Muestras por longitud de arco para CarreraVueltas ────────
     muestrasRuta(n) {
@@ -118,13 +115,13 @@ class VisorCarreraSolo extends VisorBase {
     aplicarTope(fraccion, factorArrastre) {
         if (Number.isFinite(fraccion))       this.#fraccionTope   = fraccion;
         if (Number.isFinite(factorArrastre)) this.#factorArrastre = factorArrastre;
-        this.#copiarTopeAlCarro();
+        this.#carro?.aplicarTope(this.#fraccionTope, this.#factorArrastre);
     }
 
     congelar(valor) {
         this.#congelado = !!valor;
         if (this.#congelado) {
-            this.#bucle.vaciar();
+            this.#conductor.vaciar();
             if (this.#carro) {
                 this.#carro.entradaAcel      = 0;
                 this.#carro.entradaDireccion = 0;
@@ -134,11 +131,8 @@ class VisorCarreraSolo extends VisorBase {
 
     reiniciarCarro() {
         const inicio = this.#ruta.curve ? this.#ruta.inicio : { x: 0, z: 0, angle: 0 };
-        this.#carro = new Carro(inicio.x, inicio.z, inicio.angle);
-        this.#velocidadMaxBase = this.#carro.velMaxAdelante;
-        this.#arrastreBase     = this.#carro.constArrastre;
-        this.#copiarTopeAlCarro();
-        this.#bucle.reiniciar();
+        this.#conductor.carro = new Carro(inicio.x, inicio.z, inicio.angle);
+        this.#carro.aplicarTope(this.#fraccionTope, this.#factorArrastre);
         this.#sincronizarCarroYCamara();
     }
 
@@ -174,7 +168,7 @@ class VisorCarreraSolo extends VisorBase {
             this.#observador.observe(this.#canvas.parentElement);
         }
         this.#redimensionar();
-        this.#bucle.reiniciar();
+        this.#conductor.reiniciar();
         this.#idAnimacion  = requestAnimationFrame(this.#funcionAnimacion);
     }
 
@@ -202,7 +196,7 @@ class VisorCarreraSolo extends VisorBase {
         this.#renderer = null;
         gl?.getExtension('WEBGL_lose_context')?.loseContext();
         this.#escena = null;
-        this.#carro  = null;
+        this.#conductor.carro = null;
     }
 
     // ── Escena, luces y cámara ───────────────────────────────────
@@ -348,12 +342,6 @@ class VisorCarreraSolo extends VisorBase {
     }
 
     // ── Carro ────────────────────────────────────────────────────
-    #copiarTopeAlCarro() {
-        if (!this.#carro) return;
-        this.#carro.velMaxAdelante = this.#velocidadMaxBase * this.#fraccionTope;
-        this.#carro.constArrastre  = this.#arrastreBase     * this.#factorArrastre;
-    }
-
     #sincronizarCarroYCamara() {
         if (!this.#carro) return;
         if (this.#grupoCarro) {
@@ -369,13 +357,7 @@ class VisorCarreraSolo extends VisorBase {
         if (this.#detenido) return;
         this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
 
-        const activo = !this.#congelado && !!this.#carro;
-        const pasos  = this.#bucle.avanzar(marca, activo, () => {
-            this.#carro.entradaAcel      = this.#entradaAcel;
-            this.#carro.entradaDireccion = this.#entradaDireccion;
-            this.#carro.actualizar(16);
-        });
-        this.#pasosUltimoFrame = pasos;
+        this.#conductor.avanzar(marca, this.#entradaAcel, this.#entradaDireccion, !this.#congelado);
 
         this.#sincronizarCarroYCamara();
 
