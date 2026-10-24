@@ -26,6 +26,7 @@ Errores ya cometidos en el proyecto y la regla para que no se repitan. Léela an
 | 20 | Dos plazos de 6 s seguidos (módulo y GLB) daban un peor caso de ~12 s | Controlador de Carrera Solo | Verificador PRD | Un límite de tiempo se mide con un solo reloj desde el inicio y se prueba el peor caso combinado |
 | 21 | Prueba de un cambio de física que también pasaba con la física vieja (el radio de giro ya crecía con la velocidad) | PRD 006, RF-01 | Revisor de pruebas del Verificador PRD (mutación) | Cuando un RF cambia un comportamiento, la prueba lo compara con el comportamiento anterior (por ejemplo, una copia de la física vieja en `pruebas/`) y se comprueba que falla con el código viejo |
 | 22 | Prueba de navegador que esperaba milisegundos para medir la física; en una máquina lenta daba menos pasos y fallaba al azar | `prueba_visor_controlador.mjs` (PRD 008) | Verificador PRD (dos corridas con fallos distintos) | En el navegador se espera un número de pasos de física, no un tiempo (lección 9) |
+| 23 | Un acuerdo de trabajo (la forma corta de revisar PRD) quedó solo en el chat y otra sesión no lo conocía | Sesión de los PRD 006–009 | El usuario preguntó por qué el otro agente no sabía cómo trabajamos | Todo acuerdo con el usuario se escribe en `CLAUDE.md`, `docs/PRD_CREATOR.md`, las skills o esta tabla en la misma conversación |
 
 ## Antes de llevar algo a main
 

@@ -48,8 +48,9 @@ Además (v2):
 
 ## Después del PRD
 
-Si el Verificador da ❌ en un PRD, corre el **Reparador PRD** (skill `reparador-prd`: "repara el PRD" o `/reparador-prd`). Corrige solo los detalles, pide permiso para las decisiones y vuelve a verificar hasta 3 vueltas.
+Se sigue la **forma corta** de `CLAUDE.md` ("Forma de trabajar con PRD"):
 
-Cuando el PRD esté implementado, verifícalo con el **Verificador PRD** (skill `verificador-prd`: "verifica los PRD" o `/verificador-prd`). Revisa que los PRD no se contradigan, que el código los cumpla y que las pruebas de `pruebas/` pasen.
+1. **Antes de programar**, una sola revisión con el **Verificador PRD** (skill `verificador-prd`), solo con los revisores de contradicciones y de código. Si da ❌, el **Reparador PRD** (skill `reparador-prd`) corrige los detalles **sin volver a verificar**. Solo hay otra vuelta si aparece una decisión, que antes se pregunta al usuario.
+2. **Después de programar**, Verificador PRD con los revisores de **código y pruebas** (el de contradicciones solo si se tocaron otros PRD o `CLAUDE.md`). Se corrige lo que encuentren y se corre `npm run test:todo`.
 
 Antes de escribir o corregir un PRD, lee `docs/LECCIONES_APRENDIDAS.md` y, si aparece un error nuevo, agrégalo a esa tabla.

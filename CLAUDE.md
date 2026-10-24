@@ -268,6 +268,19 @@ class TimonF1 { dibujar(ctx, S) { /* lógica F1 aquí */ } }
 - Flujo obligatorio después de cada commit: `git checkout main && git merge claude/system-overview-Z6Zik && git push origin main`
 - Nunca dejar cambios solo en la rama de desarrollo sin mergear a main
 
+## 📋 FORMA DE TRABAJAR CON PRD (forma corta)
+
+Acordada con el usuario el 2026-10-24. Vale para todo PRD desde el PRD 010.
+
+1. **Crear el PRD** con `docs/PRD_CREATOR.md` (Prompts 1, 2 y 3).
+2. **Antes de programar: una sola revisión del PRD** con el Verificador PRD (revisores de contradicciones y de código). Los detalles se corrigen sin volver a verificar. Solo se repite si aparece un problema de fondo (una decisión), que primero se le pregunta al usuario.
+3. **Programar** el PRD con sus pruebas en `pruebas/`.
+4. **Después de programar:** Verificador PRD con **2 revisores**, el de código y el de pruebas. El de contradicciones solo si el cambio tocó otros PRD o `CLAUDE.md`.
+5. **Corregir** lo que encuentren y correr `npm run test:todo`. No hay otra vuelta salvo que la corrección sea grande.
+6. **Llevar a `main`** cuando las pruebas pasen.
+
+**Los acuerdos se escriben.** Todo acuerdo de trabajo con el usuario se escribe en el repositorio (este archivo, `docs/PRD_CREATOR.md`, las skills o `docs/LECCIONES_APRENDIDAS.md`). Lo que queda solo en el chat, las otras sesiones no lo saben.
+
 ---
 
 ## 📸 CAPTURAS DE PANTALLA — SISTEMA Y USO

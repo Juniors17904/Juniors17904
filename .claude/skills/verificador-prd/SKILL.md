@@ -22,9 +22,17 @@ Elige el rango según lo que diga el usuario:
 
 Si no hay ningún PRD en `docs/prds/`, avísalo y corre solo las pruebas.
 
-## Paso 2 — Lanzar los 3 revisores en paralelo
+## Paso 2 — Lanzar los revisores en paralelo
 
-Lanza en **un solo mensaje** tres llamadas al tool Agent para que corran a la vez. Cada una usa uno de estos `subagent_type` definidos en `.claude/agents/`:
+Forma corta (`CLAUDE.md`, "Forma de trabajar con PRD"): no siempre van los 3.
+
+| Momento | Revisores |
+|---|---|
+| PRD **sin código** (antes de programar) | contradicciones + código |
+| PRD **ya programado** | código + pruebas; contradicciones solo si el rango cambia otros PRD o `CLAUDE.md` |
+| El usuario pide "verifica todo" | los 3 |
+
+Lanza en **un solo mensaje** las llamadas al tool Agent que correspondan, para que corran a la vez. Cada una usa uno de estos `subagent_type` definidos en `.claude/agents/`:
 
 1. **`revisor-contradicciones-prd`**: compara los PRD entre sí y contra `CLAUDE.md`. Prompt: "Revisa contradicciones en todos los PRD de docs/prds/."
 2. **`revisor-codigo-prd`**: compara los cambios contra los PRD. Prompt: "Revisa los cambios del rango `<rango>` (más los cambios sin commitear si aplica) contra los PRD de docs/prds/. Revisa también la responsabilidad única de cada clase nueva o cambiada (si para describirla hay que decir \"y además…\", se divide) y que ningún archivo `.js`/`.mjs` de `src/`, la raíz o `pruebas/` pase de 400 líneas fuera de la lista de `scripts/archivos_grandes_aceptados.txt` (regla anti-monolito de `CLAUDE.md`)."
