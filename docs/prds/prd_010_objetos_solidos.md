@@ -45,7 +45,7 @@ Que el árbol, el poste y la señal de curva tengan tamaño real, choquen exacta
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`.
 - La forma, los tramos, el nombre, los colores y los árboles de cada pista: de `ConfigPista*` solo cambia de dónde sale la distancia de postes y señales (D7). *(La distancia de las flechas cambia según el PRD 011, D11.)*
 - `FlechaCurvaEscena`, `BalizaChevronEscena`, `MetaEscena`, `SalidaEscena`, `BarreraEscena`, `GuardarrailEscena` y `AvisoEscena`. *(Cambian según el PRD 011, D11; `BalizaChevronEscena` se borra.)*
-- La cámara de las pantallas de manejo, los cielos, `HudCarrera` y `src/style.css`. De los visores solo cambia la lectura de las medidas nuevas y, en `VisorDisenoObjetos`, el encuadre (D2). *(Los visores también cambian cómo dibujan el piso según el PRD 012, D11.)*
+- La cámara de las pantallas de manejo, los cielos, `HudCarrera` y `src/style.css`. De los visores solo cambia la lectura de las medidas nuevas y, en `VisorDisenoObjetos`, el encuadre (D2). *(Los visores también cambian cómo dibujan el piso según el PRD 012, D11.)* *(`VisorCarreraSolo` cambia también según el PRD 011, D11: arco de meta y flechas.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -64,7 +64,7 @@ Que el árbol, el poste y la señal de curva tengan tamaño real, choquen exacta
 - **RF-07 (D4):** ningún carro atraviesa a la vista la copa de un árbol (para cualquier tamaño propio) ni el cartel de una señal.
 - **RF-08 (D5):** las señales de las 5 pistas y los postes de Ciudad están a 6,0 m del centro.
 - **RF-09 (D5):** con el carro alineado con la pista, ninguno de los 6 carros toca un poste o una señal mientras su centro está en el asfalto.
-- **RF-10 (D1):** flechas, balizas, arcos, barreras y guardarraíles se ven y se comportan como antes.
+- **RF-10 (D1):** flechas, balizas, arcos, barreras y guardarraíles se ven y se comportan como antes. *(Reemplazado por PRD 011, D11: flechas, baliza y arcos cambian.)*
 - **RF-11 (D9):** los PRD de D9 tienen su nota; `CLAUDE.md` dice que en `MedidasEscena` también viven las medidas de los objetos y que los objetos sólidos los crea `FabricaObjetosSolidos`; el backlog enlaza B15 con este PRD y agrega B16.
 
 ## 7. Requerimientos no funcionales
