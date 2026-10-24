@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v4 — implementado y con pruebas en `pruebas/`. Partes reemplazadas por los PRD 002 (D6), 004 (D9), 005 (D9), 006 (D8), 007 (D8) y 008 (D8) |
+| Estado | v4 — implementado y con pruebas en `pruebas/`. Partes reemplazadas por los PRD 002 (D6), 004 (D9), 006 (D8), 007 (D8) y 008 (D8) |
 | Fecha | 2026-10-21 |
 
 ## Decisiones bloqueadas

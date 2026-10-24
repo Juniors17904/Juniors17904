@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — reparado con el Reparador PRD, listo para verificar |
+| Estado | v3 — reparado con el Reparador PRD, listo para verificar |
 | Fecha | 2026-10-24 |
 | Backlog | B11 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D8 |
@@ -20,7 +20,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D4 | Usuarios | El derrape y la inclinación se sienten como ahora: se ajustan números, no la idea. |
 | D5 | Dominio | La física usa el tiempo real de cada paso. Los 5 visores avanzan con paso fijo de 60 Hz reutilizando `BuclePasoFijo`; hoy solo Jugar Solo lo hace. *(v2)* |
 | D6 | Técnico | Se borra la clase `MovimientoLibre` (`movimiento_libre.js`, nadie la crea) y su reexportación en `model_fisica.js`. Se quita de `CLAUDE.md` (ejemplo MVC) y de los comentarios de `carro.js` que la nombran. |
-| D7 | Técnico | Las constantes de la física viven en una clase propia del modelo. Se borran sus copias en `get physics()` de `VisorTestdriveRecto` y `VisorTestdriveRuta`, y los paneles de depuración (`PanelDatosTestDriveRecto`, `PanelDatosCircuito3D`) leen las del carro activo. *(v2)* |
+| D7 | Técnico | Las constantes de la física viven en una clase propia del modelo. Se borran sus copias en `get physics()` de `VisorTestdriveRecto` y `VisorTestdriveRuta` (la distancia de cámara `camDist` se queda en el visor), y los paneles de depuración (`PanelDatosTestDriveRecto`, `PanelDatosCircuito3D`) leen las del carro activo. *(v2)* |
 | D8 | Dominio | **Reemplaza:** del PRD 001, `Carro` en la D8 y `VisorDisenoPista` en su lista de lo que no se modifica. Del PRD 002, `VisorCarreraSolo` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego", solo en el manejo. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el manejo), `model_fisica.js`, `movimiento_libre.js` y los 5 visores de D2. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
 | D9 | Técnico | Lo nuevo va en clases aparte; los visores solo las llaman, para no pasar de 400 líneas. *(v2)* |
 
@@ -35,9 +35,9 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - **Desarrollador y agentes:** encuentran la física en un solo lugar y sin copias.
 
 ## 4. Alcance
-**In scope:** D1 a D7 y D9.
+**In scope:** D1 a D9.
 
-**Out of scope:** masa y agarre por tipo de carro (PRD 007), pasto y choques (PRD 008), turbo en el HUD (B9) y todo lo de la lista única de abajo.
+**Out of scope:** masa y agarre por tipo de carro (PRD 007), pasto y choques (PRD 008), el turbo de `Carro` (sigue como está hasta B9) y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
 - `CarreraVueltas`, `Cronometro`, `MuestraRuta` y la regla del pasto (este PRD no los toca; el pasto lo cambia el PRD 008).
@@ -45,7 +45,7 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - `HudCarrera`, la cuenta 3-2-1 y el resultado de Jugar Solo.
 - El modo "movimiento libre" de Test Drive con ruta (botón y tecla M): no depende de la clase `MovimientoLibre`.
 - `Ruta` y su reexportación en `model_fisica.js`.
-- `src/style.css`.
+- `src/style.css`. *(Solo agregar estilos de las barras del garaje, según el PRD 007, D8.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -73,7 +73,7 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 
 ## 7. Requerimientos no funcionales
 - **RNF-01 (D7, D9), reglas del proyecto:** se cumple `CLAUDE.md`: una clase por archivo, español, `#privados`, sin `{ }` como entidad, MVC y la regla anti-monolito. Ningún visor pasa de 400 líneas.
-- **RNF-02 (D6), limpieza:** en el proyecto no quedan la clase `MovimientoLibre`, su archivo ni menciones a ella en `CLAUDE.md` o en comentarios.
+- **RNF-02 (D6), limpieza:** en el proyecto no quedan la clase `MovimientoLibre`, su archivo ni menciones a ella en `CLAUDE.md` o en comentarios. Los nombres del modo (`toggleMovimientoLibre`, `#movimientoLibre`, `#alternarMovimientoLibre`) se conservan.
 - **RNF-03 (D5), pruebas:** las pruebas de física corren en el modelo con reloj controlado (lección 9), sin depender de la GPU.
 - **RNF-04, entrega:** el cambio llega a `main` solo cuando cumple "Antes de llevar algo a main" de `docs/LECCIONES_APRENDIDAS.md`.
 
@@ -87,8 +87,10 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - **Cambiar la sensación de manejo:** si al jugador le cuesta más, se ajustan las constantes sin tocar los RF.
 - **Pruebas que esperan los números viejos:** se ajustan a los nuevos rangos y citan su RF (lección 10).
 - **Visores al borde de 400 líneas** (`VisorCarreraSolo` 393, `VisorTestdriveRuta` 392): D9 obliga a sacar código a clases nuevas.
-- **Campos públicos de `Carro`** que hoy escriben los visores (tope y arrastre): pasan a la clase de constantes con acceso controlado (lección 11).
+- **Campos públicos de `Carro`** que hoy escriben y leen los visores (tope, arrastre y escala del velocímetro): pasan a la clase de constantes con acceso controlado (lección 11).
+- **`BuclePasoFijo`** vive en la carpeta de Jugar Solo; para compartirlo con los otros 4 visores se mueve a una carpeta común.
 
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
+- **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: `camDist` se queda, D8 entra al In scope, turbo de `Carro` fuera de alcance, nota del PRD 007 en `src/style.css`, RNF-02 aclara los nombres del modo, riesgos de lecturas públicas y de `BuclePasoFijo`.
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: D3 aplica al carro básico, D2 suma Diseño de Pistas, D5 da paso fijo a los 5 visores, D7 borra las copias de constantes y conecta los paneles, D9 clases aparte. Detalles: D8 completa con los PRD 002 y 004; RF-11 de código pasa a RNF-02.
