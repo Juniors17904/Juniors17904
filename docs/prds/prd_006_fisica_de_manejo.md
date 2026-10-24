@@ -41,7 +41,7 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 
 **Lista única de lo que NO se modifica:**
 - `CarreraVueltas`, `Cronometro`, `MuestraRuta` y la regla del pasto (este PRD no los toca; el pasto lo cambia el PRD 008).
-- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos y los velocímetros. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D9.)*
+- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos y los velocímetros. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)*
 - `HudCarrera`, la cuenta 3-2-1 y el resultado de Jugar Solo.
 - El modo "movimiento libre" de Test Drive con ruta (botón y tecla M): no depende de la clase `MovimientoLibre`.
 - `Ruta` y su reexportación en `model_fisica.js`.
