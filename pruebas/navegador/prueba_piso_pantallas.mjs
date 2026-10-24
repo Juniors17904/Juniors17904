@@ -3,6 +3,8 @@
 //   RF-01..06 → en las 5 pantallas el piso lo dibuja ConstructorPisoPista: grupo
 //               'pisoPista' con sus 7 mallas (asfalto, pianos, bordes, central, meta)
 //   RF-03     → el carro va a la altura del asfalto (MedidasEscena.alturaAsfalto)
+//               y en Jugar Solo los objetos de la pista se apoyan en el pasto (y = 0)
+//   RF-07     → en Jugar Solo, al cruzar el piano hacia el pasto el carro no salta
 //   RF-09     → capturas de cerca y con la cámara aérea (donde existe) para revisar parpadeo
 //   Sin errores de consola (lección 8)
 // Espía ConstructorPisoPista.construir (mismo módulo que usan los visores).
@@ -50,6 +52,10 @@ for (const p of PANTALLAS) {
     const { ConstructorPisoPista } = await import('/src/view/pistas/comun/constructor_piso_pista.js');
     const construir = ConstructorPisoPista.prototype.construir;
     window.__pisos = [];
+    // El carro que maneja el visor (para ponerlo sobre el piano en RF-07)
+    const { Carro } = await import('/src/model/carros/carro.js');
+    const actualizar = Carro.prototype.actualizar;
+    Carro.prototype.actualizar = function (dt) { window.__carro = this; return actualizar.call(this, dt); };
     ConstructorPisoPista.prototype.construir = function () { const g = construir.call(this); window.__pisos.push(g); return g; };
   });
   for (const paso of p.pasos) {
@@ -71,6 +77,57 @@ for (const p of PANTALLAS) {
   check(MALLAS.every(m => r.mallas.includes(m)), `PRD 012 RF-01..06 ${p.nombre}: asfalto, pianos, bordes, línea central y meta (${r.mallas})`);
   check(r.carroY !== null && Math.abs(r.carroY - r.h) < 1e-6, `PRD 012 RF-03 ${p.nombre}: el carro va a la altura del asfalto (${r.carroY})`);
   await page.screenshot({ path: `/tmp/piso_${p.nombre}.png` });
+
+  if (p.vertical) {
+    // RF-03: cada objeto de la escena que no es el piso, el pasto ni el carro se apoya en el pasto
+    const objetos = await page.evaluate(async () => {
+      const THREE = await import('three');
+      const g = window.__pisos[window.__pisos.length - 1], h = new window.MedidasEscena().alturaAsfalto;
+      const bajos = [];
+      for (const c of g.parent.children) {
+        if (c === g || !c.isGroup || Math.abs(c.position.y - h) < 1e-6) continue;
+        const caja = new THREE.Box3().setFromObject(c);
+        if (!caja.isEmpty()) bajos.push(caja.min.y);
+      }
+      return bajos;
+    });
+    check(objetos.length > 0 && objetos.every(y => Math.abs(y) < 0.02),
+      `PRD 012 RF-03 jugar_solo: los ${objetos.length} objetos de la pista se apoyan en el pasto (más bajo ${Math.min(...objetos).toFixed(3)}, más alto ${Math.max(...objetos).toFixed(3)})`);
+
+    // RF-07: pone el carro sobre el piano más cercano, acelera y mide su altura en cada cuadro
+    await page.evaluate(() => {
+      const g = window.__pisos[window.__pisos.length - 1], h = new window.MedidasEscena().alturaAsfalto;
+      const carro = g.parent.children.find(c => c !== g && c.isGroup && c.children.length && Math.abs(c.position.y - h) < 1e-6);
+      const c = window.__carro, p = g.getObjectByName('pianoRojo').geometry.getAttribute('position');
+      let mejor = null, dMin = Infinity;
+      for (let i = 0; i < p.count; i++) {
+        if (p.getY(i) < h + 0.02) continue;   // solo el borde alto del piano
+        const d = Math.hypot(p.getX(i) - c.px, p.getZ(i) - c.pz);
+        if (d < dMin) { dMin = d; mejor = [p.getX(i), p.getZ(i)]; }
+      }
+      // Un poco hacia adentro del borde exterior, sobre la pendiente
+      const k = 0.3 / Math.hypot(mejor[0] - c.px, mejor[1] - c.pz);
+      c.setPosicion(mejor[0] - (mejor[0] - c.px) * k, mejor[1] - (mejor[1] - c.pz) * k);
+      window.__alturas = []; window.__enPiano = 0;
+      import('three').then(THREE => {
+        const rayo = new THREE.Raycaster();
+        const pianos = [g.getObjectByName('pianoRojo'), g.getObjectByName('pianoBlanco')];
+        const medir = () => {
+          window.__alturas.push(carro.position.y);
+          rayo.set(new THREE.Vector3(carro.position.x, 5, carro.position.z), new THREE.Vector3(0, -1, 0));
+          if (rayo.intersectObjects(pianos).length) window.__enPiano++;
+          if (window.__alturas.length < 400) requestAnimationFrame(medir);
+        };
+        requestAnimationFrame(medir);
+      });
+    });
+    await page.keyboard.down('ArrowUp');
+    await page.waitForTimeout(2000);
+    await page.keyboard.up('ArrowUp');
+    const salto = await page.evaluate(() => ({ alturas: window.__alturas, enPiano: window.__enPiano }));
+    check(salto.enPiano > 3 && salto.alturas.every(y => Math.abs(y - r.h) < 1e-6),
+      `PRD 012 RF-07 jugar_solo: el carro pasa ${salto.enPiano} cuadros sobre el piano y su altura no cambia en ${salto.alturas.length} cuadros`);
+  }
 
   if (p.aerea) {
     await clic(page, 'btn-cam-aerea');

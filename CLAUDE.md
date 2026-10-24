@@ -167,6 +167,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Carro` | `CarroDeportivo`, `CarroSUV`, `CarroMusculo`, `CarroFormula`, `CarroPickup`, `CarroClasico` (las crea `RegistroCarros`) | `actualizar(dtMs)`, `constantes` (`ConstantesFisica`) |
 | `Superficie` | `SuperficieAsfalto`, `SuperficiePiano`, `SuperficiePasto` (las entrega `DetectorSuperficie`) | `nombre`, `rozamiento`, `esPasto` |
 | `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida` (los crea `FabricaObjetosSolidos`; los usa `DetectorChoques`) | `x`, `z`, `radio`, `tipo` |
+| `TrazadoPiso` | `TrazadoPisoCurva`, `TrazadoPisoRecto` (los usa `ConstructorPisoPista`, PRD 012) | `largo`, `cerrado`, `puntoEn(s)`, `distanciasEntre(s0, s1)` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:

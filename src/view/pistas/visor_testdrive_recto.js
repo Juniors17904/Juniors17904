@@ -184,10 +184,12 @@ class VisorTestdriveRecto extends VisorBase {
         sign.position.set(0, 5.5, z - 0.12);
         this.#scene.add(sign);
 
-        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        // Pegada al asfalto: no parpadea por el orden de dibujo, no por subirla (PRD 012, RF-09)
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
         const line = new THREE.Mesh(new THREE.PlaneGeometry(2 * this.#medidas.medioAnchoAsfalto, 0.5), lineMat);
         line.rotation.x = -Math.PI / 2;
-        line.position.set(0, this.#medidas.alturaAsfalto + 0.01, z);
+        line.renderOrder = 2;
+        line.position.set(0, this.#medidas.alturaAsfalto, z);
         this.#scene.add(line);
     }
 

@@ -9,6 +9,9 @@
 //   RF-06 meta a cuadros de 1 m y todo el ancho del asfalto
 //   RF-08 cambiar una medida cambia el dibujo · recta abierta sin unir extremos
 //   RNF-01 la pieza no repite medidas · liberar() suelta geometrías y materiales
+//   D3–D7  los números del PRD fijos en MedidasEscena; colores, pendiente del
+//          piano y orden de dibujo de las líneas (RF-09)
+//   RF-10  notas de D11 en los PRD, CLAUDE.md y backlog B18
 // ================================================================
 'use strict';
 const fs   = require('fs');
@@ -34,11 +37,14 @@ class PruebaPisoPista {
         ({ TrazadoPisoRecto: this.#Recto } = await import(comun('trazado_piso_recto.js')));
         this.#m = new globalThis.MedidasEscena();
 
+        this.#probarNumerosDelPrd();
+        this.#probarAspecto();
         this.#probarRecta();
         this.#probarCurva();
         this.#probarCambioDeMedida();
         this.#probarLiberar();
         this.#probarSinNumerosRepetidos();
+        this.#probarDocumentos();
 
         for (const f of this.#fallos) console.log('❌ ' + f);
         console.log(this.#fallos.length ? `${this.#fallos.length} fallo(s)` : 'Todo OK');
@@ -132,6 +138,14 @@ class PruebaPisoPista {
         // Asfalto cerrado: el recorrido de sus cuadros suma el largo completo
         const asf = this.#cuadros(grupo, 'asfalto');
         this.#ok(Math.abs(asf.length - Math.ceil(curva.getLength() / 0.5)) <= 1, 'curva cerrada sin hueco al final');
+        // RF-04 en la vuelta cerrada: el último trazo deja un hueco de ~6 m antes del primero
+        let ultimo = 0;
+        for (const [x, , z] of this.#vertices(grupo, 'lineaCentral')) {
+            const th = (Math.atan2(x, z) + 2 * Math.PI) % (2 * Math.PI);
+            if (th < 2 * Math.PI - 1e-3) ultimo = Math.max(ultimo, th);   // el inicio (≈ 2π) es el primer trazo
+        }
+        const huecoFinal = (2 * Math.PI - ultimo) * R;
+        this.#ok(Math.abs(huecoFinal - m.huecoLineaCentral) < 0.3, `RF-04 la línea central cierra la vuelta con un hueco de 6 m (${huecoFinal.toFixed(2)})`);
     }
 
     // RF-08: con otra medida, el dibujo cambia (una sola pieza para las 5 pantallas)
@@ -149,7 +163,47 @@ class PruebaPisoPista {
         let liberadas = 0;
         grupo.traverse(o => { if (o.isMesh) { const d = o.geometry.dispose.bind(o.geometry); o.geometry.dispose = () => { liberadas++; d(); }; } });
         piso.liberar();
-        this.#ok(liberadas === 7 && piso.grupo === null, 'liberar() suelta las 7 geometrías ' + liberadas);
+        this.#ok(liberadas === 7 && grupo.children.length === 0, 'liberar() suelta las 7 geometrías ' + liberadas);
+    }
+
+    // D3–D7: los números que pide el PRD, no solo los que tenga MedidasEscena
+    #probarNumerosDelPrd() {
+        const m = this.#m, eps = PruebaPisoPista.#EPS;
+        const esperado = { alturaAsfalto: 0.08, alturaPiano: 0.08, anchoPiano: 0.7, largoFranjaPiano: 1,
+            anchoLineaCentral: 0.15, trazoLineaCentral: 3, huecoLineaCentral: 6, anchoLineaBorde: 0.15, largoMeta: 1 };
+        for (const [k, v] of Object.entries(esperado)) this.#ok(Math.abs(m[k] - v) < eps, `D3–D7 ${k} = ${v} (${m[k]})`);
+    }
+
+    // Colores, pendiente del piano y orden de dibujo (RF-01, RF-04..06, RF-09)
+    #probarAspecto() {
+        const m = this.#m, eps = PruebaPisoPista.#EPS;
+        const grupo = new this.#Constructor(new this.#Recto(10), 5).construir();
+        const color = n => grupo.getObjectByName(n).material.color.getHex();
+        this.#ok(color('pianoRojo') === 0xff2222 && color('pianoBlanco') === 0xffffff, 'RF-01 piano rojo y blanco');
+        this.#ok(color('lineaCentral') === 0xffee44, 'RF-04 línea central amarilla');
+        this.#ok(color('lineasBorde') === 0xffffff, 'RF-05 líneas de borde blancas');
+        this.#ok(color('metaBlanca') === 0xffffff && color('metaNegra') === 0x111111, 'RF-06 meta blanca y negra');
+        // Pendiente: en la cara de arriba, la altura crece pareja del asfalto al borde exterior
+        const M = m.medioAnchoAsfalto, E = m.limitePiano, hA = m.alturaAsfalto;
+        const arriba = this.#vertices(grupo, 'pianoRojo').filter(([, y]) => y > eps);
+        this.#ok(arriba.every(([x, y]) => Math.abs(y - (hA + m.alturaPiano * (Math.abs(x) - M) / (E - M))) < eps), 'RF-01 el piano baja parejo hacia el asfalto');
+        // Las líneas y la meta se dibujan después del asfalto y no se pisan con él
+        const capa = n => { const o = grupo.getObjectByName(n); return [o.renderOrder, o.material.polygonOffset, o.material.polygonOffsetFactor]; };
+        const [oA] = capa('asfalto');
+        this.#ok(['lineasBorde', 'lineaCentral', 'metaBlanca', 'metaNegra'].every(n => { const [o, p, f] = capa(n); return o > oA && p && f < 0; }),
+            'RF-09 líneas y meta con orden de dibujo y polygonOffset sobre el asfalto');
+    }
+
+    // RF-10: notas de D11, CLAUDE.md y backlog
+    #probarDocumentos() {
+        const leer = r => fs.readFileSync(path.join(PruebaPisoPista.#RAIZ, r), 'utf8');
+        const prds = fs.readdirSync(path.join(PruebaPisoPista.#RAIZ, 'docs/prds'));
+        for (const n of ['001', '002', '004', '005', '008', '010']) {
+            const f = prds.find(x => x.startsWith(`prd_${n}`));
+            this.#ok(f && /PRD 012/.test(leer(`docs/prds/${f}`)), `RF-10 el PRD ${n} tiene la nota del PRD 012`);
+        }
+        this.#ok(/ConstructorPisoPista/.test(leer('CLAUDE.md')) && /`TrazadoPiso` \|/.test(leer('CLAUDE.md')), 'RF-10 CLAUDE.md nombra la pieza del piso y su jerarquía');
+        this.#ok(/B18[^\n]*prd_012/.test(leer('docs/BACKLOG.md')), 'RF-10 el backlog enlaza B18 con el PRD 012');
     }
 
     #probarSinNumerosRepetidos() {

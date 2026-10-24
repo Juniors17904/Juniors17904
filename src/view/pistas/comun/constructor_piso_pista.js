@@ -32,8 +32,6 @@ export class ConstructorPisoPista {
         this.#medidas       = medidas;
     }
 
-    get grupo() { return this.#grupo; }
-
     construir() {
         this.liberar();
         this.#grupo = new THREE.Group();
@@ -106,9 +104,11 @@ export class ConstructorPisoPista {
 
     #agregarCentral(acc) {
         const m = this.#medidas, t = this.#trazado, h = m.alturaAsfalto, a = m.anchoLineaCentral / 2;
-        const paso = m.trazoLineaCentral + m.huecoLineaCentral;
+        const pasoMedido = m.trazoLineaCentral + m.huecoLineaCentral;
+        // En las pistas cerradas el paso se ajusta para que la vuelta cierre pareja
+        const paso = this.#largoParejo(pasoMedido), trazo = m.trazoLineaCentral * paso / pasoMedido;
         for (let s = 0; s < t.largo - 1e-9; s += paso) {
-            acc.agregarTira(t, s, Math.min(t.largo, s + m.trazoLineaCentral), -a, h, a, h);
+            acc.agregarTira(t, s, Math.min(t.largo, s + trazo), -a, h, a, h);
         }
     }
 

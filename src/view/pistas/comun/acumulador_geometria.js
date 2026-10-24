@@ -25,10 +25,8 @@ export class AcumuladorGeometria {
         }
     }
 
-    get vacio() { return this.#idx.length === 0; }
-
     geometria() {
-        if (this.vacio) return null;
+        if (this.#idx.length === 0) return null;
         const geo = new THREE.BufferGeometry();
         geo.setAttribute('position', new THREE.Float32BufferAttribute(this.#pos, 3));
         geo.setAttribute('normal',   new THREE.Float32BufferAttribute(this.#nor, 3));
