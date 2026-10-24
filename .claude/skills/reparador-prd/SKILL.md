@@ -42,14 +42,11 @@ Edita el PRD siguiendo `docs/PRD_CREATOR.md`:
 
 Sube la versión del PRD (v2 → v3…) y anota en el **Historial** qué se corrigió.
 
-## Paso 5 — Volver a verificar
+## Paso 5 — ¿Volver a verificar? (forma corta)
 
-Lanza de nuevo `revisor-contradicciones-prd` y `revisor-codigo-prd` en paralelo, y diles qué se corrigió en la vuelta anterior.
-- **Sin hallazgos** (o solo avisos menores): termina.
-- **Solo detalles:** vuelve al Paso 2.
-- **Aparece una decisión:** vuelve al Paso 3.
+Según la forma corta de `CLAUDE.md`, **no se vuelve a verificar** después de corregir detalles: termina en el Paso 6.
 
-Máximo **3 vueltas**. Si después de la tercera sigue habiendo hallazgos, para y muéstralos al usuario.
+Solo si en el Paso 3 el usuario aprobó una **decisión de fondo** (por ejemplo, cambiar medidas, alcance o una lista de lo que no se modifica), lanza una vuelta más con `revisor-contradicciones-prd` y `revisor-codigo-prd`, y diles qué se corrigió. Máximo **2 vueltas** en total. Si siguen apareciendo hallazgos, para y muéstralos al usuario.
 
 ## Paso 6 — Entregar
 
