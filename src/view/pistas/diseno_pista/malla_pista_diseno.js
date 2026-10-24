@@ -22,7 +22,7 @@ export class MallaPistaDiseno {
     constructor(curva) {
         const puntos = curva.getPoints(MallaPistaDiseno.#DIVISIONES);
         const perpendiculares = puntos.map((_, i) => MallaPistaDiseno.#perpendicular(puntos, i));
-        this.#cinta = new GeometriaCinta(puntos, perpendiculares, false);
+        this.#cinta = new GeometriaCinta(puntos, perpendiculares, true);
     }
 
     // Devuelve un THREE.Group con todas las capas de la pista
@@ -31,7 +31,7 @@ export class MallaPistaDiseno {
         const cinta = this.#cinta;
         const grupo = new THREE.Group();
 
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
+        const roadMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.95, side: THREE.DoubleSide });
         const road    = new THREE.Mesh(cinta.cinta(-4, 4, 0, 0, DIV), roadMat);
         road.receiveShadow = true;
         grupo.add(road);

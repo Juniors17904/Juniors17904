@@ -142,7 +142,7 @@ class VisorDisenoPista extends VisorBase {
         this.#renderer.setSize(W, H, false);
         this.#renderer.shadowMap.enabled = false;
         this.#renderer.toneMapping         = THREE.ACESFilmicToneMapping;
-        this.#renderer.toneMappingExposure = 1.4;
+        this.#renderer.toneMappingExposure = 0.9;
 
         this.#scene = new THREE.Scene();
         const tipoCielo  = this.#pista?.tipoCielo ?? 'soleado';
@@ -156,14 +156,14 @@ class VisorDisenoPista extends VisorBase {
 
         this.#camaraChase = new CamaraSeguimiento(W / H, { seguirRotacion: true });
 
-        this.#scene.add(new THREE.AmbientLight(0x8899bb, 0.28));
-        this.#sol = new THREE.DirectionalLight(0xaabbdd, 0.35);
+        this.#scene.add(new THREE.AmbientLight(0x8899bb, 0.35));
+        this.#sol = new THREE.DirectionalLight(0xaabbdd, 0.5);
         this.#scene.add(this.#sol, this.#sol.target);
         const posSol = this.#cielo.posicionSol;
         if (posSol) this.#sol.position.copy(posSol);
         else this.#sol.position.set(6, 10, 4);
 
-        const fill = new THREE.DirectionalLight(0x8899cc, 0.12);
+        const fill = new THREE.DirectionalLight(0x8899cc, 0.15);
         fill.position.set(-5, 4, -3);
         this.#scene.add(fill);
 
