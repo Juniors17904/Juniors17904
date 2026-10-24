@@ -7,6 +7,7 @@
 //   RF-07 la copa y el cartel quedan por encima del carro más alto
 //   RF-08 señales de las 5 pistas y postes de Ciudad a 6,0 m del centro
 //   RF-09 ningún carro alineado con la pista los toca con el centro en el asfalto
+//   RF-10 la fábrica solo crea sólidos para árbol, poste y señal (no flechas ni lo demás)
 //   RNF-01 la distancia no se repite en las pistas y se lee al pedir las decoraciones
 // ================================================================
 'use strict';
@@ -22,7 +23,7 @@ class PruebaObjetosSolidos {
     #fallos = [];
     #ctx;
     #medidas;
-    #Carro; #DetectorChoques; #Ruta; #ArbolSolido;
+    #Carro; #DetectorChoques; #Ruta; #ArbolSolido; #FabricaObjetosSolidos;
 
     async ejecutar() {
         const src = p => path.join(PruebaObjetosSolidos.#RAIZ, 'src', p);
@@ -30,6 +31,7 @@ class PruebaObjetosSolidos {
         ({ DetectorChoques: this.#DetectorChoques } = await import(src('model/choques/detector_choques.js')));
         ({ ArbolSolido: this.#ArbolSolido } = await import(src('model/choques/arbol_solido.js')));
         ({ Ruta: this.#Ruta } = await import(src('model/ruta.js')));
+        ({ FabricaObjetosSolidos: this.#FabricaObjetosSolidos } = await import(src('model/choques/fabrica_objetos_solidos.js')));
         this.#cargarClasicos();
         this.#medidas = new this.#ctx.MedidasEscena();
 
@@ -40,6 +42,7 @@ class PruebaObjetosSolidos {
         this.#probarDistancias();
         this.#probarCarrosAlineados();
         this.#probarSinRepetir();
+        this.#probarSoloTresSolidos();
 
         for (const f of this.#fallos) console.log('❌ ' + f);
         console.log(this.#fallos.length ? `${this.#fallos.length} fallo(s)` : 'Todo OK');
@@ -198,6 +201,20 @@ class PruebaObjetosSolidos {
             const texto = this.#leer('src/model/choques/' + archivo);
             this.#ok(/MedidasEscena/.test(texto) && !/\b0\.\d+\b/.test(texto), `PRD 010 RNF-01 ${archivo} saca su radio de MedidasEscena`);
         }
+    }
+
+    // RF-10: lo que no es árbol, poste ni señal se ve como antes y no se vuelve sólido
+    #probarSoloTresSolidos() {
+        const enPunto = { posicionEn: () => ({ x: 0, z: 0, angle: 0 }) };
+        const fabrica = new this.#FabricaObjetosSolidos();
+        for (const tipo of ['flecha', 'baliza_chevron', 'meta', 'salida', 'barrera', 'guardarrail', 'aviso']) {
+            const solidos = fabrica.crear([{ tipo, prog: 0, lado: 1, dist: 6 }], enPunto);
+            this.#ok(solidos.length === 0, `PRD 010 RF-10 FabricaObjetosSolidos no crea un sólido para ${tipo} (${solidos.length})`);
+        }
+        const tipos = ['arbol', 'poste', 'senal_curva'];
+        const solidos = fabrica.crear(tipos.map(tipo => ({ tipo, prog: 0, lado: 1, dist: 6 })), enPunto);
+        this.#ok(solidos.map(s => s.tipo).join() === tipos.join(),
+            `PRD 010 RF-10 FabricaObjetosSolidos solo crea sólidos para arbol, poste y senal_curva (${solidos.map(s => s.tipo).join(', ')})`);
     }
 }
 

@@ -7,7 +7,10 @@
 //           apoyado encima del palo
 //   RF-02 → las luces de los postes salen de la lámpara y al asfalto le
 //           llega al menos la misma luz que antes del PRD
-//   RF-10 → flechas y balizas siguen apareciendo como antes
+//   RF-04 → en Diseño General (Ciudad) árboles de 7 m × tamaño propio,
+//           postes de 8 m y señales con palo de 2,2 m
+//   RF-10 → flechas y balizas siguen apareciendo como antes, y en Diseño
+//           de Objetos aviso, meta, salida, barrera y guardarrail se ven
 //   Sin errores de consola (lección 8). Capturas de cerca y de costado
 //   en /tmp/capturas_prd010/ (lecciones 13 y 16).
 // ================================================================
@@ -30,7 +33,10 @@ const parchear = async route => {
   } catch { await route.abort(); }
 };
 let ok = 0, fallos = 0;
-const check = (c, m) => { if (c) { ok++; console.log('OK  ', m); } else { fallos++; console.log('FALLO', m); } };
+const check = (c, texto) => {
+  const m = texto.startsWith('PRD 010') ? texto : 'PRD 010 ' + texto;
+  if (c) { ok++; console.log('OK  ', m); } else { fallos++; console.log('FALLO', m); }
+};
 const cerca = (a, b, tol) => Math.abs(a - b) <= tol;
 const browser = await chromium.launch({ headless: false, args: ['--use-gl=angle', '--ignore-gpu-blocklist'] });
 
@@ -115,10 +121,55 @@ for (const [nombreVista, ancho, alto] of [['vertical', 390, 844], ['horizontal',
   const flecha = await medirEncuadre(page);
   check(flecha?.clase === 'FlechaCurvaEscena', `RF-10 (${nombreVista}) la flecha de curva sigue apareciendo (${flecha?.clase})`);
   await clic(page, 'do-sel-baliza-chevron'); await page.waitForTimeout(600);
+  // RF-10: los demás objetos (no sólidos) siguen apareciendo con su caja
+  for (const [boton, clase] of [['do-sel-aviso', 'AvisoEscena'], ['do-sel-meta', 'MetaEscena'],
+    ['do-sel-salida', 'SalidaEscena'], ['do-sel-barrera', 'BarreraEscena'], ['do-sel-guardarrail', 'GuardarrailEscena']]) {
+    await clic(page, boton); await page.waitForTimeout(600);
+    const r = await page.evaluate(() => {
+      const obj = window.__objetos[window.__objetos.length - 1];
+      if (!obj?._grupo) return null;
+      const t = new window.__THREE.Box3().setFromObject(obj._grupo).getSize(new window.__THREE.Vector3());
+      return { clase: obj.constructor.name, enEscena: !!obj._grupo.parent, x: t.x, y: t.y, z: t.z };
+    });
+    check(r?.clase === clase && r.enEscena && r.x > 0 && r.y > 0 && r.z > 0,
+      `RF-10 (${nombreVista}) ${boton.slice(7)} aparece en la escena (${r?.clase}, caja ${r?.x.toFixed(2)} × ${r?.y.toFixed(2)} × ${r?.z.toFixed(2)} m)`);
+  }
   const reales = erroresReales(errores);
   check(reales.length === 0, `RF-04 (${nombreVista}) sin errores de consola en Diseño de Objetos ` + reales.join(' | '));
   await page.close();
 }
+
+// Mide con THREE.Box3 los árboles, postes y señales de Ciudad que construyó la
+// pantalla abierta (mismo orden que las decoraciones de la pista)
+const medirDecoraciones = page => page.evaluate(() => {
+  const THREE = window.__THREE;
+  const decs = window.registroPistas.obtener('ciudad').decoraciones;
+  const de = clase => window.__objetos.filter(o => o.constructor.name === clase && o._grupo);
+  const caja = g => new THREE.Box3().setFromObject(g);
+  const escalas = decs.filter(d => d.tipo === 'arbol').map(d => d.escala ?? 1);
+  const arboles = de('ArbolEscena').map((o, i) => {
+    const c = caja(o._grupo), tronco = o._grupo.children[0];
+    return { alto: c.max.y - c.min.y, piso: c.min.y, escala: escalas[i],
+      radioTronco: tronco.geometry.parameters.radiusBottom,
+      bajoCopa: Math.min(...o._grupo.children.slice(1).map(h => h.position.y - h.geometry.parameters.radius)) };
+  });
+  const postes = de('PosteEscena').map(o => {
+    const c = caja(o._grupo), palo = o._grupo.children[0];
+    return { alto: c.max.y - c.min.y, radio: palo.geometry.parameters.radiusBottom };
+  });
+  const senales = de('SenalCurvaEscena').map(o => {
+    const hijos = o._grupo.children;
+    const palo = hijos.find(h => h.geometry.type === 'CylinderGeometry');
+    const cartel = hijos.find(h => h.geometry.type === 'BoxGeometry');
+    const pp = palo.geometry.parameters, cp = cartel?.geometry.parameters;
+    const cajaPalo = caja(palo);
+    return { altoPalo: pp.height, altoCajaPalo: cajaPalo.max.y - cajaPalo.min.y, radioPalo: pp.radiusBottom,
+      topePalo: palo.position.y + pp.height / 2, ancho: cp?.width, altoCartel: cp?.height, grosor: cp?.depth,
+      bordeInferior: cartel ? cartel.position.y - cp.height / 2 : null };
+  });
+  return { arboles, postes, senales, decsArbol: escalas.length,
+    decsPoste: decs.filter(d => d.tipo === 'poste').length, decsSenal: decs.filter(d => d.tipo === 'senal_curva').length };
+});
 
 // ── RF-01/02/03/06 y luces en la escena real de Jugar Solo ──────────
 {
@@ -129,41 +180,16 @@ for (const [nombreVista, ancho, alto] of [['vertical', 390, 844], ['horizontal',
   check(ya, 'la carrera de Jugar Solo arranca (¡YA!)');
   await page.waitForTimeout(500);
 
-  const m = await page.evaluate(() => {
-    const THREE = window.__THREE;
-    const medidas = new window.MedidasEscena();
-    const pista = window.registroPistas.obtener('ciudad');
-    const decs = pista.decoraciones;
-    const de = clase => window.__objetos.filter(o => o.constructor.name === clase && o._grupo);
-    const caja = g => new THREE.Box3().setFromObject(g);
-    const escalas = decs.filter(d => d.tipo === 'arbol').map(d => d.escala ?? 1);
-    const arboles = de('ArbolEscena').map((o, i) => {
-      const c = caja(o._grupo), tronco = o._grupo.children[0];
-      return { alto: c.max.y - c.min.y, piso: c.min.y, escala: escalas[i],
-        radioTronco: tronco.geometry.parameters.radiusBottom,
-        bajoCopa: Math.min(...o._grupo.children.slice(1).map(h => h.position.y - h.geometry.parameters.radius)) };
-    });
-    const postes = de('PosteEscena').map(o => {
-      const c = caja(o._grupo), palo = o._grupo.children[0];
-      return { alto: c.max.y - c.min.y, radio: palo.geometry.parameters.radiusBottom };
-    });
-    const senales = de('SenalCurvaEscena').map(o => {
-      const hijos = o._grupo.children;
-      const palo = hijos.find(h => h.geometry.type === 'CylinderGeometry');
-      const cartel = hijos.find(h => h.geometry.type === 'BoxGeometry');
-      const pp = palo.geometry.parameters, cp = cartel?.geometry.parameters;
-      return { altoPalo: pp.height, radioPalo: pp.radiusBottom, topePalo: palo.position.y + pp.height / 2,
-        ancho: cp?.width, altoCartel: cp?.height, grosor: cp?.depth,
-        bordeInferior: cartel ? cartel.position.y - cp.height / 2 : null };
-    });
+  const m = await medirDecoraciones(page);
+  Object.assign(m, await page.evaluate(() => {
     const escena = window.__dibujos['canvas-carrera-solo']?.scene
       ?? Object.values(window.__dibujos).map(d => d.scene).find(s => s.children.some(h => h.isPointLight));
     const luces = (escena?.children ?? []).filter(h => h.isPointLight).map(l => ({ y: l.position.y, intensidad: l.intensity, decay: l.decay }));
-    return { arboles, postes, senales, luces,
-      decsArbol: escalas.length, decsPoste: decs.filter(d => d.tipo === 'poste').length,
-      decsSenal: decs.filter(d => d.tipo === 'senal_curva').length, decsFlecha: decs.filter(d => d.tipo === 'flecha').length,
-      flechas: de('FlechaCurvaEscena').length, altoSuv: medidas.medidaCarro('suv').alto };
-  });
+    const decs = window.registroPistas.obtener('ciudad').decoraciones;
+    return { luces, decsFlecha: decs.filter(d => d.tipo === 'flecha').length,
+      flechas: window.__objetos.filter(o => o.constructor.name === 'FlechaCurvaEscena' && o._grupo).length,
+      altoSuv: new window.MedidasEscena().medidaCarro('suv').alto };
+  }));
 
   check(m.arboles.length === m.decsArbol && m.arboles.length > 0, `RF-04 Jugar Solo dibuja los ${m.decsArbol} árboles de Ciudad (${m.arboles.length})`);
   check(m.arboles.every(a => cerca(a.alto, 7 * a.escala, 0.05)), `RF-01/RF-06 cada árbol mide 7 m × su tamaño propio (${m.arboles.map(a => `${a.alto.toFixed(2)}/${(7 * a.escala).toFixed(2)}`).join(', ')})`);
@@ -221,6 +247,27 @@ for (const [nombreVista, ancho, alto] of [['vertical', 390, 844], ['horizontal',
 
   const reales = erroresReales(errores);
   check(reales.length === 0, 'sin errores de consola en Jugar Solo ' + reales.join(' | '));
+  await page.close();
+}
+
+// ── RF-04: Diseño General (⚙ → Diseño general, pista Ciudad) ─────────
+{
+  const { page, errores } = await abrir(390, 844);
+  await clic(page, 'btn-garage'); await page.waitForTimeout(300);
+  await clic(page, 'btn-ir-diseno-general');
+  await page.waitForFunction(() => window.__objetos.some(o => o.constructor.name === 'SenalCurvaEscena' && o._grupo),
+    null, { timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(1000);
+  const m = await medirDecoraciones(page);
+  check(m.arboles.length === m.decsArbol && m.arboles.length > 0, `RF-04 Diseño General dibuja los ${m.decsArbol} árboles de Ciudad (${m.arboles.length})`);
+  check(m.arboles.every(a => cerca(a.alto, 7 * a.escala, 0.05)), `RF-04 Diseño General: cada árbol mide 7 m × su tamaño propio (${m.arboles.map(a => `${a.alto.toFixed(2)}/${(7 * a.escala).toFixed(2)}`).join(', ')})`);
+  check(m.postes.length === m.decsPoste && m.postes.length > 0, `RF-04 Diseño General dibuja los ${m.decsPoste} postes de Ciudad (${m.postes.length})`);
+  check(m.postes.every(p => cerca(p.alto, 8, 0.02)), `RF-04 Diseño General: cada poste mide 8 m (${m.postes.map(p => p.alto.toFixed(2)).join(', ')})`);
+  check(m.senales.length === m.decsSenal && m.senales.length > 0, `RF-04 Diseño General dibuja las ${m.decsSenal} señales de Ciudad (${m.senales.length})`);
+  check(m.senales.every(s => cerca(s.altoCajaPalo, 2.2, 0.01)), `RF-04 Diseño General: palo de la señal de 2,2 m (${m.senales[0]?.altoCajaPalo.toFixed(2)} m)`);
+  await page.screenshot({ path: `${CARPETA}/diseno_general.png` });
+  const reales = erroresReales(errores);
+  check(reales.length === 0, 'RF-04 sin errores de consola en Diseño General ' + reales.join(' | '));
   await page.close();
 }
 

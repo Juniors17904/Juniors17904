@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para implementar |
+| Estado | v2 — implementado, con pruebas en `pruebas/` |
 | Fecha | 2026-10-24 |
 | Backlog | B15 (`docs/BACKLOG.md`) |
 | Depende de | PRD 009 (escala: 1 unidad = 1 metro, `MedidasEscena`) |
