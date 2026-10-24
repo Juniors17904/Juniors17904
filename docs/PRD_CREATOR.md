@@ -14,6 +14,8 @@ Requerimiento: «( ....... )»
 
 Lístame las 6-8 decisiones clave que debemos resolver antes de escribir el PRD, con su propuesta de resolución y agrupadas por categoría (alcance, usuarios, dominio, técnico). Sé conciso.
 
+Antes de proponer las decisiones, lee los PRD vigentes de `docs/prds/` (sus decisiones bloqueadas y sus listas de lo que NO se modifica). Al final, lista los **choques con PRD anteriores**: qué decisión, RF o elemento protegido de qué PRD cambiaría este requerimiento. Cada choque se resuelve en el Prompt 2 con una decisión "Reemplaza", y el PRD anterior lleva una nota que lo indica (sin reescribirlo).
+
 ---
 
 ## Prompt 2 — Resolver ambigüedad
