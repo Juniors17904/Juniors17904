@@ -14,7 +14,7 @@ const vm   = require('vm');
 
 class PruebaEscalaCarroPista {
     static #RAIZ = path.join(__dirname, '..', '..');
-    static #LARGOS = { deportivo: 4.5, muscle: 4.8, formula: 5.0, suv: 4.6, pickup: 5.3, clasico: 6.0 };
+    static #LARGOS = { deportivo: 4.5, muscle: 4.8, formula: 5.0, suv: 4.5, pickup: 4.5, clasico: 6.0 };
     #fallos = [];
     #ctx;
     #Carro; #DetectorChoques; #PosteSolido;

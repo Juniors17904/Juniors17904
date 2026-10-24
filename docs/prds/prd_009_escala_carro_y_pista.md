@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — implementado, con pruebas en `pruebas/`; RF-02 pendiente para la SUV y la pickup (ver Historial v3) |
+| Estado | v4 — implementado, con pruebas en `pruebas/` |
 | Fecha | 2026-10-24 |
 | Backlog | B14 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D12 |
@@ -16,7 +16,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 |---|---|---|
 | D1 | Alcance | La escala oficial del juego 3D es **1 unidad = 1 metro**. Se escribe en `CLAUDE.md` y vale para los PRD 010 a 012. |
 | D2 | Alcance | Entran las medidas de los carros, el ancho de la pista (asfalto y piano), el encuadre de la cámara y la vista previa del garaje. Objetos, señalética y relieves quedan para los PRD 010 a 012. *(v2)* |
-| D3 | Usuarios | Cada carro tiene su **largo real**: deportivo 4,5 m, muscle 4,8 m, fórmula 5,0 m, SUV 4,6 m, pickup 5,3 m y clásico (limusina) 6,0 m. Ancho y alto salen de la forma de su modelo 3D; el ancho queda entre el 15 % y el 32 % del asfalto. *(v2, aprobado por el usuario)* |
+| D3 | Usuarios | Cada carro tiene su **largo real**: deportivo 4,5 m, muscle 4,8 m, fórmula 5,0 m, SUV 4,5 m, pickup 4,5 m y clásico (limusina) 6,0 m. Ancho y alto salen de la forma de su modelo 3D; el ancho queda entre el 15 % y el 32 % del asfalto. *(v2, aprobado por el usuario; v4: SUV y pickup a 4,5 m para no pasar del 32 %, aprobado)* |
 | D4 | Usuarios | La pista mide **8 m de asfalto y 0,7 m de piano** por lado en las 5 pantallas. La recta de Test Drive pasa su piano de 0,6 m a 0,7 m, pegado al asfalto. No cambian las pistas, el pasto ni las vueltas. *(v2: piano de la recta, aprobado)* |
 | D5 | Dominio | Las medidas viven en una sola clase del modelo, `MedidasEscena`: largo y ancho **de cada tipo de carro**, medio ancho del asfalto y ancho del piano. La usan la vista, `DetectorSuperficie`, `DetectorChoques` y el minimapa `RecorridoTestDriveRecto`. *(v2: por tipo, aprobado)* |
 | D6 | Dominio | Los choques usan la **forma rectangular** (largo × ancho) del carro que se maneja, no un círculo: de costado choca con el costado y de frente con el parachoques. *(v2, aprobado)* |
@@ -97,3 +97,4 @@ Que cada carro y la pista tengan tamaños reales y coherentes, guardados en un s
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: largo real por carro (D3), piano de la recta a 0,7 (D4), medidas por tipo (D5), choque rectangular (D6), cámara proporcional sin tocar preferencias (D7), cielos sin tocar (D8), postes al PRD 010 (D11). Detalles: D2 suma cámara y vista previa, D12 completa (`Visor3D`, `RecorridoTestDriveRecto`, PRD 002), lista de lugares con medidas, RF-04 solo en Jugar Solo y desde el centro.
 - **v3** (2026-10-24): implementado (`MedidasEscena`, `MedidaCarro`, choque rectangular, cámara con escala, anchos de pista y vista previa). Pendiente de decisión: con su largo de D3 y la forma de su modelo 3D, la SUV queda en 32,1 % y la pickup en 37,0 % del asfalto, fuera del 15–32 % de D3 y RF-02.
+- **v4** (2026-10-24): decisión aprobada por el usuario: SUV y pickup pasan a 4,5 m de largo (con su forma, a 4,6 y 5,3 m pasaban del 32 % del asfalto).

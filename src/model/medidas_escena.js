@@ -18,10 +18,10 @@ class MedidasEscena {
     // Largo real (D3) y proporciones ancho/largo y alto/largo de cada modelo GLB
     #carros = new Map([
         ['deportivo', new window.MedidaCarro(4.5, 0.4598, 0.3216)],
-        ['suv',       new window.MedidaCarro(4.6, 0.5585, 0.4561)],
+        ['suv',       new window.MedidaCarro(4.5, 0.5585, 0.4561)],
         ['muscle',    new window.MedidaCarro(4.8, 0.4647, 0.3155)],
         ['formula',   new window.MedidaCarro(5.0, 0.4598, 0.3216)],
-        ['pickup',    new window.MedidaCarro(5.3, 0.5585, 0.4387)],
+        ['pickup',    new window.MedidaCarro(4.5, 0.5585, 0.4387)],
         ['clasico',   new window.MedidaCarro(6.0, 0.2747, 0.1963)],
     ]);
 
