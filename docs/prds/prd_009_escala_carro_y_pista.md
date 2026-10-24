@@ -45,7 +45,7 @@ Que cada carro y la pista tengan tamaños reales y coherentes, guardados en un s
 **Lista única de lo que NO se modifica:**
 - La física: `Carro`, `ConstantesFisica` y las 6 físicas del PRD 007 (D9).
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`.
-- Los datos de cada pista (`ConfigPista*`), `FabricaObjetoEscena` y sus objetos de escena.
+- Los datos de cada pista (`ConfigPista*`), `FabricaObjetoEscena` y sus objetos de escena. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)*
 - Los archivos de los modelos 3D (GLB) y `PerfilCarro`.
 - Los cielos y su niebla (D8).
 - `VistaConduccion`, `DeslizadorAlturaCamara` y los rangos de los deslizadores de altura (D7).

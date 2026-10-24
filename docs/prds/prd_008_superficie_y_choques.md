@@ -15,7 +15,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | # | Categoría | Decisión |
 |---|---|---|
 | D1 | Alcance | El pasto frena con rozamiento según la superficie, en vez del tope al 40 % más el arrastre ×3 de hoy. |
-| D2 | Alcance | Hay choques contra los objetos sólidos junto a la pista: árboles, postes y señales de curva. Las flechas de curva **no** son sólidas, porque quedan sobre el piano. El carro rebota y pierde velocidad. No hay daños ni reinicio. *(v2, aprobado por el usuario)* |
+| D2 | Alcance | Hay choques contra los objetos sólidos junto a la pista: árboles, postes y señales de curva. Las flechas de curva **no** son sólidas, porque quedan sobre el piano. El carro rebota y pierde velocidad. No hay daños ni reinicio. *(v2, aprobado por el usuario)* *(Los tamaños de choque cambian según el PRD 010, D9.)* |
 | D3 | Usuarios | Salirse al pasto cuesta más o menos lo mismo que hoy: el carro queda cerca del 40 % de su velocidad máxima. |
 | D4 | Usuarios | Al chocar, el carro nunca atraviesa el objeto ni queda atrapado en él. |
 | D5 | Dominio | La superficie (asfalto, piano o pasto) es una jerarquía de clases (`Superficie` y subclases) que el modelo consulta. Qué superficie hay bajo el carro (incluido el ancho del piano) lo calcula una clase nueva del modelo, sin tocar `Ruta`. *(v4 aprobado por el usuario)* *(Dónde viven las medidas de la superficie cambia según el PRD 009, D12: pasan a `MedidasEscena`.)* |
@@ -42,7 +42,7 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 **Lista única de lo que NO se modifica:**
 - Las reglas de física del PRD 006 y las físicas por carro del PRD 007.
 - Las vueltas, los puntos de control, `Cronometro`, `MuestraRuta` y el resultado.
-- Los datos de cada pista (`ConfigPista*`) y `FabricaObjetoEscena`.
+- Los datos de cada pista (`ConfigPista*`) y `FabricaObjetoEscena`. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)*
 - `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana` y `VisorDisenoPista` (D7). *(Estos visores cambian según el PRD 009, D12: tamaño del carro y cámara.)*
 - `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos, los velocímetros y `src/style.css`. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)*
 
