@@ -19,8 +19,8 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D4 | Usuarios | El selector Botones / Timón / Giroscopio de Inicio sigue visible. Conectarlo a la carrera 3D es B4. |
 | D5 | Dominio | Ocultar significa que el modo no se ve ni se abre. El código 2D se queda en el repo; borrarlo es B2. |
 | D6 | Dominio | Del PRD 001, este PRD reemplaza la D1, el RF-02, el botón "Clásico 2D" del In scope y el criterio de aceptación 4. |
-| D7 | Técnico | "GIRA TU CELULAR" se oculta. El aviso queda en la página, pero nunca se muestra porque `aplicacion.js` deja de llamar a `GestorOrientacion`. |
-| D8 | Técnico | Cada modo es una clase: una superclase `Modo` y una subclase por modo (`ModoJugarSolo`, `ModoTestDrive3D`, `ModoClasico2D`, `ModoTestDrive2D`, `ModoMultijugador`, `ModoUnirse`), cada una en su propio archivo dentro de `src/controller/modos/`. `ModosDisponibles` las registra y es el único lugar que decide si un modo está disponible, en "Próximamente" u oculto. Se pueden ajustar las pruebas que esperan el 2D. |
+| D7 | Técnico | "GIRA TU CELULAR" se oculta. El aviso queda en la página, pero nunca se muestra porque `aplicacion.js` deja de llamar a `GestorOrientacion`. *(Reemplazado por PRD 005, D9: el aviso y `GestorOrientacion` se borran.)* |
+| D8 | Técnico | Cada modo es una clase: una superclase `Modo` y una subclase por modo (`ModoJugarSolo`, `ModoTestDrive3D`, `ModoClasico2D`, `ModoTestDrive2D`, `ModoMultijugador`, `ModoUnirse`), cada una en su propio archivo dentro de `src/controller/modos/`. `ModosDisponibles` las registra y es el único lugar que decide si un modo está disponible, en "Próximamente" u oculto. Se pueden ajustar las pruebas que esperan el 2D. *(Según el PRD 005, D9, `ModoClasico2D` y `ModoTestDrive2D` se borran.)* |
 
 ## 1. Contexto y problema
 El juego todavía tiene el modo de juego 2D, la carrera clásica antigua. Ya no se quiere en el juego, y además es la única parte que muestra "GIRA TU CELULAR", un aviso sin salida (lección 17). El multijugador corre en 2D y no funciona porque faltan las claves de Supabase. Los elementos dibujados en 2D que usa el juego 3D no son "modo 2D" (ver §5).
@@ -48,7 +48,7 @@ Que el jugador solo encuentre modos 3D, que nunca aparezca "GIRA TU CELULAR" y q
 - Configurar Supabase.
 - Cambiar los elementos dibujados en 2D del juego 3D.
 
-**Lista única de lo que NO se modifica:** `Juego`, `Pista`, `Segmento`, `Carro2D`, `RenderizadorPista`, `RenderizadorAuto`, `PantallaJuego`, `Controles`, `MultiJugador`, `GestorOrientacion`, `ConfigPista*` y `PISTAS`, timones, velocímetros, `Garaje`, todas las clases de la carrera 3D, los elementos dibujados en 2D y `src/style.css`. Solo cambian `index.html`, `src/controller/aplicacion.js`, la carpeta nueva `src/controller/modos/` y `pruebas/`. *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9.)*
+**Lista única de lo que NO se modifica:** `Juego`, `Pista`, `Segmento`, `Carro2D`, `RenderizadorPista`, `RenderizadorAuto`, `PantallaJuego`, `Controles`, `MultiJugador`, `GestorOrientacion`, `ConfigPista*` y `PISTAS`, timones, velocímetros, `Garaje`, todas las clases de la carrera 3D, los elementos dibujados en 2D y `src/style.css`. Solo cambian `index.html`, `src/controller/aplicacion.js`, la carpeta nueva `src/controller/modos/` y `pruebas/`. *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9. Según el PRD 005, D9, quedan fuera de esta lista las clases de D1, `PISTAS`, `ConfigPista*` y la frase "Solo cambian…"; y, en las clases de la carrera 3D y en los elementos dibujados en 2D, la forma de pedir una pista y los usos de `canvas-carro-3d`.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

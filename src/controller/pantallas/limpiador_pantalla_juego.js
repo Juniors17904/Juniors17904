@@ -30,6 +30,5 @@ class LimpiadorPantallaJuego {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         }
-        document.getElementById('canvas-carro-3d').style.display = '';
     }
 }

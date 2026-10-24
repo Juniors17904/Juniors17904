@@ -18,7 +18,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D3 | Usuarios | El jugador no nota nada: las pantallas, los botones y el comportamiento son los mismos. |
 | D4 | Usuarios | Se comprueba con las pruebas actuales en verde y con capturas de cada pantalla antes y después. |
 | D5 | Dominio | `Aplicacion` solo navega entre pantallas y guarda un controlador por pantalla. |
-| D6 | Dominio | **Cada pantalla de `index.html` tiene su controlador** (v2): `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje` (garaje y vista previa), `ControladorGiroscopio`, `ControladorPistas` (lista y detalle de pista), `ControladorDisenoPistas`, `ControladorTestDrive3D` (selector y carrera), `ControladorControles` (controles y diseño del timón), `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos`, `ControladorCarreraSolo` (ya existe) y `ControladorModo2D` (crear, unirse, espera, juego y resultado 2D, que siguen ocultos por el PRD 002). |
+| D6 | Dominio | **Cada pantalla de `index.html` tiene su controlador** (v2): `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje` (garaje y vista previa), `ControladorGiroscopio`, `ControladorPistas` (lista y detalle de pista), `ControladorDisenoPistas`, `ControladorTestDrive3D` (selector y carrera), `ControladorControles` (controles y diseño del timón), `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos`, `ControladorCarreraSolo` (ya existe) y `ControladorModo2D` (crear, unirse, espera, juego y resultado 2D, que siguen ocultos por el PRD 002). *(Según el PRD 005, D9, `ControladorModo2D` se borra.)* |
 | D7 | Técnico | `Garaje` deja de ser todo `static`: pasa a ser una clase instanciable, dividida en partes con una sola responsabilidad. |
 | D8 | Técnico | B10 se cierra cuando ningún archivo pasa de 400 líneas, `scripts/archivos_grandes_aceptados.txt` queda vacío y `CLAUDE.md` no tiene excepciones temporales. |
 | D9 | Dominio | **Reemplaza** (v2): en las listas de lo que no se modifica de los PRD 001 y 002, quedan fuera `VisorDisenoPista`, `VisorCarreraSolo` y `Garaje`, solo para reordenarlos por dentro. Esos PRD llevan una nota que lo indica. |
@@ -47,11 +47,11 @@ Que todos los archivos cumplan la regla anti-monolito sin excepciones y que cada
 
 **Lista única de lo que NO se modifica:**
 - El comportamiento y el aspecto del juego.
-- Las decisiones de los PRD 001, 002 y 003 (solo se agregan las notas de D9).
+- Las decisiones de los PRD 001, 002 y 003 (solo se agregan las notas de D9). *(Reemplazado por PRD 005, D9.)*
 - `src/style.css`.
 - `CarreraVueltas`, `Cronometro` y `MuestraRuta`.
-- `Modo` y sus subclases, y `ModosDisponibles`.
-- El motor 2D (`Juego`, `Pista`, `Carro2D` y sus renderizadores).
+- `Modo` y sus subclases, y `ModosDisponibles`. *(Reemplazado por PRD 005, D9.)*
+- El motor 2D (`Juego`, `Pista`, `Carro2D` y sus renderizadores). *(Reemplazado por PRD 005, D9: el motor 2D se borra.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -63,7 +63,7 @@ Que todos los archivos cumplan la regla anti-monolito sin excepciones y que cada
 
 ## 6. Requerimientos funcionales
 - **RF-01 (D5):** `Aplicacion` solo navega entre pantallas y guarda un controlador por pantalla.
-- **RF-02 (D6):** cada pantalla de `index.html` tiene el controlador que le asigna D6.
+- **RF-02 (D6):** cada pantalla de `index.html` tiene el controlador que le asigna D6. *(Según el PRD 005, D9, sin `ControladorModo2D`.)*
 - **RF-03 (D3, D4):** cada pantalla se ve igual que antes. Las capturas de antes y después coinciden en vertical y en horizontal.
 - **RF-04 (D3):** los botones atrás y adelante funcionan igual en todas las pantallas, incluida la redirección del PRD 002.
 - **RF-05 (D1):** `visor_carrera_solo.js` y `visor_diseno_pista.js` quedan por debajo de 400 líneas, y la carrera y Diseño General funcionan igual.

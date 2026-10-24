@@ -122,10 +122,10 @@ class VisorTestdriveRuta extends VisorBase {
     // ── Cargar ruta desde la pista ───────────────────────────────
     #cargarRuta(tipoPista) {
         try {
-            const pista = window.PISTAS?.[tipoPista];
+            const pista = window.registroPistas?.obtener(tipoPista);
             if (!pista?.tramos) {
                 window.__modelErrors = window.__modelErrors || [];
-                window.__modelErrors.push(`[pista_ciudad] PISTAS.${tipoPista} no encontrado — ¿cargó model.js?`);
+                window.__modelErrors.push(`[pista_ciudad] pista "${tipoPista}" no está en registroPistas`);
                 return;
             }
             this.#ruta.construir(pista.tramos, pista.totalSegs);

@@ -14,7 +14,7 @@ class MapaDetallePista {
         const W = canvas.width, H = canvas.height;
         ctx.clearRect(0, 0, W, H);
 
-        const pista = window.PISTAS?.[tipoPista];
+        const pista = window.registroPistas?.obtener(tipoPista);
         if (!pista) {
             ctx.fillStyle = '#1e1e40';
             ctx.fillRect(0, 0, W, H);

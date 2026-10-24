@@ -24,16 +24,9 @@ class ConfigPistaCiudad extends ConfigPista {
 
     get nombre()          { return 'Circuito Urbano'; }
     get totalSegs()       { return 300; }
-    get distMeta()        { return 1800; }
     get tramos()          { return this.#tramos; }
-    get obstFrecuencia()  { return 0.12; }
-    get obstTipos()       { return ['carro','carro','carro','bache','turbo']; }
-    get coloresTrafico()  { return ['#ef4444','#3b82f6','#eab308','#6b7280','#f97316']; }
 
     get cielo()   { return ['#060a14', '#0d1b2a']; }
-    get cesped()  { return ['#0a200a', '#081808']; }
-    get asfalto() { return ['#3a3a3a', '#2e2e2e']; }
-    get borde()   { return '#555'; }
 
     // prog: 0..1 a lo largo del trazado | lado: +1 derecha / -1 izquierda | dist: metros desde el centro
     get decoraciones() {
@@ -58,7 +51,7 @@ class ConfigPistaCiudad extends ConfigPista {
     }
 }
 
-window.PISTAS.ciudad = new ConfigPistaCiudad();
+window.registroPistas.registrar('ciudad', new ConfigPistaCiudad());
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

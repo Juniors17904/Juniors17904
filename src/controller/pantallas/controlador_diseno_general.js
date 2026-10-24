@@ -81,7 +81,7 @@ class ControladorDisenoGeneral extends ControladorPantalla {
         canvas.width  = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        this.#visor = new window.VisorDisenoPista(canvas, window.PISTAS['ciudad']);
+        this.#visor = new window.VisorDisenoPista(canvas, window.registroPistas.obtener('ciudad'));
         this.#visor.cargar(this.#estado.tipoAuto, this.#estado.color);
         this.#visor.iniciar();
 

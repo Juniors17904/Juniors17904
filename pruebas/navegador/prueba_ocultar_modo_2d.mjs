@@ -1,6 +1,11 @@
 // ================================================================
-// Prueba en navegador real del PRD 002 — Ocultar el modo 2D.
-// Cubre RF-01..RF-11. Los errores de consola cuentan como fallo.
+// Prueba en navegador real del PRD 002 — Ocultar el modo 2D,
+// ajustada por el PRD 005 — Archivar el motor 2D (D8).
+// Lo 2D ya no se oculta: se borró. Esta prueba comprueba que no
+// existe (PRD 005 RF-02, RF-08), que Multijugador y Únete siguen
+// con "Próximamente" (RF-07) y que atrás, adelante o un enlace a
+// una pantalla que no existe llevan a Inicio (RF-03). Conserva toda
+// la cobertura del 3D. Los errores de consola cuentan como fallo.
 // ================================================================
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULO || '/opt/node22/lib/node_modules/playwright/index.mjs');
 const SP = process.env.CAPTURAS_DIR || '/tmp/capturas_turborace'; (await import('fs')).mkdirSync(SP, { recursive: true });
@@ -24,6 +29,7 @@ const browser = await chromium.launch({ headless:false, args:['--use-gl=angle','
 
 // ── Utilidades sobre una página ────────────────────────────────
 const activa = page => page.evaluate(()=>document.querySelector('.pantalla.activa')?.id);
+const existe = (page, id) => page.evaluate(i=>!!document.getElementById(i), id);
 const visible = (page, id) => page.evaluate(i=>{ const b=document.getElementById(i);
   if(!b || b.hidden) return false; const cs=getComputedStyle(b); const r=b.getBoundingClientRect();
   return cs.display!=='none' && cs.visibility!=='hidden' && r.width>0 && r.height>0; }, id);
@@ -43,30 +49,8 @@ async function abrir(viewport) {
   page.on('pageerror', e=>errores.push('pageerror: '+e.message));
   page.on('console', m=>{ if(m.type()==='error') errores.push('console: '+m.text()); });
   await page.route('**', parchear);
-  // RF-07: vigila "GIRA TU CELULAR" durante toda la sesión de la página
-  await page.addInitScript(()=>{
-    window.__rotarVisto = [];
-    setInterval(()=>{ const r=document.getElementById('pantalla-rotar'); if(!r) return;
-      const cs=getComputedStyle(r); const b=r.getBoundingClientRect();
-      if(cs.display!=='none' && cs.visibility!=='hidden' && b.width>0 && b.height>0)
-        window.__rotarVisto.push(document.querySelector('.pantalla.activa')?.id || '?'); }, 50);
-  });
   await page.goto(URL_JUEGO, { waitUntil:'load' });
   await page.waitForTimeout(2500);
-  // RF-10: espía de Juego (la carrera 2D). Proxy en window.Juego y métodos que solo usa Juego.
-  await page.evaluate(()=>{
-    window.__juego2D = 0;
-    if (window.Juego) {
-      const orig = window.Juego;
-      window.Juego = new Proxy(orig, { construct(t,a,n){ window.__juego2D++; return Reflect.construct(t,a,n); } });
-      const ini = orig.prototype.iniciar;
-      orig.prototype.iniciar = function(...a){ window.__juego2D++; return ini.apply(this,a); };
-    }
-    if (window.PantallaJuego) {   // solo el constructor de Juego crea PantallaJuego y llama setCircuito
-      const sc = window.PantallaJuego.prototype.setCircuito;
-      window.PantallaJuego.prototype.setCircuito = function(...a){ window.__juego2D++; return sc.apply(this,a); };
-    }
-  });
   await page.waitForFunction(()=>window.VisorTestdriveRecto && window.VisorTestdriveRuta, null, { timeout:15000 }).catch(()=>{});
   return { ctx, page, errores };
 }
@@ -91,8 +75,8 @@ async function revisarInicio(page, etiqueta) {
 async function revisarAjustes(page, etiqueta) {
   await irAAjustes(page);
   check(await activa(page)==='pantalla-ajustes', `PRD 002 RF-01 ${etiqueta}: ⚙ abre ajustes`);
-  check(!(await visible(page,'btn-clasico-2d')), `PRD 002 RF-01 ${etiqueta}: "Clásico 2D" no aparece en ⚙`);
-  check(!(await visible(page,'btn-test-drive')), `PRD 002 RF-01 ${etiqueta}: "Test Drive" (2D) no aparece en ⚙`);
+  check(!(await existe(page,'btn-clasico-2d')), `PRD 005 RF-02 RF-08 ${etiqueta}: "Clásico 2D" no existe en el DOM`);
+  check(!(await existe(page,'btn-test-drive')), `PRD 005 RF-02 RF-08 ${etiqueta}: "Test Drive" (2D) no existe en el DOM`);
   for (const id of ['btn-ir-garage','btn-ir-giro','btn-ir-pista','btn-test-drive-3d','btn-ir-controles',
                     'btn-ir-velocimetro','btn-ir-vista-conduccion','btn-ir-diseno-general','btn-ir-diseno-objetos'])
     check(await visible(page,id), `PRD 002 RF-02 ${etiqueta}: ${id} visible en ⚙`);
@@ -120,18 +104,18 @@ async function entrarTestDrive3D(page, boton, salida, lienzo, etiqueta) {
   const V = 'vertical';
   await revisarInicio(page, V);
 
-  // RF-04 / RF-05: Multijugador y Únete visibles con "Próximamente" y no abren nada
-  for (const [id, rf, nombre] of [['btn-crear','RF-04','Multijugador'],['btn-unirse','RF-05','Únete']]) {
+  // PRD 005 RF-07 (antes PRD 002 RF-04 / RF-05): Multijugador y Únete visibles con "Próximamente" y no abren nada
+  for (const [id, rf, nombre] of [['btn-crear','RF-07','Multijugador'],['btn-unirse','RF-07','Únete']]) {
     const info = await page.evaluate(i=>{ const b=document.getElementById(i); return { txt:b.textContent, dis:b.disabled }; }, id);
-    check(/Próximamente/.test(info.txt), `PRD 002 ${rf} "${nombre}" muestra "Próximamente" (${info.txt.trim()})`);
-    check(info.dis===true, `PRD 002 ${rf} "${nombre}" está desactivado`);
+    check(/Próximamente/.test(info.txt), `PRD 005 ${rf} "${nombre}" muestra "Próximamente" (${info.txt.trim()})`);
+    check(info.dis===true, `PRD 005 ${rf} "${nombre}" está desactivado`);
     await page.click('#'+id, { force:true, timeout:2000 }).catch(()=>{});
     await page.evaluate(i=>document.getElementById(i).dispatchEvent(new MouseEvent('click',{bubbles:true})), id);
     await esperar(page,400);
-    check(await activa(page)==='pantalla-inicio', `PRD 002 ${rf} al tocar "${nombre}" se queda en pantalla-inicio`);
+    check(await activa(page)==='pantalla-inicio', `PRD 005 ${rf} al tocar "${nombre}" se queda en pantalla-inicio`);
   }
 
-  // RF-06: selector de control visible y "Timón" abre el diseño del timón
+  // PRD 002 RF-06 / PRD 005 RF-08: selector de control visible y "Timón" abre el diseño del timón
   check(await visible(page,'control-tabs'), 'PRD 002 RF-06 selector Botones / Timón / Giroscopio visible en Inicio');
   for (const c of ['botones','timon','giro'])
     check(await page.evaluate(k=>{ const b=document.querySelector(`#control-tabs [data-ctrl="${k}"]`); return !!b && getComputedStyle(b).display!=='none' && b.getBoundingClientRect().width>0; }, c),
@@ -141,7 +125,7 @@ async function entrarTestDrive3D(page, boton, salida, lienzo, etiqueta) {
   await clic(page,'btn-volver-timon-diseno'); await esperar(page,300);
   check(await activa(page)==='pantalla-inicio', 'PRD 002 RF-06 volver del diseño del timón regresa a Inicio');
 
-  // RF-01 / RF-02: ⚙ sin modos 2D, con el resto visible y funcionando
+  // PRD 005 RF-02 / RF-08 (antes PRD 002 RF-01 / RF-02): ⚙ sin modos 2D, con el resto visible y funcionando
   await revisarAjustes(page, V);
   const destinos = [
     ['btn-ir-garage','pantalla-garage','btn-volver-garage'],
@@ -183,29 +167,28 @@ async function entrarTestDrive3D(page, boton, salida, lienzo, etiqueta) {
   await page.screenshot({ path: `${SP}/prd002_jugar_solo.png` });
   await irAInicio(page);
 
-  // RF-08 / RF-09: atrás y adelante hacia pantallas de modos ocultos terminan en Inicio
+  // PRD 005 RF-03: atrás y adelante hacia pantallas borradas (o pantalla-juego sin visor) terminan en Inicio
   for (const destino of ['pantalla-crear','pantalla-unirse','pantalla-espera','pantalla-resultado','pantalla-juego']) {
-    const rf = destino==='pantalla-juego' ? 'RF-09' : 'RF-08';
+    const rf = destino==='pantalla-juego' ? 'PRD 002 RF-09 / PRD 005 RF-03' : 'PRD 005 RF-03';
     await irAInicio(page);
     // atrás: [destino] ← [ajustes]
     await page.evaluate(d=>{ history.pushState({pantalla:d},''); history.pushState({pantalla:'pantalla-ajustes'},''); }, destino);
     await page.evaluate(()=>history.back()); await esperar(page,500);
-    check(await activa(page)==='pantalla-inicio', `PRD 002 ${rf} atrás hacia ${destino} muestra Inicio (${await activa(page)})`);
+    check(await activa(page)==='pantalla-inicio', `${rf} atrás hacia ${destino} muestra Inicio (${await activa(page)})`);
     // adelante: [ajustes] → [destino]
     await page.evaluate(d=>{ history.pushState({pantalla:'pantalla-ajustes'},''); history.pushState({pantalla:d},''); }, destino);
     await page.evaluate(()=>history.back()); await esperar(page,400);
     await page.evaluate(()=>history.forward()); await esperar(page,500);
-    check(await activa(page)==='pantalla-inicio', `PRD 002 ${rf} adelante hacia ${destino} muestra Inicio (${await activa(page)})`);
+    check(await activa(page)==='pantalla-inicio', `${rf} adelante hacia ${destino} muestra Inicio (${await activa(page)})`);
   }
 
-  // RF-07 / RF-10 / RF-11
-  const rotar = await page.evaluate(()=>window.__rotarVisto);
-  check(rotar.length===0, `PRD 002 RF-07 ${V}: "GIRA TU CELULAR" nunca visible ${[...new Set(rotar)].join(',')}`);
-  check(await page.evaluate(()=>window.__juego2D)===0, `PRD 002 RF-10 ${V}: la carrera 2D (Juego) nunca se crea`);
+  // PRD 005 RF-02: "GIRA TU CELULAR" y las pantallas 2D ya no existen en el DOM
+  for (const id of ['pantalla-rotar','pantalla-crear','pantalla-unirse','pantalla-espera','pantalla-resultado'])
+    check(!(await existe(page,id)), `PRD 005 RF-02 ${V}: ${id} no existe en el DOM`);
   console.log('__modelErrors:', JSON.stringify(await page.evaluate(()=>window.__modelErrors)));
   const reales = errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)/.test(t));
   console.log('errores:', errores.join('\n'));
-  check(reales.length===0, `PRD 002 RF-11 ${V}: sin errores de consola ${reales.join(' | ')}`);
+  check(reales.length===0, `PRD 002 RF-11 / PRD 005 RF-09 ${V}: sin errores de consola ${reales.join(' | ')}`);
   await ctx.close();
 }
 
@@ -224,15 +207,13 @@ async function entrarTestDrive3D(page, boton, salida, lienzo, etiqueta) {
   const llegoYa = await page.waitForFunction(()=>document.getElementById('cuenta-carrera-solo')?.textContent==='¡YA!',null,{timeout:12000}).then(()=>true,()=>false);
   check(llegoYa, `PRD 002 RF-03 ${H}: Jugar Solo llega a ¡YA!`);
   await irAInicio(page);
-  const rotar = await page.evaluate(()=>window.__rotarVisto);
-  check(rotar.length===0, `PRD 002 RF-07 ${H}: "GIRA TU CELULAR" nunca visible ${[...new Set(rotar)].join(',')}`);
-  check(await page.evaluate(()=>window.__juego2D)===0, `PRD 002 RF-10 ${H}: la carrera 2D (Juego) nunca se crea`);
+  check(!(await existe(page,'pantalla-rotar')), `PRD 005 RF-02 ${H}: "GIRA TU CELULAR" (pantalla-rotar) no existe en el DOM`);
   // Un enlace a una pantalla oculta (recarga con hash) termina en Inicio
   await page.goto(URL_JUEGO+'#pantalla-crear', { waitUntil:'load' }); await esperar(page,1500);
-  check(await activa(page)==='pantalla-inicio', `PRD 002 RF-08 ${H}: enlace a pantalla-crear muestra Inicio`);
+  check(await activa(page)==='pantalla-inicio', `PRD 005 RF-03 ${H}: enlace a pantalla-crear (borrada) muestra Inicio`);
   const reales = errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)/.test(t));
   console.log('errores:', errores.join('\n'));
-  check(reales.length===0, `PRD 002 RF-11 ${H}: sin errores de consola ${reales.join(' | ')}`);
+  check(reales.length===0, `PRD 002 RF-11 / PRD 005 RF-09 ${H}: sin errores de consola ${reales.join(' | ')}`);
   await ctx.close();
 }
 

@@ -142,14 +142,15 @@ class ControladorCarreraSolo {
     }
 
     #resolverPista() {
-        const pistas = window.PISTAS ?? {};
-        const clave  = this.#estado?.pista;
-        if (clave && pistas[clave]) return pistas[clave];
+        const registro = window.registroPistas;
+        const clave    = this.#estado?.pista;
+        const pista    = clave ? registro?.obtener(clave) : null;
+        if (pista) return pista;
         if (clave) {
             this.#registrarError('pista "' + clave + '" no existe, se usa "' +
                 ControladorCarreraSolo.#PISTA_RESPALDO + '"');
         }
-        const respaldo = pistas[ControladorCarreraSolo.#PISTA_RESPALDO];
+        const respaldo = registro?.obtener(ControladorCarreraSolo.#PISTA_RESPALDO);
         if (!respaldo) throw new Error('no existe la pista de respaldo');
         return respaldo;
     }

@@ -21,16 +21,9 @@ class ConfigPistaMontana extends ConfigPista {
 
     get nombre()          { return 'Cañón Rojo'; }
     get totalSegs()       { return 300; }
-    get distMeta()        { return 1800; }
     get tramos()          { return this.#tramos; }
-    get obstFrecuencia()  { return 0.08; }
-    get obstTipos()       { return ['bache','carro','turbo']; }
-    get coloresTrafico()  { return ['#6b7280','#4a5568','#718096']; }
 
     get cielo()   { return ['#1a2a3a', '#2d4a5a']; }
-    get cesped()  { return ['#1a3a1a', '#2d5a2d']; }
-    get asfalto() { return ['#5a5a5a', '#4a4a4a']; }
-    get borde()   { return '#888'; }
 
     get decoraciones() {
         return [
@@ -44,7 +37,7 @@ class ConfigPistaMontana extends ConfigPista {
     }
 }
 
-window.PISTAS.montana = new ConfigPistaMontana();
+window.registroPistas.registrar('montana', new ConfigPistaMontana());
 
 } catch (e) {
     window.__modelErrors = window.__modelErrors || [];

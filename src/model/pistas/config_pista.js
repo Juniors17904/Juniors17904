@@ -7,12 +7,7 @@ try {
 class ConfigPista {
     get nombre()          { return ''; }
     get totalSegs()       { return 300; }
-    get distMeta()        { return 1800; }
     get tramos()          { return []; }
-    get esTestDrive()     { return false; }
-    get obstFrecuencia()  { return 0; }
-    get obstTipos()       { return []; }
-    get coloresTrafico()  { return []; }
     get decoraciones()    { return []; }
 
     // Genera postes de alumbrado cada `cadaSegs` segmentos, alternando lados.
@@ -53,20 +48,6 @@ class ConfigPista {
     get tipoCielo()  { return 'nocturno'; }
     get esNocturno() { return this.tipoCielo !== 'soleado'; }
     get cielo()      { return ['#060a14', '#0d1b2a']; }
-    get cesped()     { return ['#1a5c1a', '#174d17']; }
-    get asfalto()    { return ['#484848', '#3d3d3d']; }
-    get borde()      { return '#888'; }
-
-    // Compatibilidad con pista.js — construido desde los getters individuales
-    get nivelFijo() {
-        return {
-            nombre:  this.nombre,
-            cielo:   this.cielo,
-            cesped:  this.cesped,
-            asfalto: this.asfalto,
-            borde:   this.borde,
-        };
-    }
 }
 
 window.ConfigPista = ConfigPista;

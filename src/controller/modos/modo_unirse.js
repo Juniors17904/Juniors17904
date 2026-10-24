@@ -1,14 +1,15 @@
 'use strict';
 
 // ================================================================
-// CONTROLLER — ModoUnirse: unirse a una sala con código (corre en 2D) (PRD 002 D8)
+// CONTROLLER — ModoUnirse: unirse a una sala con código (PRD 002 D8)
+// PRD 005 D7: solo conserva pantalla-juego, para que sin visor 3D lleve a Inicio
 // ================================================================
 
 try {
 
 class ModoUnirse extends Modo {
     constructor() {
-        super('Únete', ['btn-unirse'], ['pantalla-unirse', 'pantalla-espera', 'pantalla-juego', 'pantalla-resultado']);
+        super('Únete', ['btn-unirse'], ['pantalla-juego']);
     }
 }
 

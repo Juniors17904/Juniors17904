@@ -104,6 +104,5 @@ class ControladorTestDrive3D extends ControladorPantallaJuego {
             'debug-td3d', 'minimap-td3d', 'trail-map', 'btn-toggle-minimap', 'btn-toggle-trail',
             'ctrl-cam-height'];
         for (const id of ocultos) document.getElementById(id).style.display = 'none';
-        document.getElementById('canvas-carro-3d').style.display = '';
     }
 }
