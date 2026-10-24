@@ -14,7 +14,9 @@ Requerimiento: «( ....... )»
 
 Lístame las 6-8 decisiones clave que debemos resolver antes de escribir el PRD, con su propuesta de resolución y agrupadas por categoría (alcance, usuarios, dominio, técnico). Sé conciso.
 
-Antes de proponer las decisiones, lee los PRD vigentes de `docs/prds/` (sus decisiones bloqueadas y sus listas de lo que NO se modifica). Al final, lista los **choques con PRD anteriores**: qué decisión, RF o elemento protegido de qué PRD cambiaría este requerimiento. Cada choque se resuelve en el Prompt 2 con una decisión "Reemplaza", y el PRD anterior lleva una nota que lo indica (sin reescribirlo).
+Antes de proponer las decisiones, lee los PRD vigentes de `docs/prds/` (sus decisiones bloqueadas y sus listas de lo que NO se modifica). Al final, lista los **choques con PRD anteriores**: qué decisión, RF o elemento protegido de qué PRD cambiaría este requerimiento. Cada choque se resuelve en el Prompt 2 con una decisión "Reemplaza", y el PRD anterior lleva una nota que lo indica (sin reescribirlo). Revisa **todas** las listas protegidas: decisiones, RF y listas de lo que no se modifica de cada PRD, y las tablas de jerarquías de `CLAUDE.md`.
+
+Si el requerimiento **borra, mueve o renombra código**, antes del Prompt 2 un agente revisa en el código quién usa cada pieza afectada (archivos, clases, ids del HTML, globales `window.*` y pruebas). Lista las **piezas compartidas** con lo que se conserva y nombra cada pieza que se borra, sin agruparlas en frases como "las pantallas 2D".
 
 ---
 
