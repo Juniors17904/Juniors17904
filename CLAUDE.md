@@ -174,7 +174,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/view/velocimetros/` → `Velocimetro` + subclases
 - `src/view/minimapas/` → `MinimapBase` + subclases, y `MapaConduccion` / `ParMapasConduccion` + subclases
 - `src/view/paneles/` → `PanelDatos` + subclases
-- `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes); `src/view/pistas/comun/` → piezas que comparten (`BuclePasoFijo`, `ConductorPasoFijo`)
+- `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes); `src/view/pistas/comun/` → piezas que comparten (`BuclePasoFijo`, `ConductorPasoFijo` y el piso de la pista del PRD 012: `ConstructorPisoPista` con sus ayudantes `TrazadoPiso`, `TrazadoPisoCurva`, `TrazadoPisoRecto`, `PuntoPiso` y `AcumuladorGeometria`)
 - `src/model/carros/` → `Carro` + subclases, `ConstantesFisica` y `RegistroCarros`
 - `src/model/superficies/` → `Superficie` + subclases y `DetectorSuperficie`
 - `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos` y `DetectorChoques`

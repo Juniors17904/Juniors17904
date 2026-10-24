@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para implementar |
+| Estado | v3 — implementado |
 | Fecha | 2026-10-24 |
 | Backlog | B18 (`docs/BACKLOG.md`) |
 | Depende de | PRD 009 (escala y `MedidasEscena`) |
@@ -90,3 +90,4 @@ Que el piso de la pista tenga relieve y grosor reales y se vea igual en las 5 pa
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
 - **v2** (2026-10-24): revisión única (forma corta). Decisiones aprobadas por el usuario: piano 8 cm sobre el asfalto (D3), pasto a nivel 0 con el asfalto y el carro 8 cm arriba (D4). Detalles: 5 pantallas nombradas, meta y salida de la recta, pieza de entrada con ayudantes, `GeometriaCinta` y `PerpendicularRuta`, D11 completa (PRD 008), Diseño de Objetos fuera, parpadeo con la cámara aérea.
+- **v3** (2026-10-24): implementado en 3 fases. Fase 1: medidas del piso en `MedidasEscena` y `ConstructorPisoPista` con sus ayudantes en `src/view/pistas/comun/`. Fase 2: las 5 pantallas dibujan el piso con esa pieza y el carro va a `alturaAsfalto`. Fase 3: pasto de Jugar Solo a nivel 0, se borran `GeometriaCinta` y `PerpendicularRuta` (sin uso), pruebas `pruebas/modelo/prueba_piso_pista.js`, `prueba_escala_carro_pista.js` (RNF-01, RF-08) y `pruebas/navegador/prueba_piso_pantallas.mjs` (capturas en las 5 pantallas).

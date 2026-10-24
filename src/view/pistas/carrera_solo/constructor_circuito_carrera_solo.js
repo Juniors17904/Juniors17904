@@ -30,7 +30,7 @@ export class ConstructorCircuitoCarreraSolo {
         const matPasto = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
         const pasto    = new THREE.Mesh(geoPasto, matPasto);
         pasto.rotation.x = -Math.PI / 2;
-        pasto.position.y = -0.01;
+        pasto.position.y = 0;
         this.#recursos.push(geoPasto, matPasto);
         this.#escena.add(pasto);
 
