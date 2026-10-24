@@ -48,6 +48,8 @@ Además (v2):
 
 ## Después del PRD
 
+Si el Verificador da ❌ en un PRD, corre el **Reparador PRD** (skill `reparador-prd`: "repara el PRD" o `/reparador-prd`). Corrige solo los detalles, pide permiso para las decisiones y vuelve a verificar hasta 3 vueltas.
+
 Cuando el PRD esté implementado, verifícalo con el **Verificador PRD** (skill `verificador-prd`: "verifica los PRD" o `/verificador-prd`). Revisa que los PRD no se contradigan, que el código los cumpla y que las pruebas de `pruebas/` pasen.
 
 Antes de escribir o corregir un PRD, lee `docs/LECCIONES_APRENDIDAS.md` y, si aparece un error nuevo, agrégalo a esa tabla.
