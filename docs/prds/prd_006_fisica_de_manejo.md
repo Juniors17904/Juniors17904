@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — reparado con el Reparador PRD, listo para verificar |
+| Estado | v4 — cerrado con el usuario, listo para implementar |
 | Fecha | 2026-10-24 |
 | Backlog | B11 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D8 |
@@ -18,10 +18,10 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D2 | Alcance | Se aplica a las 5 pantallas que manejan un `Carro`: Jugar Solo (`VisorCarreraSolo`), Test Drive recto (`VisorTestdriveRecto`), Test Drive con ruta (`VisorTestdriveRuta`), Diseño de Pistas → Entrar (`VisorCarreraUrbana`) y Diseño General (`VisorDisenoPista`). *(v2: suma Diseño de Pistas)* |
 | D3 | Usuarios | Con el carro básico de referencia, la velocidad máxima y el tiempo de una vuelta en Ciudad quedan casi igual que hoy (±10 %). Las diferencias entre carros son del PRD 007. *(v2)* |
 | D4 | Usuarios | El derrape y la inclinación se sienten como ahora: se ajustan números, no la idea. |
-| D5 | Dominio | La física usa el tiempo real de cada paso. Los 5 visores avanzan con paso fijo de 60 Hz reutilizando `BuclePasoFijo`; hoy solo Jugar Solo lo hace. *(v2)* |
+| D5 | Dominio | La física usa el tiempo real de cada paso. Los 5 visores avanzan con paso fijo de 60 Hz reutilizando `BuclePasoFijo`, que se mueve de `src/view/pistas/carrera_solo/` a `src/view/pistas/comun/`; hoy solo Jugar Solo lo usa. *(v2; v4 aprobado por el usuario)* |
 | D6 | Técnico | Se borra la clase `MovimientoLibre` (`movimiento_libre.js`, nadie la crea) y su reexportación en `model_fisica.js`. Se quita de `CLAUDE.md` (ejemplo MVC) y de los comentarios de `carro.js` que la nombran. |
 | D7 | Técnico | Las constantes de la física viven en una clase propia del modelo. Se borran sus copias en `get physics()` de `VisorTestdriveRecto` y `VisorTestdriveRuta` (la distancia de cámara `camDist` se queda en el visor), y los paneles de depuración (`PanelDatosTestDriveRecto`, `PanelDatosCircuito3D`) leen las del carro activo. *(v2)* |
-| D8 | Dominio | **Reemplaza:** del PRD 001, `Carro` en la D8 y `VisorDisenoPista` en su lista de lo que no se modifica. Del PRD 002, `VisorCarreraSolo` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego", solo en el manejo. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el manejo), `model_fisica.js`, `movimiento_libre.js` y los 5 visores de D2. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
+| D8 | Dominio | **Reemplaza:** del PRD 001, `Carro` en la D8 y `Carro` y `VisorDisenoPista` en su lista de lo que no se modifica. Del PRD 002, `VisorCarreraSolo` y `BuclePasoFijo` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego", solo en el manejo. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el manejo), `model_fisica.js`, `movimiento_libre.js` y los 5 visores de D2. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
 | D9 | Técnico | Lo nuevo va en clases aparte; los visores solo las llaman, para no pasar de 400 líneas. *(v2)* |
 
 ## 1. Contexto y problema
@@ -73,7 +73,7 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 
 ## 7. Requerimientos no funcionales
 - **RNF-01 (D7, D9), reglas del proyecto:** se cumple `CLAUDE.md`: una clase por archivo, español, `#privados`, sin `{ }` como entidad, MVC y la regla anti-monolito. Ningún visor pasa de 400 líneas.
-- **RNF-02 (D6), limpieza:** en el proyecto no quedan la clase `MovimientoLibre`, su archivo ni menciones a ella en `CLAUDE.md` o en comentarios. Los nombres del modo (`toggleMovimientoLibre`, `#movimientoLibre`, `#alternarMovimientoLibre`) se conservan.
+- **RNF-02 (D6), limpieza:** en el proyecto no quedan la clase `MovimientoLibre`, su archivo ni menciones a ella en `CLAUDE.md` o en comentarios. El modo "movimiento libre" de Test Drive se conserva; su método en inglés pasa a español (`CLAUDE.md`). *(v4 aprobado por el usuario)*
 - **RNF-03 (D5), pruebas:** las pruebas de física corren en el modelo con reloj controlado (lección 9), sin depender de la GPU.
 - **RNF-04, entrega:** el cambio llega a `main` solo cuando cumple "Antes de llevar algo a main" de `docs/LECCIONES_APRENDIDAS.md`.
 
@@ -88,9 +88,9 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - **Pruebas que esperan los números viejos:** se ajustan a los nuevos rangos y citan su RF (lección 10).
 - **Visores al borde de 400 líneas** (`VisorCarreraSolo` 393, `VisorTestdriveRuta` 392): D9 obliga a sacar código a clases nuevas.
 - **Campos públicos de `Carro`** que hoy escriben y leen los visores (tope, arrastre y escala del velocímetro): pasan a la clase de constantes con acceso controlado (lección 11).
-- **`BuclePasoFijo`** vive en la carpeta de Jugar Solo; para compartirlo con los otros 4 visores se mueve a una carpeta común.
 
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
-- **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: `camDist` se queda, D8 entra al In scope, turbo de `Carro` fuera de alcance, nota del PRD 007 en `src/style.css`, RNF-02 aclara los nombres del modo, riesgos de lecturas públicas y de `BuclePasoFijo`.
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: D3 aplica al carro básico, D2 suma Diseño de Pistas, D5 da paso fijo a los 5 visores, D7 borra las copias de constantes y conecta los paneles, D9 clases aparte. Detalles: D8 completa con los PRD 002 y 004; RF-11 de código pasa a RNF-02.
+- **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: `camDist` se queda, D8 entra al In scope, turbo de `Carro` fuera de alcance, nota del PRD 007 en `src/style.css`, RNF-02 aclara los nombres del modo, riesgos de lecturas públicas y de `BuclePasoFijo`.
+- **v4** (2026-10-24): cierre con el usuario. Decisiones aprobadas: `BuclePasoFijo` se mueve a `src/view/pistas/comun/` (D5) y el método en inglés del modo movimiento libre pasa a español (RNF-02). Detalles: D8 nombra `Carro` en la lista del PRD 001 y `BuclePasoFijo` en el PRD 002; historial ordenado.

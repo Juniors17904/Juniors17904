@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — reparado con el Reparador PRD, listo para verificar |
+| Estado | v4 — cerrado con el usuario, listo para implementar |
 | Fecha | 2026-10-24 |
 | Backlog | B13 (`docs/BACKLOG.md`) |
 | Depende de | PRD 006 (física de manejo) y PRD 007 (carros con personalidad) |
@@ -16,9 +16,9 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 |---|---|---|
 | D1 | Alcance | El pasto frena con rozamiento según la superficie, en vez del tope al 40 % más el arrastre ×3 de hoy. |
 | D2 | Alcance | Hay choques contra los objetos sólidos junto a la pista: árboles, postes y señales de curva. Las flechas de curva **no** son sólidas, porque quedan sobre el piano. El carro rebota y pierde velocidad. No hay daños ni reinicio. *(v2, aprobado por el usuario)* |
-| D3 | Usuarios | Salirse al pasto cuesta más o menos lo mismo que hoy: el carro queda cerca del 40 % de su velocidad. |
+| D3 | Usuarios | Salirse al pasto cuesta más o menos lo mismo que hoy: el carro queda cerca del 40 % de su velocidad máxima. |
 | D4 | Usuarios | Al chocar, el carro nunca atraviesa el objeto ni queda atrapado en él. |
-| D5 | Dominio | La superficie (asfalto, piano o pasto) es una jerarquía de clases (`Superficie` y subclases) que el modelo consulta. |
+| D5 | Dominio | La superficie (asfalto, piano o pasto) es una jerarquía de clases (`Superficie` y subclases) que el modelo consulta. Qué superficie hay bajo el carro (incluido el ancho del piano) lo calcula una clase nueva del modelo, sin tocar `Ruta`. *(v4 aprobado por el usuario)* |
 | D6 | Técnico | Los choques los calcula el modelo; el visor solo los aplica (MVC). El modelo crea una instancia por cada objeto, a partir de los datos de la pista, **sin cambiar esos datos**. `ObjetoSolido` es la superclase, con una subclase por tipo: árbol, poste y señal de curva (`CLAUDE.md`: variantes → subclases). *(v2; v3 aclara)* |
 | D7 | Técnico | Solo para Jugar Solo. Las otras 4 pantallas del PRD 006 (D2) quedan como están. |
 | D8 | Dominio | **Reemplaza:** del PRD 001, la D3 ("no hay choques"), el RF-07 (el pasto como tope) y "choques o daños" de su Out of scope. Del PRD 002, `CarreraVueltas`, `VisorCarreraSolo` y `ControladorCarreraSolo` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego" (solo el pasto y los choques) y `CarreraVueltas`. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el pasto y los choques), `CarreraVueltas`, `VisorCarreraSolo` y `ControladorCarreraSolo`. Los PRD 006 y 007 ya dejan el pasto fuera de su alcance. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
@@ -55,7 +55,7 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 | Choque | El carro toca un objeto sólido: rebota hacia afuera y pierde velocidad. |
 
 ## 6. Requerimientos funcionales
-- **RF-01 (D1, D5):** en el pasto el carro pierde velocidad aunque se acelere, más que en el asfalto.
+- **RF-01 (D1, D5):** si el carro entra al pasto por encima del 40 % de su velocidad máxima, pierde velocidad aunque se acelere, más que en el asfalto.
 - **RF-02 (D3):** acelerando a fondo en el pasto, la velocidad se estabiliza cerca del 40 % de la máxima (entre 35 % y 45 %).
 - **RF-03 (D1):** al volver al asfalto, el carro recupera la aceleración normal.
 - **RF-04 (D5):** el piano frena poco: menos que el pasto y algo más que el asfalto.
@@ -89,5 +89,6 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
-- **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: depende también del PRD 007, D6 aclara instancia y subclases de `ObjetoSolido`, D8 suma `CarreraVueltas` (PRD 002) y `ControladorCarreraSolo` (PRD 005), D8 entra al In scope, riesgo del ancho del piano.
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: D2 con objetos sólidos sin flechas, D6 con `ObjetoSolido` sin cambiar los datos, D9 tabla de `CLAUDE.md` y clases aparte. Detalles: contexto del pasto corregido (arrastre ×3), D8 completa con los PRD 002 y 004, cita del RF-11 corregida, riesgo de pruebas viejas y se quita "mover objetos en los datos".
+- **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: depende también del PRD 007, D6 aclara instancia y subclases de `ObjetoSolido`, D8 suma `CarreraVueltas` (PRD 002) y `ControladorCarreraSolo` (PRD 005), D8 entra al In scope, riesgo del ancho del piano.
+- **v4** (2026-10-24): cierre con el usuario. Decisión aprobada: el ancho del piano lo calcula una clase nueva del modelo, sin tocar `Ruta` (D5). Detalles: RF-01 y D3 precisan "de la velocidad máxima", historial ordenado.

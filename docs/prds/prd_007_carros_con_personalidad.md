@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — reparado con el Reparador PRD, listo para verificar |
+| Estado | v4 — cerrado con el usuario, listo para implementar |
 | Fecha | 2026-10-24 |
 | Backlog | B12 (`docs/BACKLOG.md`) |
 | Depende de | PRD 006 (física de manejo) |
@@ -21,7 +21,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D5 | Dominio | Un registro del modelo decide qué física corresponde a cada modelo del garaje. |
 | D6 | Dominio | Hay 6 modelos (deportivo, SUV, muscle, fórmula, pickup y clásico) y solo 3 físicas (`CarroDeportivo`, `CarroSUV`, `CarroMusculo` para "muscle"). Se crean las 3 que faltan y las 3 existentes se rehacen con `#privados` y sin diferencias de turbo. *(v2)* |
 | D7 | Técnico | El turbo por tipo de carro no entra; es B9. |
-| D8 | Dominio | **Reemplaza:** del PRD 001, `VisorDisenoPista` y `src/style.css` en su lista de lo que no se modifica (amplía su D4: el carro del garaje también trae su física). Del PRD 002, `Garaje`, `VisorCarreraSolo` y `src/style.css` en su lista. Del PRD 004, "el comportamiento y el aspecto del juego" (solo el manejo y el garaje) y `src/style.css`. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el manejo y el garaje), `src/style.css`, los 5 visores del PRD 006 (D2) y los controladores que les pasan el carro (`ControladorCarreraSolo`, `ControladorTestDrive3D`, `ControladorDisenoPistas`, `ControladorDisenoGeneral`) y `ControladorGaraje`. Del PRD 006, `src/style.css`. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
+| D8 | Dominio | **Reemplaza:** del PRD 001, `VisorDisenoPista` y `src/style.css` en su lista de lo que no se modifica (amplía su D4: el carro del garaje también trae su física). Del PRD 002, `Garaje`, `VisorCarreraSolo`, `ControladorCarreraSolo` y `src/style.css` en su lista. Del PRD 004, "el comportamiento y el aspecto del juego" (solo el manejo y el garaje) y `src/style.css`. Del PRD 005, "el comportamiento y el aspecto del juego 3D" (solo el manejo y el garaje), `src/style.css`, los 5 visores del PRD 006 (D2) y los controladores que les pasan el carro (`ControladorCarreraSolo`, `ControladorTestDrive3D`, `ControladorDisenoPistas`, `ControladorDisenoGeneral`) y `ControladorGaraje`. Del PRD 006, `src/style.css`. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
 | D9 | Técnico | `src/style.css` solo puede **agregar** los estilos de las barras. *(v2)* |
 | D10 | Técnico | La familia `Carro` y sus 6 subclases se agrega a la tabla de jerarquías de `CLAUDE.md`. Lo nuevo va en clases aparte; los visores solo las llaman, para no pasar de 400 líneas. *(v2)* |
 
@@ -82,11 +82,12 @@ Que elegir carro sea una decisión de juego: cada uno se maneja distinto y el ga
 
 ## 9. Riesgos y supuestos
 - **Balance:** un carro puede quedar demasiado bueno; se ajustan sus números sin tocar los RF.
-- **Orden de carga:** hoy los 5 visores crean el carro antes de saber qué modelo se guardó; hay que crearlo después. `Carro` guarda además el modelo de velocímetro, que hoy se pone justo después de cargar: al crear el carro de nuevo no debe perderse.
+- **Orden de carga:** hoy los 4 visores que crean un carro (`VisorCarreraUrbana` lo hereda de `VisorTestdriveRuta`) lo crean antes de saber qué modelo se guardó; hay que crearlo después. `Carro` guarda además el modelo de velocímetro, que hoy se pone justo después de cargar: al crear el carro de nuevo no debe perderse.
 - **Garaje clásico y física en módulos:** el garaje usa scripts con `window.*` y la física son módulos; el registro debe estar disponible al abrir el garaje.
 - **Depende del PRD 006:** sin masa ni aire en la física base, los carros solo se diferenciarían por el tope.
 
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
-- **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: D8 libera los controladores del PRD 005, D8 entra al In scope, RF-09 de código pasa a RNF-02, riesgo de orden de carga en los 5 visores y del modelo de velocímetro.
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: D1 suma Diseño de Pistas, D4 marcado/guardado, D9 solo agregar estilos, D10 tabla de `CLAUDE.md` y clases aparte. Detalles: D6 nombra las subclases y su arreglo, D8 completa con los PRD 001, 002, 004 y 006.
+- **v3** (2026-10-24): Reparador PRD, vuelta 2. Detalles: D8 libera los controladores del PRD 005, D8 entra al In scope, RF-09 de código pasa a RNF-02, riesgo de orden de carga en los 5 visores y del modelo de velocímetro.
+- **v4** (2026-10-24): cierre con el usuario. Detalles: D8 libera `ControladorCarreraSolo` del PRD 002, riesgo de orden de carga con 4 visores, historial ordenado.
