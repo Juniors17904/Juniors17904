@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v4 — listo para verificar |
+| Estado | v4 — verificado (Verificador PRD ✅), listo para implementar |
 | Fecha | 2026-10-24 |
 | Backlog | B2 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D9 |
@@ -13,7 +13,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 
 | # | Categoría | Decisión |
 |---|---|---|
-| D1 | Alcance | **Se borran estas clases:** `Juego`, `Pista`, `Segmento`, `Carro2D`, `Controles`, `RenderizadorPista`, `RenderizadorAuto`, `PantallaJuego`, `VisorJuego3D`, `MinimapaConductor`, `GestorOrientacion`, `ControladorModo2D`, `ConfigPistaTestDrive` y `ConfigPistaTestDriveLibre`. **Se borran estos archivos de compatibilidad:** `app.js`, `game.js`, `garage.js`, `minimap.js`, `view_pista2d.js`, `viewer3d.js` y `model.js`. **Se borran estos ids de `index.html`:** `pantalla-crear`, `pantalla-unirse`, `pantalla-espera`, `pantalla-resultado`, `pantalla-rotar`, `canvas-juego`, `canvas-carro-3d`, `btn-test-drive` y `btn-clasico-2d`. **Se quedan:** `pantalla-juego`, `canvas-td3d`, `canvas-cir3d`, los botones Multijugador y Únete, `Garaje` y `visor3d.js`, que `index.html` pasa a cargar directamente. |
+| D1 | Alcance | **Se borran estas clases:** `Juego`, `Pista`, `Segmento`, `Carro2D`, `Controles`, `RenderizadorPista`, `RenderizadorAuto`, `PantallaJuego`, `VisorJuego3D`, `MinimapaConductor`, `GestorOrientacion`, `ControladorModo2D`, `ConfigPistaTestDrive` y `ConfigPistaTestDriveLibre`. **Se borran estos archivos de compatibilidad:** `app.js`, `game.js`, `garage.js` (cáscara vacía; no confundir con `garaje.js`, que se queda), `minimap.js`, `view_pista2d.js`, `viewer3d.js` y `model.js`. **Se borran estos ids de `index.html`:** `pantalla-crear`, `pantalla-unirse`, `pantalla-espera`, `pantalla-resultado`, `pantalla-rotar`, `canvas-juego`, `canvas-carro-3d`, `btn-test-drive` y `btn-clasico-2d`. **Se quedan:** `pantalla-juego`, `canvas-td3d`, `canvas-cir3d`, los botones Multijugador y Únete, `Garaje` y `visor3d.js`, que `index.html` pasa a cargar directamente. |
 | D2 | Alcance | Antes de borrar se crea y se sube la etiqueta git `v-clasico-2d`, que guarda el código 2D completo. |
 | D3 | Usuarios | El jugador no nota nada. Atrás, adelante o un enlace a una pantalla que no existe llevan a Inicio, nunca a una página en blanco. |
 | D4 | Dominio | `PISTAS` pasa a ser `RegistroPistas`: una sola instancia, creada en su propio archivo `registro_pistas.js`, que se carga antes que las pistas. Las pistas se registran en ella, y los controladores, visores y minimapas le piden las pistas. |
@@ -97,4 +97,4 @@ Que `main` solo tenga el juego 3D, con el código 2D guardado en una etiqueta de
 - **v3** (2026-10-24): Reparador PRD, vuelta 1.
   - Detalles: RF-01 habla del código guardado; D9 completa con los PRD 002 y 004 y `CLAUDE.md`; se nombran los archivos de compatibilidad y las pruebas; se aclara RNF-01.
   - Decisiones aprobadas por el usuario: borrar `viewer3d.js` y los botones 2D; los campos de D5; `RegistroPistas` como instancia única; conservar el estado "oculto"; limpiar MVC en `CLAUDE.md`; no tocar `model_fisica.js`.
-- **v4** (2026-10-24): Reparador PRD, vuelta 2 (solo detalles). D7 nombra `ModoMultijugador` y `ModoUnirse` y conserva `pantalla-juego` en sus listas. D9 libera también los elementos dibujados en 2D del PRD 002. La lista única permite los cambios de D3, D5 y D7. RNF-01 se limita a lo nuevo o modificado.
+- **v4** (2026-10-24): Reparador PRD, vuelta 2 (solo detalles). D7 nombra `ModoMultijugador` y `ModoUnirse` y conserva `pantalla-juego` en sus listas. D9 libera también los elementos dibujados en 2D del PRD 002. La lista única permite los cambios de D3, D5 y D7. RNF-01 se limita a lo nuevo o modificado. Vuelta 3: se aclara que se borra `garage.js` y no `garaje.js`; Verificador ✅.
