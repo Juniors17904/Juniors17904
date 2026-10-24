@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — reparado con el Reparador PRD, listo para verificar |
+| Estado | v3 — implementado, con pruebas en `pruebas/`; RF-02 pendiente para la SUV y la pickup (ver Historial v3) |
 | Fecha | 2026-10-24 |
 | Backlog | B14 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D12 |
@@ -96,3 +96,4 @@ Que cada carro y la pista tengan tamaños reales y coherentes, guardados en un s
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
 - **v2** (2026-10-24): Reparador PRD, vuelta 1. Decisiones aprobadas por el usuario: largo real por carro (D3), piano de la recta a 0,7 (D4), medidas por tipo (D5), choque rectangular (D6), cámara proporcional sin tocar preferencias (D7), cielos sin tocar (D8), postes al PRD 010 (D11). Detalles: D2 suma cámara y vista previa, D12 completa (`Visor3D`, `RecorridoTestDriveRecto`, PRD 002), lista de lugares con medidas, RF-04 solo en Jugar Solo y desde el centro.
+- **v3** (2026-10-24): implementado (`MedidasEscena`, `MedidaCarro`, choque rectangular, cámara con escala, anchos de pista y vista previa). Pendiente de decisión: con su largo de D3 y la forma de su modelo 3D, la SUV queda en 32,1 % y la pickup en 37,0 % del asfalto, fuera del 15–32 % de D3 y RF-02.

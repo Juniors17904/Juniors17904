@@ -16,13 +16,12 @@ import { GeometriaCinta }    from '../geometria_cinta.js';
 // ================================================================
 export class ConstructorCircuitoCarreraSolo {
     static #DIVISIONES  = 800;
-    static #MEDIO_ANCHO = 4;
-    static #ANCHO_PIANO = 0.7;
     static #BANDA_PIANO = 10;
     static #TRAZO_LINEA = 14;
     static #HUECO_LINEA = 10;
 
     #escena;
+    #medidas  = new window.MedidasEscena();   // anchos de la pista (PRD 009)
     #recursos = [];   // geometrías y materiales propios para liberar
 
     constructor(escena) {
@@ -52,12 +51,12 @@ export class ConstructorCircuitoCarreraSolo {
         this.#escena.add(pasto);
 
         // Asfalto
-        const M = ConstructorCircuitoCarreraSolo.#MEDIO_ANCHO;
+        const M = this.#medidas.medioAnchoAsfalto;
         const matAsfalto = new THREE.MeshStandardMaterial({ color: 0x404040, roughness: 0.85 });
         this.#agregarCinta(cinta, -M, M, 0, 0, DIV, matAsfalto);
 
         // Pianos rojo/blanco
-        const A = ConstructorCircuitoCarreraSolo.#ANCHO_PIANO;
+        const A = this.#medidas.anchoPiano;
         const matRojo   = new THREE.MeshStandardMaterial({ color: 0xff2222, roughness: 0.4, emissive: 0xaa0000, emissiveIntensity: 0.25 });
         const matBlanco = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35, emissive: 0xffffff, emissiveIntensity: 0.2 });
         this.#registrar(matRojo, matBlanco);

@@ -27,6 +27,7 @@ class VisorDisenoPista extends VisorBase {
     #cielo       = null;
     #ruta        = new Ruta();
     #conductor   = new ConductorPasoFijo();
+    #medidas     = new window.MedidasEscena();   // escala real (PRD 009)
     #sol         = null;
     #resizeObs   = null;
 
@@ -245,10 +246,11 @@ class VisorDisenoPista extends VisorBase {
     async cargar(tipo, color) {
         const i = this.#ruta.curve ? this.#ruta.inicio : null;
         if (i) this.#conductor.carro = new RegistroCarros().crear(tipo, i.x, i.z, i.angle);
+        this.#camaraChase.escala = this.#medidas.escalaCamara(tipo);
         try {
             const gltf  = await VisorBase.cargarGLTF();
             const inner = VisorBase.construirGrupo(gltf, tipo, color);
-            VisorBase.centrarGrupo(inner, 2.6);
+            VisorBase.centrarGrupo(inner, this.#medidas.medidaCarro(tipo).largo);
 
             if (this.#carGroup) this.#scene.remove(this.#carGroup);
             const lean  = new THREE.Group(); lean.add(inner); this.#leanGroup = lean;

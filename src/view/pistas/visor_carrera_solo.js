@@ -51,6 +51,7 @@ class VisorCarreraSolo extends VisorBase {
     #conductor        = new ConductorPasoFijo((carro, px, pz) => this.#choques?.resolver(carro, px, pz));
     #choques          = null;   // DetectorChoques (modelo)
     #tipoAuto         = null;
+    #medidas          = new window.MedidasEscena();   // tamaño real del carro (PRD 009)
     #superficie       = null;
     #congelado        = false;
     #callbackFrame    = null;
@@ -141,11 +142,13 @@ class VisorCarreraSolo extends VisorBase {
     // Crea el carro con la física del modelo guardado (PRD 007) y carga su GLB
     async cargar(tipoAuto, color) {
         if (tipoAuto !== this.#tipoAuto) { this.#tipoAuto = tipoAuto; this.reiniciarCarro(); }
+        this.#choques?.usarCarro(this.#medidas.medidaCarro(tipoAuto));
+        if (this.#camara) this.#camara.escala = this.#medidas.escalaCamara(tipoAuto);
         try {
             const gltf    = await VisorBase.cargarGLTF();
             if (this.#detenido || !this.#escena) return;
             const interno = VisorBase.construirGrupo(gltf, tipoAuto, color);
-            VisorBase.centrarGrupo(interno, 2.6);
+            VisorBase.centrarGrupo(interno, this.#medidas.medidaCarro(tipoAuto).largo);
 
             if (this.#grupoCarro) this.#escena.remove(this.#grupoCarro);
             const inclina = new THREE.Group(); inclina.add(interno);
@@ -267,6 +270,7 @@ class VisorCarreraSolo extends VisorBase {
                 altura:    VisorCarreraSolo.#ALTURA_VERTICAL,
             })
             : new CamaraSeguimiento(aspecto);
+        this.#camara.escala = this.#medidas.escalaCamara(this.#tipoAuto);
         this.#aplicarReglaFov(aspecto);
         this.#aplicarAlturaCamara();
     }
@@ -308,7 +312,7 @@ class VisorCarreraSolo extends VisorBase {
         const curva = this.#ruta.curve;
         if (!curva) return;
 
-        this.#choques  = new DetectorChoques(this.#pista.decoraciones, this.#ruta);
+        this.#choques  = new DetectorChoques(this.#pista.decoraciones, this.#ruta, this.#medidas.medidaCarro(this.#tipoAuto));
         this.#circuito = new ConstructorCircuitoCarreraSolo(this.#escena);
         this.#circuito.construir(curva);
 

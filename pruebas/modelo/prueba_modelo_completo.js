@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm');
 const R=require('path').join(__dirname,'../../src/')+'model/';
 const ctx={console,performance,Math,Object,Array,Number,String,Error,Infinity};ctx.window=ctx;vm.createContext(ctx);
-for(const f of ['muestra_ruta.js','cronometro.js','superficies/superficie.js','superficies/superficie_asfalto.js','superficies/superficie_piano.js','superficies/superficie_pasto.js','superficies/detector_superficie.js','carrera_vueltas.js'])vm.runInContext(fs.readFileSync(R+f,'utf8'),ctx,{filename:f});
+for(const f of ['muestra_ruta.js','cronometro.js','medida_carro.js','medidas_escena.js','superficies/superficie.js','superficies/superficie_asfalto.js','superficies/superficie_piano.js','superficies/superficie_pasto.js','superficies/detector_superficie.js','carrera_vueltas.js'])vm.runInContext(fs.readFileSync(R+f,'utf8'),ctx,{filename:f});
 const fallos=[];const ok=(c,m)=>{if(!c)fallos.push(m);};
 ok(!ctx.__modelErrors,'modelErrors '+ctx.__modelErrors);
 const C=ctx.Cronometro, CV=ctx.CarreraVueltas, M=ctx.MuestraRuta;

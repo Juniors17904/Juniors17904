@@ -24,6 +24,7 @@ class VisorTestdriveRuta extends VisorBase {
     #camAerea = null;
     #camAereaActiva = false;
     #conductor = new ConductorPasoFijo(carro => this.#seguirRuta(carro));
+    #medidas = new window.MedidasEscena(); #giroRuedas = 6;   // escala real (PRD 009)
     #dirLine  = null;
     #camPunto = null;
 
@@ -200,11 +201,12 @@ class VisorTestdriveRuta extends VisorBase {
         };
 
         const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
-        const road = new THREE.Mesh(_ribbon(-4, 4, 0, 0, DIV), roadMat);
+        const M = this.#medidas.medioAnchoAsfalto;
+        const road = new THREE.Mesh(_ribbon(-M, M, 0, 0, DIV), roadMat);
         road.receiveShadow = true;
         this.#scene.add(road);
 
-        const curbW  = 0.7;
+        const curbW  = this.#medidas.anchoPiano;
         const BAND   = 10;
         const redMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.7, side: THREE.DoubleSide });
         const whtMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.7, side: THREE.DoubleSide });
@@ -239,8 +241,8 @@ class VisorTestdriveRuta extends VisorBase {
             if (rPos.length) this.#scene.add(new THREE.Mesh(_geo(rPos,rNor,rIdx), redMat));
             if (wPos.length) this.#scene.add(new THREE.Mesh(_geo(wPos,wNor,wIdx), whtMat));
         };
-        _buildCurbs(-4-curbW, -4);
-        _buildCurbs(4, 4+curbW);
+        _buildCurbs(-M-curbW, -M);
+        _buildCurbs(M, M+curbW);
 
         const dashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const DASH = 10, GAP = 10;
@@ -249,13 +251,14 @@ class VisorTestdriveRuta extends VisorBase {
         }
 
         const finMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        this.#scene.add(new THREE.Mesh(_ribbon(-4, 4, 0.015, 0, 5), finMat));
+        this.#scene.add(new THREE.Mesh(_ribbon(-M, M, 0.015, 0, 5), finMat));
     }
 
     // ── Cargar auto ──────────────────────────────────────────────
     async cargar(tipo, color) {
         const i = this.#ruta.curve ? this.#ruta.inicio : null;
         if (i) this.#conductor.carro = new RegistroCarros().crear(tipo, i.x, i.z, i.angle);
+        this.#camaraChase.escala = this.#medidas.escalaCamara(tipo); this.#giroRuedas = 6 / this.#medidas.escalaCamara(tipo);
         try {
             this.#setCar(await VisorBase.cargarGLTF(), tipo, color);
         } catch(e) { console.error('VisorJuego:', e); }
@@ -264,7 +267,7 @@ class VisorTestdriveRuta extends VisorBase {
     #setCar(gltf, tipo, color) {
         if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
         const inner = VisorBase.construirGrupo(gltf, tipo, color);
-        VisorBase.centrarGrupo(inner, 2.6);
+        VisorBase.centrarGrupo(inner, this.#medidas.medidaCarro(tipo).largo);
         const lean = new THREE.Group(); lean.add(inner); this.#leanGroup = lean;
         const outer = new THREE.Group(); outer.add(lean);
         this.#scene.add(outer); this.#carGroup = outer;
@@ -365,12 +368,13 @@ class VisorTestdriveRuta extends VisorBase {
         if (this.#movimientoLibre || this.#ruta.longitud <= 0) return;
         this.#progress = ((this.#progress + carro.velocidad / this.#ruta.longitud) % 1 + 1) % 1;
 
-        // Límite suave: empujar de vuelta si se aleja más de 3.8 del trazado
+        // Límite suave: empujar de vuelta si se aleja del trazado más que el límite de MedidasEscena
         const p = this.#ruta.posicionEn(this.#progress);
         const dx = carro.px - p.x, dz = carro.pz - p.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
         this.#lateral = dx * Math.cos(p.angle) + dz * -Math.sin(p.angle);
-        if (dist > 3.8) carro.setPosicion(p.x + (dx / dist) * 3.8 * 0.90, p.z + (dz / dist) * 3.8 * 0.90);
+        const lim = this.#medidas.limiteSuave;
+        if (dist > lim) carro.setPosicion(p.x + (dx / dist) * lim * 0.90, p.z + (dz / dist) * lim * 0.90);
     }
 
     #updatePhysics(marca) {
@@ -382,7 +386,7 @@ class VisorTestdriveRuta extends VisorBase {
             this.#carGroup.rotation.y = this.#mov.rotY;
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;
-        for (const w of this.#wheels) w.rotation.x += this.#mov.velocidad * 6;
+        for (const w of this.#wheels) w.rotation.x += this.#mov.velocidad * this.#giroRuedas;
     }
 
 

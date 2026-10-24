@@ -18,7 +18,6 @@ const { PilotoAutomatico } = require('./piloto_automatico.cjs');
 class PruebaSuperficieChoques {
     static #RAIZ = path.join(__dirname, '..', '..');
     static #PASO = 1000 / 60;
-    static #RADIO_CARRO = 0.8;
     #fallos = [];
     #clases;
     #ctx;
@@ -54,7 +53,7 @@ class PruebaSuperficieChoques {
     #cargarClasicos() {
         const ctx = { console, Math }; ctx.window = ctx;
         vm.createContext(ctx);
-        const archivos = ['muestra_ruta.js', 'superficies/superficie.js', 'superficies/superficie_asfalto.js', 'superficies/superficie_piano.js',
+        const archivos = ['medida_carro.js', 'medidas_escena.js', 'muestra_ruta.js', 'superficies/superficie.js', 'superficies/superficie_asfalto.js', 'superficies/superficie_piano.js',
             'superficies/superficie_pasto.js', 'superficies/detector_superficie.js', 'carrera_vueltas.js',
             'registro_pistas.js', 'pistas/config_pista.js', 'pistas/config_pista_ciudad.js', 'pistas/config_pista_costa.js'];
         for (const f of archivos) {
@@ -171,12 +170,21 @@ class PruebaSuperficieChoques {
             const px = carro.px, pz = carro.pz;
             carro.actualizar(PruebaSuperficieChoques.#PASO);
             if (this.#resolverContra(carro, objeto, px, pz)) { if (!choco) vDespues = carro.velocidad; choco = true; }
-            if (Math.hypot(carro.px, carro.pz) < objeto.radio + PruebaSuperficieChoques.#RADIO_CARRO - 1e-6) dentro = true;
+            if (this.#distanciaAlCarro(carro, objeto) < objeto.radio - 1e-6) dentro = true;
         }
         return { dentro, choco, vAntes, vDespues, carro };
     }
 
     // Un detector con un solo objeto del mismo tipo en (0, 0)
+    // Distancia del centro del objeto al rectángulo del deportivo (PRD 009, D6)
+    #distanciaAlCarro(carro, objeto) {
+        const m = new this.#ctx.MedidasEscena().medidaCarro('deportivo');
+        const fx = Math.sin(carro.rotY), fz = Math.cos(carro.rotY);
+        const ox = objeto.x - carro.px, oz = objeto.z - carro.pz;
+        const a = ox * fx + oz * fz, c = ox * fz - oz * fx;
+        return Math.hypot(a - Math.max(-m.largo / 2, Math.min(m.largo / 2, a)), c - Math.max(-m.ancho / 2, Math.min(m.ancho / 2, c)));
+    }
+
     #resolverContra(carro, objeto, px, pz) {
         const enOrigen = { posicionEn: () => ({ x: 0, z: 0, angle: 0 }) };
         const detector = new this.#DetectorChoques([{ tipo: objeto.tipo, prog: 0, lado: 1, dist: 0 }], enOrigen);

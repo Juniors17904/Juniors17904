@@ -90,6 +90,9 @@ class NivelCiudad extends Nivel {
 - **Controller** → orquesta Model y View (`aplicacion.js`, `controlador_carrera_solo.js`). Sin física ni dibujo directo.
 - **Excepción permitida — visores 3D:** un visor de pista (subclase de `VisorBase`) puede crear su `Ruta` y su `Carro` y avanzar la física con paso fijo, porque la integración va atada al render. Las **reglas de negocio** (vueltas, tiempos, penalizaciones como el pasto) viven siempre en clases del modelo (`CarreraVueltas`, `Cronometro`…); el visor solo aplica lo que el modelo calcula.
 
+### Escala del juego 3D
+- **1 unidad = 1 metro** (PRD 009). Las medidas del carro (por tipo) y de la pista viven en `MedidasEscena` (`src/model/medidas_escena.js`); nadie repite esos números.
+
 ### POO obligatorio — checklist antes de escribir cualquier código nuevo
 1. ¿Tiene nombre propio? → clase con ese nombre en español
 2. ¿Tiene datos internos? → campos privados `#campo`
@@ -153,7 +156,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `ConfigPista` | `ConfigPistaCiudad`, `ConfigPistaDesierto`, … | `nombre`, `tramos`, `totalSegs` |
 | `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
-| `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo` | (utilidades Three.js) |
+| `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo`, `Visor3D` (vista previa del garaje) | (utilidades Three.js) |
 | `MinimapBase` | `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
 | `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos` | `iniciar()`, `detener()`, `irA(id)` |
 | `ControladorPantallaJuego` (hereda de `ControladorPantalla`) | `ControladorTestDrive3D`, `ControladorDisenoPistas` | `tieneVisor`, `ocupaPantallaJuego`, `cancelarArranque()` |

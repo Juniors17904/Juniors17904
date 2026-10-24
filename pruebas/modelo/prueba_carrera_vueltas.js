@@ -1,7 +1,7 @@
 const fs = require('fs');
 global.window = {};
 eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/muestra_ruta.js', 'utf8'));
-for (const f of ['superficie', 'superficie_asfalto', 'superficie_piano', 'superficie_pasto', 'detector_superficie'])
+for (const f of ['../medida_carro', '../medidas_escena', 'superficie', 'superficie_asfalto', 'superficie_piano', 'superficie_pasto', 'detector_superficie'])
   eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/superficies/' + f + '.js', 'utf8'));
 eval(fs.readFileSync(require('path').join(__dirname,'../../src/')+'model/carrera_vueltas.js', 'utf8'));
 const M = window.MuestraRuta;

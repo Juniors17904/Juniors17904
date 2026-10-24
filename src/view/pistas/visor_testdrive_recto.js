@@ -16,6 +16,8 @@ class VisorTestdriveRecto extends VisorBase {
     #funcionAnimacion = marca => this.#tick(marca);
     #resizeHandler = null;
     #conductor = new ConductorPasoFijo(carro => this.#limitarPista(carro));
+    #medidas   = new window.MedidasEscena();   // escala real (PRD 009)
+    #giroRuedas = 6;
     #leanGroup = null;
     #wheels = [];
 
@@ -46,6 +48,8 @@ class VisorTestdriveRecto extends VisorBase {
 
     async cargar(tipo, color) {
         this.#conductor.carro = new RegistroCarros().crear(tipo, -2, 0, 0);
+        this.#camaraChase.escala = this.#medidas.escalaCamara(tipo);
+        this.#giroRuedas = 6 / this.#medidas.escalaCamara(tipo);
         try {
             const gltf = await VisorBase.cargarGLTF();
             this.#setCar(gltf, tipo, color);
@@ -124,7 +128,7 @@ class VisorTestdriveRecto extends VisorBase {
         const L = 2000;
 
         const road = new THREE.Mesh(
-            new THREE.PlaneGeometry(8, L),
+            new THREE.PlaneGeometry(2 * this.#medidas.medioAnchoAsfalto, L),
             new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85 })
         );
         road.rotation.x = -Math.PI / 2;
@@ -144,7 +148,7 @@ class VisorTestdriveRecto extends VisorBase {
         for (const side of [-1, 1]) {
             const line = new THREE.Mesh(new THREE.PlaneGeometry(0.18, L), edgeMat);
             line.rotation.x = -Math.PI / 2;
-            line.position.set(side * 3.9, 0.01, 0);
+            line.position.set(side * this.#medidas.lineaBorde, 0.01, 0);
             this.#scene.add(line);
         }
 
@@ -164,7 +168,8 @@ class VisorTestdriveRecto extends VisorBase {
         this.#scene.add(centerLine);
 
         const segLen = 3, nSegs = Math.floor(L / segLen);
-        const curbGeo = new THREE.BoxGeometry(0.6, 0.06, segLen - 0.05);
+        const piano   = this.#medidas.anchoPiano, centroPiano = this.#medidas.medioAnchoAsfalto + piano / 2;
+        const curbGeo = new THREE.BoxGeometry(piano, 0.06, segLen - 0.05);
         const iRed = new THREE.InstancedMesh(curbGeo, new THREE.MeshStandardMaterial({ color: 0xff3333 }), nSegs);
         const iWht = new THREE.InstancedMesh(curbGeo, new THREE.MeshStandardMaterial({ color: 0xfafafa }), nSegs);
         const dummy = new THREE.Object3D();
@@ -172,7 +177,7 @@ class VisorTestdriveRecto extends VisorBase {
         for (let i = 0; i < nSegs; i++) {
             const z = -L / 2 + i * segLen + segLen / 2;
             for (const side of [-1, 1]) {
-                dummy.position.set(side * 4.35, 0.03, z);
+                dummy.position.set(side * centroPiano, 0.03, z);
                 dummy.updateMatrix();
                 if (i % 2 === 0) iRed.setMatrixAt(ri++, dummy.matrix);
                 else             iWht.setMatrixAt(wi++, dummy.matrix);
@@ -192,11 +197,11 @@ class VisorTestdriveRecto extends VisorBase {
         const barMat  = new THREE.MeshStandardMaterial({ color: 0xffffff });
 
         const poleGeo = new THREE.BoxGeometry(0.22, 5, 0.22);
-        const barGeo  = new THREE.BoxGeometry(9.5, 0.35, 0.22);
+        const barGeo  = new THREE.BoxGeometry(2 * this.#medidas.limitePiano + 0.1, 0.35, 0.22);
 
         for (const side of [-1, 1]) {
             const pole = new THREE.Mesh(poleGeo, poleMat);
-            pole.position.set(side * 4.7, 2.5, z);
+            pole.position.set(side * this.#medidas.limitePiano, 2.5, z);
             pole.castShadow = true;
             this.#scene.add(pole);
         }
@@ -224,7 +229,7 @@ class VisorTestdriveRecto extends VisorBase {
         this.#scene.add(sign);
 
         const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const line = new THREE.Mesh(new THREE.PlaneGeometry(8, 0.5), lineMat);
+        const line = new THREE.Mesh(new THREE.PlaneGeometry(2 * this.#medidas.medioAnchoAsfalto, 0.5), lineMat);
         line.rotation.x = -Math.PI / 2;
         line.position.set(0, 0.02, z);
         this.#scene.add(line);
@@ -247,11 +252,11 @@ class VisorTestdriveRecto extends VisorBase {
         const barMat  = new THREE.MeshStandardMaterial({ map: fTex });
 
         const poleGeo = new THREE.BoxGeometry(0.22, 5, 0.22);
-        const barGeo  = new THREE.BoxGeometry(9.5, 0.7, 0.22);
+        const barGeo  = new THREE.BoxGeometry(2 * this.#medidas.limitePiano + 0.1, 0.7, 0.22);
 
         for (const side of [-1, 1]) {
             const pole = new THREE.Mesh(poleGeo, poleMat);
-            pole.position.set(side * 4.7, 2.5, z);
+            pole.position.set(side * this.#medidas.limitePiano, 2.5, z);
             pole.castShadow = true;
             this.#scene.add(pole);
         }
@@ -289,7 +294,7 @@ class VisorTestdriveRecto extends VisorBase {
         }
         const rTex = new THREE.CanvasTexture(rc);
         const roadLine = new THREE.Mesh(
-            new THREE.PlaneGeometry(8, 1.2),
+            new THREE.PlaneGeometry(2 * this.#medidas.medioAnchoAsfalto, 1.2),
             new THREE.MeshBasicMaterial({ map: rTex })
         );
         roadLine.rotation.x = -Math.PI / 2;
@@ -300,7 +305,7 @@ class VisorTestdriveRecto extends VisorBase {
     #setCar(gltf, tipo, color) {
         if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
         const inner = VisorBase.construirGrupo(gltf, tipo, color);
-        VisorBase.centrarGrupo(inner, 2.6);
+        VisorBase.centrarGrupo(inner, this.#medidas.medidaCarro(tipo).largo);
         const lean = new THREE.Group();
         lean.add(inner);
         this.#leanGroup = lean;
@@ -330,7 +335,7 @@ class VisorTestdriveRecto extends VisorBase {
 
     // Bordes de la recta y vuelta al inicio, después de cada paso fijo
     #limitarPista(carro) {
-        if (Math.abs(carro.px) > 3.8) carro.setPosicion(carro.px * 0.90, carro.pz);
+        if (Math.abs(carro.px) > this.#medidas.limiteSuave) carro.setPosicion(carro.px * 0.90, carro.pz);
         if (carro.pz >  950) carro.setPosicion(carro.px, carro.pz - 1900);
         if (carro.pz < -950) carro.setPosicion(carro.px, carro.pz + 1900);
     }
@@ -344,7 +349,7 @@ class VisorTestdriveRecto extends VisorBase {
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carro.carLean;
 
-        const spin = this.#carro.velocidad * 6;
+        const spin = this.#carro.velocidad * this.#giroRuedas;
         for (const w of this.#wheels) w.rotation.x += spin;
     }
 

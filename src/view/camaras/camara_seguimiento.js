@@ -7,6 +7,9 @@ import { CamaraBase } from './camara_base.js';
 // Cámara que sigue al carro. Dos modos:
 //   seguirRotacion: true  → gira con el carro, el carro queda fijo en pantalla (Circuito)
 //   seguirRotacion: false → ángulo fijo, el carro se ve rotar en pantalla (Test Drive)
+// escala: cuánto más grande es el carro que el de referencia (PRD 009, D7).
+//   Multiplica distancia, altura y punto de mira: el carro se ve igual en
+//   pantalla y la altura que eligió el jugador no cambia de valor.
 // ================================================================
 export class CamaraSeguimiento extends CamaraBase {
     #distancia;
@@ -15,10 +18,9 @@ export class CamaraSeguimiento extends CamaraBase {
     #camAngle  = 0;
     #carRotY   = 0;
     #lean      = 0;
+    #escala    = 1;
 
     altura    = 2.8;
-    leanMax   = 0.5;
-    leanSpeed = 0.06;
 
     get camRotY() {
         let a = this.#camAngle - this.#carRotY;
@@ -46,6 +48,10 @@ export class CamaraSeguimiento extends CamaraBase {
         scene.add(this.#indicador);
     }
 
+    set escala(valor) {
+        if (Number.isFinite(valor) && valor > 0) this.#escala = valor;
+    }
+
     set indicadorVisible(v) {
         if (this.#indicador) this.#indicador.visible = v;
     }
@@ -55,10 +61,10 @@ export class CamaraSeguimiento extends CamaraBase {
         const orbit = this.#seguirRotacion ? rotY : 0;
         const sinY  = Math.sin(orbit);
         const cosY  = Math.cos(orbit);
-        const D     = this.#distancia;
+        const D     = this.#distancia * this.#escala;
 
-        this.camera.position.set(px - sinY * D, this.altura, pz - cosY * D);
-        this.camera.lookAt(px, 0.6, pz);
+        this.camera.position.set(px - sinY * D, this.altura * this.#escala, pz - cosY * D);
+        this.camera.lookAt(px, 0.6 * this.#escala, pz);
 
         this.actualizarIndicador(px, pz);
     }

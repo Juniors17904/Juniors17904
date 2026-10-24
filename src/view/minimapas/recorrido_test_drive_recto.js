@@ -6,9 +6,9 @@
 // ================================================================
 class RecorridoTestDriveRecto extends MapaConduccion {
     static #LARGO_RECTA  = 950;
-    static #MEDIO_ANCHO  = 3.8;
 
     #historial = new HistorialRecorrido(0.04, 3000);
+    #medioAncho = new window.MedidasEscena().limiteSuave;   // hasta donde llega el carro (PRD 009)
 
     constructor() {
         super('trail-map');
@@ -32,7 +32,7 @@ class RecorridoTestDriveRecto extends MapaConduccion {
 
     // Mundo 3D → píxeles del recorrido
     #aMapaX(wx) {
-        return this.ancho / 2 + (-wx / RecorridoTestDriveRecto.#MEDIO_ANCHO) * (this.ancho * 0.15);
+        return this.ancho / 2 + (-wx / this.#medioAncho) * (this.ancho * 0.15);
     }
 
     #aMapaY(wz) {

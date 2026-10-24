@@ -12,12 +12,12 @@ import { PerpendicularRuta } from '../perpendicular_ruta.js';
 // ================================================================
 export class MallaPistaDiseno {
     static #DIVISIONES      = 800;
-    static #ANCHO_PIANO     = 0.7;
     static #BANDA_PIANO     = 10;
     static #LARGO_RAYA      = 14;
     static #HUECO_RAYA      = 10;
 
     #cinta;
+    #medidas = new window.MedidasEscena();   // anchos de la pista (PRD 009)
 
     constructor(curva) {
         const puntos = curva.getPoints(MallaPistaDiseno.#DIVISIONES);
@@ -32,22 +32,23 @@ export class MallaPistaDiseno {
         const grupo = new THREE.Group();
 
         const roadMat = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.95, side: THREE.DoubleSide });
-        const road    = new THREE.Mesh(cinta.cinta(-4, 4, 0, 0, DIV), roadMat);
+        const M       = this.#medidas.medioAnchoAsfalto;
+        const road    = new THREE.Mesh(cinta.cinta(-M, M, 0, 0, DIV), roadMat);
         road.receiveShadow = true;
         grupo.add(road);
 
-        const curbW  = MallaPistaDiseno.#ANCHO_PIANO;
+        const curbW  = this.#medidas.anchoPiano;
         const redMat = new THREE.MeshStandardMaterial({ color: 0xff0000, roughness: 0.3, emissive: 0xaa0000, emissiveIntensity: 0.25, side: THREE.DoubleSide });
         const whtMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.25, emissive: 0xffffff, emissiveIntensity: 0.2,  side: THREE.DoubleSide });
-        this.#agregarPianos(grupo, -4 - curbW, -4, redMat, whtMat);
-        this.#agregarPianos(grupo, 4, 4 + curbW, redMat, whtMat);
+        this.#agregarPianos(grupo, -M - curbW, -M, redMat, whtMat);
+        this.#agregarPianos(grupo, M, M + curbW, redMat, whtMat);
 
         const dashMat = new THREE.MeshBasicMaterial({ color: 0xffee44 });
         const DASH = MallaPistaDiseno.#LARGO_RAYA, GAP = MallaPistaDiseno.#HUECO_RAYA;
         for (let i = 0; i < DIV; i += DASH + GAP) {
             grupo.add(new THREE.Mesh(cinta.cinta(-0.22, 0.22, 0.03, i, Math.min(i+DASH, DIV)), dashMat));
         }
-        grupo.add(new THREE.Mesh(cinta.cinta(-4, 4, 0.015, 0, 5), new THREE.MeshBasicMaterial({ color: 0xffffff })));
+        grupo.add(new THREE.Mesh(cinta.cinta(-M, M, 0.015, 0, 5), new THREE.MeshBasicMaterial({ color: 0xffffff })));
 
         return grupo;
     }

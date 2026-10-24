@@ -10,6 +10,9 @@ import { VisorBase } from './visor_base.js';
 class Visor3D extends VisorBase {
     #renderer = null; #scene = null; #camera = null; #controls = null;
     #canvas; #idAnimacion = 0; #carGroup = null;
+    #suelo = null; #anillo = null;
+    #medidas = new window.MedidasEscena();   // largo real del carro (PRD 009)
+    static #LARGO_ESCENA = 3.2;               // largo para el que se armó la escena
 
     constructor(canvas) {
         super();
@@ -69,14 +72,14 @@ class Visor3D extends VisorBase {
         fill.position.set(-5, 4, -3);
         this.#scene.add(fill);
 
-        const ground = new THREE.Mesh(
+        const ground = this.#suelo = new THREE.Mesh(
             new THREE.CircleGeometry(5, 48),
             new THREE.MeshStandardMaterial({ color: 0x7a9e6e, roughness: 0.85, metalness: 0.0 })
         );
         ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
         this.#scene.add(ground);
 
-        const ring = new THREE.Mesh(
+        const ring = this.#anillo = new THREE.Mesh(
             new THREE.RingGeometry(1.9, 2.1, 48),
             new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, opacity: 0.4, transparent: true })
         );
@@ -98,10 +101,16 @@ class Visor3D extends VisorBase {
     #setCar(gltf, tipo, color) {
         if (this.#carGroup) { this.#scene.remove(this.#carGroup); this.#carGroup = null; }
         const group = VisorBase.construirGrupo(gltf, tipo, color);
-        const box2  = VisorBase.centrarGrupo(group, 3.2);
+        const largo = this.#medidas.medidaCarro(tipo).largo;
+        const box2  = VisorBase.centrarGrupo(group, largo);
         this.#scene.add(group); this.#carGroup = group;
         const carH = (box2.max.y - box2.min.y) * 0.5;
-        this.#camera.position.set(4, 2.5, 5);
+        // La escena (suelo, anillo, cámara y zoom) crece con el carro
+        const e = largo / Visor3D.#LARGO_ESCENA;
+        this.#suelo.scale.setScalar(e); this.#anillo.scale.setScalar(e);
+        this.#scene.fog = new THREE.Fog(0x87ceeb, 18 * e, 40 * e);
+        this.#controls.minDistance = 3 * e; this.#controls.maxDistance = 12 * e;
+        this.#camera.position.set(4 * e, 2.5 * e, 5 * e);
         this.#controls.target.set(0, carH, 0);
         this.#controls.update();
     }
