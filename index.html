@@ -72,15 +72,6 @@
 </head>
 <body>
 
-    <!-- Pantalla: Rotar celular -->
-    <div id="pantalla-rotar" class="pantalla" style="display:none">
-        <div class="rotar-icono">📱</div>
-        <div class="rotar-msg">
-            <div class="rotar-titulo">GIRA TU CELULAR</div>
-            <div class="rotar-sub">Este juego requiere<br>modo horizontal</div>
-        </div>
-    </div>
-
     <!-- Pantalla: Inicio -->
     <div id="pantalla-inicio" class="pantalla activa">
         <!-- Botón tuerca garage -->
@@ -127,62 +118,13 @@
         </div>
     </div>
 
-    <!-- Pantalla: Crear sala -->
-    <div id="pantalla-crear" class="pantalla">
-        <div class="sala-card">
-            <h2>Tu Sala</h2>
-            <div class="codigo-box" id="codigo-display">----</div>
-            <p class="sub-texto">Comparte este código con tu amigo</p>
-            <button id="btn-copiar" class="btn-ghost">📋 Copiar código</button>
-            <div class="esperando-box">
-                <div class="loader"></div>
-                <span>Esperando oponente...</span>
-            </div>
-            <button id="btn-volver-1" class="btn-link">← Volver</button>
-        </div>
-    </div>
-
-    <!-- Pantalla: Unirse a sala -->
-    <div id="pantalla-unirse" class="pantalla">
-        <div class="sala-card">
-            <h2>Unirse</h2>
-            <input id="inp-codigo" type="text" placeholder="Código (ej: ABCD)" maxlength="4" class="inp-codigo" autocomplete="off">
-            <button id="btn-confirmar-unirse" class="btn-neon">Unirse →</button>
-            <p id="error-unirse" class="error-txt"></p>
-            <button id="btn-volver-2" class="btn-link">← Volver</button>
-        </div>
-    </div>
-
-    <!-- Pantalla: Sala de espera (ambos conectados) -->
-    <div id="pantalla-espera" class="pantalla">
-        <div class="sala-card">
-            <h2>¡Listos!</h2>
-            <div class="jugadores-box">
-                <div class="jugador-row">
-                    <div class="dot-color" id="dot-j1"></div>
-                    <span id="nombre-j1">---</span>
-                    <span class="badge-listo">✓</span>
-                </div>
-                <div class="vs-sep">VS</div>
-                <div class="jugador-row">
-                    <div class="dot-color" id="dot-j2"></div>
-                    <span id="nombre-j2">---</span>
-                    <span class="badge-listo">✓</span>
-                </div>
-            </div>
-            <div id="cuenta-regresiva" class="cuenta-txt"></div>
-        </div>
-    </div>
-
     <!-- Pantalla: Juego -->
     <div id="pantalla-juego" class="pantalla">
         <!-- PANTALLA PROVISIONAL — se reemplazará con el diseño que estamos desarrollando en Diseño General -->
         <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:999;background:rgba(180,0,0,0.75);color:#fff;font:bold 9px 'Orbitron',monospace;padding:4px 10px;border-radius:4px;letter-spacing:1px;pointer-events:none">EN DESARROLLO · NO ES LA VERSIÓN FINAL</div>
-        <canvas id="canvas-juego"></canvas>
         <canvas id="canvas-td3d" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:10"></canvas>
         <canvas id="canvas-cir3d" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:10"></canvas>
         <canvas id="canvas-hud-cir3d" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;z-index:11;pointer-events:none"></canvas>
-        <canvas id="canvas-carro-3d" width="240" height="160"></canvas>
         <button id="btn-exit-td3d" class="btn-tuerca" style="top:16px;left:16px;display:none">←</button>
         <button id="btn-exit-cir3d" class="btn-tuerca" style="top:16px;left:16px;display:none">←</button>
         <button id="btn-cam-aerea" style="display:none;position:absolute;bottom:190px;left:143px;z-index:250;background:rgba(10,10,30,0.82);color:#a78bfa;border:1px solid #7c3aed;border-radius:6px;font:bold 9px 'Orbitron',monospace;padding:5px 10px;cursor:pointer;letter-spacing:1px">CAM↑</button>
@@ -289,11 +231,6 @@
                 <span class="ajuste-txt">Diseño de pista</span>
                 <span class="ajuste-arrow">›</span>
             </button>
-            <button id="btn-test-drive" class="ajuste-item">
-                <span class="ajuste-icono">🏎️</span>
-                <span class="ajuste-txt">Test Drive</span>
-                <span class="ajuste-arrow">›</span>
-            </button>
             <button id="btn-test-drive-3d" class="ajuste-item">
                 <span class="ajuste-icono">🌐</span>
                 <span class="ajuste-txt">Test Drive 3D</span>
@@ -322,11 +259,6 @@
             <button id="btn-ir-diseno-objetos" class="ajuste-item">
                 <span class="ajuste-icono">🌲</span>
                 <span class="ajuste-txt">Diseño de objetos</span>
-                <span class="ajuste-arrow">›</span>
-            </button>
-            <button id="btn-clasico-2d" class="ajuste-item">
-                <span class="ajuste-icono">🕹️</span>
-                <span class="ajuste-txt">Clásico 2D</span>
                 <span class="ajuste-arrow">›</span>
             </button>
         </div>
@@ -794,29 +726,6 @@
         </div>
     </div>
 
-    <!-- Pantalla: Resultado -->
-    <div id="pantalla-resultado" class="pantalla">
-        <div class="resultado-card">
-            <div id="titulo-resultado" class="resultado-titulo"></div>
-            <div class="stats-grid">
-                <div class="stat">
-                    <span class="stat-lbl">Tu tiempo</span>
-                    <span id="stat-tutiempo" class="stat-val">--</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-lbl">Oponente</span>
-                    <span id="stat-eltiempo" class="stat-val">--</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-lbl">Vel. máx</span>
-                    <span id="stat-velmax" class="stat-val">--</span>
-                </div>
-            </div>
-            <button id="btn-revancha" class="btn-neon">Revancha 🔄</button>
-            <button id="btn-menu" class="btn-link">Menú principal</button>
-        </div>
-    </div>
-
     <!-- Pantalla: Carrera Solo 3D (vertical) -->
     <div id="pantalla-carrera-solo" class="pantalla">
         <div class="columna-carrera-solo">
@@ -856,7 +765,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Módulos ES (Three.js, pistas 3D) -->
-    <script type="module" src="src/view/viewer3d.js?v=11"></script>
+    <script type="module" src="src/view/visor3d.js?v=11"></script>
     <script type="module" src="src/view/pistas/visor_testdrive_recto.js?v=11"></script>
     <script type="module" src="src/view/pistas/visor_testdrive_ruta.js?v=11"></script>
     <script type="module" src="src/view/pistas/visor_carrera_urbana.js?v=11"></script>
@@ -866,19 +775,13 @@
 
     <!-- Scripts globales (window.*) — en orden de dependencia -->
     <script src="src/services/supabase-client.js"></script>
-    <script src="src/model/model.js"></script>
     <script src="src/model/registro_pistas.js"></script>
     <script src="src/model/pistas/config_pista.js"></script>
-    <script src="src/model/pistas/config_pista_testdrive_libre.js"></script>
     <script src="src/model/pistas/config_pista_ciudad.js"></script>
-    <script src="src/model/pistas/config_pista_testdrive.js"></script>
     <script src="src/model/pistas/config_pista_desierto.js"></script>
     <script src="src/model/pistas/config_pista_montana.js"></script>
     <script src="src/model/pistas/config_pista_costa.js"></script>
     <script src="src/model/pistas/config_pista_volcan.js"></script>
-    <script src="src/model/carros/carro2d.js"></script>
-    <script src="src/model/segmento.js"></script>
-    <script src="src/model/pista.js"></script>
     <script src="src/model/muestra_ruta.js"></script>
     <script src="src/model/cronometro.js"></script>
     <script src="src/model/carrera_vueltas.js"></script>
@@ -912,7 +815,6 @@
 
     <!-- View: minimapas (jerarquía: MinimapBase → subclases) -->
     <script src="src/view/minimapas/minimapa_base.js"></script>
-    <script src="src/view/minimapas/minimapa_conductor.js"></script>
     <script src="src/view/minimapas/minimapa_diseno_general.js"></script>
     <script src="src/view/minimapas/punto_minimapa.js"></script>
     <script src="src/view/minimapas/mapa_conduccion.js"></script>
@@ -929,9 +831,6 @@
     <script src="src/view/paneles/panel_datos_circuito_3d.js"></script>
     <script src="src/view/paneles/panel_datos_test_drive_recto.js"></script>
     <script src="src/view/paneles/panel_datos_diseno_general.js"></script>
-    <script src="src/view/renderizador_pista.js"></script>
-    <script src="src/view/renderizador_auto.js"></script>
-    <script src="src/view/pantalla_juego.js"></script>
 
     <!-- View: garaje (jerarquía: PerfilCarro → un perfil por tipo) -->
     <script src="src/view/perfiles_carro/perfil_carro.js"></script>
@@ -949,18 +848,13 @@
     <!-- Controller -->
     <script src="src/controller/probador_giroscopio.js"></script>
     <script src="src/controller/gestor_alertas.js"></script>
-    <script src="src/controller/gestor_orientacion.js"></script>
     <script src="src/controller/garaje.js"></script>
-    <script src="src/controller/controles.js"></script>
-    <script src="src/controller/juego.js"></script>
     <script src="vista_conduccion.js"></script>
     <script src="src/controller/controlador_carrera_solo.js"></script>
     <!-- Modos de juego (PRD 002 D8): superclase, subclases y registro -->
     <script src="src/controller/modos/modo.js"></script>
     <script src="src/controller/modos/modo_jugar_solo.js"></script>
     <script src="src/controller/modos/modo_test_drive_3d.js"></script>
-    <script src="src/controller/modos/modo_clasico_2d.js"></script>
-    <script src="src/controller/modos/modo_test_drive_2d.js"></script>
     <script src="src/controller/modos/modo_multijugador.js"></script>
     <script src="src/controller/modos/modo_unirse.js"></script>
     <script src="src/controller/modos/modos_disponibles.js"></script>
@@ -977,7 +871,6 @@
     <script src="src/controller/pantallas/controlador_controles.js"></script>
     <script src="src/controller/pantallas/controlador_velocimetro.js"></script>
     <script src="src/controller/pantallas/controlador_vista_conduccion.js"></script>
-    <script src="src/controller/pantallas/controlador_modo_2d.js"></script>
     <script src="src/controller/pantallas/toque_boton_conduccion.js"></script>
     <script src="src/controller/pantallas/botones_tactiles_conduccion.js"></script>
     <script src="src/controller/pantallas/teclado_conduccion.js"></script>
