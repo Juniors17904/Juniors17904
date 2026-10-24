@@ -1,6 +1,7 @@
 'use strict';
 import * as THREE from 'three';
 import { Carro } from '../../model/carros/carro.js';
+import { RegistroCarros } from '../../model/carros/registro_carros.js';
 import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { VisorBase } from '../visor_base.js';
@@ -44,6 +45,7 @@ class VisorTestdriveRecto extends VisorBase {
     }
 
     async cargar(tipo, color) {
+        this.#conductor.carro = new RegistroCarros().crear(tipo, -2, 0, 0);
         try {
             const gltf = await VisorBase.cargarGLTF();
             this.#setCar(gltf, tipo, color);

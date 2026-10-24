@@ -3,6 +3,7 @@
 import * as THREE    from 'three';
 import { Ruta } from '../../model/ruta.js';
 import { Carro }             from '../../model/carros/carro.js';
+import { RegistroCarros }    from '../../model/carros/registro_carros.js';
 import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
 import { VisorBase }         from '../visor_base.js';
 import { CamaraSeguimiento } from '../camaras/camara_seguimiento.js';
@@ -242,6 +243,8 @@ class VisorDisenoPista extends VisorBase {
 
     // ── Cargar auto ──────────────────────────────────────────────
     async cargar(tipo, color) {
+        const i = this.#ruta.curve ? this.#ruta.inicio : null;
+        if (i) this.#conductor.carro = new RegistroCarros().crear(tipo, i.x, i.z, i.angle);
         try {
             const gltf  = await VisorBase.cargarGLTF();
             const inner = VisorBase.construirGrupo(gltf, tipo, color);

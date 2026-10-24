@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { Ruta } from '../../model/ruta.js';
 import { Carro } from '../../model/carros/carro.js';
+import { RegistroCarros } from '../../model/carros/registro_carros.js';
 import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { CieloSoleado }  from '../cielo_soleado.js';
@@ -109,7 +110,6 @@ class VisorTestdriveRuta extends VisorBase {
 
         this.#scene.add(new THREE.AmbientLight(0xfff4e0, 1.2));
         this.#sun = new THREE.DirectionalLight(0xfffbe6, 2.2);
-        this.#sun.position.set(6, 10, 4);
         this.#sun.castShadow = true;
         this.#sun.shadow.mapSize.set(1024, 1024);
         this.#sun.shadow.camera.near = 1; this.#sun.shadow.camera.far = 60;
@@ -254,9 +254,10 @@ class VisorTestdriveRuta extends VisorBase {
 
     // ── Cargar auto ──────────────────────────────────────────────
     async cargar(tipo, color) {
+        const i = this.#ruta.curve ? this.#ruta.inicio : null;
+        if (i) this.#conductor.carro = new RegistroCarros().crear(tipo, i.x, i.z, i.angle);
         try {
-            const gltf = await VisorBase.cargarGLTF();
-            this.#setCar(gltf, tipo, color);
+            this.#setCar(await VisorBase.cargarGLTF(), tipo, color);
         } catch(e) { console.error('VisorJuego:', e); }
     }
 

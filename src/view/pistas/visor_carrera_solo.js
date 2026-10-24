@@ -2,7 +2,7 @@
 
 import * as THREE              from 'three';
 import { Ruta }                from '../../model/ruta.js';
-import { Carro }               from '../../model/carros/carro.js';
+import { RegistroCarros }      from '../../model/carros/registro_carros.js';
 import { VisorBase }           from '../visor_base.js';
 import { CamaraSeguimiento }   from '../camaras/camara_seguimiento.js';
 import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
@@ -48,6 +48,7 @@ class VisorCarreraSolo extends VisorBase {
     #detenido     = false;
 
     #conductor        = new ConductorPasoFijo();
+    #tipoAuto         = null;
     #fraccionTope     = 1;
     #factorArrastre   = 1;
     #congelado        = false;
@@ -131,13 +132,15 @@ class VisorCarreraSolo extends VisorBase {
 
     reiniciarCarro() {
         const inicio = this.#ruta.curve ? this.#ruta.inicio : { x: 0, z: 0, angle: 0 };
-        this.#conductor.carro = new Carro(inicio.x, inicio.z, inicio.angle);
+        this.#conductor.carro = new RegistroCarros().crear(this.#tipoAuto, inicio.x, inicio.z, inicio.angle);
         this.#carro.aplicarTope(this.#fraccionTope, this.#factorArrastre);
         this.#sincronizarCarroYCamara();
     }
 
     // ── Cargar el modelo GLB del carro ───────────────────────────
+    // Crea el carro con la física del modelo guardado (PRD 007) y carga su GLB
     async cargar(tipoAuto, color) {
+        if (tipoAuto !== this.#tipoAuto) { this.#tipoAuto = tipoAuto; this.reiniciarCarro(); }
         try {
             const gltf    = await VisorBase.cargarGLTF();
             if (this.#detenido || !this.#escena) return;

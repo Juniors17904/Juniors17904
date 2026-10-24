@@ -4,13 +4,14 @@
 // CLASE: Garaje — orquesta las pantallas del garaje y de la vista
 // previa (PRD 004 D7): guarda el tipo y el color que se están
 // eligiendo y responde a los botones. El dibujo lo hacen las vistas
-// (GaleriaMiniaturasCarro, VistaPreviaCarro y los PerfilCarro).
+// (GaleriaMiniaturasCarro, VistaPreviaCarro, BarrasCarro y los PerfilCarro).
 // ================================================================
 class Garaje {
     #estado       = null;
     #navegar      = null;
     #galeria      = null;
     #vistaPrevia  = null;
+    #barras       = null;
     #tipoSel      = 'deportivo';
     #colorPreview = null;
     #conectado    = false;
@@ -21,6 +22,7 @@ class Garaje {
         this.#navegar     = navegar;
         this.#galeria     = new GaleriaMiniaturasCarro(catalogo);
         this.#vistaPrevia = new VistaPreviaCarro(catalogo);
+        this.#barras      = new BarrasCarro(document.getElementById('barras-carro'));
     }
 
     // Se llama cada vez que se entra al garaje: parte de lo guardado
@@ -30,7 +32,15 @@ class Garaje {
         this.#tipoSel      = this.#estado.tipoAuto || 'deportivo';
         this.#colorPreview = this.#estado.color;
         this.#galeria.dibujar(this.#estado.color);
+        this.#marcar(this.#tipoSel);
         if (!this.#conectado) this.#conectarEventos();
+    }
+
+    // Marca la tarjeta del carro y muestra sus barras (PRD 007, D4)
+    #marcar(tipo) {
+        document.querySelectorAll('.carro-card').forEach(c => c.classList.toggle('sel', c.dataset.tipo === tipo));
+        this.#tipoSel = tipo;
+        this.#barras.mostrar(tipo);
     }
 
     #conectarEventos() {
@@ -47,10 +57,7 @@ class Garaje {
 
     #elegirTipo(e) {
         const card = e.target.closest('.carro-card');
-        if (!card) return;
-        document.querySelectorAll('.carro-card').forEach(c => c.classList.remove('sel'));
-        card.classList.add('sel');
-        this.#tipoSel = card.dataset.tipo;
+        if (card) this.#marcar(card.dataset.tipo);
     }
 
     #verCarro() {
