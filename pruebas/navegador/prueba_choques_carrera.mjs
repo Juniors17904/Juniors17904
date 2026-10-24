@@ -2,7 +2,7 @@
 // Prueba en navegador real del PRD 008 — Superficie y choques en Jugar Solo.
 //   RF-05 → el carro no atraviesa un árbol de la pista
 //   RF-07 → al chocar de frente rebota
-//   RF-09 → chocar no reinicia la carrera ni detiene el cronómetro
+//   RF-09 → chocar no reinicia la carrera ni detiene el cronómetro, ni daña el carro
 //   Sin errores de consola (lección 8)
 // Espía el Carro real (mismo módulo que usa el visor) y el Cronometro.
 // ================================================================
@@ -73,6 +73,14 @@ const arbol = await page.evaluate(async () => {
 });
 check(!!arbol, 'hay un árbol sólido en Ciudad');
 
+// Ficha del carro antes del choque: mismas constantes = sin daño (RF-09)
+const fichaCarro = () => page.evaluate(() => {
+  const c = window.__carro, k = c.constantes;
+  window.__carroAntes ??= c;
+  return { mismo: c === window.__carroAntes, velMaxAdelante: k.velMaxAdelante,
+    aceleracion: k.aceleracion, freno: k.freno, direccion: k.direccion, agarre: k.agarre, masa: k.masa };
+});
+const antes = await fichaCarro();
 const t0 = await page.evaluate(() => window.__tiempo);
 await page.keyboard.down('ArrowUp');
 await page.waitForTimeout(2500);
@@ -86,6 +94,10 @@ check(r.distMin >= arbol.radio + 0.8 - 1e-6, `RF-05 nunca entra en el árbol (di
 check(r.rebotes.some(x => x.factor < 0), 'RF-07 de frente rebota hacia atrás');
 check(r.pantalla === 'pantalla-carrera-solo', 'RF-09 la carrera sigue en pantalla (sin reinicio)');
 check(r.tiempo > t0 + 2000, `RF-09 el cronómetro sigue corriendo (${t0} → ${r.tiempo} ms)`);
+const despues = await fichaCarro();
+check(despues.mismo, 'RF-09 sigue siendo el mismo carro (no se reinicia)');
+check(['velMaxAdelante','aceleracion','freno','direccion','agarre','masa'].every(k => despues[k] === antes[k]),
+  `RF-09 chocar no daña el carro: tope, aceleración, freno, dirección, agarre y masa iguales (${JSON.stringify(despues)})`);
 
 const reales = errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|bad HTTP response code \(404\)|status of 404/.test(t));
 check(reales.length === 0, 'sin errores de consola ' + reales.join(' | '));
