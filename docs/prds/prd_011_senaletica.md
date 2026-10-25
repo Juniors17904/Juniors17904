@@ -60,7 +60,7 @@ Que la señalética necesaria tenga tamaño real, grosor y un lugar correcto, qu
 - **RF-01 (D4):** cada flecha mide 2,4 × 0,8 m, tiene 3 cm de grosor, su borde de abajo está a 0,9 m del piso y se ve también de costado.
 - **RF-02 (D5):** en las 5 pistas las flechas están a 5,4 m del centro, fuera del piano, y ningún tablero toca a otro.
 - **RF-03 (D6, D10):** en Jugar Solo el carro choca con el tablero de una flecha cuando lo toca (±0,1 m) y nunca lo atraviesa.
-- **RF-04 (D5):** con el carro alineado con la pista, ninguno de los 6 carros toca una flecha mientras su centro está en el asfalto, salvo en el quiebre donde las pistas abiertas empiezan su tramo de cierre (ver v3).
+- **RF-04 (D5):** con el carro alineado con la pista, ninguno de los 6 carros toca una flecha mientras su centro está en el asfalto, salvo en el quiebre donde las pistas abiertas empiezan su tramo de cierre (ver v3). *(La excepción del quiebre desaparece según el PRD 014, D9 y RF-08.)*
 - **RF-05 (D6):** con las flechas sólidas, Jugar Solo sigue a 30 FPS o más en un celular de gama media.
 - **RF-06 (D3, D7):** en Jugar Solo hay un arco de meta sobre la línea de meta, girado con la pista, con sus postes a 6,0 m del centro y 5,5 m de altura libre, en las 5 pistas.
 - **RF-07 (D3):** el arco de meta no cambia cómo se cuentan las vueltas ni el tiempo.
