@@ -15,6 +15,7 @@
 const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
+const { CargadorTrazadoVuelta } = require('./cargador_trazado_vuelta.cjs');
 const { PilotoAutomatico } = require('./piloto_automatico.cjs');
 
 class PruebaLlegadasNaturales {
@@ -63,6 +64,7 @@ class PruebaLlegadasNaturales {
         for (const f of archivos) {
             vm.runInContext(fs.readFileSync(path.join(PruebaLlegadasNaturales.#RAIZ, 'src/model', f), 'utf8'), ctx, { filename: f });
         }
+        new CargadorTrazadoVuelta().cargar(ctx);   // la vuelta entera, para Ruta (PRD 014)
         this.#ctx = ctx;
         for (const c of ['MedidasEscena', 'CarreraVueltas', 'Cronometro', 'MuestraRuta']) globalThis[c] = ctx[c];
     }

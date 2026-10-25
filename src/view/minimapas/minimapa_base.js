@@ -30,15 +30,9 @@ class MinimapBase {
         const pista = this.#pistaCfg;
         if (!pista?.tramos?.length) return;
 
-        const raw = [];
-        let px = 0, py = 0, angulo = -Math.PI / 2;
-        for (let i = 0; i < pista.totalSegs; i++) {
-            const tr = pista.tramos.find(([d, h]) => i >= d && i < h);
-            angulo += (tr ? tr[2] : 0) * 0.045;
-            px -= Math.cos(angulo) * 1.5;
-            py += Math.sin(angulo) * 1.5;
-            raw.push([px, py]);
-        }
+        // La vuelta entera, con el camino de vuelta de las pistas abiertas (PRD 014),
+        // girada media vuelta para que el mapa quede orientado como siempre
+        const raw = new window.TrazadoVuelta(pista.tramos, pista.totalSegs).puntos.map(([x, z]) => [-x, -z]);
         if (!raw.length) return;
 
         const xs   = raw.map(p => p[0]), ys = raw.map(p => p[1]);

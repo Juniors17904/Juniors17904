@@ -72,6 +72,13 @@ class MedidasEscena {
     static #GROSOR_CARTEL_AVISO   = 0.08;
     static #CENTRO_CARTEL_AVISO   = 3.3;   // altura del centro del cartel
 
+    // Cierre de las pistas abiertas (PRD 014)
+    static #DISTANCIA_PISTA_ABIERTA = 50;   // si el trazado termina más lejos de la largada, la pista es abierta
+    static #RADIO_MINIMO_CIERRE     = 40;   // curvas del camino de vuelta
+    static #MARGEN_CIERRE           = 45;   // el camino de vuelta rodea la pista a esta distancia
+    static #DISTANCIA_MINIMA_CIERRE = 20;   // lo más cerca que el camino de vuelta pasa de la pista
+    static #DISTANCIA_UNION_CIERRE  = 50;   // en las uniones con la pista no rige la distancia mínima
+
     // Largo real (D3) y proporciones ancho/largo y alto/largo de cada modelo GLB
     #carros = new Map([
         ['deportivo', new window.MedidaCarro(4.5, 0.4598, 0.3216)],
@@ -149,6 +156,13 @@ class MedidasEscena {
     get marcoCartelAviso()    { return MedidasEscena.#MARCO_CARTEL_AVISO; }
     get grosorCartelAviso()   { return MedidasEscena.#GROSOR_CARTEL_AVISO; }
     get centroCartelAviso()   { return MedidasEscena.#CENTRO_CARTEL_AVISO; }
+
+    // Cierre de las pistas abiertas (PRD 014)
+    get distanciaPistaAbierta() { return MedidasEscena.#DISTANCIA_PISTA_ABIERTA; }
+    get radioMinimoCierre()     { return MedidasEscena.#RADIO_MINIMO_CIERRE; }
+    get margenCierre()          { return MedidasEscena.#MARGEN_CIERRE; }
+    get distanciaMinimaCierre() { return MedidasEscena.#DISTANCIA_MINIMA_CIERRE; }
+    get distanciaUnionCierre()  { return MedidasEscena.#DISTANCIA_UNION_CIERRE; }
 
     // Sin tipo o con un tipo desconocido se usan las del deportivo (carro básico)
     medidaCarro(tipo) {

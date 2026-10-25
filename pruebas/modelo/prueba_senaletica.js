@@ -16,6 +16,7 @@
 const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
+const { CargadorTrazadoVuelta } = require('./cargador_trazado_vuelta.cjs');
 
 class PruebaSenaletica {
     static #RAIZ    = path.join(__dirname, '..', '..');
@@ -64,6 +65,7 @@ class PruebaSenaletica {
         for (const f of ['registro_pistas.js', 'pistas/config_pista.js', ...pistas, 'medida_carro.js', 'medidas_escena.js']) {
             vm.runInContext(this.#leer('src/model/' + f), ctx, { filename: f });
         }
+        new CargadorTrazadoVuelta().cargar(ctx);   // la vuelta entera, para Ruta (PRD 014)
         this.#ok(!(ctx.__modelErrors?.length), 'las pistas cargan antes que MedidasEscena sin errores: ' + ctx.__modelErrors);
         this.#ctx = ctx;
         globalThis.MedidasEscena = ctx.MedidasEscena;   // los objetos sólidos (módulos) leen sus medidas de aquí
@@ -111,7 +113,8 @@ class PruebaSenaletica {
         const m = this.#m, borde = m.limitePiano;
         for (const nombre of PruebaSenaletica.#PISTAS) {
             const pista = this.#pista(nombre), ruta = this.#rutaDe(pista);
-            const flechas = pista.decoraciones.filter(d => d.tipo === 'flecha');
+            // Con las flechas del camino de vuelta de las pistas abiertas (PRD 014, RF-05)
+            const flechas = ruta.decoracionesCon(pista.decoraciones).filter(d => d.tipo === 'flecha');
             this.#ok(flechas.length > 0 && flechas.every(f => f.dist === m.distanciaFlechas),
                 `RF-02 ${nombre}: sus ${flechas.length} flechas están a 5,4 m del centro`);
             const solidas = new this.#FabricaObjetosSolidos().crear(flechas, ruta);
@@ -200,20 +203,14 @@ class PruebaSenaletica {
     }
 
     // RF-04: carro alineado con la pista, centro en el asfalto → no toca ninguna flecha.
-    // Se revisa toda la pista menos el quiebre donde las pistas abiertas empiezan
-    // su tramo de cierre (la curva gira con menos de RADIO_QUIEBRE m de radio);
-    // las curvas de las pistas tienen 31 m de radio o más.
-    static #RADIO_QUIEBRE = 15;
-
+    // Toda la vuelta, con el camino de vuelta de las pistas abiertas y sus flechas,
+    // sin excepciones (PRD 014, RF-08: ya no hay quiebre de cierre).
     #probarCarrosAlineados() {
         const m = this.#m, M = m.medioAnchoAsfalto;
         for (const nombre of PruebaSenaletica.#PISTAS) {
             const pista = this.#pista(nombre), ruta = this.#rutaDe(pista);
-            const flechas = new this.#FabricaObjetosSolidos().crear(pista.decoraciones.filter(d => d.tipo === 'flecha'), ruta);
-            const todas = ruta.muestras(Math.ceil(ruta.longitud));
-            const muestras = todas.filter((pos, i) => this.#radioEn(todas, i) >= PruebaSenaletica.#RADIO_QUIEBRE);
-            this.#ok(muestras.length > 0.9 * todas.length,
-                `RF-04 ${nombre}: se revisa casi toda la pista (${muestras.length} de ${todas.length} puntos; quedan fuera los del quiebre del cierre)`);
+            const flechas = new this.#FabricaObjetosSolidos().crear(ruta.decoracionesCon(pista.decoraciones).filter(d => d.tipo === 'flecha'), ruta);
+            const muestras = ruta.muestras(Math.ceil(ruta.longitud));
             for (const tipo of PruebaSenaletica.#TIPOS) {
                 const medida = m.medidaCarro(tipo);
                 let peor = Infinity;
@@ -231,14 +228,6 @@ class PruebaSenaletica {
                 this.#ok(peor > 0, `RF-04 ${nombre}: el ${tipo} alineado no toca ninguna flecha con el centro en el asfalto (margen ${peor === Infinity ? 'lejos' : peor.toFixed(2) + ' m'})`);
             }
         }
-    }
-
-    // Radio de la curva en la muestra i (con sus dos vecinas)
-    #radioEn(muestras, i) {
-        const a = muestras[(i - 1 + muestras.length) % muestras.length], b = muestras[(i + 1) % muestras.length];
-        let giro = b.angle - a.angle;
-        giro = Math.abs(Math.atan2(Math.sin(giro), Math.cos(giro)));
-        return giro < 1e-9 ? Infinity : Math.hypot(b.x - a.x, b.z - a.z) / giro;
     }
 
     #probarBalizaBorrada() {

@@ -14,6 +14,7 @@
 const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
+const { CargadorTrazadoVuelta } = require('./cargador_trazado_vuelta.cjs');
 
 class PruebaObjetosSolidos {
     static #RAIZ    = path.join(__dirname, '..', '..');
@@ -61,6 +62,7 @@ class PruebaObjetosSolidos {
         for (const f of ['registro_pistas.js', 'pistas/config_pista.js', ...pistas, 'medida_carro.js', 'medidas_escena.js']) {
             vm.runInContext(this.#leer('src/model/' + f), ctx, { filename: f });
         }
+        new CargadorTrazadoVuelta().cargar(ctx);   // la vuelta entera, para Ruta (PRD 014)
         this.#ok(!(ctx.__modelErrors?.length), 'RNF-01 las pistas cargan antes que MedidasEscena sin errores: ' + ctx.__modelErrors);
         this.#ctx = ctx;
         globalThis.MedidasEscena = ctx.MedidasEscena;   // los objetos sólidos (módulos) leen sus medidas de aquí

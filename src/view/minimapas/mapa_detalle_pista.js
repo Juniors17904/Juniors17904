@@ -26,15 +26,9 @@ class MapaDetallePista {
             return;
         }
 
-        const puntos = [];
-        let x = 0, y = 0, angle = -Math.PI / 2;
-        for (let i = 0; i < pista.totalSegs; i++) {
-            const tramo = pista.tramos.find(([d, h]) => i >= d && i < h);
-            angle += (tramo ? tramo[2] : 0) * 0.045;
-            x -= Math.cos(angle) * 1.5;
-            y += Math.sin(angle) * 1.5;
-            puntos.push([x, y]);
-        }
+        // La vuelta entera, con el camino de vuelta de las pistas abiertas (PRD 014),
+        // girada media vuelta para que el mapa quede orientado como siempre
+        const puntos = new window.TrazadoVuelta(pista.tramos, pista.totalSegs).puntos.map(([x, z]) => [-x, -z]);
         const xs = puntos.map(p => p[0]), ys = puntos.map(p => p[1]);
         const minX = Math.min(...xs), maxX = Math.max(...xs);
         const minY = Math.min(...ys), maxY = Math.max(...ys);

@@ -53,7 +53,7 @@ class VisorTestdriveRuta extends VisorBase {
     get constantesFisica() { return this.#mov?.constantes ?? null; }
     get camDist()      { return 7; }
     get #mov()         { return this.#conductor.carro; }
-    get pathPos()      { return this.#ruta.posicionEn(this.#progress); }
+    get pathPos()      { return this.#ruta.posicionVuelta(this.#progress); }
     get lateral()      { return this.#lateral; }
     get pathLen()      { return this.#ruta.longitud; }
     get camAereaActiva()    { return this.#camAereaActiva; }
@@ -287,7 +287,7 @@ class VisorTestdriveRuta extends VisorBase {
         this.#progress = ((this.#progress + carro.velocidad / this.#ruta.longitud) % 1 + 1) % 1;
 
         // Límite suave: empujar de vuelta si se aleja del trazado más que el límite de MedidasEscena
-        const p = this.#ruta.posicionEn(this.#progress);
+        const p = this.#ruta.posicionVuelta(this.#progress);
         const dx = carro.px - p.x, dz = carro.pz - p.z;
         const dist = Math.sqrt(dx * dx + dz * dz);
         this.#lateral = dx * Math.cos(p.angle) + dz * -Math.sin(p.angle);

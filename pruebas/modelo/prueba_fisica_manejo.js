@@ -11,6 +11,7 @@
 const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
+const { CargadorTrazadoVuelta } = require('./cargador_trazado_vuelta.cjs');
 const { PilotoAutomatico }  = require('./piloto_automatico.cjs');
 const { CarroReferenciaV1 } = require('./carro_referencia_v1.cjs');
 
@@ -131,6 +132,7 @@ class PruebaFisicaManejo {
             const archivo = path.join(PruebaFisicaManejo.#RAIZ, 'src/model/pistas', f);
             vm.runInContext(fs.readFileSync(archivo, 'utf8'), ctx, { filename: f });
         }
+        new CargadorTrazadoVuelta().cargar(ctx);   // la vuelta entera, para Ruta (PRD 014)
         const ruta = new this.#Ruta();
         const ciudad = ctx.registroPistas.obtener('ciudad');
         ruta.construir(ciudad.tramos, ciudad.totalSegs);

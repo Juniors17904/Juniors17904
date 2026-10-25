@@ -324,33 +324,21 @@ class VisorCarreraSolo extends VisorBase {
     // ── Circuito: superficie (ConstructorCircuitoCarreraSolo) y decoraciones ──
     #construirCircuito() {
         if (this.#pista?.tramos) this.#ruta.construir(this.#pista.tramos, this.#pista.totalSegs);
-        this.#afinarLongitudArco();
         const curva = this.#ruta.curve;
+        const decoraciones = this.#ruta.decoracionesCon(this.#pista?.decoraciones);   // con las flechas del camino de vuelta (PRD 014)
         if (curva) {
-            this.#rivales = new RivalesCarreraSolo(this.#escena, this.#ruta, this.#pista.decoraciones,
+            this.#rivales = new RivalesCarreraSolo(this.#escena, this.#ruta, decoraciones,
                 this.muestrasRuta(VisorCarreraSolo.#MUESTRAS_RIVALES), this.#medidas);
         }
         this.reiniciarCarro();
         if (!curva) return;
 
-        this.#choques  = new DetectorChoques(this.#pista.decoraciones, this.#ruta, this.#medidas.medidaCarro(this.#tipoAuto));
+        this.#choques  = new DetectorChoques(decoraciones, this.#ruta, this.#medidas.medidaCarro(this.#tipoAuto));
         this.#circuito = new ConstructorCircuitoCarreraSolo(this.#escena);
         this.#circuito.construir(curva);
 
         this.#decoraciones = new DecoracionesCarreraSolo(this.#escena, this.#ruta);
-        this.#decoraciones.construir(this.#pista.decoraciones, this.#circuito);
-    }
-
-    // La curva trae 200 divisiones de arco por defecto: con ~300 puntos de
-    // control y el tramo de cierre largo de las pistas abiertas, getPointAt
-    // deja de ser equiespaciado. Se afina solo en la curva de ESTA instancia
-    // de Ruta (no se modifica la clase Ruta).
-    #afinarLongitudArco() {
-        const curva = this.#ruta.curve;
-        if (!curva) return;
-        const puntosControl = curva.points?.length ?? 0;
-        curva.arcLengthDivisions = Math.max(60000, puntosControl * 200);
-        curva.updateArcLengths();
+        this.#decoraciones.construir(decoraciones, this.#circuito);
     }
 
     // ── Carro ────────────────────────────────────────────────────

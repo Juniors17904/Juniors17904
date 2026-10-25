@@ -11,6 +11,7 @@
 const fs   = require('fs');
 const path = require('path');
 const vm   = require('vm');
+const { CargadorTrazadoVuelta } = require('./cargador_trazado_vuelta.cjs');
 
 class PruebaPilotosPC {
     static #RAIZ     = path.join(__dirname, '..', '..');
@@ -60,6 +61,7 @@ class PruebaPilotosPC {
         for (const f of archivos) {
             vm.runInContext(fs.readFileSync(path.join(PruebaPilotosPC.#RAIZ, 'src/model', f), 'utf8'), ctx, { filename: f });
         }
+        new CargadorTrazadoVuelta().cargar(ctx);   // la vuelta entera, para Ruta (PRD 014)
         this.#ctx = ctx;
     }
 

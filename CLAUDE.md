@@ -198,6 +198,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/model/carros/` → `Carro` + subclases, `ConstantesFisica` y `RegistroCarros`
 - `src/model/superficies/` → `Superficie` + subclases y `DetectorSuperficie`
 - `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos`, `DetectorChoques`, `RectanguloCarro` y `PuntoChoque`
+- `src/model/cierre/` → camino de vuelta de las pistas abiertas (PRD 014): `PoseCierre`, `TrayectoDubins`, `ContornoPista`, `CierrePistaAbierta` y `FlechasCierre`. La vuelta entera la arma `TrazadoVuelta` (`src/model/trazado_vuelta.js`) y la usan `Ruta` y los mapas
 - `src/model/pilotos/` → `PilotoPC` + subclases y `Rival` (PRD 013)
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes

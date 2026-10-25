@@ -31,14 +31,10 @@ class MinimapaCircuito3D extends MapaConduccion {
     #calcularTrazado(pistaCfg) {
         const MM_W = this.ancho, MM_H = this.alto, MM_PAD = this.margen;
         if (!pistaCfg?.tramos?.length) return null;
-        const xs = [], ys = [];
-        let x=0,y=0,angle=-Math.PI/2;
-        for (let i=0; i<pistaCfg.totalSegs; i++) {
-            const tr=pistaCfg.tramos.find(([d,h])=>i>=d&&i<h);
-            angle+=(tr?tr[2]:0)*0.045;
-            x-=Math.cos(angle)*1.5; y+=Math.sin(angle)*1.5;
-            xs.push(x); ys.push(y);
-        }
+        // La vuelta entera, con el camino de vuelta de las pistas abiertas (PRD 014),
+        // girada media vuelta para que el mapa quede orientado como siempre
+        const vuelta = new window.TrazadoVuelta(pistaCfg.tramos, pistaCfg.totalSegs).puntos;
+        const xs = vuelta.map(p => -p[0]), ys = vuelta.map(p => -p[1]);
         const minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
         const scl=Math.min((MM_W-MM_PAD*2)/(maxX-minX||1),(MM_H-MM_PAD*2)/(maxY-minY||1));
         const ox=(MM_W-(maxX-minX)*scl)/2-minX*scl, oy=(MM_H-(maxY-minY)*scl)/2-minY*scl;

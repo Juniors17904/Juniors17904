@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para programar |
+| Estado | v3 — implementado |
 | Fecha | 2026-10-25 |
 | Backlog | B19 (`docs/BACKLOG.md`) |
 | Depende de | PRD 011 (flechas de curva) y PRD 012 (piso de la pista) |
@@ -20,7 +20,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D4 | Usuarios | Las curvas del camino de vuelta tienen un **radio mínimo de 40 m**. |
 | D5 | Usuarios | Las curvas del camino de vuelta **llevan flechas**, igual que las demás. Las arma la clase nueva del cierre, con el mismo formato de datos que las de las pistas: la excepción del PRD 010 (D7, B16) se amplía a esa clase. No lleva árboles ni postes nuevos. *(v2: aprobado)* |
 | D6 | Dominio | El camino de vuelta lo **calcula el programa** a partir de la forma de cada pista. Los datos de las pistas (`ConfigPista*`) **no se tocan**. |
-| D7 | Dominio | La vuelta se alarga **entre 8 % y 10 %** (Costa ≈ 2357 m, Desierto ≈ 2226 m, Montaña ≈ 1979 m, Volcán ≈ 2206 m). El conteo de vueltas y los puntos de control salen solos del recorrido nuevo, sin reglas nuevas. |
+| D7 | Dominio | La vuelta se alarga **entre 5 % y 9 %** (Costa 2360 m, Desierto 2203 m, Montaña 1899 m, Volcán 2169 m; *v3: medido, la v2 tenía una estimación de 8 % a 10 %*). El conteo de vueltas y los puntos de control salen solos del recorrido nuevo, sin reglas nuevas. |
 | D8 | Usuarios | Los **minimapas** (Diseño General, Diseño de Pistas) y el **mapa de la pantalla Pistas** dibujan el recorrido nuevo, con el camino de vuelta. *(v2: aprobado)* |
 | D9 | Técnico | El cálculo del cierre va en una **clase nueva del modelo**. El recorrido entero, con el camino de vuelta, lo entrega `Ruta`; los minimapas y las pantallas lo leen de ahí en vez de rehacerlo desde los tramos. |
 | D10 | Técnico | Lo nuevo va en clases aparte; ningún archivo pasa de 400 líneas. |
@@ -86,3 +86,4 @@ Que las 4 pistas abiertas vuelvan a la largada por un camino que se puede maneja
 ### Historial
 - **v1** (2026-10-25): primera versión, con las decisiones aceptadas por el usuario.
 - **v2** (2026-10-25): revisión única (forma corta). Decisiones aprobadas por el usuario: el camino de vuelta rodea la pista por fuera (D3, la forma "curva, recta, curva" cruzaba la pista en las 4), las flechas las arma la clase del cierre con la excepción del PRD 010 ampliada (D5) y los mapas, también el de la pantalla Pistas, muestran el camino de vuelta (D8). Detalles: regla de pista abierta (50 m), el recorrido entero lo entrega `Ruta` (D9), largo nuevo de cada vuelta (D7), RF-02 con las decoraciones en su lugar, RF-04 sin las uniones, minimapas nombrados, contradicción de `MedidasEscena` resuelta, D11 completa (PRD 002, 004, 005 y 013, Out of scope del 001, historial del 011).
+- **v3** (2026-10-25): implementado. Clases del modelo en `src/model/cierre/` (`PoseCierre`, `TrayectoDubins`, `ContornoPista`, `CierrePistaAbierta`, `FlechasCierre`) y `TrazadoVuelta` (`src/model/trazado_vuelta.js`), que arma la vuelta entera para `Ruta` y los 3 mapas. `Ruta.posicionEn` sigue midiendo en fracción de la pista y `posicionVuelta` recorre la vuelta entera; `Ruta.decoracionesCon` suma las flechas del camino de vuelta. Medidas del cierre en `MedidasEscena`. El camino de vuelta pasa a 36–43 m de la pista. Pruebas: `pruebas/modelo/prueba_cierre_pistas.js` y `pruebas/navegador/prueba_cierre_pantallas.mjs`; la prueba del PRD 011 ya no excluye el quiebre.

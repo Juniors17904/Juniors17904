@@ -213,7 +213,7 @@ class VisorDisenoPista extends VisorBase {
         this.#scene.add(grupoPista);
 
         // ── Capa 3: decoraciones de la pista ────────────────────
-        for (const dec of this.#pista.decoraciones) {
+        for (const dec of this.#ruta.decoracionesCon(this.#pista.decoraciones)) {   // con el camino de vuelta (PRD 014)
             const obj = this.#crearObjeto(dec);
             if (!obj) continue;
             obj.construir(this.#scene);
