@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — listo para implementar |
+| Estado | v2 — implementado y verificado (Verificador PRD ✅), con pruebas en `pruebas/` |
 | Fecha | 2026-10-22 |
 | Backlog | B10 (`docs/BACKLOG.md`) |
 | Reemplaza | Ver D9 |

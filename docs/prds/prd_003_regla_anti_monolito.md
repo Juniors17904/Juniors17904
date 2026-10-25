@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — cerrado y verificado (Verificador PRD ✅). Listo para implementar |
+| Estado | v2 — implementado y verificado (Verificador PRD ✅), con pruebas en `pruebas/` |
 | Fecha | 2026-10-22 |
 | Relacionado | PRD 001 y PRD 002 (no los reemplaza) |
 
