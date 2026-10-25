@@ -294,12 +294,19 @@ class TimonF1 { dibujar(ctx, S) { /* lógica F1 aquí */ } }
 
 Acordada con el usuario el 2026-10-24. Vale para todo PRD desde el PRD 010.
 
-1. **Crear el PRD** con `docs/PRD_CREATOR.md` (Prompts 1, 2 y 3).
-2. **Antes de programar: una sola revisión del PRD** con el Verificador PRD (revisores de contradicciones y de código). **Se corre sola apenas el PRD queda escrito, sin preguntarle al usuario** (acordado el 2026-10-25). Los detalles se corrigen sin volver a verificar. Solo se repite si aparece un problema de fondo (una decisión), que primero se le pregunta al usuario.
-3. **Programar** el PRD con sus pruebas en `pruebas/`.
-4. **Después de programar:** Verificador PRD con **2 revisores**, el de código y el de pruebas. El de contradicciones solo si el cambio tocó otros PRD o `CLAUDE.md`.
-5. **Corregir** lo que encuentren y correr `npm run test:todo`. No hay otra vuelta salvo que la corrección sea grande.
-6. **Llevar a `main`** cuando las pruebas pasen.
+| Paso | Qué se hace | ¿Se le pregunta al usuario? |
+|---|---|---|
+| 1 | **Crear el PRD** con `docs/PRD_CREATOR.md`: Prompt 1 (decisiones), Prompt 2 (bloquearlas) y Prompt 3 (escribirlo). | **Sí:** el usuario aprueba las decisiones del Prompt 1. |
+| 2 | **Revisión única del PRD**, con el Verificador PRD (revisores de contradicciones y de código). | **No.** Se corre sola apenas el PRD queda escrito. Los detalles se corrigen sin preguntar. Solo se pregunta si aparece un problema de fondo (cambia una decisión). |
+| 3 | **Programar** el PRD con sus pruebas en `pruebas/`. | **No**, si el usuario ya pidió implementarlo. Si no lo pidió, se pregunta una vez: "¿lo programo?". |
+| 4 | **Revisión después de programar**, con el Verificador PRD: revisor de código y revisor de pruebas. El de contradicciones solo si el cambio tocó otros PRD o `CLAUDE.md`. | **No.** Se corre sola apenas termina la programación. |
+| 5 | **Corregir** lo que encuentren y correr `npm run test:todo`. | **No.** Solo se pregunta si una corrección cambia una decisión. |
+| 6 | **Llevar a `main`.** | **No.** Se hace solo cuando `npm run test:todo` pasa entero. **Nunca antes**, ni aunque falte poco. |
+
+**Reglas para no olvidarse:**
+- Un paso marcado "No" **no se ofrece como pregunta** al final de la respuesta: se hace y se informa.
+- Al terminar cada paso se dice en qué paso va el PRD (por ejemplo, "PRD 014: paso 2 de 6, revisión única corriendo").
+- Si una prueba de navegador falla por carga lenta, primero se revisa que el servidor del puerto 8099 sea el del ejecutor (`npm run test:todo` levanta el suyo); no se deja otro servidor corriendo.
 
 **Los acuerdos se escriben.** Todo acuerdo de trabajo con el usuario se escribe en el repositorio (este archivo, `docs/PRD_CREATOR.md`, las skills o `docs/LECCIONES_APRENDIDAS.md`). Lo que queda solo en el chat, las otras sesiones no lo saben.
 

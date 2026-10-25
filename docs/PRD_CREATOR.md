@@ -48,7 +48,7 @@ Además (v2):
 
 ## Después del PRD
 
-Se sigue la **forma corta** de `CLAUDE.md` ("Forma de trabajar con PRD"):
+Se sigue la **forma corta** de `CLAUDE.md` ("Forma de trabajar con PRD"). La tabla de esa sección dice qué pasos se hacen solos y cuáles se le preguntan al usuario:
 
 1. **Antes de programar**, una sola revisión con el **Verificador PRD** (skill `verificador-prd`), solo con los revisores de contradicciones y de código. Si da ❌, el **Reparador PRD** (skill `reparador-prd`) corrige los detalles **sin volver a verificar**. Solo hay otra vuelta si aparece una decisión, que antes se pregunta al usuario.
 2. **Después de programar**, Verificador PRD con los revisores de **código y pruebas** (el de contradicciones solo si se tocaron otros PRD o `CLAUDE.md`). Se corrige lo que encuentren y se corre `npm run test:todo`.
