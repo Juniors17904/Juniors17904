@@ -196,7 +196,8 @@ const medirDecoraciones = page => page.evaluate(() => {
   check(m.arboles.every(a => cerca(a.piso, 0, 0.01)), 'RF-01 ninguna raíz ni esfera baja del piso (la caja empieza en 0)');
   check(m.arboles.every(a => a.bajoCopa >= 2.3 - 1e-6 && a.bajoCopa > m.altoSuv), `RF-07 la copa empieza por encima de 2,3 m y del carro más alto (${m.arboles.map(a => a.bajoCopa.toFixed(2)).join(', ')})`);
 
-  check(m.postes.length === m.decsPoste && m.postes.length > 0, `RF-04 Jugar Solo dibuja los ${m.decsPoste} postes de Ciudad (${m.postes.length})`);
+  // El poste de alumbrado que cae dentro de un poste del arco de meta no se dibuja (PRD 011, opción A)
+  check(m.postes.length === m.decsPoste - 1 && m.postes.length > 0, `RF-04 Jugar Solo dibuja los ${m.decsPoste} postes de Ciudad menos el que tapa el arco de meta (${m.postes.length})`);
   check(m.postes.every(p => cerca(p.alto, 8, 0.02) && cerca(p.radio, 0.15, 1e-6)), `RF-02 cada poste mide 8 m de alto y 0,15 m de radio (${m.postes[0]?.alto.toFixed(2)} m, ${m.postes[0]?.radio})`);
 
   check(m.senales.length === m.decsSenal && m.senales.length > 0, `RF-04 Jugar Solo dibuja las ${m.decsSenal} señales de Ciudad (${m.senales.length})`);
