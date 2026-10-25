@@ -98,6 +98,12 @@ class MinimapBase {
         return pts[pts.length - 1];
     }
 
+    // Pasa un lugar de la pista (x, z en metros) a un punto del canvas, con el
+    // mismo giro de media vuelta que el trazado (PRD 017)
+    _aPixel(x, z) {
+        return new PuntoMinimapa(-x * this.#escala + this.#ox, -z * this.#escala + this.#oy);
+    }
+
     get _tienePuntos() { return this.#puntos.length > 0; }
     get _primerPunto() { return this.#puntos[0] ?? { x: 0, y: 0 }; }
     get _escala()      { return this.#escala; }

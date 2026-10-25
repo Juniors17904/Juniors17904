@@ -175,7 +175,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
 | `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo`, `Visor3D` (vista previa del garaje) | (utilidades Three.js) |
-| `MinimapBase` | `MinimapaDisenoGeneral` | `setCircuito(cfg)`, `dibujar(ctx, …)` |
+| `MinimapBase` | `MinimapaDisenoGeneral`, `MinimapaCarrera` (minimapa de una carrera 3D con un punto por carro, PRD 017) | `setCircuito(cfg)`, `dibujar(ctx, …)` |
 | `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos` | `iniciar()`, `detener()`, `irA(id)` |
 | `ControladorPantallaJuego` (hereda de `ControladorPantalla`) | `ControladorTestDrive3D`, `ControladorDisenoPistas` | `tieneVisor`, `ocupaPantallaJuego`, `cancelarArranque()` |
 | `DestinoCircuito3D` | `DestinoCarreraUrbana`, `DestinoTestDriveRuta` | `claseVisor`, `titulo`, `origen` |
@@ -186,14 +186,14 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Superficie` | `SuperficieAsfalto`, `SuperficiePiano`, `SuperficiePasto` (las entrega `DetectorSuperficie`) | `nombre`, `rozamiento`, `esPasto` |
 | `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida`, `FlechaCurvaSolida` (los crea `FabricaObjetosSolidos`; los usa `DetectorChoques`) | `x`, `z`, `radio`, `tipo`, `alcance`, `puntoCercano(rectangulo)` (cada objeto calcula su propio choque contra el `RectanguloCarro`, PRD 011) |
 | `TrazadoPiso` | `TrazadoPisoCurva`, `TrazadoPisoRecto` (los usa `ConstructorPisoPista`, PRD 012) | `largo`, `cerrado`, `puntoEn(s)`, `distanciasEntre(s0, s1)` |
-| `DisenoCarrera` | `DisenoVertical`, `DisenoHorizontal` (los elige `SelectorDisenoCarrera` por la forma de la pantalla y los aplica `AdaptadorDisenoCarrera`, PRD 015) | `nombre`, `anchoArea(anchoVentana)`, `camaraVertical`, `fovCamara`, `aplicar(pantalla)`; y los controles (PRD 016): `ladoPedal`, `separacionPedales`, `pedalesApilados`, `altoControles`, `recorridoGiro(anchoVentana)` |
+| `DisenoCarrera` | `DisenoVertical`, `DisenoHorizontal` (los elige `SelectorDisenoCarrera` por la forma de la pantalla y los aplica `AdaptadorDisenoCarrera`, PRD 015) | `nombre`, `anchoArea(anchoVentana)`, `camaraVertical`, `fovCamara`, `aplicar(pantalla)`; y los controles (PRD 016): `ladoPedal`, `separacionPedales`, `pedalesApilados`, `altoControles`, `recorridoGiro(anchoVentana)`; y el minimapa (PRD 017): `anchoMapa`, `altoMapa` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 | `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
 - `src/view/controles/` → `ControlEntrada` + subclases + timones; también `RespuestaToque` (el botón apretado se ilumina y vibra) y `EstiloControlesCarrera` (lleva las medidas de cada diseño a los controles de la carrera), del PRD 016
 - `src/view/velocimetros/` → `Velocimetro` + subclases
-- `src/view/minimapas/` → `MinimapBase` + subclases, y `MapaConduccion` / `ParMapasConduccion` + subclases
+- `src/view/minimapas/` → `MinimapBase` + subclases, y `MapaConduccion` / `ParMapasConduccion` + subclases; `PuntoCarroMapa` (lugar y color de un carro en `MinimapaCarrera`, PRD 017)
 - `src/view/paneles/` → `PanelDatos` + subclases
 - `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes); `src/view/pistas/comun/` → piezas que comparten (`BuclePasoFijo`, `ConductorPasoFijo` y el piso de la pista del PRD 012: `ConstructorPisoPista` con sus ayudantes `TrazadoPiso`, `TrazadoPisoCurva`, `TrazadoPisoRecto`, `PuntoPiso` y `AcumuladorGeometria`)
 - `src/model/carros/` → `Carro` + subclases, `ConstantesFisica` y `RegistroCarros`

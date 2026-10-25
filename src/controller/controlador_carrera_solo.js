@@ -38,6 +38,7 @@ class ControladorCarreraSolo {
     #carrera    = null;
     #cronometro = null;
     #hud        = null;
+    #mapa       = null;   // MinimapaCarrera (PRD 017)
     #adaptadorDiseno = null;   // AdaptadorDisenoCarrera (PRD 015)
 
     #estadoCarrera   = ControladorCarreraSolo.#ESTADO_PREPARANDO;
@@ -112,11 +113,13 @@ class ControladorCarreraSolo {
         this.#vistaConduccion?.destruirControl();
         this.#visor?.detener();
         this.#hud?.destruir();
+        this.#mapa?.destruir();
 
         this.#visor      = null;
         this.#carrera    = null;
         this.#cronometro = null;
         this.#hud        = null;
+        this.#mapa       = null;
         this.#estadoCarrera = ControladorCarreraSolo.#ESTADO_TERMINADA;
     }
 
@@ -138,6 +141,8 @@ class ControladorCarreraSolo {
             document.getElementById('cuenta-carrera-solo'),
             document.getElementById('resultado-carrera-solo')
         );
+
+        this.#mapa = new window.MinimapaCarrera(document.getElementById('minimapa-carrera-solo'), pista);
 
         const timonModelo = this.#estado?.timonModelo ?? 0;
         this.#vistaConduccion?.aplicarA(this.#visor, timonModelo);
@@ -268,6 +273,16 @@ class ControladorCarreraSolo {
             this.#estado?.velocimetroModelo ?? 0,
             this.#textoPosicion(filas)
         );
+        this.#dibujarMapa();
+    }
+
+    // Minimapa (PRD 017): el lugar real del jugador y de cada rival, con el color de su auto
+    #dibujarMapa() {
+        const mapa = this.#mapa, visor = this.#visor;
+        if (!mapa) return;
+        (visor.rivales?.rivales ?? []).forEach((r, i) => mapa.ubicar(i + 1, r.carro.px, r.carro.pz, r.piloto.color));
+        mapa.ubicar(0, visor.px, visor.pz, this.#estado?.color ?? '#ef4444', true);
+        mapa.actualizar();
     }
 
     // ── Privados: posiciones con los rivales (PRD 013, D5) ──────

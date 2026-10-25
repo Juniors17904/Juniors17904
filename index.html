@@ -87,6 +87,9 @@
         /* Con el panel de resultado visible la pantalla sube por encima de .ctrl-overlay (z 20):
            el z-index del panel solo vale dentro del contexto de apilamiento de la pantalla */
         #pantalla-carrera-solo.activa.con-resultado { z-index: 25; }
+        /* Minimapa (PRD 017): arriba a la derecha, bajo la barra del HUD (52 px); se oculta con el resultado */
+        #pantalla-carrera-solo #minimapa-carrera-solo { position: absolute; top: 58px; right: 8px; pointer-events: none; border-radius: 6px; }
+        #pantalla-carrera-solo.con-resultado #minimapa-carrera-solo { display: none; }
         #resultado-carrera-solo {
             position: fixed;
             z-index: 30;
@@ -773,6 +776,7 @@
         <div class="columna-carrera-solo">
             <canvas id="canvas-carrera-solo"></canvas>
             <canvas id="canvas-hud-carrera-solo"></canvas>
+            <canvas id="minimapa-carrera-solo"></canvas>
             <div id="cuenta-carrera-solo" style="display:none"></div>
             <div id="resultado-carrera-solo">
                 <button id="btn-revancha-solo" class="btn-neon btn-compacto">Revancha 🔄</button>
@@ -888,6 +892,8 @@
     <script src="src/view/minimapas/punto_minimapa.js"></script>
     <script src="src/view/minimapas/mapa_conduccion.js"></script>
     <script src="src/view/minimapas/minimapa_circuito_3d.js"></script>
+    <script src="src/view/minimapas/punto_carro_mapa.js"></script>
+    <script src="src/view/minimapas/minimapa_carrera.js"></script>
     <script src="src/view/minimapas/recorrido_circuito_3d.js"></script>
     <script src="src/view/minimapas/minimapa_test_drive_recto.js"></script>
     <script src="src/view/minimapas/recorrido_test_drive_recto.js"></script>

@@ -8,7 +8,8 @@ try {
 // la derecha, con el velocímetro encima (lo acomoda el CSS). La cámara
 // es la de seguimiento común, con 55° de visión. ACEL y FRENO van lado a
 // lado como pedales, de 88 px, y el giro máximo pide un cuarto del ancho
-// (PRD 016): todo eso son los valores de DisenoCarrera.
+// (PRD 016). El minimapa es más ancho y bajo, 140×104, para dejar lugar
+// al velocímetro (PRD 017): todo eso son los valores de DisenoCarrera.
 // ================================================================
 class DisenoHorizontal extends window.DisenoCarrera {
     get nombre() { return 'horizontal'; }

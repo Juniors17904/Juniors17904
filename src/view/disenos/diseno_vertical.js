@@ -8,13 +8,15 @@ try {
 // de visión amplio (78°) para ver la pista en la pantalla angosta.
 // ACEL y FRENO van apilados, de 72 px, y el giro máximo pide un arrastre
 // fijo de 85 px (PRD 016, D4 y D5): en una pantalla angosta un cuarto del
-// ancho llevaría el dedo hasta el borde.
+// ancho llevaría el dedo hasta el borde. El minimapa mide 90×120 (PRD 017).
 // ================================================================
 class DisenoVertical extends window.DisenoCarrera {
     static #ANCHO_MAXIMO = 480;
     static #FOV_CAMARA   = 78;
     static #LADO_PEDAL   = 72;
     static #RECORRIDO_GIRO = 85;
+    static #ANCHO_MAPA = 90;
+    static #ALTO_MAPA  = 120;
 
     get nombre()         { return 'vertical'; }
     get camaraVertical() { return true; }
@@ -23,6 +25,8 @@ class DisenoVertical extends window.DisenoCarrera {
     get pedalesApilados() { return true; }
 
     recorridoGiro() { return DisenoVertical.#RECORRIDO_GIRO; }
+    get anchoMapa() { return DisenoVertical.#ANCHO_MAPA; }
+    get altoMapa()  { return DisenoVertical.#ALTO_MAPA; }
 
     anchoArea(anchoVentana) { return Math.min(anchoVentana, DisenoVertical.#ANCHO_MAXIMO); }
 }
