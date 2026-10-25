@@ -21,7 +21,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D5 | Usuarios | El mapa es fijo: no gira con el carro. |
 | D6 | Usuarios | Se ve desde la cuenta 3-2-1 y se oculta cuando aparece el panel de resultado. Su fondo es semitransparente para no tapar la pista. No se puede ocultar con un toque. |
 | D7 | Técnico | Una clase nueva de la vista, `MinimapaCarrera`, que hereda de `MinimapBase` y vive en `src/view/minimapas/`. No nombra Jugar Solo: sirve para cualquier carrera 3D, también el multijugador futuro (B3). Los puntos salen de la posición real de cada carro en la pista. El modelo no cambia y `VisorCarreraSolo` no crece. Pruebas en navegador real en 390×844 y 844×390, con capturas. |
-| D8 | Dominio | **Reemplaza:** del PRD 001, el HUD de su In scope (vuelta, tiempo y velocímetro): ahora suma el mapa. Del PRD 015, su D4 ("el diseño vertical queda igual"): suma el mapa; también crece la interfaz de `DisenoCarrera` con el tamaño del mapa. Del PRD 016, `ControladorCarreraSolo` en su lista: crea el mapa y le pasa los carros. De los PRD 002 y 004 a 016, `index.html` y `src/style.css` en sus listas, solo para agregar el lugar del mapa. `CLAUDE.md` suma `MinimapaCarrera` a la jerarquía de `MinimapBase`. Esos PRD llevan una nota que lo indica. |
+| D8 | Dominio | **Reemplaza:** del PRD 001, el HUD de su In scope (vuelta, tiempo y velocímetro), su D10 (lo que va arriba en vertical) y `src/style.css` en su lista: ahora suma el mapa. Del PRD 015, su D4, su RF-01 y "el diseño vertical" en su lista: en vertical se suma el mapa; también crece la interfaz de `DisenoCarrera` con el tamaño del mapa. `ControladorCarreraSolo` en las listas de los PRD 002 ("todas las clases de la carrera 3D"), 005 y 016: crea el mapa y le pasa los carros. De los PRD 004 y 005, "el comportamiento y el aspecto del juego" (solo el mapa de Jugar Solo). De los PRD 002, 004, 005, 006, 008 a 012 y 014, `src/style.css` en sus listas, solo para agregar el lugar del mapa. `CLAUDE.md` suma `MinimapaCarrera` a la jerarquía de `MinimapBase` y el tamaño del mapa a la interfaz de `DisenoCarrera`. Esos PRD llevan una nota que lo indica. |
 
 ## 1. Contexto y problema
 En Jugar Solo se corre contra 4 rivales (PRD 013), pero no hay forma de ver la pista entera ni dónde va cada uno. Solo se sabe la posición (por ejemplo, "2.º/5"). Las pantallas Diseño de Pistas y Diseño General ya tienen minimapa; Jugar Solo no.
@@ -68,7 +68,7 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 - **RNF-01 (D7), reglas del proyecto:** `MinimapaCarrera` es una clase de la vista en su propio archivo, hereda de `MinimapBase` y no nombra Jugar Solo; el tamaño del mapa lo da cada diseño (PRD 015). Se cumple `CLAUDE.md`.
 - **RNF-02, MVC:** el modelo no cambia; el controlador de Jugar Solo le pasa al mapa dónde está cada carro y el mapa solo dibuja.
 - **RNF-03 (D7), anti-monolito:** `VisorCarreraSolo` no crece y ningún archivo pasa de 400 líneas.
-- **RNF-04 (D7), pruebas:** en el modelo, el cálculo del lugar de cada punto; en navegador real en 390×844 y 844×390, la ubicación, los 5 puntos, el ocultarse con el resultado y capturas (lecciones 13 y 16).
+- **RNF-04 (D7), pruebas:** sin navegador (Node), el cálculo del lugar de cada punto en `MinimapaCarrera`; en navegador real en 390×844 y 844×390, la ubicación, los 5 puntos, el ocultarse con el resultado y capturas (lecciones 13 y 16).
 - **RNF-05, entrega:** llega a `main` cumpliendo la forma corta de `CLAUDE.md`.
 
 ## 8. Criterios de aceptación del MVP
