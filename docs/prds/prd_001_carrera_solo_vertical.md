@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v4 — implementado y con pruebas en `pruebas/`. Partes reemplazadas por los PRD 002 (D6), 004 (D9), 005 (D9), 006 (D8), 007 (D8), 008 (D8), 009 (D12) y 010 (D9) *(También 011 (D11) y 012 (D11).)* |
+| Estado | v4 — implementado y con pruebas en `pruebas/`. Partes reemplazadas por los PRD 002 (D6), 004 (D9), 005 (D9), 006 (D8), 007 (D8), 008 (D8), 009 (D12) y 010 (D9) *(También 011 (D11) y 012 (D11).)* *(También 014 (D11).)* |
 | Fecha | 2026-10-21 |
 
 ## Decisiones bloqueadas
@@ -36,7 +36,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 ## 4. Alcance
 **In scope:** carrera 3D vertical de 3 vueltas, cuenta regresiva, HUD (vuelta, tiempo y velocímetro), puntos de control, penalización por pasto, resultado con Revancha y Menú, botón "Clásico 2D" *(Reemplazado por PRD 002, D6.)* y mejoras visuales de la pista (más luz, línea central y línea de meta).
 
-**Out of scope:** rivales, récords guardados, choques o daños *(choques reemplazados por PRD 008, D8)*, pausa, turbo en el HUD, modo horizontal de la carrera nueva, cerrar las pistas abiertas y cambios en el multijugador.
+**Out of scope:** rivales, récords guardados, choques o daños *(choques reemplazados por PRD 008, D8)*, pausa, turbo en el HUD, modo horizontal de la carrera nueva, cerrar las pistas abiertas y cambios en el multijugador. *(Cerrar las pistas abiertas lo hace el PRD 014, D11.)*
 
 **No se modifican:** `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, los cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` ni `src/style.css`. *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9. `Juego`, `GestorOrientacion` y `ConfigPista*` quedan fuera de esta lista según el PRD 005, D9.)* *(`Carro` y `VisorDisenoPista` salen de esta lista según el PRD 006, D8; `VisorDisenoPista` y `src/style.css` —solo agregar estilos— según el PRD 007, D8.)* *(`CamaraSeguimiento`, `VisorBase` y `VisorDisenoPista` salen de esta lista según el PRD 009, D12: tamaño del carro y cámara.)* *(`FabricaObjetoEscena` y `ConfigPista*` cambian según el PRD 010, D9: árbol, poste y señal.)* *(`FabricaObjetoEscena` y `ConfigPista*` cambian también según el PRD 011, D11: señalética.)* *(`Ruta` cambia según el PRD 014, D9: cierre suave de las pistas abiertas.)*
 

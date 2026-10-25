@@ -41,7 +41,7 @@ Que Jugar Solo sea una carrera de verdad contra 4 rivales que manejan como perso
 
 **Lista única de lo que NO se modifica:**
 - La física: `Carro`, `ConstantesFisica` y las 6 físicas de carro. Los rivales las usan tal cual (el pedal es todo o nada; la dirección, gradual).
-- `CarreraVueltas`, `Cronometro`, `MuestraRuta`, `Ruta` y `DetectorSuperficie`: se crea una instancia por rival.
+- `CarreraVueltas`, `Cronometro`, `MuestraRuta`, `Ruta` y `DetectorSuperficie`: se crea una instancia por rival. *(`Ruta` entrega el recorrido con el camino de vuelta según el PRD 014, D11: los rivales lo siguen.)*
 - Los choques con árboles, postes y señales (PRD 008, 010 y 011).
 - La pista, sus objetos, el piso (PRD 012) y la señalética (PRD 011).
 - La cámara, los controles del jugador, los cielos y las reglas que ya existen en `src/style.css`.
