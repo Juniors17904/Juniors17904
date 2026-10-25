@@ -92,6 +92,7 @@ for (const [nombre, vp, recorrido] of [['vertical', { width: 390, height: 844 },
   check([m.acel, m.freno, m.timon, m.vel].every(b => dentro(b, m.W, m.H)), `RF-09 (${nombre}) nada se corta`);
   check(!solapa(m.vel, m.acel) && !solapa(m.vel, m.freno) && !solapa(m.vel, m.timon), `RF-09 (${nombre}) los controles no tapan el velocímetro`);
   check(m.zona && m.zona.x <= 0.5 && m.zona.w >= m.W / 3 - 1 && m.zona.b >= m.H - 0.5 && m.zona.r <= Math.max(m.W / 3, 200) + 1, `D3 (${nombre}) la zona de giro es el tercio izquierdo de abajo (${JSON.stringify(m.zona)})`);
+  check(m.zona && m.zona.x <= m.timon.x && m.zona.r >= m.timon.r && m.zona.y <= m.timon.y && m.zona.b >= m.timon.b, `D3 (${nombre}) la zona de giro nunca es más chica que el timón: lo contiene`);
   await page.screenshot({ path: `${CARPETA}/${nombre}.png` });
 
   // RF-01 / RF-02 / RF-03: un dedo arrastra en la zona, lejos del timón
@@ -110,15 +111,19 @@ for (const [nombre, vp, recorrido] of [['vertical', { width: 390, height: 844 },
   check(Math.abs(mitad.giro - 0.5) < 0.05, `RF-03 (${nombre}) la mitad del recorrido da la mitad del giro (${mitad.giro.toFixed(2)})`);
   check(dibujoAntes !== dibujoDespues, `RF-02 (${nombre}) el timón dibujado gira con el arrastre en la zona`);
 
+  const aspectoSuelto = await page.evaluate(() => { const c = getComputedStyle(document.getElementById('btn-acelerar')); return { fondo: c.backgroundColor, sombra: c.boxShadow }; });
   // RF-08: segundo dedo en ACEL mientras se gira
   const acel = { id: 2, x: (m.acel.x + m.acel.r) / 2, y: (m.acel.y + m.acel.b) / 2 };
   const girando = { ...inicio, x: inicio.x + recorrido };
   await tocar(cdp, 'touchStart', [girando, acel]);
   await esperar(250);
   const ambos = await entradas(page);
-  const apretado = await page.evaluate(() => { const b = document.getElementById('btn-acelerar'); return { clase: b.classList.contains('apretado'), transform: getComputedStyle(b).transform }; });
+  // Se espera a que termine la transición: hundido es una escala menor a 1
+  await page.waitForFunction(() => new DOMMatrix(getComputedStyle(document.getElementById('btn-acelerar')).transform).a < 0.95, null, { timeout: 3000 }).catch(() => {});
+  const apretado = await page.evaluate(() => { const b = document.getElementById('btn-acelerar'), c = getComputedStyle(b); return { clase: b.classList.contains('apretado'), escala: new DOMMatrix(c.transform).a, fondo: c.backgroundColor, sombra: c.boxShadow }; });
   check(ambos.acel === 1 && Math.abs(ambos.giro - 1) < 0.02, `RF-08 (${nombre}) con dos dedos gira y acelera a la vez (${JSON.stringify(ambos)})`);
-  check(apretado.clase && apretado.transform !== 'none', `RF-06 (${nombre}) ACEL apretado se ve hundido e iluminado (${apretado.transform})`);
+  check(apretado.clase && apretado.escala < 0.95, `RF-06 (${nombre}) ACEL apretado se ve hundido (escala ${apretado.escala.toFixed(2)})`);
+  check(apretado.fondo !== aspectoSuelto.fondo || apretado.sombra !== aspectoSuelto.sombra, `RF-06 (${nombre}) ACEL apretado se ve iluminado (${apretado.fondo})`);
   check(await page.evaluate(() => window.__vibraciones > 0), `RF-07 (${nombre}) vibra al empezar a acelerar`);
   if (nombre === 'vertical') await page.screenshot({ path: `${CARPETA}/vertical_girando_y_acelerando.png` });
   // Se suelta ACEL: el giro sigue (en el CDP, touchEnd suelta los dedos que se le pasan)
@@ -136,9 +141,29 @@ for (const [nombre, vp, recorrido] of [['vertical', { width: 390, height: 844 },
   await esperar(200);
   const sigue = await entradas(page);
   check(Math.abs(sigue.giro - 1) < 0.02, `RF-08 (${nombre}) un segundo dedo en la zona no endereza el timón (${sigue.giro.toFixed(2)})`);
+  // Al revés: con ACEL apretado se suelta el dedo que gira; el timón vuelve al centro y ACEL sigue
+  const acel2 = { ...acel, id: 4 };
+  await tocar(cdp, 'touchStart', [acel2]);
+  await esperar(100);
   await tocar(cdp, 'touchEnd', [girando]);
   await esperar(300);
-  check(Math.abs((await entradas(page)).giro) < 0.02, `(${nombre}) al soltar el dedo que gira, el timón vuelve al centro`);
+  const soloAcel = await entradas(page);
+  check(soloAcel.acel === 1 && Math.abs(soloAcel.giro) < 0.02, `RF-08 (${nombre}) al soltar el giro, ACEL sigue y el timón vuelve al centro (${JSON.stringify(soloAcel)})`);
+  await tocar(cdp, 'touchEnd', [acel2]);
+  await esperar(150);
+  // Girar y frenar a la vez; FRENO también se ve apretado
+  const gira2 = { id: 5, x: inicio.x, y: inicio.y };
+  const freno = { id: 6, x: (m.freno.x + m.freno.r) / 2, y: (m.freno.y + m.freno.b) / 2 };
+  await tocar(cdp, 'touchStart', [gira2]);
+  await tocar(cdp, 'touchMove', [{ ...gira2, x: gira2.x + recorrido }]);
+  await tocar(cdp, 'touchStart', [freno]);
+  await esperar(250);
+  const frenando = await entradas(page);
+  const frenoApretado = await page.evaluate(() => document.getElementById('btn-freno').classList.contains('apretado'));
+  check(frenando.acel === -1 && Math.abs(frenando.giro - 1) < 0.02 && frenoApretado, `RF-06/RF-08 (${nombre}) gira y frena a la vez, FRENO apretado (${JSON.stringify(frenando)})`);
+  await tocar(cdp, 'touchEnd', [freno]);
+  await tocar(cdp, 'touchEnd', [{ ...gira2, x: gira2.x + recorrido }]);
+  await esperar(150);
 
   const reales = erroresReales(errores);
   check(reales.length === 0, `(${nombre}) sin errores de consola ` + reales.join(' | '));

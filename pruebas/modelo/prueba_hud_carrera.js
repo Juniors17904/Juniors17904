@@ -28,7 +28,10 @@ ok(!textos.some(t=>t.includes('/5')),'RF-09: sin texto de posicion no dibuja pos
 textos.length=0;h.dibujar(2,3,'0:12.34',0.5,1,'2.º/5');ok(textos.includes('2.º/5'),'RF-09: dibuja la posicion 2.º/5 en la barra');llamadas.length=1;
 // PRD 016 (D5): en vertical el velocímetro sube encima de ACEL/FRENO apilados de 72 px (2·72 + 16 + 6 = 166 px)
 ok(llamadas.length==1&&llamadas[0][1]==334&&llamadas[0][2]==844-166-48&&llamadas[0][3]==40&&llamadas[0][5]==1,'PRD 016 D5 velocimetro encima de los pedales '+JSON.stringify(llamadas[0].slice(1)));
-window.innerWidth=1280;listeners.resize();ok(canvas.style.width=='1280px','PRD 015 D7: ventana más ancha que alta → horizontal, todo el ancho');
+// PRD 016 (D5): en horizontal (pedales de 88 px lado a lado) el velocímetro no baja de 176 px sobre el borde
+window.innerWidth=844;window.innerHeight=390;listeners.resize();llamadas.length=0;h.dibujar(2,3,'0:12.34',0.5,1);
+ok(llamadas.length==1&&llamadas[0][1]==844-56&&llamadas[0][2]==390-176,'PRD 016 D5 en horizontal el velocimetro queda a 176 px del borde '+JSON.stringify(llamadas[0]?.slice(1)));
+window.innerHeight=844;window.innerWidth=1280;listeners.resize();ok(canvas.style.width=='1280px','PRD 015 D7: ventana más ancha que alta → horizontal, todo el ancho');
 window.innerWidth=600;window.innerHeight=900;listeners.orientationchange();ok(canvas.style.width=='480px','PRD 015 D4: vertical ancho → columna de 480 (y escucha el giro)');
 window.innerWidth=390;window.innerHeight=844;listeners.resize();
 delete window.RenderizadorVelocimetro;h.dibujar(1,3,'0:00.00',0,0);ok(true,'sin renderizador no falla');
