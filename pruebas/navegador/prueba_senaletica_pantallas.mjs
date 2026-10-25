@@ -4,6 +4,10 @@
 //           con su borde de abajo a 0,9 m
 //   RF-06 → en Jugar Solo hay un arco de meta sobre la línea de meta, girado
 //           con la pista, con postes a 6,0 m del centro y 5,5 m de altura libre
+//           y lo mismo en las 5 pistas (con ConstructorCircuitoCarreraSolo, la
+//           misma pieza que usa Jugar Solo)
+//   RF-07 → el arco no cambia la carrera: el carro arranca, pasa bajo el arco
+//           sin chocar y la vuelta y el cronómetro siguen como siempre
 //   RF-08 → en Diseño de Objetos los arcos de meta y de salida tienen esas
 //           medidas y se ven completos al abrir
 //   RF-10 → el botón "Chevrón" ya no existe
@@ -118,9 +122,57 @@ const medirFlecha = page => page.evaluate(() => {
 
 const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
 
-// ── Jugar Solo: arco de meta (RF-06) y flechas (RF-01) ───────────────
+// ── RF-06 en las 5 pistas: el circuito de Jugar Solo pone el arco sobre la meta ──
 {
   const { page, errores } = await abrir(390, 844);
+  const pistas = await page.evaluate(async () => {
+    const THREE = window.__THREE;
+    const { Ruta } = await import('/src/model/ruta.js');
+    const { ConstructorCircuitoCarreraSolo } = await import('/src/view/pistas/carrera_solo/constructor_circuito_carrera_solo.js');
+    const resultado = [];
+    for (const nombre of ['ciudad', 'costa', 'desierto', 'montana', 'volcan']) {
+      const pista = window.registroPistas.obtener(nombre), ruta = new Ruta();
+      ruta.construir(pista.tramos, pista.totalSegs);
+      const escena = new THREE.Scene(), circuito = new ConstructorCircuitoCarreraSolo(escena);
+      circuito.construir(ruta.curve);
+      const arco = window.__objetos[window.__objetos.length - 1];
+      const g = arco._grupo; g.updateMatrixWorld(true);
+      const postes = [], cruces = [];
+      for (const hijo of g.children) {
+        const caja = new THREE.Box3().setFromObject(hijo);
+        if (caja.min.y < 0.01 && caja.max.y - caja.min.y > 3) postes.push(hijo.getWorldPosition(new THREE.Vector3()));
+        else cruces.push(caja.min.y);
+      }
+      const inicio = ruta.curve.getPointAt(0), tangente = ruta.curve.getTangentAt(0);
+      // Los postes, a 6 m a cada lado del inicio y en la línea perpendicular a la pista
+      const lados = postes.map(p => (p.x - inicio.x) * tangente.z - (p.z - inicio.z) * tangente.x);
+      const adelante = postes.map(p => (p.x - inicio.x) * tangente.x + (p.z - inicio.z) * tangente.z);
+      resultado.push({ nombre, clase: arco.constructor.name, lados, adelante, libre: Math.min(...cruces) });
+      circuito.liberar();
+    }
+    return resultado;
+  });
+  for (const p of pistas) {
+    check(p.clase === 'MetaEscena' && p.lados.length === 2 && p.lados.every(l => cerca(Math.abs(l), 6.0)) && p.lados[0] * p.lados[1] < 0
+      && p.adelante.every(a => cerca(a, 0, 0.05)) && cerca(p.libre, 5.5),
+      `RF-06 ${p.nombre}: arco sobre la meta, girado con la pista, postes a ${p.lados.map(l => l.toFixed(2))} m y altura libre ${p.libre.toFixed(2)} m`);
+  }
+  const reales = erroresReales(errores);
+  check(reales.length === 0, 'RF-06 las 5 pistas sin errores de consola ' + reales.join(' | '));
+  await page.close();
+}
+
+// ── Jugar Solo: arco de meta (RF-06), flechas (RF-01) y carrera igual (RF-07) ──
+{
+  const { page, errores } = await abrir(390, 844);
+  await page.evaluate(async () => {
+    const { Carro } = await import('/src/model/carros/carro.js');
+    const rebotar = Carro.prototype.rebotar;
+    window.__rebotes = 0;
+    Carro.prototype.rebotar = function (...a) { window.__rebotes++; return rebotar.apply(this, a); };
+    const formatear = window.Cronometro.prototype.formatear;
+    window.Cronometro.prototype.formatear = function (ms) { window.__tiempo = ms; return formatear.call(this, ms); };
+  });
   await clic(page, 'btn-solo');
   await page.waitForTimeout(3500);
   const arco = await medirArco(page, 'MetaEscena');
@@ -162,6 +214,17 @@ const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
   check(flecha && cerca(flecha.ancho, 2.4, 1e-6) && cerca(flecha.alto, 0.8, 1e-6) && cerca(flecha.grosor, 0.03, 1e-6) && cerca(flecha.abajo, 0.9, 1e-6),
     `RF-01 Jugar Solo: ${flecha?.cuantas} flechas con tablero de ${flecha?.ancho} × ${flecha?.alto} × ${flecha?.grosor} m, borde de abajo a ${flecha?.abajo?.toFixed(2)} m`);
   await page.screenshot({ path: `${CARPETA}/jugar_solo_arco_meta.png` });
+  // RF-07: arranca bajo el arco y sigue derecho: no choca, la vuelta y el reloj siguen
+  // La carrera ya arrancó cuando el cronómetro corre
+  const ya = await page.waitForFunction(() => (window.__tiempo ?? 0) > 0, null, { timeout: 15000 }).then(() => true, () => false);
+  const t0 = await page.evaluate(() => window.__tiempo ?? 0);
+  await page.keyboard.down('ArrowUp');
+  await page.waitForTimeout(2500);
+  await page.keyboard.up('ArrowUp');
+  const carrera = await page.evaluate(() => ({ rebotes: window.__rebotes, tiempo: window.__tiempo,
+    pantalla: document.querySelector('.pantalla.activa')?.id }));
+  check(ya && carrera.rebotes === 0 && carrera.tiempo > t0 + 2000 && carrera.pantalla === 'pantalla-carrera-solo',
+    `RF-07 el carro pasa bajo el arco sin chocar (${carrera.rebotes} choques) y el cronómetro sigue (${t0} → ${carrera.tiempo} ms)`);
   // Salir de Jugar Solo libera las flechas y el arco sin errores
   await page.goBack(); await page.waitForTimeout(800);
   const activa = await page.evaluate(() => document.querySelector('.pantalla.activa')?.id);
