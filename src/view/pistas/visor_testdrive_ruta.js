@@ -4,6 +4,8 @@ import { Ruta } from '../../model/ruta.js';
 import { Carro } from '../../model/carros/carro.js';
 import { RegistroCarros } from '../../model/carros/registro_carros.js';
 import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
+import { ConstructorPisoPista } from './comun/constructor_piso_pista.js';
+import { TrazadoPisoCurva } from './comun/trazado_piso_curva.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { CieloSoleado }  from '../cielo_soleado.js';
 import { CieloNocturno } from '../cielo_nocturno.js';
@@ -25,6 +27,7 @@ class VisorTestdriveRuta extends VisorBase {
     #camAereaActiva = false;
     #conductor = new ConductorPasoFijo(carro => this.#seguirRuta(carro));
     #medidas = new window.MedidasEscena(); #giroRuedas = 6;   // escala real (PRD 009)
+    #piso     = null;   // ConstructorPisoPista (PRD 012)
     #dirLine  = null;
     #camPunto = null;
 
@@ -159,99 +162,13 @@ class VisorTestdriveRuta extends VisorBase {
         const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
         const grass = new THREE.Mesh(new THREE.PlaneGeometry(3000, 3000), grassMat);
         grass.rotation.x = -Math.PI / 2;
-        grass.position.y = -0.01;
+        grass.position.y = 0;
         grass.receiveShadow = true;
         this.#scene.add(grass);
 
-        const DIV = 800;
-        const cp  = curve.getPoints(DIV); // DIV+1 puntos, cp[DIV]=cp[0] para cerrar el loop
-
-        const _perp = i => {
-            const a = cp[i], b = cp[(i + 1) % cp.length];
-            let tx = b.x - a.x, tz = b.z - a.z;
-            let L  = Math.sqrt(tx*tx + tz*tz);
-            if (L < 0.0001) {
-                const prev = cp[(i - 1 + cp.length) % cp.length];
-                tx = a.x - prev.x; tz = a.z - prev.z;
-                L = Math.sqrt(tx*tx + tz*tz) || 1;
-            }
-            return { px: -tz/L, pz: tx/L };
-        };
-
-        const _ribbon = (lo, ro, y, i0, i1) => {
-            const pos = [], nor = [], uv = [], idx = [];
-            for (let i = i0; i <= i1; i++) {
-                const q = cp[i % cp.length];
-                const { px, pz } = _perp(i % cp.length);
-                const u = (i - i0) / (i1 - i0 || 1);
-                pos.push(q.x + px*lo, y, q.z + pz*lo, q.x + px*ro, y, q.z + pz*ro);
-                nor.push(0,1,0, 0,1,0);
-                uv.push(0,u, 1,u);
-            }
-            for (let i = 0; i < i1 - i0; i++) {
-                const a=i*2, b=a+1, c=a+2, d=a+3;
-                idx.push(a,c,b, b,c,d);
-            }
-            const g = new THREE.BufferGeometry();
-            g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
-            g.setAttribute('normal',   new THREE.Float32BufferAttribute(nor, 3));
-            g.setAttribute('uv',       new THREE.Float32BufferAttribute(uv, 2));
-            g.setIndex(idx);
-            return g;
-        };
-
-        const roadMat = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85, side: THREE.DoubleSide });
-        const M = this.#medidas.medioAnchoAsfalto;
-        const road = new THREE.Mesh(_ribbon(-M, M, 0, 0, DIV), roadMat);
-        road.receiveShadow = true;
-        this.#scene.add(road);
-
-        const curbW  = this.#medidas.anchoPiano;
-        const BAND   = 10;
-        const redMat = new THREE.MeshStandardMaterial({ color: 0xff3333, roughness: 0.7, side: THREE.DoubleSide });
-        const whtMat = new THREE.MeshStandardMaterial({ color: 0xfafafa, roughness: 0.7, side: THREE.DoubleSide });
-
-        const _buildCurbs = (lo, ro) => {
-            const rPos=[], rNor=[], rIdx=[], wPos=[], wNor=[], wIdx=[];
-            for (let b = 0; b * BAND <= DIV; b++) {
-                const i0 = b * BAND, i1 = Math.min((b+1)*BAND, DIV);
-                const pos = b%2===0 ? rPos : wPos;
-                const nor = b%2===0 ? rNor : wNor;
-                const idx = b%2===0 ? rIdx : wIdx;
-                const v0  = pos.length / 3;
-                for (let i = i0; i <= i1; i++) {
-                    const q = cp[i % cp.length];
-                    const { px, pz } = _perp(i % cp.length);
-                    pos.push(q.x + px*lo, 0.04, q.z + pz*lo);
-                    pos.push(q.x + px*ro, 0.04, q.z + pz*ro);
-                    nor.push(0,1,0, 0,1,0);
-                }
-                for (let j = 0; j < i1-i0; j++) {
-                    const a=v0+j*2, b2=a+1, c=a+2, d=a+3;
-                    idx.push(a,c,b2, b2,c,d);
-                }
-            }
-            const _geo = (p, n, i) => {
-                const g = new THREE.BufferGeometry();
-                g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
-                g.setAttribute('normal',   new THREE.Float32BufferAttribute(n, 3));
-                g.setIndex(i);
-                return g;
-            };
-            if (rPos.length) this.#scene.add(new THREE.Mesh(_geo(rPos,rNor,rIdx), redMat));
-            if (wPos.length) this.#scene.add(new THREE.Mesh(_geo(wPos,wNor,wIdx), whtMat));
-        };
-        _buildCurbs(-M-curbW, -M);
-        _buildCurbs(M, M+curbW);
-
-        const dashMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const DASH = 10, GAP = 10;
-        for (let i = 0; i < DIV; i += DASH+GAP) {
-            this.#scene.add(new THREE.Mesh(_ribbon(-0.12, 0.12, 0.005, i, Math.min(i+DASH, DIV)), dashMat));
-        }
-
-        const finMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        this.#scene.add(new THREE.Mesh(_ribbon(-M, M, 0.015, 0, 5), finMat));
+        // Piso de la pista (asfalto, pianos, líneas y meta): pieza compartida (PRD 012)
+        this.#piso = new ConstructorPisoPista(new TrazadoPisoCurva(curve), 0, 0x3a3a3a);
+        this.#scene.add(this.#piso.construir());
     }
 
     // ── Cargar auto ──────────────────────────────────────────────
@@ -304,6 +221,7 @@ class VisorTestdriveRuta extends VisorBase {
             this.#resizeHandler = null;
         }
         this.#cielo?.destruir(this.#scene); this.#cielo = null;
+        this.#piso?.liberar(); this.#piso = null;
         this.#renderer?.dispose(); this.#renderer = null;
     }
 
@@ -382,7 +300,7 @@ class VisorTestdriveRuta extends VisorBase {
         this.#conductor.avanzar(marca, this.entradaAcel, this.entradaDireccion);
 
         if (this.#carGroup) {
-            this.#carGroup.position.set(this.#mov.px, 0, this.#mov.pz);
+            this.#carGroup.position.set(this.#mov.px, this.#medidas.alturaAsfalto, this.#mov.pz);
             this.#carGroup.rotation.y = this.#mov.rotY;
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#mov.carLean;

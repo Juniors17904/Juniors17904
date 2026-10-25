@@ -100,10 +100,11 @@ class PruebaEscalaCarroPista {
 
     #probarSinRepetir() {
         const archivos = {
-            'src/view/pistas/carrera_solo/constructor_circuito_carrera_solo.js': /#MEDIO_ANCHO|#ANCHO_PIANO/,
-            'src/view/pistas/diseno_pista/malla_pista_diseno.js':                 /#ANCHO_PIANO|cinta\(-4, 4/,
-            'src/view/pistas/visor_testdrive_recto.js':                          /PlaneGeometry\(8,|3\.9|4\.35|4\.7|9\.5|> 3\.8/,
-            'src/view/pistas/visor_testdrive_ruta.js':                           /_ribbon\(-4, 4|curbW *= 0\.7|3\.8/,
+            // PRD 012 RNF-01: ninguna pantalla repite medidas del piso (anchos, alturas, líneas, meta)
+            'src/view/pistas/carrera_solo/constructor_circuito_carrera_solo.js': /#MEDIO_ANCHO|#ANCHO_PIANO|0\.44|0\.22|0\.04/,
+            'src/view/pistas/diseno_pista/malla_pista_diseno.js':                 /#ANCHO_PIANO|cinta\(|0\.22|0\.04/,
+            'src/view/pistas/visor_testdrive_recto.js':                          /PlaneGeometry\(8,|3\.9|4\.35|4\.7|9\.5|> 3\.8|0\.18|0\.14|BoxGeometry\(piano/,
+            'src/view/pistas/visor_testdrive_ruta.js':                           /_ribbon|_buildCurbs|curbW|3\.8|0\.24|0\.12/,
             'src/view/minimapas/recorrido_test_drive_recto.js':                  /3\.8/,
             'src/model/superficies/detector_superficie.js':                      /= 4;|= 4\.7/,
             'src/model/choques/detector_choques.js':                             /RADIO_CARRO|LARGO_BASICO|ANCHO_BASICO|= 4\.5|2\.07/,
@@ -117,6 +118,20 @@ class PruebaEscalaCarroPista {
             this.#ok(/escala/.test(texto), `RF-07 ${archivo} ajusta la cámara al carro`);
         }
         this.#ok(/medidaCarro\(/.test(this.#leer('src/view/visor3d.js')), 'RF-10 la vista previa usa el largo real');
+        // PRD 012 RF-08 / D9: las 5 pantallas dibujan el piso con la misma pieza
+        const usanPieza = {
+            'src/view/pistas/carrera_solo/constructor_circuito_carrera_solo.js': 'Jugar Solo',
+            'src/view/pistas/diseno_pista/malla_pista_diseno.js':                 'Diseño General',
+            'src/view/pistas/visor_testdrive_ruta.js':                           'Test Drive con ruta y Diseño de Pistas',
+            'src/view/pistas/visor_testdrive_recto.js':                          'Test Drive recto',
+        };
+        for (const [archivo, pantalla] of Object.entries(usanPieza)) {
+            this.#ok(/new ConstructorPisoPista\(/.test(this.#leer(archivo)), `PRD 012 RF-08 ${pantalla} usa ConstructorPisoPista`);
+        }
+        this.#ok(/extends VisorTestdriveRuta/.test(this.#leer('src/view/pistas/visor_carrera_urbana.js')), 'PRD 012 RF-08 Diseño de Pistas hereda el piso de la ruta');
+        for (const borrado of ['src/view/pistas/geometria_cinta.js', 'src/view/pistas/perpendicular_ruta.js']) {
+            this.#ok(!fs.existsSync(path.join(PruebaEscalaCarroPista.#RAIZ, borrado)), `PRD 012 D9 ${borrado} se borró (sin uso)`);
+        }
         for (const archivo of ['src/view/pistas/visor_testdrive_recto.js', 'src/view/pistas/visor_testdrive_ruta.js', 'src/view/minimapas/recorrido_test_drive_recto.js']) {
             this.#ok(/limiteSuave/.test(this.#leer(archivo)), `RF-11 ${archivo} usa el límite de MedidasEscena`);
         }

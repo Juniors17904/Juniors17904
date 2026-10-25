@@ -7,6 +7,7 @@
 //   - Ancho del asfalto y del piano, y los bordes que salen de ellos.
 //   - Medidas del árbol, el poste y la señal de curva, y la distancia de
 //     postes y señales a la pista (PRD 010, D3, D5 y D6).
+//   - Alturas y líneas del piso de la pista (PRD 012, D8).
 //   La usan la vista (carro, pista, objetos, cámara, minimapa) y el modelo
 //   (DetectorSuperficie, DetectorChoques, objetos sólidos y pistas).
 // ================================================================
@@ -30,6 +31,17 @@ class MedidasEscena {
     static #LADO_CARTEL_SENAL   = 0.7;
     static #GROSOR_CARTEL_SENAL = 0.03;
     static #DISTANCIA_POSTES_Y_SENALES = 6.0;   // del centro de la pista (PRD 010, D5)
+
+    // Piso de la pista (PRD 012): el pasto queda a nivel 0
+    static #ALTURA_ASFALTO       = 0.08;  // el asfalto, sobre el pasto
+    static #ALTURA_PIANO         = 0.08;  // borde exterior del piano, sobre el asfalto
+    static #LARGO_FRANJA_PIANO   = 1;     // franjas rojas y blancas
+    static #ANCHO_LINEA_CENTRAL  = 0.15;
+    static #TRAZO_LINEA_CENTRAL  = 3;
+    static #HUECO_LINEA_CENTRAL  = 6;
+    static #ANCHO_LINEA_BORDE    = 0.15;
+    static #LARGO_META           = 1;
+    static #LADO_CUADRO_META     = 0.5;
 
     // Largo real (D3) y proporciones ancho/largo y alto/largo de cada modelo GLB
     #carros = new Map([
@@ -66,6 +78,18 @@ class MedidasEscena {
 
     // Metros del centro de la pista a postes y señales de curva
     get distanciaPostesYSenales() { return MedidasEscena.#DISTANCIA_POSTES_Y_SENALES; }
+
+    // Piso de la pista (PRD 012). El carro va a la altura del asfalto; los
+    // objetos de la pista, sobre el pasto (nivel 0).
+    get alturaAsfalto()     { return MedidasEscena.#ALTURA_ASFALTO; }
+    get alturaPiano()       { return MedidasEscena.#ALTURA_PIANO; }
+    get largoFranjaPiano()  { return MedidasEscena.#LARGO_FRANJA_PIANO; }
+    get anchoLineaCentral() { return MedidasEscena.#ANCHO_LINEA_CENTRAL; }
+    get trazoLineaCentral() { return MedidasEscena.#TRAZO_LINEA_CENTRAL; }
+    get huecoLineaCentral() { return MedidasEscena.#HUECO_LINEA_CENTRAL; }
+    get anchoLineaBorde()   { return MedidasEscena.#ANCHO_LINEA_BORDE; }
+    get largoMeta()         { return MedidasEscena.#LARGO_META; }
+    get ladoCuadroMeta()    { return MedidasEscena.#LADO_CUADRO_META; }
 
     // Sin tipo o con un tipo desconocido se usan las del deportivo (carro básico)
     medidaCarro(tipo) {

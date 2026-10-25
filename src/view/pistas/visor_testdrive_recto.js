@@ -3,6 +3,8 @@ import * as THREE from 'three';
 import { Carro } from '../../model/carros/carro.js';
 import { RegistroCarros } from '../../model/carros/registro_carros.js';
 import { ConductorPasoFijo } from './comun/conductor_paso_fijo.js';
+import { ConstructorPisoPista } from './comun/constructor_piso_pista.js';
+import { TrazadoPisoRecto } from './comun/trazado_piso_recto.js';
 import { CamaraSeguimiento as CamaraChase } from '../camaras/camara_seguimiento.js';
 import { VisorBase } from '../visor_base.js';
 import { CieloSoleado } from '../cielo_soleado.js';
@@ -18,6 +20,7 @@ class VisorTestdriveRecto extends VisorBase {
     #conductor = new ConductorPasoFijo(carro => this.#limitarPista(carro));
     #medidas   = new window.MedidasEscena();   // escala real (PRD 009)
     #giroRuedas = 6;
+    #piso = null;   // asfalto, pianos, líneas y meta (PRD 012)
     #leanGroup = null;
     #wheels = [];
 
@@ -83,6 +86,8 @@ class VisorTestdriveRecto extends VisorBase {
         }
         this.#cielo?.destruir(this.#scene);
         this.#cielo = null;
+        this.#piso?.liberar();
+        this.#piso = null;
         this.#renderer?.dispose();
         this.#renderer = null;
     }
@@ -124,69 +129,20 @@ class VisorTestdriveRecto extends VisorBase {
         this.#buildRoad();
     }
 
+    // Pasto a nivel 0; el piso (asfalto 8 cm arriba, pianos, líneas y meta a
+    // cuadros) lo dibuja ConstructorPisoPista sobre una recta abierta (PRD 012)
     #buildRoad() {
         const L = 2000;
 
-        const road = new THREE.Mesh(
-            new THREE.PlaneGeometry(2 * this.#medidas.medioAnchoAsfalto, L),
-            new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.85 })
-        );
-        road.rotation.x = -Math.PI / 2;
-        road.receiveShadow = true;
-        this.#scene.add(road);
+        const g = new THREE.Mesh(new THREE.PlaneGeometry(408, L),
+            new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 }));
+        g.rotation.x = -Math.PI / 2;
+        g.receiveShadow = true;
+        this.#scene.add(g);
 
-        const grassMat = new THREE.MeshStandardMaterial({ color: 0x3d7a3d, roughness: 0.9 });
-        for (const side of [-1, 1]) {
-            const g = new THREE.Mesh(new THREE.PlaneGeometry(200, L), grassMat);
-            g.rotation.x = -Math.PI / 2;
-            g.position.set(side * 104, -0.01, 0);
-            g.receiveShadow = true;
-            this.#scene.add(g);
-        }
-
-        const edgeMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        for (const side of [-1, 1]) {
-            const line = new THREE.Mesh(new THREE.PlaneGeometry(0.18, L), edgeMat);
-            line.rotation.x = -Math.PI / 2;
-            line.position.set(side * this.#medidas.lineaBorde, 0.01, 0);
-            this.#scene.add(line);
-        }
-
-        const dc = document.createElement('canvas');
-        dc.width = 16; dc.height = 128;
-        dc.getContext('2d').fillStyle = '#ffff88';
-        dc.getContext('2d').fillRect(0, 0, 16, 64);
-        const dTex = new THREE.CanvasTexture(dc);
-        dTex.wrapT = THREE.RepeatWrapping;
-        dTex.repeat.set(1, L / 8);
-        const centerLine = new THREE.Mesh(
-            new THREE.PlaneGeometry(0.14, L),
-            new THREE.MeshBasicMaterial({ map: dTex, transparent: true })
-        );
-        centerLine.rotation.x = -Math.PI / 2;
-        centerLine.position.y = 0.01;
-        this.#scene.add(centerLine);
-
-        const segLen = 3, nSegs = Math.floor(L / segLen);
-        const piano   = this.#medidas.anchoPiano, centroPiano = this.#medidas.medioAnchoAsfalto + piano / 2;
-        const curbGeo = new THREE.BoxGeometry(piano, 0.06, segLen - 0.05);
-        const iRed = new THREE.InstancedMesh(curbGeo, new THREE.MeshStandardMaterial({ color: 0xff3333 }), nSegs);
-        const iWht = new THREE.InstancedMesh(curbGeo, new THREE.MeshStandardMaterial({ color: 0xfafafa }), nSegs);
-        const dummy = new THREE.Object3D();
-        let ri = 0, wi = 0;
-        for (let i = 0; i < nSegs; i++) {
-            const z = -L / 2 + i * segLen + segLen / 2;
-            for (const side of [-1, 1]) {
-                dummy.position.set(side * centroPiano, 0.03, z);
-                dummy.updateMatrix();
-                if (i % 2 === 0) iRed.setMatrixAt(ri++, dummy.matrix);
-                else             iWht.setMatrixAt(wi++, dummy.matrix);
-            }
-        }
-        iRed.count = ri; iWht.count = wi;
-        iRed.instanceMatrix.needsUpdate = true;
-        iWht.instanceMatrix.needsUpdate = true;
-        this.#scene.add(iRed, iWht);
+        // La meta a cuadros va en z = 700: 1700 m desde el inicio de la recta (z = -1000)
+        this.#piso = new ConstructorPisoPista(new TrazadoPisoRecto(L, -L / 2), 700 + L / 2, 0x3a3a3a);
+        this.#scene.add(this.#piso.construir());
 
         this.#addStartArch(50);
         this.#addFinishArch(700);
@@ -228,10 +184,12 @@ class VisorTestdriveRecto extends VisorBase {
         sign.position.set(0, 5.5, z - 0.12);
         this.#scene.add(sign);
 
-        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        // Pegada al asfalto: no parpadea por el orden de dibujo, no por subirla (PRD 012, RF-09)
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 });
         const line = new THREE.Mesh(new THREE.PlaneGeometry(2 * this.#medidas.medioAnchoAsfalto, 0.5), lineMat);
         line.rotation.x = -Math.PI / 2;
-        line.position.set(0, 0.02, z);
+        line.renderOrder = 2;
+        line.position.set(0, this.#medidas.alturaAsfalto, z);
         this.#scene.add(line);
     }
 
@@ -282,24 +240,6 @@ class VisorTestdriveRecto extends VisorBase {
         );
         sign.position.set(0, 5.9, z - 0.12);
         this.#scene.add(sign);
-
-        const rc = document.createElement('canvas');
-        rc.width = 128; rc.height = 128;
-        const rx = rc.getContext('2d');
-        for (let cx = 0; cx < rc.width; cx += sq) {
-            for (let cy = 0; cy < rc.height; cy += sq) {
-                rx.fillStyle = (Math.floor(cx / sq) + Math.floor(cy / sq)) % 2 === 0 ? '#111' : '#fff';
-                rx.fillRect(cx, cy, sq, sq);
-            }
-        }
-        const rTex = new THREE.CanvasTexture(rc);
-        const roadLine = new THREE.Mesh(
-            new THREE.PlaneGeometry(2 * this.#medidas.medioAnchoAsfalto, 1.2),
-            new THREE.MeshBasicMaterial({ map: rTex })
-        );
-        roadLine.rotation.x = -Math.PI / 2;
-        roadLine.position.set(0, 0.02, z);
-        this.#scene.add(roadLine);
     }
 
     #setCar(gltf, tipo, color) {
@@ -344,7 +284,7 @@ class VisorTestdriveRecto extends VisorBase {
         this.#conductor.avanzar(marca, this.entradaAcel, this.entradaDireccion);
 
         if (this.#carGroup) {
-            this.#carGroup.position.set(this.#carro.px, 0, this.#carro.pz);
+            this.#carGroup.position.set(this.#carro.px, this.#medidas.alturaAsfalto, this.#carro.pz);
             this.#carGroup.rotation.y = this.#carro.rotY;
         }
         if (this.#leanGroup) this.#leanGroup.rotation.z = this.#carro.carLean;

@@ -353,7 +353,7 @@ class VisorCarreraSolo extends VisorBase {
     #sincronizarCarroYCamara() {
         if (!this.#carro) return;
         if (this.#grupoCarro) {
-            this.#grupoCarro.position.set(this.#carro.px, 0, this.#carro.pz);
+            this.#grupoCarro.position.set(this.#carro.px, this.#medidas.alturaAsfalto, this.#carro.pz);
             this.#grupoCarro.rotation.y = this.#carro.rotY;
         }
         if (this.#grupoInclina) this.#grupoInclina.rotation.z = this.#carro.carLean;
