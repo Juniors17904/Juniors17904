@@ -7,6 +7,24 @@
 - **TODO el código fuente en español**: nombres de clases, archivos, métodos y atributos en español
 - Solo se permite inglés en: APIs externas (Three.js, Supabase), nombres de librerías, acrónimos universales (HUD, SUV, F1)
 
+## 🗂️ FORMA DE RESPONDER — acordada con el usuario el 2026-10-25
+
+Vale para esta y para todas las conversaciones. El usuario tiene que ubicar rápido qué se hizo, qué se sugiere y qué decisión le toca.
+
+**Cada respuesta va con títulos (`##`)**, solo las secciones que hagan falta y en este orden:
+
+1. **Resumen** — una o dos líneas con lo más importante.
+2. **Qué hice** — lo que cambió, en viñetas cortas.
+3. **Problemas** — lo que falló o falta, dicho claro.
+4. **Decisión que necesito de ti** — opciones con letra (A, B, C) y cuál se recomienda.
+5. **Siguiente paso** — una sola pregunta al final.
+
+**Reglas:**
+- Frases cortas y palabras simples, sin jerga.
+- Si no hay nada que decidir, esa sección no aparece.
+- Si hay que preguntar o avisar algo, va en su propio título; nunca escondido dentro de un párrafo.
+- La pregunta del final y el párrafo de conclusión de cada cambio de código (ver más abajo) siguen valiendo y entran en estas secciones.
+
 ## Reglas de código — CRÍTICAS
 - NUNCA modificar, editar, crear ni borrar código sin que el usuario use palabras de acción explícitas:
   hazlo, impleméntalo, cámbialo, ponlo, agrégalo, modifica, arréglalo, crea, borra, actualiza, pushealo, commitea, aplícalo
