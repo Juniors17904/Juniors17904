@@ -9,6 +9,8 @@
 //   RF-10 → el botón "Chevrón" ya no existe
 //   Opción A (aprobada): en Jugar Solo no se dibuja un poste de alumbrado
 //           dentro de un poste del arco (en Ciudad caen en el mismo lugar)
+//   Salir de Jugar Solo y cambiar de objeto en Diseño de Objetos después de la
+//   flecha funciona (la flecha tiene una lista de materiales: se liberan todos).
 //   Sin errores de consola (lección 8). Capturas en /tmp/capturas_prd011/
 //   (lecciones 13 y 16): arco en Jugar Solo, arcos y flecha de frente y de costado.
 // ================================================================
@@ -140,6 +142,13 @@ const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
     const medio = [(ax + bx) / 2, (az + bz) / 2];
     check(cerca(ancho, 12, 0.05) && Math.hypot(medio[0] - meta[0], medio[1] - meta[1]) < 0.6,
       `RF-06 Jugar Solo: el arco cruza la pista de lado a lado, centrado en la meta (${ancho.toFixed(2)} m entre postes)`);
+    // Girado con la pista: el arco mira hacia donde mira el carro en la largada (aún en la cuenta)
+    const rumboCarro = await page.evaluate(() => {
+      const g = window.__pisos[window.__pisos.length - 1], h = new window.MedidasEscena().alturaAsfalto;
+      return g.parent.children.find(c => c !== g && c.isGroup && c.children.length && Math.abs(c.position.y - h) < 1e-6)?.rotation.y;
+    });
+    const giro = Math.abs(Math.atan2(Math.sin(arco.rotY - rumboCarro), Math.cos(arco.rotY - rumboCarro)));
+    check(giro < 0.05, `RF-06 Jugar Solo: el arco está girado con la pista (diferencia con el rumbo de largada ${giro.toFixed(3)} rad)`);
   }
   // Ningún poste de alumbrado dibujado dentro de un poste del arco
   const encimados = await page.evaluate(() => {
@@ -153,8 +162,12 @@ const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
   check(flecha && cerca(flecha.ancho, 2.4, 1e-6) && cerca(flecha.alto, 0.8, 1e-6) && cerca(flecha.grosor, 0.03, 1e-6) && cerca(flecha.abajo, 0.9, 1e-6),
     `RF-01 Jugar Solo: ${flecha?.cuantas} flechas con tablero de ${flecha?.ancho} × ${flecha?.alto} × ${flecha?.grosor} m, borde de abajo a ${flecha?.abajo?.toFixed(2)} m`);
   await page.screenshot({ path: `${CARPETA}/jugar_solo_arco_meta.png` });
+  // Salir de Jugar Solo libera las flechas y el arco sin errores
+  await page.goBack(); await page.waitForTimeout(800);
+  const activa = await page.evaluate(() => document.querySelector('.pantalla.activa')?.id);
+  check(activa !== 'pantalla-carrera-solo', `salir de Jugar Solo funciona (pantalla: ${activa})`);
   const reales = erroresReales(errores);
-  check(reales.length === 0, 'Jugar Solo sin errores de consola ' + reales.join(' | '));
+  check(reales.length === 0, 'Jugar Solo sin errores de consola (también al salir) ' + reales.join(' | '));
   await page.close();
 }
 
@@ -191,6 +204,25 @@ for (const [nombreVista, ancho, alto] of [['vertical', 390, 844], ['horizontal',
     await page.waitForTimeout(600);
     await page.screenshot({ path: `${CARPETA}/diseno_objetos_flecha_costado.png` });
   }
+  // Después de la flecha, elegir otro objeto la saca de la escena
+  await clic(page, 'do-sel-meta'); await page.waitForTimeout(900);
+  const despues = await page.evaluate(() => ({
+    ultimo: window.__objetos[window.__objetos.length - 1]?.constructor.name,
+    flechas: window.__objetos.filter(o => o.constructor.name === 'FlechaCurvaEscena' && o._grupo?.parent).length,
+  }));
+  check(despues.ultimo === 'MetaEscena' && despues.flechas === 0,
+    `(${nombreVista}) después de la flecha se puede elegir la meta (${despues.ultimo}, flechas en escena: ${despues.flechas})`);
+  // RF-09: el cartel de aviso dibujado mide 3 m de palo y 1,4 × 0,75 m, con grosor
+  await clic(page, 'do-sel-aviso'); await page.waitForTimeout(900);
+  const aviso = await page.evaluate(() => {
+    const THREE = window.__THREE, obj = window.__objetos[window.__objetos.length - 1];
+    if (obj?.constructor.name !== 'AvisoEscena') return null;
+    const cajas = obj._grupo.children.map(h => new THREE.Box3().setFromObject(h).getSize(new THREE.Vector3()));
+    return { palo: Math.max(...cajas.map(c => c.y)), ancho: Math.max(...cajas.map(c => c.x)),
+             alto: Math.max(...cajas.filter(c => c.y < 1).map(c => c.y)), grosor: Math.min(...cajas.map(c => c.z)) };
+  });
+  check(aviso && cerca(aviso.palo, 3) && cerca(aviso.ancho, 1.4) && cerca(aviso.alto, 0.75) && aviso.grosor > 0,
+    `RF-09 (${nombreVista}) aviso con palo de ${aviso?.palo.toFixed(2)} m y cartel de ${aviso?.ancho.toFixed(2)} × ${aviso?.alto.toFixed(2)} m, grosor ${aviso?.grosor.toFixed(2)} m`);
   const reales = erroresReales(errores);
   check(reales.length === 0, `(${nombreVista}) Diseño de Objetos sin errores de consola ` + reales.join(' | '));
   await page.close();

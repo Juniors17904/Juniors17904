@@ -37,9 +37,16 @@ export class ObjetoEscena {
     destruir(scene) {
         if (!this._grupo) return;
         scene.remove(this._grupo);
+        // Una malla puede tener un material o una lista (una por cara, como el
+        // tablero de la flecha); se liberan también sus texturas
         this._grupo.traverse(child => {
             child.geometry?.dispose();
-            child.material?.dispose();
+            const materiales = Array.isArray(child.material) ? child.material : [child.material];
+            for (const material of materiales) {
+                material?.map?.dispose();
+                material?.emissiveMap?.dispose();
+                material?.dispose();
+            }
         });
         this._grupo = null;
     }
