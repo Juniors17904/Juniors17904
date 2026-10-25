@@ -22,7 +22,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D6 | Usuarios | **Se nota el toque:** el botón apretado se ilumina y se ve hundido; si el celular lo permite, vibra muy corto al empezar a acelerar o frenar. |
 | D7 | Usuarios | **Todo a la vez:** se puede girar con un dedo y acelerar o frenar con otro, sin que uno corte al otro. |
 | D8 | Usuarios | Los controles no tapan el velocímetro, la posición ni el tiempo, y nada se corta en ningún diseño. |
-| D9 | Técnico | El tamaño y el lugar de los controles los define cada diseño (`DisenoVertical` y `DisenoHorizontal`, PRD 015), así hay un solo lugar para cambiarlos. Lo nuevo va en clases aparte; ningún archivo pasa de 400 líneas. |
+| D9 | Técnico | El tamaño y el lugar de los controles los define cada diseño (`DisenoVertical` y `DisenoHorizontal`, PRD 015), así hay un solo lugar para cambiarlos. Lo nuevo va en clases aparte; ningún archivo pasa de 400 líneas. *(v3: la zona de giro y la altura mínima del velocímetro son iguales en los dos diseños, por eso viven en el CSS de la zona y en `HudCarrera`.)* |
 | D10 | Técnico | Pruebas en navegador real en 390×844 y 844×390: tamaño mínimo de cada control, zona de giro, toques a la vez y capturas. |
 | D11 | Dominio | **Reemplaza:** del PRD 001, su D10 (ubicación de ACEL y FRENO; su tamaño está en `index.html` y `src/style.css`) y `ControlTimon` y `src/style.css` en su lista. Del PRD 002, "cambiar los elementos dibujados en 2D" en su Out of scope, los timones, "todas las clases de la carrera 3D", "los elementos dibujados en 2D" y `src/style.css` en su lista, y su criterio 5 ("funcionan igual que antes"), solo para los controles de Jugar Solo. De los PRD 004 y 005, "el comportamiento y el aspecto del juego" (solo los controles de Jugar Solo); del PRD 005, también los timones (`ControlTimon`). Del PRD 015, su D4, su RF-01 y "el diseño vertical" en su lista (en vertical los controles crecen) y "solo cambia su ubicación, no su dibujo" de su D12; también crece la interfaz de `DisenoCarrera`. `HudCarrera` (PRD 006 y 009 a 014): el velocímetro se ubica según el alto de los controles de cada diseño. De los PRD 006, 007, 008, 009 y 013, `ControlTimon` y los controles del jugador en sus listas. De los PRD 002 y 004 a 014, `src/style.css` (solo los estilos de los controles de Jugar Solo). Esos PRD llevan una nota que lo indica. *(v2: completa)* |
 
@@ -56,7 +56,7 @@ Que manejar en Jugar Solo sea cómodo e intuitivo en el celular, en vertical y e
 | Pedales | ACEL y FRENO lado a lado, en horizontal (D5). |
 
 ## 6. Requerimientos funcionales
-- **RF-01 (D3):** tocar y arrastrar en cualquier parte del tercio izquierdo de abajo de la pantalla gira el carro, aunque no se toque el dibujo del timón.
+- **RF-01 (D3):** tocar y arrastrar en cualquier parte del tercio izquierdo de abajo de la pantalla (un tercio del ancho, con un mínimo de 200 px) gira el carro, aunque no se toque el dibujo del timón.
 - **RF-02 (D3):** el timón dibujado gira igual que el carro mientras se arrastra en la zona de giro.
 - **RF-03 (D4):** en horizontal, el giro máximo se alcanza arrastrando una cuarta parte del ancho de la pantalla; en vertical, con unos 85 px.
 - **RF-04 (D5):** en vertical, ACEL y FRENO miden al menos 72 px y están separados al menos 16 px.
@@ -83,7 +83,7 @@ Que manejar en Jugar Solo sea cómodo e intuitivo en el celular, en vertical y e
 ## 9. Riesgos y supuestos
 - **Zona de giro y otros toques:** la zona va dentro de los controles, así se oculta con ellos cuando aparece el panel de resultado y no tapa Revancha ni Menú. Solo existe en Jugar Solo.
 - **Vibración:** iPhone (Safari) no permite vibrar desde una página web; ahí D6 se cumple solo con el aspecto del botón.
-- **Pantallas chicas:** en un celular muy angosto, ACEL y FRENO de 72 px pueden acercarse al velocímetro; RF-09 manda y se ajusta su lugar.
+- **Pantallas chicas:** en un celular muy angosto, ACEL y FRENO de 72 px pueden acercarse al velocímetro; RF-09 manda y se ajusta su lugar. *(v3: resuelto, el velocímetro sube según el alto de los controles.)*
 
 ### Historial
 - **v1** (2026-10-25): primera versión, con las decisiones aceptadas por el usuario.
