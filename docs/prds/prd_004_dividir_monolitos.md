@@ -46,9 +46,9 @@ Que todos los archivos cumplan la regla anti-monolito sin excepciones y que cada
 **Out of scope:** las ideas B2 a B9 del backlog y todo lo que figura en la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- El comportamiento y el aspecto del juego. *(El manejo cambia según el PRD 006, D8; el manejo y el garaje según el PRD 007, D8; el pasto y los choques según el PRD 008, D8.)* *(El tamaño del carro, la cámara y el piano de la recta cambian según el PRD 009, D12.)* *(El aspecto del árbol, el poste y la señal cambia según el PRD 010, D9.)* *(La señalética cambia según el PRD 011, D11.)* *(El piso cambia según el PRD 012, D11.)* *(Los rivales en Jugar Solo se agregan según el PRD 013, D9.)* *(El cierre de las pistas abiertas cambia según el PRD 014, D11.)*
+- El comportamiento y el aspecto del juego. *(El manejo cambia según el PRD 006, D8; el manejo y el garaje según el PRD 007, D8; el pasto y los choques según el PRD 008, D8.)* *(El tamaño del carro, la cámara y el piano de la recta cambian según el PRD 009, D12.)* *(El aspecto del árbol, el poste y la señal cambia según el PRD 010, D9.)* *(La señalética cambia según el PRD 011, D11.)* *(El piso cambia según el PRD 012, D11.)* *(Los rivales en Jugar Solo se agregan según el PRD 013, D9.)* *(El cierre de las pistas abiertas cambia según el PRD 014, D11.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)*
 - Las decisiones de los PRD 001, 002 y 003 (solo se agregan las notas de D9). *(Reemplazado por PRD 005, D9.)* *(Del PRD 001, la D8 cambia según el PRD 006, la D4 se amplía según el PRD 007 y la D3 cambia según el PRD 008.)*
-- `src/style.css`. *(Solo agregar estilos de las barras del garaje, según el PRD 007, D8.)* *(Solo agregar reglas de la posición y la tabla, según el PRD 013, D9.)*
+- `src/style.css`. *(Solo agregar estilos de las barras del garaje, según el PRD 007, D8.)* *(Solo agregar reglas de la posición y la tabla, según el PRD 013, D9.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)*
 - `CarreraVueltas`, `Cronometro` y `MuestraRuta`. *(`CarreraVueltas` sale según el PRD 008, D8.)*
 - `Modo` y sus subclases, y `ModosDisponibles`. *(Reemplazado por PRD 005, D9.)*
 - El motor 2D (`Juego`, `Pista`, `Carro2D` y sus renderizadores). *(Reemplazado por PRD 005, D9: el motor 2D se borra.)*

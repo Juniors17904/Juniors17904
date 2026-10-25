@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v1 — escrito, falta la revisión única (forma corta) |
+| Estado | v2 — revisado (forma corta), listo para programar |
 | Fecha | 2026-10-25 |
 | Backlog | B20 (`docs/BACKLOG.md`) |
 | Depende de | PRD 001 (Jugar Solo vertical), PRD 013 (rivales y posición en el HUD) |
@@ -14,18 +14,18 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 
 | # | Categoría | Decisión |
 |---|---|---|
-| D1 | Alcance | Solo Jugar Solo. Test Drive, Diseño de Pistas y Diseño General ya funcionan en horizontal y no cambian. |
+| D1 | Alcance | Solo Jugar Solo. Test Drive, Diseño de Pistas y Diseño General ya funcionan en horizontal y no cambian: el estilo horizontal de los controles (que son comunes a todas las pantallas) vale solo mientras la carrera está activa. |
 | D2 | Alcance | Se puede jugar con el celular en vertical o en horizontal. Al girarlo en plena carrera, la carrera **sigue sin pausa**: no se reinicia, el cronómetro sigue y los rivales siguen. |
 | D3 | Alcance | No se bloquea la orientación ni aparece un aviso de "gira tu celular". Se borra el estilo del aviso viejo `#pantalla-rotar`, que quedó sin uso. |
 | D4 | Usuarios | El diseño **vertical** queda igual que hoy (PRD 001, D10). |
-| D5 | Usuarios | El diseño **horizontal** usa la pantalla completa, sin franjas a los lados: arriba la vuelta, la posición y el tiempo; abajo a la izquierda el timón; abajo a la derecha ACEL y FRENO, con el velocímetro encima. |
+| D5 | Usuarios | El diseño **horizontal** usa la pantalla completa, sin franjas a los lados: arriba la vuelta, la posición y el tiempo; abajo a la izquierda el timón; abajo a la derecha ACEL y FRENO, con el velocímetro encima. Con el control de botones (teclado), los botones conservan su orden de hoy, a lo ancho. |
 | D6 | Usuarios | En horizontal se ve más pista hacia los costados y la cámara sigue mostrando al menos 30 m hacia adelante (PRD 009). |
 | D7 | Usuarios | En PC, si la ventana es más ancha que alta, se usa el diseño horizontal. |
-| D8 | Dominio | El diseño se elige solo por la forma de la pantalla: más ancha que alta es horizontal; si no, vertical. |
-| D9 | Técnico | Cada diseño (vertical y horizontal) es una clase de la vista, en su propio archivo, con una superclase común. `VisorCarreraSolo` no crece (está en 376 de 400 líneas). |
+| D8 | Dominio | El diseño se elige solo por la forma de la pantalla: más ancha que alta es horizontal; si no, vertical. *(v2: hoy la cámara se elige por la forma del lienzo, que en PC 1280×960 mide 480×960 y queda vertical; con D7 pasa a horizontal.)* |
+| D9 | Técnico | Cada diseño (vertical y horizontal) es una clase de la vista, en su propio archivo, con una superclase común, en su propia carpeta (`src/view/disenos/`). `VisorCarreraSolo` no crece (está en 376 de 400 líneas). |
 | D10 | Técnico | Pruebas en navegador real con capturas en 390×844 y 844×390, y una prueba que gira la pantalla en plena carrera. |
 | D11 | Alcance | Los dos diseños se arman para **cualquier carrera 3D**, no solo para la de un jugador: cuando exista el multijugador en 3D (B3), usa los mismos diseños sin rehacerlos. Este PRD no construye el multijugador. *(pedido del usuario)* |
-| D12 | Dominio | **Reemplaza:** del PRD 001, su D10 (se suma el diseño horizontal) y "modo horizontal" en su Out of scope; del PRD 002, `VisorCarreraSolo`, `ControladorCarreraSolo` y `HudCarrera` dentro de "todas las clases de la carrera 3D", y `src/style.css`; del PRD 003, `index.html` y `src/style.css`; de los PRD 004 a 014, `src/style.css` (se cambian y se borran reglas, no solo se agregan); de los PRD 006 y 009 a 014, `HudCarrera` y "la cámara" (solo para ubicarse en horizontal); de los PRD 001, 006, 007, 008, 009 y 013, `ControlTimon` y los controles del jugador (solo su ubicación). Esos PRD llevan una nota que lo indica. |
+| D12 | Dominio | **Reemplaza:** del PRD 001, su D10 (se suma el horizontal y, por D7, en PC ancha deja de ser "igual, centrado"), su RF-01 y su RF-09 (se amplían), la cámara en su D8, "modo horizontal" en su Out of scope y `ControlTimon`, `ControlTeclado`, `RenderizadorVelocimetro` y `src/style.css` en su lista. Del PRD 002, `VisorCarreraSolo`, `ControladorCarreraSolo` y `HudCarrera` dentro de "todas las clases de la carrera 3D", "los elementos dibujados en 2D" (solo su ubicación) y `src/style.css`. De los PRD 004 y 005, "el comportamiento y el aspecto del juego" (solo el diseño horizontal de Jugar Solo); del PRD 005, también `ControladorCarreraSolo` y `VisorCarreraSolo` en su lista de visores y controladores. De los PRD 004 a 014, `src/style.css` (se cambian y se borran reglas, no solo se agregan). `HudCarrera` (PRD 006, 009, 010, 011, 012 y 014) y "la cámara" (PRD 010 a 014), solo para acomodarse en horizontal; del PRD 010, también "de los visores solo cambia la lectura de las medidas nuevas". Los timones, velocímetros y el panel de resultado (PRD 005, 006, 007, 008 y 009) y los controles del jugador (PRD 013): solo cambia su ubicación, no su dibujo. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
 
 ## 1. Contexto y problema
 Jugar Solo se diseñó en vertical (PRD 001). Hoy nada impide girar el celular, pero todo vive en una columna de 480 px centrada: en horizontal la carrera se ve como un vertical angosto con franjas negras a los lados, el timón y los botones quedan apretados y no se aprovecha la pantalla. Ninguna prueba revisa Jugar Solo en horizontal ni el giro en plena carrera.
@@ -62,16 +62,16 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 - **RF-04 (D6):** en horizontal la cámara muestra al menos 30 m hacia adelante.
 - **RF-05 (D2):** al girar el celular en plena carrera, la carrera sigue: el mismo carro, en el mismo lugar, el cronómetro sigue y los rivales siguen.
 - **RF-06 (D2):** después de girar, el timón, ACEL y FRENO responden en el diseño nuevo.
-- **RF-07 (D2):** el panel de resultado (Revancha y Menú) se ve completo en los dos diseños.
+- **RF-07 (D4, D5):** el panel de resultado (¡META!, la tabla de posiciones, Revancha y Menú) se ve completo en los dos diseños; en horizontal, si no entra, se puede desplazar.
 - **RF-08 (D7, D8):** en PC, con la ventana más ancha que alta, se usa el diseño horizontal.
-- **RF-09 (D3):** no aparece ningún aviso de "gira tu celular" y el estilo viejo `#pantalla-rotar` ya no existe.
-- **RF-10 (D12):** los PRD de D12 tienen su nota; `CLAUDE.md` suma la jerarquía de los diseños; el backlog enlaza B20 con este PRD.
+- **RF-09 (D3):** no aparece ningún aviso de "gira tu celular" y el estilo viejo ya no existe (`#pantalla-rotar`, `.rotar-icono`, `@keyframes balanceo`, `.rotar-msg`, `.rotar-titulo`, `.rotar-sub` y su media query).
+- **RF-10 (D12):** los PRD de D12 tienen su nota; `CLAUDE.md` suma la jerarquía de los diseños y su carpeta, y la tabla de visores deja de decir que Jugar Solo es solo vertical; el backlog enlaza B20 con este PRD.
 
 ## 7. Requerimientos no funcionales
 - **RNF-01 (D9, D11), reglas del proyecto:** los diseños son clases de la vista (una superclase y una subclase por diseño, cada una en su archivo) que no dependen de que la carrera sea de un jugador. Se cumple `CLAUDE.md`.
-- **RNF-02, MVC:** elegir y aplicar el diseño es de la vista; el modelo no se entera del giro.
+- **RNF-02, MVC:** elegir y aplicar el diseño es de la vista; el modelo no se entera del giro. La regla para elegirlo (D8) vive en una sola clase y la usan el visor, el HUD y el estilo de la pantalla.
 - **RNF-03 (D9), anti-monolito:** ningún archivo pasa de 400 líneas; `VisorCarreraSolo` no crece.
-- **RNF-04 (D10), pruebas:** navegador real con capturas en 390×844 y 844×390, y giro en plena carrera (lecciones 13 y 16). Las pruebas de layout de hoy siguen pasando en vertical.
+- **RNF-04 (D10), pruebas:** navegador real con capturas en 390×844 y 844×390, y giro en plena carrera (lecciones 13 y 16). Las pruebas de layout de hoy siguen pasando en vertical; las que miden PC 1280×960 como columna de 480 se actualizan, porque en PC el diseño pasa a ser horizontal (D7). RF-04 se mide como en el PRD 009 (RF-08), con la altura de cámara por defecto.
 - **RNF-05, entrega:** llega a `main` cumpliendo la forma corta de `CLAUDE.md`.
 
 ## 8. Criterios de aceptación del MVP
@@ -82,7 +82,9 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 ## 9. Riesgos y supuestos
 - **iPhone:** al girar, Safari cambia el alto visible por la barra de direcciones; el diseño se recalcula también cuando cambia el alto.
 - **Pantallas muy anchas (PC):** el timón y los botones quedan en las esquinas; si se ven lejos, se ajusta en B23.
+- **Altura de cámara alta:** en horizontal se usa la altura que eligió el jugador (1 a 8); con un carro corto y la altura cerca de 8, la cámara puede ver menos de 30 m adelante. Ya pasaba antes de este PRD; se deja así.
 - **Multijugador (B3):** D11 deja los diseños listos, pero el multijugador puede necesitar mostrar más datos (por ejemplo, el nombre del otro jugador).
 
 ### Historial
 - **v1** (2026-10-25): primera versión, con las decisiones aceptadas por el usuario. El usuario pidió que los diseños sirvan también para jugar en grupo (D11).
+- **v2** (2026-10-25): revisión única (forma corta), sin decisiones nuevas. Detalles: estilo horizontal limitado a la carrera activa (D1), control de botones (D5), cámara en PC (D8), panel de resultado con desplazamiento (RF-07), lista del estilo viejo (RF-09), una sola regla (RNF-02), pruebas de PC que se actualizan y RF-04 con la altura por defecto (RNF-04, riesgo de altura alta); D12 completa (PRD 001 en PC, RF-01, RF-09, cámara y `src/style.css`; PRD 002 elementos 2D; PRD 004 y 005 aspecto del juego; PRD 005 visores y controladores; timones, velocímetros y resultado solo de lugar; se saca el PRD 003, que no se reemplaza), carpeta de los diseños, cita de RF-07 y RF-10 con `CLAUDE.md`.
