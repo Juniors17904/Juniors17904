@@ -38,6 +38,7 @@ class ControladorCarreraSolo {
     #carrera    = null;
     #cronometro = null;
     #hud        = null;
+    #adaptadorDiseno = null;   // AdaptadorDisenoCarrera (PRD 015)
 
     #estadoCarrera   = ControladorCarreraSolo.#ESTADO_PREPARANDO;
     #detenido        = false;
@@ -105,6 +106,8 @@ class ControladorCarreraSolo {
         this.#cancelarLimiteCarga();
         this.#cancelarTemporizadores();
 
+        this.#adaptadorDiseno?.destruir();
+        this.#adaptadorDiseno = null;
         this.#vistaConduccion?.ocultarOverlay();
         this.#vistaConduccion?.destruirControl();
         this.#visor?.detener();
@@ -119,6 +122,8 @@ class ControladorCarreraSolo {
 
     // ── Privados: construcción ──────────────────────────────────
     #crearPiezas() {
+        // Diseño vertical u horizontal según la forma de la pantalla; sigue al girar (PRD 015)
+        this.#adaptadorDiseno = new window.AdaptadorDisenoCarrera(document.getElementById('pantalla-carrera-solo'));
         const pista = this.#resolverPista();
         this.#visor = new window.VisorCarreraSolo(
             document.getElementById('canvas-carrera-solo'), pista

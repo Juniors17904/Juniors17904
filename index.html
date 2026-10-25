@@ -68,6 +68,22 @@
             display: none;
             background: rgba(0, 0, 0, 0.72);
         }
+        /* Diseño horizontal de una carrera 3D (PRD 015): lo marca DisenoHorizontal con
+           data-diseno en la pantalla. La pista y el HUD usan todo el ancho; el timón va
+           a la izquierda y ACEL/FRENO a la derecha, en los bordes. Los controles son
+           comunes a todas las pantallas: estas reglas valen solo con la carrera activa.
+           Llevan el id de la pantalla para ganarle a las reglas de la columna vertical. */
+        #pantalla-carrera-solo[data-diseno="horizontal"] .columna-carrera-solo { width: 100vw; }
+        #pantalla-carrera-solo.activa[data-diseno="horizontal"] ~ #ctrl-timon,
+        #pantalla-carrera-solo.activa[data-diseno="horizontal"] ~ #ctrl-botones {
+            left: 0;
+            transform: none;
+            width: 100vw;
+            box-sizing: border-box;
+            padding: 0 16px 6px;
+        }
+        /* Con poca altura, el panel de resultado se puede desplazar (RF-07) */
+        #pantalla-carrera-solo[data-diseno="horizontal"] #resultado-carrera-solo { overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -827,6 +843,12 @@
     <script src="src/view/velocimetros/renderizador_velocimetro.js"></script>
     <script src="src/view/velocimetros/galeria_velocimetros.js"></script>
     <script src="src/view/tabla_final_carrera.js"></script>
+    <!-- View: diseños de la carrera 3D, vertical y horizontal (PRD 015) -->
+    <script src="src/view/disenos/diseno_carrera.js"></script>
+    <script src="src/view/disenos/diseno_vertical.js"></script>
+    <script src="src/view/disenos/diseno_horizontal.js"></script>
+    <script src="src/view/disenos/selector_diseno_carrera.js"></script>
+    <script src="src/view/disenos/adaptador_diseno_carrera.js"></script>
     <script src="src/view/hud_carrera.js"></script>
 
     <!-- View: minimapas (jerarquía: MinimapBase → subclases) -->

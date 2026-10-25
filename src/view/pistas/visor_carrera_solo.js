@@ -24,7 +24,6 @@ import { RivalesCarreraSolo }        from './carrera_solo/rivales_carrera_solo.j
 // ================================================================
 class VisorCarreraSolo extends VisorBase {
     // ── Constantes internas de la vista ──────────────────────────
-    static #ANCHO_COLUMNA   = 480;
     static #FOV_VERTICAL    = 78;
     static #DIST_VERTICAL   = 9;
     static #ALTURA_VERTICAL = 3.6;
@@ -235,7 +234,8 @@ class VisorCarreraSolo extends VisorBase {
     }
 
     #dimensionarCanvas() {
-        const ancho = Math.max(1, Math.min(window.innerWidth, VisorCarreraSolo.#ANCHO_COLUMNA));
+        // Vertical: columna de 480 px; horizontal: todo el ancho (PRD 015)
+        const ancho = Math.max(1, new window.SelectorDisenoCarrera().elegir().anchoArea(window.innerWidth));
         const alto  = Math.max(1, window.innerHeight);
         this.#canvas.width        = ancho;
         this.#canvas.height       = alto;

@@ -1,5 +1,6 @@
 const vm=require('vm'),fs=require('fs');
-// Prueba de HudCarrera (PRD 006) y de la posición y la tabla final (PRD 013, RF-09 y D5)
+// Prueba de HudCarrera (PRD 006), de la posición y la tabla final (PRD 013, RF-09 y D5)
+// y de su ancho según el diseño vertical u horizontal (PRD 015, D4, D5 y D7)
 function el(id){const e={id,style:{},children:[],textContent:'',parentNode:null,className:'',onclick:null,
  classList:{add(c){if(!(' '+e.className+' ').includes(' '+c+' '))e.className=(e.className?e.className+' ':'')+c;}},
  replaceChildren(){e.children=[];},
@@ -17,7 +18,7 @@ const window={innerWidth:390,innerHeight:844,devicePixelRatio:2,addEventListener
 const document={createElement:()=>el('')};
 const leer=(r)=>fs.readFileSync(require('path').join(__dirname,'../../src/'+r),'utf8');
 const contexto={window,document,console,Number,Math,String,Array,Error,performance:{now:()=>0}};
-for(const r of ['model/cronometro.js','view/tabla_final_carrera.js','view/hud_carrera.js'])vm.runInNewContext(leer(r),contexto);
+for(const r of ['model/cronometro.js','view/tabla_final_carrera.js','view/disenos/diseno_carrera.js','view/disenos/diseno_vertical.js','view/disenos/diseno_horizontal.js','view/disenos/selector_diseno_carrera.js','view/hud_carrera.js'])vm.runInNewContext(leer(r),contexto);
 const ok=(c,m)=>{if(!c){console.log('FALLO',m);process.exitCode=1}else console.log('ok',m)};
 ok(!window.__modelErrors,'sin errores de carga');
 const h=new window.HudCarrera(canvas,cuenta,panel);
@@ -26,7 +27,9 @@ h.dibujar(2,3,'0:12.34',0.5,1);
 ok(!textos.some(t=>t.includes('/5')),'RF-09: sin texto de posicion no dibuja posicion');
 textos.length=0;h.dibujar(2,3,'0:12.34',0.5,1,'2.º/5');ok(textos.includes('2.º/5'),'RF-09: dibuja la posicion 2.º/5 en la barra');llamadas.length=1;
 ok(llamadas.length==1&&llamadas[0][1]==334&&llamadas[0][2]==668&&llamadas[0][3]==40&&llamadas[0][5]==1,'velocimetro posicion fija '+JSON.stringify(llamadas[0].slice(1)));
-window.innerWidth=1280;listeners.resize();ok(canvas.style.width=='480px','resize max 480');
+window.innerWidth=1280;listeners.resize();ok(canvas.style.width=='1280px','PRD 015 D7: ventana más ancha que alta → horizontal, todo el ancho');
+window.innerWidth=600;window.innerHeight=900;listeners.orientationchange();ok(canvas.style.width=='480px','PRD 015 D4: vertical ancho → columna de 480 (y escucha el giro)');
+window.innerWidth=390;window.innerHeight=844;listeners.resize();
 delete window.RenderizadorVelocimetro;h.dibujar(1,3,'0:00.00',0,0);ok(true,'sin renderizador no falla');
 h.mostrarCuenta('3');ok(cuenta.style.display=='flex'&&cuenta.textContent=='3','cuenta');h.ocultarCuenta();ok(cuenta.style.display=='none','ocultar cuenta');
 let r=0,m=0;h.mostrarResultado('1:23.45','0:27.10',()=>r++,()=>m++);

@@ -16,8 +16,11 @@ const parchear = async route => {
 let ok=0, fallos=0;
 const check=(c,m)=>{ if(c){ok++;console.log('OK  ',m);} else {fallos++;console.log('FALLO',m);} };
 const browser = await chromium.launch({ headless:false, args:['--use-gl=angle','--ignore-gpu-blocklist'] });
+// PRD 015: con la pantalla más ancha que alta el diseño es horizontal (todo el ancho); si no,
+// la columna vertical de hasta 480 px. PC 1280×960 pasa a horizontal (D7).
 const casos = [
   { nombre:'timon_390', vp:{width:390,height:844}, movil:true, control:'timon' },
+  { nombre:'timon_844_horizontal', vp:{width:844,height:390}, movil:true, control:'timon' },
   { nombre:'timon_1280', vp:{width:1280,height:960}, movil:false, control:'timon' },
   { nombre:'teclado_1280', vp:{width:1280,height:960}, movil:false, control:'teclado' },
 ];
@@ -33,7 +36,7 @@ for (const c of casos) {
   await page.waitForTimeout(6000);
   const m = await page.evaluate(() => {
     const r = id => { const e=document.getElementById(id); if(!e) return null; const b=e.getBoundingClientRect(); const vis=getComputedStyle(e).display!=='none' && b.width>0; return vis?{x:b.left,y:b.top,r:b.right,b:b.bottom}:null; };
-    const ancho=Math.min(innerWidth,480), izq=(innerWidth-ancho)/2;
+    const ancho=innerWidth>innerHeight?innerWidth:Math.min(innerWidth,480), izq=(innerWidth-ancho)/2;
     const v={x:izq+ancho-56-48, y:innerHeight-176-48, r:izq+ancho-56+48, b:innerHeight-176+48};
     return { H:innerHeight, W:innerWidth, izq, der:izq+ancho, vel:v,
       elems:{ 'canvas-timon':r('canvas-timon'), 'btn-acelerar':r('btn-acelerar'), 'btn-freno':r('btn-freno'),
@@ -45,7 +48,7 @@ for (const c of casos) {
   check(visibles.length>=3, c.nombre+': controles visibles '+visibles.map(v=>v[0]).join(','));
   for (const [id,b] of visibles) {
     check(b.b<=m.H+0.5 && b.y>=0, 'RF-09 '+c.nombre+': '+id+' sin cortar ('+b.y.toFixed(0)+'..'+b.b.toFixed(0)+' de '+m.H+')');
-    check(b.x>=m.izq-0.5 && b.r<=m.der+0.5, 'RF-09 '+c.nombre+': '+id+' dentro de la columna');
+    check(b.x>=m.izq-0.5 && b.r<=m.der+0.5, 'RF-09 '+c.nombre+': '+id+' dentro de la columna (o de la pantalla, en horizontal)');
     check(!solapa(b,m.vel), 'RF-08 '+c.nombre+': '+id+' no solapa velocímetro');
   }
   await page.screenshot({ path: SP+'/layout_'+c.nombre+'.png' });

@@ -41,44 +41,6 @@ html, body {
 .pantalla.activa { display: flex; }
 
 /* =============================================
-   PANTALLA: ROTAR
-   ============================================= */
-#pantalla-rotar {
-    z-index: 9000;
-    background: #0a0a14;
-    gap: 20px;
-}
-.rotar-icono {
-    font-size: 72px;
-    animation: balanceo 1.1s ease-in-out infinite;
-}
-@keyframes balanceo {
-    0%   { transform: rotate(-25deg); }
-    50%  { transform: rotate(25deg); }
-    100% { transform: rotate(-25deg); }
-}
-.rotar-msg {
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-.rotar-titulo {
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    color: var(--neon-c);
-    text-shadow: 0 0 20px var(--neon-c);
-}
-.rotar-sub {
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--txt2);
-    line-height: 1.8;
-}
-
-/* =============================================
    TOAST
    ============================================= */
 .toast {
@@ -1048,10 +1010,6 @@ input[type="text"]::placeholder { color: #3a3a5a; }
 /* =============================================
    RESPONSIVE / LANDSCAPE
    ============================================= */
-@media (orientation: portrait) and (max-width: 600px) {
-    #pantalla-juego #pantalla-rotar { display: flex !important; }
-}
-
 @media (max-height: 500px) {
     .titulo-logo { font-size: 24px; margin-bottom: 14px; }
     .card-setup { padding: 16px; gap: 12px; }

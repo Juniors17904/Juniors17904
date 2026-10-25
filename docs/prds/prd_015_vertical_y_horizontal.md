@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para programar |
+| Estado | v3 — implementado |
 | Fecha | 2026-10-25 |
 | Backlog | B20 (`docs/BACKLOG.md`) |
 | Depende de | PRD 001 (Jugar Solo vertical), PRD 013 (rivales y posición en el HUD) |
@@ -88,3 +88,4 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 ### Historial
 - **v1** (2026-10-25): primera versión, con las decisiones aceptadas por el usuario. El usuario pidió que los diseños sirvan también para jugar en grupo (D11).
 - **v2** (2026-10-25): revisión única (forma corta), sin decisiones nuevas. Detalles: estilo horizontal limitado a la carrera activa (D1), control de botones (D5), cámara en PC (D8), panel de resultado con desplazamiento (RF-07), lista del estilo viejo (RF-09), una sola regla (RNF-02), pruebas de PC que se actualizan y RF-04 con la altura por defecto (RNF-04, riesgo de altura alta); D12 completa (PRD 001 en PC, RF-01, RF-09, cámara y `src/style.css`; PRD 002 elementos 2D; PRD 004 y 005 aspecto del juego; PRD 005 visores y controladores; timones, velocímetros y resultado solo de lugar; se saca el PRD 003, que no se reemplaza), carpeta de los diseños, cita de RF-07 y RF-10 con `CLAUDE.md`.
+- **v3** (2026-10-25): implementado. Clases de la vista en `src/view/disenos/`: `DisenoCarrera`, `DisenoVertical`, `DisenoHorizontal`, `SelectorDisenoCarrera` (la regla de D8) y `AdaptadorDisenoCarrera` (marca la pantalla con `data-diseno` y la sigue al girar). `HudCarrera` y `VisorCarreraSolo` piden el ancho al diseño; `ControladorCarreraSolo` crea y destruye el adaptador. Estilo horizontal en `index.html`, limitado a la carrera activa; se borra el estilo del aviso de girar de `src/style.css`. Pruebas: `pruebas/modelo/prueba_disenos_carrera.js` y `pruebas/navegador/prueba_vertical_horizontal.mjs`; se actualizaron `prueba_hud_carrera.js` y `prueba_layout.mjs` (PC pasa a horizontal y se suma el caso 844×390).

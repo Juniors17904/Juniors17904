@@ -2,14 +2,14 @@
 try {
 
 // ================================================================
-// CLASE: HudCarrera — Vista del HUD de la Carrera Solo 3D (vertical)
+// CLASE: HudCarrera — Vista del HUD de la Carrera Solo 3D (vertical u
+// horizontal: el ancho lo da el diseño de SelectorDisenoCarrera, PRD 015)
 // Dibuja "VUELTA X/3", la posición ("2.º/5", PRD 013), el cronómetro y el
 // velocímetro en su canvas, muestra la cuenta 3-2-1/¡YA! y el panel de
 // resultado con la tabla de posiciones (TablaFinalCarrera).
 // Sin lógica de negocio: solo pinta lo que le pasa el controlador.
 // ================================================================
 class HudCarrera {
-    static #ANCHO_MAX_COLUMNA = 480;
     static #ALTO_BANDA_CONTROLES = 120;
     static #RADIO_VELOCIMETRO = 40;
     static #MARGEN_VELOCIMETRO = 56;
@@ -47,6 +47,7 @@ class HudCarrera {
 
         this.#alRedimensionar = () => this.#dimensionar();
         window.addEventListener('resize', this.#alRedimensionar);
+        window.addEventListener('orientationchange', this.#alRedimensionar);
         this.#dimensionar();
     }
 
@@ -120,7 +121,10 @@ class HudCarrera {
     destruir() {
         if (this.#destruido) return;
         this.#destruido = true;
-        if (this.#alRedimensionar) window.removeEventListener('resize', this.#alRedimensionar);
+        if (this.#alRedimensionar) {
+            window.removeEventListener('resize', this.#alRedimensionar);
+            window.removeEventListener('orientationchange', this.#alRedimensionar);
+        }
         this.#alRedimensionar = null;
         this.ocultarCuenta();
         this.ocultarResultado();
@@ -228,7 +232,7 @@ class HudCarrera {
     // ── Privados: tamaño ────────────────────────────────────────
     #dimensionar() {
         if (this.#destruido) return;
-        this.#ancho = Math.min(window.innerWidth, HudCarrera.#ANCHO_MAX_COLUMNA);
+        this.#ancho = new window.SelectorDisenoCarrera().elegir().anchoArea(window.innerWidth);
         this.#alto = window.innerHeight;
         this.#escala = window.devicePixelRatio || 1;
         this.#canvas.width = Math.round(this.#ancho * this.#escala);

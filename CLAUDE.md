@@ -186,6 +186,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Superficie` | `SuperficieAsfalto`, `SuperficiePiano`, `SuperficiePasto` (las entrega `DetectorSuperficie`) | `nombre`, `rozamiento`, `esPasto` |
 | `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida`, `FlechaCurvaSolida` (los crea `FabricaObjetosSolidos`; los usa `DetectorChoques`) | `x`, `z`, `radio`, `tipo`, `alcance`, `puntoCercano(rectangulo)` (cada objeto calcula su propio choque contra el `RectanguloCarro`, PRD 011) |
 | `TrazadoPiso` | `TrazadoPisoCurva`, `TrazadoPisoRecto` (los usa `ConstructorPisoPista`, PRD 012) | `largo`, `cerrado`, `puntoEn(s)`, `distanciasEntre(s0, s1)` |
+| `DisenoCarrera` | `DisenoVertical`, `DisenoHorizontal` (los elige `SelectorDisenoCarrera` por la forma de la pantalla y los aplica `AdaptadorDisenoCarrera`, PRD 015) | `nombre`, `anchoArea(anchoVentana)`, `aplicar(pantalla)` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 | `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
@@ -200,6 +201,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos`, `DetectorChoques`, `RectanguloCarro` y `PuntoChoque`
 - `src/model/cierre/` → camino de vuelta de las pistas abiertas (PRD 014): `PoseCierre`, `TrayectoDubins`, `ContornoPista`, `CierrePistaAbierta` y `FlechasCierre`. La vuelta entera la arma `TrazadoVuelta` (`src/model/trazado_vuelta.js`) y la usan `Ruta` y los mapas
 - `src/model/pilotos/` → `PilotoPC` + subclases y `Rival` (PRD 013)
+- `src/view/disenos/` → `DisenoCarrera` + subclases, `SelectorDisenoCarrera` y `AdaptadorDisenoCarrera`: cómo se acomoda una carrera 3D en vertical u horizontal (PRD 015); sirven para cualquier carrera 3D, también el multijugador futuro
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes
 
@@ -211,7 +213,7 @@ Cada pantalla que muestra un circuito 3D tiene su propia clase. Nunca dos pantal
 | Test Drive 3D → Con Ruta | `VisorTestdriveRuta` | `pistas/visor_testdrive_ruta.js` |
 | Diseño de Pistas → Entrar | `VisorCarreraUrbana` | `pistas/visor_carrera_urbana.js` |
 | 🎨 Diseño General | `VisorDisenoPista` | `pistas/visor_diseno_pista.js` |
-| Jugar Solo (carrera 3D vertical) | `VisorCarreraSolo` | `pistas/visor_carrera_solo.js` |
+| Jugar Solo (carrera 3D, vertical u horizontal) | `VisorCarreraSolo` | `pistas/visor_carrera_solo.js` |
 
 **Regla: cada pantalla tiene su propio controlador.** El visor vive dentro de ese controlador y `Aplicacion` guarda el controlador en su campo privado (Jugar Solo: `#carreraSolo` → `ControladorCarreraSolo` → `VisorCarreraSolo`). Solo uno puede estar activo a la vez. Al cambiar de pantalla: `.detener()` → `null` → nueva instancia.
 
