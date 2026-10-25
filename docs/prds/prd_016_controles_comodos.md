@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v1 — escrito, falta la revisión única (forma corta) |
+| Estado | v2 — revisado (forma corta), listo para programar |
 | Fecha | 2026-10-25 |
 | Backlog | B23 (`docs/BACKLOG.md`) |
 | Depende de | PRD 015 (diseños vertical y horizontal) |
@@ -18,13 +18,13 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D2 | Alcance | Entran el timón y los botones ACEL y FRENO. El giroscopio y el selector Botones / Timón / Giroscopio quedan fuera (B4). |
 | D3 | Usuarios | **Girar es más fácil:** se puede tocar y arrastrar en cualquier parte del tercio izquierdo de abajo de la pantalla, sin tener que acertar el timón. El timón dibujado sigue mostrando cuánto se gira. |
 | D4 | Usuarios | **Giro según la pantalla:** el giro máximo se alcanza arrastrando una cuarta parte del ancho de la pantalla (hoy son 80 px fijos), así se siente igual en cualquier celular y en los dos diseños. |
-| D5 | Usuarios | **ACEL y FRENO más grandes y separados:** en vertical, de al menos 72 px, con 16 px entre ellos; en horizontal, lado a lado como pedales (FRENO a la izquierda, ACEL a la derecha), de al menos 88 px. |
+| D5 | Usuarios | **ACEL y FRENO más grandes y separados:** en vertical, de al menos 72 px, con 16 px entre ellos; en horizontal, lado a lado como pedales (FRENO a la izquierda, ACEL a la derecha), de al menos 88 px, con 16 px entre ellos. |
 | D6 | Usuarios | **Se nota el toque:** el botón apretado se ilumina y se ve hundido; si el celular lo permite, vibra muy corto al empezar a acelerar o frenar. |
 | D7 | Usuarios | **Todo a la vez:** se puede girar con un dedo y acelerar o frenar con otro, sin que uno corte al otro. |
 | D8 | Usuarios | Los controles no tapan el velocímetro, la posición ni el tiempo, y nada se corta en ningún diseño. |
 | D9 | Técnico | El tamaño y el lugar de los controles los define cada diseño (`DisenoVertical` y `DisenoHorizontal`, PRD 015), así hay un solo lugar para cambiarlos. Lo nuevo va en clases aparte; ningún archivo pasa de 400 líneas. |
 | D10 | Técnico | Pruebas en navegador real en 390×844 y 844×390: tamaño mínimo de cada control, zona de giro, toques a la vez y capturas. |
-| D11 | Dominio | **Reemplaza:** del PRD 001, su D10 (ACEL y FRENO apilados de 52 px) y `ControlTimon` y `src/style.css` en su lista; del PRD 015, "solo cambia su ubicación, no su dibujo" de los controles (D12); de los PRD 006, 007, 008, 009 y 013, `ControlTimon` y los controles del jugador en sus listas (solo en Jugar Solo); de los PRD 004 a 015, `src/style.css` (solo los estilos de los controles de Jugar Solo). Esos PRD llevan una nota que lo indica. |
+| D11 | Dominio | **Reemplaza:** del PRD 001, su D10 (ubicación de ACEL y FRENO; su tamaño está en `index.html` y `src/style.css`) y `ControlTimon` y `src/style.css` en su lista. Del PRD 002, "cambiar los elementos dibujados en 2D" en su Out of scope, los timones, "todas las clases de la carrera 3D", "los elementos dibujados en 2D" y `src/style.css` en su lista, y su criterio 5 ("funcionan igual que antes"), solo para los controles de Jugar Solo. De los PRD 004 y 005, "el comportamiento y el aspecto del juego" (solo los controles de Jugar Solo); del PRD 005, también los timones (`ControlTimon`). Del PRD 015, su D4, su RF-01 y "el diseño vertical" en su lista (en vertical los controles crecen) y "solo cambia su ubicación, no su dibujo" de su D12; también crece la interfaz de `DisenoCarrera`. De los PRD 006, 007, 008, 009 y 013, `ControlTimon` y los controles del jugador en sus listas. De los PRD 002 y 004 a 014, `src/style.css` (solo los estilos de los controles de Jugar Solo). Esos PRD llevan una nota que lo indica. *(v2: completa)* |
 
 ## 1. Contexto y problema
 En Jugar Solo el timón solo responde si se toca justo encima de su dibujo (160 px) y el giro máximo pide un arrastre fijo de 80 px, igual en cualquier pantalla. ACEL y FRENO quedaron de 52 px, apilados y a 8 px uno del otro, así que es fácil apretar el equivocado, y al tocarlos no se ve una respuesta clara.
@@ -43,7 +43,8 @@ Que manejar en Jugar Solo sea cómodo e intuitivo en el celular, en vertical y e
 
 **Lista única de lo que NO se modifica:**
 - La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): solo cambia cómo se toca, no cómo maneja el carro.
-- El control por teclado en PC (flechas y WASD).
+- El control por teclado en PC (flechas y WASD) y los botones táctiles ◀ ▲ ▼ ▶ del modo botones.
+- `VistaConduccion` y `ControladorCarreraSolo`: el timón reconoce solo la zona de giro de Jugar Solo.
 - Los dibujos de los timones (`TimonClasico`, `TimonDeportivo`, `TimonF1`, `TimonRetro`) y el velocímetro.
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
 
@@ -64,10 +65,10 @@ Que manejar en Jugar Solo sea cómodo e intuitivo en el celular, en vertical y e
 - **RF-07 (D6):** si el celular permite vibrar, vibra muy corto al empezar a acelerar o frenar; si no, no pasa nada y no hay error.
 - **RF-08 (D7):** con un dedo girando y otro en ACEL o FRENO, el carro gira y acelera (o frena) a la vez; soltar uno no corta al otro.
 - **RF-09 (D8):** en los dos diseños los controles no tapan el velocímetro, la posición ni el tiempo, y ninguno se corta.
-- **RF-10 (D11):** los PRD de D11 tienen su nota; `CLAUDE.md` suma lo que corresponda a la tabla de jerarquías; el backlog enlaza B23 con este PRD.
+- **RF-10 (D11):** los PRD de D11 tienen su nota; `CLAUDE.md` suma a la interfaz de `DisenoCarrera` los tamaños de los controles y nombra las clases nuevas en `src/view/controles/`; el backlog enlaza B23 con este PRD.
 
 ## 7. Requerimientos no funcionales
-- **RNF-01 (D9), reglas del proyecto:** los tamaños y lugares de los controles viven en los diseños del PRD 015; la zona de giro y la respuesta al toque son clases de la vista, cada una en su archivo. Se cumple `CLAUDE.md`.
+- **RNF-01 (D9), reglas del proyecto:** los tamaños y lugares de los controles viven en los diseños del PRD 015; la respuesta al toque es una clase de la vista en `src/view/controles/`, en su archivo. Se cumple `CLAUDE.md`.
 - **RNF-02, MVC:** los controles solo entregan cuánto se gira, acelera o frena; el modelo no cambia.
 - **RNF-03 (D9), anti-monolito:** ningún archivo pasa de 400 líneas.
 - **RNF-04 (D10), pruebas:** navegador real con pantalla táctil en 390×844 y 844×390, toques a la vez y capturas (lecciones 13 y 16). Las pruebas de layout de hoy se ajustan a los tamaños nuevos.
@@ -86,3 +87,4 @@ Que manejar en Jugar Solo sea cómodo e intuitivo en el celular, en vertical y e
 
 ### Historial
 - **v1** (2026-10-25): primera versión, con las decisiones aceptadas por el usuario.
+- **v2** (2026-10-25): revisión única (forma corta), sin decisiones nuevas. Detalles: D11 completa (PRD 002, PRD 004 y 005, PRD 015 D4/RF-01/lista, rango de `src/style.css`, cita del PRD 001 sin "52 px"), separación en horizontal en D5, botones táctiles del modo botones fuera, `VistaConduccion` y `ControladorCarreraSolo` no cambian, RF-10 y RNF-01 con la tabla de `CLAUDE.md` y la carpeta.

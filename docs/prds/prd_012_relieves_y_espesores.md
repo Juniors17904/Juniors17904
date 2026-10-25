@@ -46,7 +46,7 @@ Que el piso de la pista tenga relieve y grosor reales y se vea igual en las 5 pa
 - La física, la superficie y los choques (PRD 006 a 011): los anchos del asfalto y del piano no cambian.
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`: la meta a cuadros es solo dibujo.
 - Los datos de cada pista (`ConfigPista*`), los objetos de escena y la señalética, que siguen apoyados en el pasto (nivel 0).
-- La cámara, los cielos, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)*
+- La cámara, los cielos, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
