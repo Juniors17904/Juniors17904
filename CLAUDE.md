@@ -295,7 +295,7 @@ class TimonF1 { dibujar(ctx, S) { /* lógica F1 aquí */ } }
 Acordada con el usuario el 2026-10-24. Vale para todo PRD desde el PRD 010.
 
 1. **Crear el PRD** con `docs/PRD_CREATOR.md` (Prompts 1, 2 y 3).
-2. **Antes de programar: una sola revisión del PRD** con el Verificador PRD (revisores de contradicciones y de código). Los detalles se corrigen sin volver a verificar. Solo se repite si aparece un problema de fondo (una decisión), que primero se le pregunta al usuario.
+2. **Antes de programar: una sola revisión del PRD** con el Verificador PRD (revisores de contradicciones y de código). **Se corre sola apenas el PRD queda escrito, sin preguntarle al usuario** (acordado el 2026-10-25). Los detalles se corrigen sin volver a verificar. Solo se repite si aparece un problema de fondo (una decisión), que primero se le pregunta al usuario.
 3. **Programar** el PRD con sus pruebas en `pruebas/`.
 4. **Después de programar:** Verificador PRD con **2 revisores**, el de código y el de pruebas. El de contradicciones solo si el cambio tocó otros PRD o `CLAUDE.md`.
 5. **Corregir** lo que encuentren y correr `npm run test:todo`. No hay otra vuelta salvo que la corrección sea grande.
