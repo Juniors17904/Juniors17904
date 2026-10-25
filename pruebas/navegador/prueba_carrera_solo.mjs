@@ -24,11 +24,17 @@ page.on('console', m=>{ if(m.type()==='error') errores.push('console: '+m.text()
 await page.route('**', parchear);
 await page.goto('http://localhost:8099/', { waitUntil:'load' });
 await page.waitForTimeout(2500);
-// Espiar CarreraVueltas.actualizar
-await page.evaluate(()=>{
+// Espiar CarreraVueltas.actualizar, solo la carrera del JUGADOR: desde el PRD 013 los 4 rivales
+// tienen su propia CarreraVueltas. La del jugador es la que el controlador le pasa a
+// CarreraConRivales.seguirJugador (justo después de ubicarlo en su lugar de la grilla).
+await page.evaluate(async ()=>{
+  const { CarreraConRivales } = await import('/src/model/carrera_con_rivales.js');
+  const seguir = CarreraConRivales.prototype.seguirJugador;
+  CarreraConRivales.prototype.seguirJugador = function(c){ window.__carreraJugador=c; return seguir.call(this,c); };
   const orig = window.CarreraVueltas.prototype.actualizar;
   window.__llamadas=0; window.__pos=[];
   window.CarreraVueltas.prototype.actualizar = function(px,pz,pasos){
+    if (this !== window.__carreraJugador) return orig.call(this,px,pz,pasos);
     window.__llamadas++; window.__pos.push([px,pz,pasos]);
     const ev = orig.call(this,px,pz,pasos);
     if (window.__forzarMeta) { window.__forzarMeta=false; return 'meta'; }

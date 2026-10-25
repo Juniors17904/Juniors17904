@@ -187,6 +187,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida`, `FlechaCurvaSolida` (los crea `FabricaObjetosSolidos`; los usa `DetectorChoques`) | `x`, `z`, `radio`, `tipo`, `alcance`, `puntoCercano(rectangulo)` (cada objeto calcula su propio choque contra el `RectanguloCarro`, PRD 011) |
 | `TrazadoPiso` | `TrazadoPisoCurva`, `TrazadoPisoRecto` (los usa `ConstructorPisoPista`, PRD 012) | `largo`, `cerrado`, `puntoEn(s)`, `distanciasEntre(s0, s1)` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
+| `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
 - `src/view/controles/` → `ControlEntrada` + subclases + timones
@@ -197,6 +198,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/model/carros/` → `Carro` + subclases, `ConstantesFisica` y `RegistroCarros`
 - `src/model/superficies/` → `Superficie` + subclases y `DetectorSuperficie`
 - `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos`, `DetectorChoques`, `RectanguloCarro` y `PuntoChoque`
+- `src/model/pilotos/` → `PilotoPC` + subclases y `Rival` (PRD 013)
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes
 

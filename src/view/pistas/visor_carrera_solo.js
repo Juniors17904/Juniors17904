@@ -6,16 +6,19 @@ import { RegistroCarros }      from '../../model/carros/registro_carros.js';
 import { DetectorChoques }     from '../../model/choques/detector_choques.js';
 import { VisorBase }           from '../visor_base.js';
 import { CamaraSeguimiento }   from '../camaras/camara_seguimiento.js';
-import { FabricaObjetoEscena } from '../objetos/fabrica_objeto_escena.js';
 import { CieloSoleado }        from '../cielo_soleado.js';
 import { CieloNocturno }       from '../cielo_nocturno.js';
 import { ConductorPasoFijo }   from './comun/conductor_paso_fijo.js';
 import { ConstructorCircuitoCarreraSolo } from './carrera_solo/constructor_circuito_carrera_solo.js';
+import { DecoracionesCarreraSolo }   from './carrera_solo/decoraciones_carrera_solo.js';
+import { RivalesCarreraSolo }        from './carrera_solo/rivales_carrera_solo.js';
 
 // ================================================================
 // VIEW — VisorCarreraSolo: escena 3D de la carrera "Jugar Solo" en vertical.
 //   - La superficie de la pista la arma ConstructorCircuitoCarreraSolo.
 //   - Mueve el Carro con pasos fijos de 60 Hz (ConductorPasoFijo).
+//   - Crea, avanza y dibuja a los 4 rivales de la PC (RivalesCarreraSolo,
+//     PRD 013); el jugador sale del último lugar de la grilla.
 //   - NO decide reglas de carrera: aplica la superficie que le pasa el
 //     controlador y los choques que calcula DetectorChoques (modelo).
 // ================================================================
@@ -25,6 +28,7 @@ class VisorCarreraSolo extends VisorBase {
     static #FOV_VERTICAL    = 78;
     static #DIST_VERTICAL   = 9;
     static #ALTURA_VERTICAL = 3.6;
+    static #MUESTRAS_RIVALES = 1000;
 
     #canvas;
     #pista;
@@ -35,9 +39,9 @@ class VisorCarreraSolo extends VisorBase {
     #cielo        = null;
     #sol          = null;
     #ruta         = new Ruta();
-    #fabrica      = new FabricaObjetoEscena();
-    #objetos      = [];
+    #decoraciones = null;   // DecoracionesCarreraSolo
     #circuito     = null;   // ConstructorCircuitoCarreraSolo
+    #rivales      = null;   // RivalesCarreraSolo (PRD 013)
 
     #grupoCarro   = null;
     #grupoInclina = null;
@@ -94,6 +98,11 @@ class VisorCarreraSolo extends VisorBase {
     get pasosUltimoFrame() { return this.#conductor.pasosUltimoCuadro; }
     get #carro()           { return this.#conductor.carro; }
 
+    // ── Rivales de la PC (PRD 013) ───────────────────────────────
+    get rivales()            { return this.#rivales?.carrera ?? null; }   // CarreraConRivales
+    activarRivales(valor)    { if (this.#rivales) this.#rivales.activo = valor; }
+    reiniciarRivales()       { this.#rivales?.reiniciar(); }
+
     // ── Muestras por longitud de arco para CarreraVueltas ────────
     muestrasRuta(n) {
         const curva = this.#ruta.curve;
@@ -132,15 +141,20 @@ class VisorCarreraSolo extends VisorBase {
     }
 
     reiniciarCarro() {
+        const punto = this.#rivales?.puntoJugador;   // último lugar de la grilla (PRD 013)
         const inicio = this.#ruta.curve ? this.#ruta.inicio : { x: 0, z: 0, angle: 0 };
-        this.#conductor.carro = new RegistroCarros().crear(this.#tipoAuto, inicio.x, inicio.z, inicio.angle);
+        this.#conductor.carro = punto
+            ? new RegistroCarros().crear(this.#tipoAuto, punto.x, punto.z, punto.angulo)
+            : new RegistroCarros().crear(this.#tipoAuto, inicio.x, inicio.z, inicio.angle);
         this.#carro.pisar(this.#superficie);
         this.#sincronizarCarroYCamara();
     }
 
     // ── Cargar el modelo GLB del carro ───────────────────────────
-    // Crea el carro con la física del modelo guardado (PRD 007) y carga su GLB
+    // Crea el carro con la física del modelo guardado (PRD 007) y carga su GLB;
+    // termina cuando también cargaron los rivales
     async cargar(tipoAuto, color) {
+        const cargaRivales = this.#rivales?.cargar();
         if (tipoAuto !== this.#tipoAuto) { this.#tipoAuto = tipoAuto; this.reiniciarCarro(); }
         this.#choques?.usarCarro(this.#medidas.medidaCarro(tipoAuto));
         if (this.#camara) this.#camara.escala = this.#medidas.escalaCarro(tipoAuto);
@@ -162,6 +176,7 @@ class VisorCarreraSolo extends VisorBase {
             window.__modelErrors.push('[VisorCarreraSolo.cargar] ' + e.message);
             console.error('[VisorCarreraSolo.cargar]', e);
         }
+        await cargaRivales;
     }
 
     // ── Ciclo de vida ────────────────────────────────────────────
@@ -189,8 +204,10 @@ class VisorCarreraSolo extends VisorBase {
         this.#observador?.disconnect();
         this.#observador = null;
 
-        for (const obj of this.#objetos) obj.destruir(this.#escena);
-        this.#objetos = [];
+        this.#decoraciones?.destruir();
+        this.#decoraciones = null;
+        this.#rivales?.destruir();
+        this.#rivales = null;
         this.#cielo?.destruir(this.#escena);
         this.#cielo = null;
 
@@ -308,26 +325,20 @@ class VisorCarreraSolo extends VisorBase {
     #construirCircuito() {
         if (this.#pista?.tramos) this.#ruta.construir(this.#pista.tramos, this.#pista.totalSegs);
         this.#afinarLongitudArco();
-        this.reiniciarCarro();
         const curva = this.#ruta.curve;
+        if (curva) {
+            this.#rivales = new RivalesCarreraSolo(this.#escena, this.#ruta, this.#pista.decoraciones,
+                this.muestrasRuta(VisorCarreraSolo.#MUESTRAS_RIVALES), this.#medidas);
+        }
+        this.reiniciarCarro();
         if (!curva) return;
 
         this.#choques  = new DetectorChoques(this.#pista.decoraciones, this.#ruta, this.#medidas.medidaCarro(this.#tipoAuto));
         this.#circuito = new ConstructorCircuitoCarreraSolo(this.#escena);
         this.#circuito.construir(curva);
 
-        // Decoraciones
-        for (const dec of this.#pista.decoraciones ?? []) {
-            try {
-                const obj = this.#crearObjeto(dec);
-                if (!obj || (dec.tipo === 'poste' && this.#circuito.tapaArco(obj))) continue;   // PRD 011: el arco ya tiene poste ahí
-                obj.construir(this.#escena);
-                obj.setVisible?.(true);
-                this.#objetos.push(obj);
-            } catch (e) {
-                console.error('[VisorCarreraSolo.decoracion]', e);
-            }
-        }
+        this.#decoraciones = new DecoracionesCarreraSolo(this.#escena, this.#ruta);
+        this.#decoraciones.construir(this.#pista.decoraciones, this.#circuito);
     }
 
     // La curva trae 200 divisiones de arco por defecto: con ~300 puntos de
@@ -340,13 +351,6 @@ class VisorCarreraSolo extends VisorBase {
         const puntosControl = curva.points?.length ?? 0;
         curva.arcLengthDivisions = Math.max(60000, puntosControl * 200);
         curva.updateArcLengths();
-    }
-
-    #crearObjeto({ tipo, prog, lado, dist, escala = 1, texto = '', direccion = 'derecha', conLuz = true }) {
-        const pos  = this.#ruta.posicionEn(prog);
-        const wx   = pos.x + Math.cos(pos.angle) * dist * lado;
-        const wz   = pos.z - Math.sin(pos.angle) * dist * lado;
-        return this.#fabrica.crear(tipo, wx, wz, { escala, texto, direccion, rotY: pos.angle, lado, conLuz });
     }
 
     // ── Carro ────────────────────────────────────────────────────
@@ -366,6 +370,7 @@ class VisorCarreraSolo extends VisorBase {
         this.#idAnimacion = requestAnimationFrame(this.#funcionAnimacion);
 
         this.#conductor.avanzar(marca, this.#entradaAcel, this.#entradaDireccion, !this.#congelado);
+        this.#rivales?.avanzar(marca, this.#carro, this.#medidas.medidaCarro(this.#tipoAuto));
 
         this.#sincronizarCarroYCamara();
 

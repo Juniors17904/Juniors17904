@@ -35,15 +35,21 @@ await page.waitForTimeout(2000);
 // Espías: el carro que maneja el visor, sus rebotes y el último tiempo del cronómetro
 await page.evaluate(async () => {
   const { Carro } = await import('/src/model/carros/carro.js');
+  const { ConductorPasoFijo } = await import('/src/view/pistas/comun/conductor_paso_fijo.js');
   const actualizar = Carro.prototype.actualizar, rebotar = Carro.prototype.rebotar;
   window.__rebotes = []; window.__distMin = Infinity;
+  // Solo el carro del JUGADOR (el que mueve el ConductorPasoFijo del visor): desde el
+  // PRD 013 los 4 rivales de la PC también son Carro
+  const avanzar = ConductorPasoFijo.prototype.avanzar;
+  ConductorPasoFijo.prototype.avanzar = function (...a) { if (this.carro) window.__carro = this.carro; return avanzar.apply(this, a); };
   Carro.prototype.actualizar = function (dt) {
+    if (this !== window.__carro) return actualizar.call(this, dt);
     // Posición ya resuelta del paso anterior (la que se dibuja), antes de mover
-    window.__carro = this;
     if (window.__arbol) window.__distMin = Math.min(window.__distMin, Math.hypot(this.px - window.__arbol.x, this.pz - window.__arbol.z));
     actualizar.call(this, dt);
   };
   Carro.prototype.rebotar = function (px, pz, factor) {
+    if (this !== window.__carro) return rebotar.call(this, px, pz, factor);
     window.__rebotes.push({ antes: this.velocidad, factor });
     rebotar.call(this, px, pz, factor);
     if (window.__arbol) window.__distMin = Math.min(window.__distMin, Math.hypot(this.px - window.__arbol.x, this.pz - window.__arbol.z));

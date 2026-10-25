@@ -12,7 +12,7 @@ Las decisiones se tomaron con el usuario y son definitivas. Si algún requerimie
 | # | Decisión |
 |---|---|
 | D1 | "Jugar Solo" abre una carrera 3D **en vertical**. La carrera 2D se conserva intacta en ⚙ con el botón "Clásico 2D", que sigue en horizontal. *(Reemplazado por PRD 002, D6.)* |
-| D2 | El MVP tiene 3 vueltas, cuenta 3-2-1, cronómetro, velocímetro, contador de vuelta y un resultado (tiempo total y mejor vuelta) con los botones Revancha y Menú. |
+| D2 | El MVP tiene 3 vueltas, cuenta 3-2-1, cronómetro, velocímetro, contador de vuelta y un resultado (tiempo total y mejor vuelta) con los botones Revancha y Menú. *(Se amplía según el PRD 013, D9: la posición y la tabla con los rivales.)* |
 | D3 | Salirse al pasto baja la velocidad máxima al 40 %. No hay choques ni reinicio. *(Reemplazado por PRD 008, D8.)* |
 | D4 | Se usan la pista elegida en ⚙ → Pistas (Ciudad por defecto) y el carro, el color, el timón y el velocímetro del garaje. *(Ampliado por PRD 007, D8: el carro también trae su física.)* |
 | D5 | Una vuelta solo vale si se pasan 3 puntos de control en orden: 33 %, 66 % y meta. |
@@ -36,9 +36,9 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 ## 4. Alcance
 **In scope:** carrera 3D vertical de 3 vueltas, cuenta regresiva, HUD (vuelta, tiempo y velocímetro), puntos de control, penalización por pasto, resultado con Revancha y Menú, botón "Clásico 2D" *(Reemplazado por PRD 002, D6.)* y mejoras visuales de la pista (más luz, línea central y línea de meta).
 
-**Out of scope:** rivales, récords guardados, choques o daños *(choques reemplazados por PRD 008, D8)*, pausa, turbo en el HUD, modo horizontal de la carrera nueva, cerrar las pistas abiertas y cambios en el multijugador.
+**Out of scope:** rivales *(reemplazados por PRD 013, D9)*, récords guardados, choques o daños *(choques reemplazados por PRD 008, D8)*, pausa, turbo en el HUD, modo horizontal de la carrera nueva, cerrar las pistas abiertas y cambios en el multijugador.
 
-**No se modifican:** `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, los cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` ni `src/style.css`. *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9. `Juego`, `GestorOrientacion` y `ConfigPista*` quedan fuera de esta lista según el PRD 005, D9.)* *(`Carro` y `VisorDisenoPista` salen de esta lista según el PRD 006, D8; `VisorDisenoPista` y `src/style.css` —solo agregar estilos— según el PRD 007, D8.)* *(`CamaraSeguimiento`, `VisorBase` y `VisorDisenoPista` salen de esta lista según el PRD 009, D12: tamaño del carro y cámara.)* *(`FabricaObjetoEscena` y `ConfigPista*` cambian según el PRD 010, D9: árbol, poste y señal.)* *(`FabricaObjetoEscena` y `ConfigPista*` cambian también según el PRD 011, D11: señalética.)* *(`Ruta` cambia según el PRD 014, D9: cierre suave de las pistas abiertas.)*
+**No se modifican:** `Ruta`, `Carro`, `CamaraSeguimiento`, `VisorBase`, `FabricaObjetoEscena`, los cielos, `RenderizadorVelocimetro`, `ConfigPista*`, `VisorDisenoPista`, `GestorOrientacion`, `VistaConduccion`, `ControlTimon`, `ControlTeclado`, `Juego`, `GestorAlertas` ni `src/style.css`. *(`VisorDisenoPista`, `VisorCarreraSolo` y `Garaje` se reordenan por dentro según el PRD 004, D9. `Juego`, `GestorOrientacion` y `ConfigPista*` quedan fuera de esta lista según el PRD 005, D9.)* *(`Carro` y `VisorDisenoPista` salen de esta lista según el PRD 006, D8; `VisorDisenoPista` y `src/style.css` —solo agregar estilos— según el PRD 007, D8.)* *(`CamaraSeguimiento`, `VisorBase` y `VisorDisenoPista` salen de esta lista según el PRD 009, D12: tamaño del carro y cámara.)* *(`FabricaObjetoEscena` y `ConfigPista*` cambian según el PRD 010, D9: árbol, poste y señal.)* *(`FabricaObjetoEscena` y `ConfigPista*` cambian también según el PRD 011, D11: señalética.)* *(`Ruta` cambia según el PRD 014, D9: cierre suave de las pistas abiertas.)* *(`VisorCarreraSolo` cambia y `src/style.css` —solo agregar reglas de la posición y la tabla— según el PRD 013, D9: rivales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -59,7 +59,7 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 - **RF-07:** En el pasto la velocidad máxima baja de forma gradual hasta el 40 %, y al volver al asfalto se recupera. *(Reemplazado por PRD 008, D8.)*
 - **RF-08:** El velocímetro se ve pequeño, encima de los botones, sin taparlos.
 - **RF-09:** Los controles (timón y ACEL/FRENO, o las flechas en PC) se ven completos, sin cortes y dentro de la columna.
-- **RF-10:** Al terminar las 3 vueltas aparece un panel con el tiempo total y la mejor vuelta, con Revancha y Menú, por encima de los controles.
+- **RF-10:** Al terminar las 3 vueltas aparece un panel con el tiempo total y la mejor vuelta, con Revancha y Menú, por encima de los controles. *(Se amplía según el PRD 013, D9: el panel suma la tabla de posiciones.)*
 - **RF-11:** Revancha reinicia la carrera desde la salida, con velocidad 0 y en la misma pantalla. Menú vuelve a Inicio.
 - **RF-12:** Al salir con Menú o con el botón atrás no queda nada corriendo, y volver con "adelante" no deja una pantalla vacía.
 - **RF-13:** Si la carrera no carga en 6 s, aparece un aviso y se vuelve a Inicio.
