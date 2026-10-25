@@ -7,6 +7,8 @@
 //   RF-08 → en Diseño de Objetos los arcos de meta y de salida tienen esas
 //           medidas y se ven completos al abrir
 //   RF-10 → el botón "Chevrón" ya no existe
+//   Opción A (aprobada): en Jugar Solo no se dibuja un poste de alumbrado
+//           dentro de un poste del arco (en Ciudad caen en el mismo lugar)
 //   Sin errores de consola (lección 8). Capturas en /tmp/capturas_prd011/
 //   (lecciones 13 y 16): arco en Jugar Solo, arcos y flecha de frente y de costado.
 // ================================================================
@@ -139,6 +141,14 @@ const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
     check(cerca(ancho, 12, 0.05) && Math.hypot(medio[0] - meta[0], medio[1] - meta[1]) < 0.6,
       `RF-06 Jugar Solo: el arco cruza la pista de lado a lado, centrado en la meta (${ancho.toFixed(2)} m entre postes)`);
   }
+  // Ningún poste de alumbrado dibujado dentro de un poste del arco
+  const encimados = await page.evaluate(() => {
+    const arco = window.__objetos.find(o => o.constructor.name === 'MetaEscena' && o._grupo?.parent);
+    const postes = window.__objetos.filter(o => o.constructor.name === 'PosteEscena' && o._grupo?.parent);
+    return { encimados: postes.filter(p => arco?.tapa(p.x, p.z)).length, postes: postes.length };
+  });
+  check(encimados.postes > 0 && encimados.encimados === 0,
+    `RF-06 Jugar Solo: ningún poste de alumbrado encimado con el arco (${encimados.encimados} de ${encimados.postes} postes)`);
   const flecha = await medirFlecha(page);
   check(flecha && cerca(flecha.ancho, 2.4, 1e-6) && cerca(flecha.alto, 0.8, 1e-6) && cerca(flecha.grosor, 0.03, 1e-6) && cerca(flecha.abajo, 0.9, 1e-6),
     `RF-01 Jugar Solo: ${flecha?.cuantas} flechas con tablero de ${flecha?.ancho} × ${flecha?.alto} × ${flecha?.grosor} m, borde de abajo a ${flecha?.abajo?.toFixed(2)} m`);

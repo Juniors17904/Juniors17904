@@ -31,7 +31,7 @@ export class FlechaCurvaEscena extends ObjetoEscena {
         const atras   = this.#lado * (grosor / 2 + radio);
         for (const s of [-1, 1]) {
             const palo = new THREE.Mesh(geoPalo, matPalo);
-            palo.position.set(atras, altoPalo / 2, s * (ancho / 2 - 4 * radio));
+            palo.position.set(atras, altoPalo / 2, s * (ancho / 2 - m.margenPalosFlecha));
             palo.castShadow = true;
             grupo.add(palo);
         }

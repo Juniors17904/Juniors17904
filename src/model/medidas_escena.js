@@ -51,6 +51,7 @@ class MedidasEscena {
     static #BORDE_INFERIOR_FLECHA = 0.9;   // del piso al borde de abajo del tablero
     static #GROSOR_TABLERO_FLECHA = 0.03;
     static #RADIO_PALO_FLECHA     = 0.05;
+    static #MARGEN_PALOS_FLECHA   = 0.2;   // de cada punta del tablero a su palo
     static #DISTANCIA_FLECHAS     = 5.4;   // del centro de la pista, fuera del piano (D5)
     static #PASO_FLECHAS          = 3;     // metros entre flechas, medidos en el centro de la pista
     static #LARGO_SEGMENTO_RUTA   = 4;     // metros de cada segmento con que Ruta arma la pista
@@ -60,6 +61,8 @@ class MedidasEscena {
     static #GROSOR_TRAVESANO_ARCO = 0.28;
     static #ALTO_BANDERA_META     = 0.8;
     static #LADO_CAJA_LUZ_SALIDA  = 0.55;
+    static #FONDO_CAJA_LUZ_SALIDA = 0.44;
+    static #GROSOR_BANDERA_META   = 0.06;
     // Cartel de aviso (D8): palo de 3 m y cartel de 1,4 × 0,75 m con marco blanco
     static #ALTO_PALO_AVISO       = 3;
     static #RADIO_PALO_AVISO      = 0.05;
@@ -123,6 +126,7 @@ class MedidasEscena {
     get bordeInferiorFlecha() { return MedidasEscena.#BORDE_INFERIOR_FLECHA; }
     get grosorTableroFlecha() { return MedidasEscena.#GROSOR_TABLERO_FLECHA; }
     get radioPaloFlecha()     { return MedidasEscena.#RADIO_PALO_FLECHA; }
+    get margenPalosFlecha()   { return MedidasEscena.#MARGEN_PALOS_FLECHA; }
     get distanciaFlechas()    { return MedidasEscena.#DISTANCIA_FLECHAS; }
     get pasoFlechas()         { return MedidasEscena.#PASO_FLECHAS; }
     get largoSegmentoRuta()   { return MedidasEscena.#LARGO_SEGMENTO_RUTA; }
@@ -134,6 +138,8 @@ class MedidasEscena {
     get grosorTravesanoArco() { return MedidasEscena.#GROSOR_TRAVESANO_ARCO; }
     get altoBanderaMeta()     { return MedidasEscena.#ALTO_BANDERA_META; }
     get ladoCajaLuzSalida()   { return MedidasEscena.#LADO_CAJA_LUZ_SALIDA; }
+    get fondoCajaLuzSalida()  { return MedidasEscena.#FONDO_CAJA_LUZ_SALIDA; }
+    get grosorBanderaMeta()   { return MedidasEscena.#GROSOR_BANDERA_META; }
 
     // Cartel de aviso (PRD 011, D8)
     get altoPaloAviso()       { return MedidasEscena.#ALTO_PALO_AVISO; }

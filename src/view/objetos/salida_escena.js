@@ -36,7 +36,7 @@ export class SalidaEscena extends ObjetoEscena {
         grupo.add(viga);
 
         // 5 cajas de luz colgando de la viga, repartidas sobre el asfalto
-        const geoPod = new THREE.BoxGeometry(caja, caja, caja * 0.8);
+        const geoPod = new THREE.BoxGeometry(caja, caja, m.fondoCajaLuzSalida);
         const geoLuz = new THREE.SphereGeometry(caja / 3, 12, 8);
         const yCaja  = yViga - g / 2 - caja / 2;
         const medio  = m.medioAnchoAsfalto;

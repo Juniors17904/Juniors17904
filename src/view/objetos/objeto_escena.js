@@ -25,6 +25,10 @@ export class ObjetoEscena {
         scene.add(this._grupo);
     }
 
+    get x()    { return this.#x; }
+    get z()    { return this.#z; }
+    get rotY() { return this.#rotY; }
+
     setVisible(v) { if (this._grupo) this._grupo.visible = v; }
 
     // Hook para objetos que necesitan seguir la cámara (Luna, NubeAtmosferica, etc.)

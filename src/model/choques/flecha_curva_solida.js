@@ -7,7 +7,8 @@ import { PuntoChoque }  from './punto_choque.js';
 // MODEL — FlechaCurvaSolida: el tablero de una flecha de curva (PRD 011,
 // D6 y D10). Choca el tablero entero: una tira del ancho del tablero a lo
 // largo de la pista (rumbo), con la mitad de su grosor como radio. Sus
-// medidas salen de MedidasEscena. Los palos quedan debajo del tablero.
+// medidas salen de MedidasEscena. Los palos quedan detrás del tablero, del
+// lado del pasto: desde la pista se choca primero con el tablero.
 // ================================================================
 export class FlechaCurvaSolida extends ObjetoSolido {
     static #BUSQUEDAS = 24;   // vueltas de la búsqueda del punto más cercano

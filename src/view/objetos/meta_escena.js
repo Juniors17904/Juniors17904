@@ -7,9 +7,19 @@ import { ObjetoEscena } from './objeto_escena.js';
 //        distancia de los postes de alumbrado y una bandera a cuadros
 //        cuyo borde de abajo deja la altura libre del arco (PRD 011, D7).
 //        Girado con la pista (rotY). Medidas de MedidasEscena.
+//        tapa(x, z) dice si algo parado en (x, z) quedaría dentro de uno de
+//        sus postes (en Ciudad, un poste de alumbrado cae justo ahí).
 // ================================================================
 export class MetaEscena extends ObjetoEscena {
     constructor(x, z, rotY = 0) { super(x, z, rotY); }
+
+    tapa(x, z) {
+        const m = new window.MedidasEscena();
+        const dx = x - this.x, dz = z - this.z;
+        const lateral  = dx * Math.cos(this.rotY) - dz * Math.sin(this.rotY);
+        const adelante = dx * Math.sin(this.rotY) + dz * Math.cos(this.rotY);
+        return Math.hypot(Math.abs(lateral) - m.distanciaPostesArco, adelante) < m.radioPosteArco + m.radioPoste + m.radioPosteArco;
+    }
 
     _poblar(grupo) {
         const m = new window.MedidasEscena();
@@ -41,7 +51,7 @@ export class MetaEscena extends ObjetoEscena {
         const ancho = 2 * (D - r), filas = 2;
         const cols = Math.max(2, Math.round(ancho / altoBandera * filas));
         const wC = ancho / cols, hC = altoBandera / filas;
-        const geoCuadro = new THREE.BoxGeometry(wC, hC, 0.06);
+        const geoCuadro = new THREE.BoxGeometry(wC, hC, m.grosorBanderaMeta);
         const arriba = yBarra - g / 2;
         for (let f = 0; f < filas; f++) {
             for (let c = 0; c < cols; c++) {

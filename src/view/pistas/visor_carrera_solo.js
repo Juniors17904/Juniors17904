@@ -320,7 +320,7 @@ class VisorCarreraSolo extends VisorBase {
         for (const dec of this.#pista.decoraciones ?? []) {
             try {
                 const obj = this.#crearObjeto(dec);
-                if (!obj) continue;
+                if (!obj || (dec.tipo === 'poste' && this.#circuito.tapaArco(obj))) continue;   // PRD 011: el arco ya tiene poste ahí
                 obj.construir(this.#escena);
                 obj.setVisible?.(true);
                 this.#objetos.push(obj);

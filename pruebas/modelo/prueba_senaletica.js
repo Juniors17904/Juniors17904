@@ -9,7 +9,8 @@
 //   RF-09/D8 cartel de aviso de 3 m de palo y 1,4 × 0,75 m
 //   RF-10 la baliza chevron y su botón ya no existen
 //   RF-12 nota en los PRD de D11, CLAUDE.md y backlog B17
-//   RNF-01 las medidas no se repiten fuera de MedidasEscena
+//   RNF-01 las medidas no se repiten fuera de MedidasEscena; largoSegmentoRuta
+//          es el mismo paso con que Ruta arma la pista
 // ================================================================
 'use strict';
 const fs   = require('fs');
@@ -44,6 +45,7 @@ class PruebaSenaletica {
         this.#probarCarrosAlineados();
         this.#probarBalizaBorrada();
         this.#probarSinRepetir();
+        this.#probarSegmentoRuta();
         this.#probarDocumentos();
 
         for (const f of this.#fallos) console.log('❌ ' + f);
@@ -263,6 +265,15 @@ class PruebaSenaletica {
             'RNF-01 ConfigPista lee la distancia y el paso de las flechas de MedidasEscena');
         const solida = this.#leer('src/model/choques/flecha_curva_solida.js').replace(/\/\/.*$/gm, '');
         this.#ok(/MedidasEscena/.test(solida) && !/\b0\.\d+\b|2\.4/.test(solida), 'RNF-01 FlechaCurvaSolida saca sus medidas de MedidasEscena');
+    }
+
+    // RNF-01: el paso de las flechas se pasa a segmentos con el mismo largo de
+    // segmento que usa Ruta (si alguien cambia uno, esta prueba falla)
+    #probarSegmentoRuta() {
+        const pista = this.#pista('ciudad'), ruta = this.#rutaDe(pista), p = ruta.curve.points;
+        const largos = p.slice(1).map((q, i) => Math.hypot(q.x - p[i].x, q.z - p[i].z));
+        this.#ok(largos.every(l => Math.abs(l - this.#m.largoSegmentoRuta) < 1e-9),
+            `RNF-01 Ruta arma la pista con segmentos de largoSegmentoRuta (${this.#m.largoSegmentoRuta} m)`);
     }
 
     // RF-12: notas de D11, CLAUDE.md y backlog

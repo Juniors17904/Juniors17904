@@ -16,6 +16,8 @@ import { MetaEscena }           from '../../objetos/meta_escena.js';
 //     con el que usa CarreraVueltas.
 //   - Pone el arco de meta sobre la línea de meta, girado con la pista
 //     (PRD 011, D3). Es solo un adorno: las vueltas no cambian.
+//     tapaArco(objeto) dice si un objeto de la pista cae dentro de un poste
+//     del arco (así el visor no dibuja dos postes encimados).
 //   - Guarda sus geometrías y materiales y los libera en liberar().
 // ================================================================
 export class ConstructorCircuitoCarreraSolo {
@@ -46,6 +48,10 @@ export class ConstructorCircuitoCarreraSolo {
         const inicio = curva.getPointAt(0), rumbo = curva.getTangentAt(0);
         this.#arcoMeta = new MetaEscena(inicio.x, inicio.z, Math.atan2(rumbo.x, rumbo.z));
         this.#arcoMeta.construir(this.#escena);
+    }
+
+    tapaArco(objeto) {
+        return !!this.#arcoMeta?.tapa(objeto.x, objeto.z);
     }
 
     liberar() {

@@ -40,7 +40,7 @@ export class AvisoEscena extends ObjetoEscena {
             new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 })
         );
         borde.position.y = y;
-        borde.position.z = -(grosor / 2 + grosor / 4 + grosor / 8);   // detrás del panel, sin tocarlo
+        borde.position.z = -grosor * 7 / 8;   // detrás del panel, con una luz de grosor/8 entre los dos
 
         grupo.add(poste, panel, borde);
     }
