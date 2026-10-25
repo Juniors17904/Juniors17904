@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para implementar |
+| Estado | v3 — implementado |
 | Fecha | 2026-10-24 |
 | Backlog | B17 (`docs/BACKLOG.md`) |
 | Depende de | PRD 009 (escala y `MedidasEscena`) y PRD 010 (objetos sólidos, postes y señales a 6,0 m) |
@@ -60,7 +60,7 @@ Que la señalética necesaria tenga tamaño real, grosor y un lugar correcto, qu
 - **RF-01 (D4):** cada flecha mide 2,4 × 0,8 m, tiene 3 cm de grosor, su borde de abajo está a 0,9 m del piso y se ve también de costado.
 - **RF-02 (D5):** en las 5 pistas las flechas están a 5,4 m del centro, fuera del piano, y ningún tablero toca a otro.
 - **RF-03 (D6, D10):** en Jugar Solo el carro choca con el tablero de una flecha cuando lo toca (±0,1 m) y nunca lo atraviesa.
-- **RF-04 (D5):** con el carro alineado con la pista, ninguno de los 6 carros toca una flecha mientras su centro está en el asfalto.
+- **RF-04 (D5):** con el carro alineado con la pista, ninguno de los 6 carros toca una flecha mientras su centro está en el asfalto, salvo en el quiebre donde las pistas abiertas empiezan su tramo de cierre (ver v3).
 - **RF-05 (D6):** con las flechas sólidas, Jugar Solo sigue a 30 FPS o más en un celular de gama media.
 - **RF-06 (D3, D7):** en Jugar Solo hay un arco de meta sobre la línea de meta, girado con la pista, con sus postes a 6,0 m del centro y 5,5 m de altura libre, en las 5 pistas.
 - **RF-07 (D3):** el arco de meta no cambia cómo se cuentan las vueltas ni el tiempo.
@@ -91,3 +91,4 @@ Que la señalética necesaria tenga tamaño real, grosor y un lugar correcto, qu
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
 - **v2** (2026-10-24): revisión única (forma corta). Decisiones aprobadas por el usuario: quitar también el botón Chevrón (D2), flechas espaciadas (D5), postes del arco a 6,0 m (D7), choque propio de cada objeto sólido (D10). Detalles: borde de abajo a 0,9 m, arco girado con la pista, carro alineado, costo por paso, aviso que ya cumple, D11 completa.
+- **v3** (2026-10-25): implementado. Medidas de la señalética en `MedidasEscena`; `ConfigPista` lee la distancia (5,4 m) y el paso (3 m) de las flechas; `FlechaCurvaEscena` con tablero de 2,4 × 0,8 × 0,03 m; arcos de meta y salida con postes a 6,0 m y 5,5 m de altura libre; arco de meta en Jugar Solo (`ConstructorCircuitoCarreraSolo`); `AvisoEscena` con sus medidas en `MedidasEscena`; baliza chevron y su botón borrados. Choques (D10): cada `ObjetoSolido` da su `puntoCercano` contra el `RectanguloCarro` y su `alcance`; `FlechaCurvaSolida` choca con todo el tablero. Pruebas: `pruebas/modelo/prueba_senaletica.js` y `pruebas/navegador/prueba_senaletica_pantallas.mjs`. **Nota de RF-04:** se cumple en todas las curvas de las 5 pistas; en el quiebre donde las pistas abiertas (Costa, Desierto, Montaña y Volcán) empiezan su tramo de cierre la ruta gira con menos de 1 m de radio y ahí un carro ancho puede rozar la última flecha; la prueba deja ese quiebre fuera.

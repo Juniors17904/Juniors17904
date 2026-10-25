@@ -8,6 +8,8 @@
 //   - Medidas del árbol, el poste y la señal de curva, y la distancia de
 //     postes y señales a la pista (PRD 010, D3, D5 y D6).
 //   - Alturas y líneas del piso de la pista (PRD 012, D8).
+//   - Señalética: flechas de curva, arcos de meta y de salida y cartel de
+//     aviso, y dónde van las flechas (PRD 011, D4 a D9).
 //   La usan la vista (carro, pista, objetos, cámara, minimapa) y el modelo
 //   (DetectorSuperficie, DetectorChoques, objetos sólidos y pistas).
 // ================================================================
@@ -42,6 +44,33 @@ class MedidasEscena {
     static #ANCHO_LINEA_BORDE    = 0.15;
     static #LARGO_META           = 1;
     static #LADO_CUADRO_META     = 0.5;
+
+    // Señalética (PRD 011). Flecha de curva: tablero de pista de carreras
+    static #ANCHO_TABLERO_FLECHA  = 2.4;
+    static #ALTO_TABLERO_FLECHA   = 0.8;
+    static #BORDE_INFERIOR_FLECHA = 0.9;   // del piso al borde de abajo del tablero
+    static #GROSOR_TABLERO_FLECHA = 0.03;
+    static #RADIO_PALO_FLECHA     = 0.05;
+    static #MARGEN_PALOS_FLECHA   = 0.2;   // de cada punta del tablero a su palo
+    static #DISTANCIA_FLECHAS     = 5.4;   // del centro de la pista, fuera del piano (D5)
+    static #PASO_FLECHAS          = 3;     // metros entre flechas, medidos en el centro de la pista
+    static #LARGO_SEGMENTO_RUTA   = 4;     // metros de cada segmento con que Ruta arma la pista
+    // Arcos de meta y de salida (D7): los postes van a la distancia de los postes de alumbrado
+    static #ALTURA_LIBRE_ARCO     = 5.5;   // del piso a lo más bajo que cruza la pista
+    static #RADIO_POSTE_ARCO      = 0.15;
+    static #GROSOR_TRAVESANO_ARCO = 0.28;
+    static #ALTO_BANDERA_META     = 0.8;
+    static #LADO_CAJA_LUZ_SALIDA  = 0.55;
+    static #FONDO_CAJA_LUZ_SALIDA = 0.44;
+    static #GROSOR_BANDERA_META   = 0.06;
+    // Cartel de aviso (D8): palo de 3 m y cartel de 1,4 × 0,75 m con marco blanco
+    static #ALTO_PALO_AVISO       = 3;
+    static #RADIO_PALO_AVISO      = 0.05;
+    static #ANCHO_CARTEL_AVISO    = 1.4;
+    static #ALTO_CARTEL_AVISO     = 0.75;
+    static #MARCO_CARTEL_AVISO    = 0.1;   // borde blanco alrededor del panel de color
+    static #GROSOR_CARTEL_AVISO   = 0.08;
+    static #CENTRO_CARTEL_AVISO   = 3.3;   // altura del centro del cartel
 
     // Largo real (D3) y proporciones ancho/largo y alto/largo de cada modelo GLB
     #carros = new Map([
@@ -90,6 +119,36 @@ class MedidasEscena {
     get anchoLineaBorde()   { return MedidasEscena.#ANCHO_LINEA_BORDE; }
     get largoMeta()         { return MedidasEscena.#LARGO_META; }
     get ladoCuadroMeta()    { return MedidasEscena.#LADO_CUADRO_META; }
+
+    // Flecha de curva (PRD 011, D4 y D5)
+    get anchoTableroFlecha()  { return MedidasEscena.#ANCHO_TABLERO_FLECHA; }
+    get altoTableroFlecha()   { return MedidasEscena.#ALTO_TABLERO_FLECHA; }
+    get bordeInferiorFlecha() { return MedidasEscena.#BORDE_INFERIOR_FLECHA; }
+    get grosorTableroFlecha() { return MedidasEscena.#GROSOR_TABLERO_FLECHA; }
+    get radioPaloFlecha()     { return MedidasEscena.#RADIO_PALO_FLECHA; }
+    get margenPalosFlecha()   { return MedidasEscena.#MARGEN_PALOS_FLECHA; }
+    get distanciaFlechas()    { return MedidasEscena.#DISTANCIA_FLECHAS; }
+    get pasoFlechas()         { return MedidasEscena.#PASO_FLECHAS; }
+    get largoSegmentoRuta()   { return MedidasEscena.#LARGO_SEGMENTO_RUTA; }
+
+    // Arcos de meta y de salida (PRD 011, D7)
+    get distanciaPostesArco() { return MedidasEscena.#DISTANCIA_POSTES_Y_SENALES; }
+    get alturaLibreArco()     { return MedidasEscena.#ALTURA_LIBRE_ARCO; }
+    get radioPosteArco()      { return MedidasEscena.#RADIO_POSTE_ARCO; }
+    get grosorTravesanoArco() { return MedidasEscena.#GROSOR_TRAVESANO_ARCO; }
+    get altoBanderaMeta()     { return MedidasEscena.#ALTO_BANDERA_META; }
+    get ladoCajaLuzSalida()   { return MedidasEscena.#LADO_CAJA_LUZ_SALIDA; }
+    get fondoCajaLuzSalida()  { return MedidasEscena.#FONDO_CAJA_LUZ_SALIDA; }
+    get grosorBanderaMeta()   { return MedidasEscena.#GROSOR_BANDERA_META; }
+
+    // Cartel de aviso (PRD 011, D8)
+    get altoPaloAviso()       { return MedidasEscena.#ALTO_PALO_AVISO; }
+    get radioPaloAviso()      { return MedidasEscena.#RADIO_PALO_AVISO; }
+    get anchoCartelAviso()    { return MedidasEscena.#ANCHO_CARTEL_AVISO; }
+    get altoCartelAviso()     { return MedidasEscena.#ALTO_CARTEL_AVISO; }
+    get marcoCartelAviso()    { return MedidasEscena.#MARCO_CARTEL_AVISO; }
+    get grosorCartelAviso()   { return MedidasEscena.#GROSOR_CARTEL_AVISO; }
+    get centroCartelAviso()   { return MedidasEscena.#CENTRO_CARTEL_AVISO; }
 
     // Sin tipo o con un tipo desconocido se usan las del deportivo (carro básico)
     medidaCarro(tipo) {

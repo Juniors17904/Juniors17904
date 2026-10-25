@@ -3,6 +3,7 @@
 import * as THREE               from 'three';
 import { ConstructorPisoPista } from '../comun/constructor_piso_pista.js';
 import { TrazadoPisoCurva }     from '../comun/trazado_piso_curva.js';
+import { MetaEscena }           from '../../objetos/meta_escena.js';
 
 // ================================================================
 // VIEW — ConstructorCircuitoCarreraSolo: arma la superficie de la pista de
@@ -13,11 +14,16 @@ import { TrazadoPisoCurva }     from '../comun/trazado_piso_curva.js';
 //   - Recorre la curva por longitud de arco, igual que
 //     VisorCarreraSolo.muestrasRuta(), para que el asfalto dibujado coincida
 //     con el que usa CarreraVueltas.
+//   - Pone el arco de meta sobre la línea de meta, girado con la pista
+//     (PRD 011, D3). Es solo un adorno: las vueltas no cambian.
+//     tapaArco(objeto) dice si un objeto de la pista cae dentro de un poste
+//     del arco (así el visor no dibuja dos postes encimados).
 //   - Guarda sus geometrías y materiales y los libera en liberar().
 // ================================================================
 export class ConstructorCircuitoCarreraSolo {
     #escena;
     #piso     = null;   // ConstructorPisoPista
+    #arcoMeta = null;   // MetaEscena
     #recursos = [];     // geometrías y materiales propios (pasto) para liberar
 
     constructor(escena) {
@@ -37,9 +43,20 @@ export class ConstructorCircuitoCarreraSolo {
         // Piso de la pista, con la meta al inicio de la ruta
         this.#piso = new ConstructorPisoPista(new TrazadoPisoCurva(curva), 0);
         this.#escena.add(this.#piso.construir());
+
+        // Arco de meta en el inicio de la ruta, girado con la pista
+        const inicio = curva.getPointAt(0), rumbo = curva.getTangentAt(0);
+        this.#arcoMeta = new MetaEscena(inicio.x, inicio.z, Math.atan2(rumbo.x, rumbo.z));
+        this.#arcoMeta.construir(this.#escena);
+    }
+
+    tapaArco(objeto) {
+        return !!this.#arcoMeta?.tapa(objeto.x, objeto.z);
     }
 
     liberar() {
+        this.#arcoMeta?.destruir(this.#escena);
+        this.#arcoMeta = null;
         this.#piso?.liberar();
         this.#piso = null;
         for (const recurso of this.#recursos) recurso.dispose?.();

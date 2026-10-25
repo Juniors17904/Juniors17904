@@ -1,11 +1,14 @@
 'use strict';
 
 import { FabricaObjetosSolidos } from './fabrica_objetos_solidos.js';
+import { RectanguloCarro }       from './rectangulo_carro.js';
 
 // ================================================================
 // MODEL — DetectorChoques: choques del carro contra los objetos sólidos
 // de la pista (PRD 008, D2, D4 y D6).
-//   - Los objetos los crea FabricaObjetosSolidos (las flechas no son sólidas).
+//   - Los objetos los crea FabricaObjetosSolidos (también las flechas, PRD 011).
+//   - Cada objeto da su propio punto de choque (PRD 011, D10): este detector
+//     sirve para cualquier forma. Solo revisa los objetos cercanos al carro.
 //   - El carro es un rectángulo de su largo y su ancho, girado con él
 //     (PRD 009, D6): de costado choca con el costado, de frente con el
 //     parachoques. Las medidas son las del carro que se maneja.
@@ -47,18 +50,23 @@ export class DetectorChoques {
         const saltos = Math.max(1, Math.ceil(Math.hypot(dx, dz) / DetectorChoques.#SALTO_MAXIMO));
         for (let i = 1; i <= saltos; i++) {
             const x = pxAntes + dx * i / saltos, z = pzAntes + dz * i / saltos;
+            const rectangulo = new RectanguloCarro(x, z, carro.rotY, this.#medioLargo, this.#medioAncho);
+            const alcance = rectangulo.alcance;
             for (const objeto of this.#objetos) {
-                if (this.#resolverObjeto(carro, objeto, x, z, dx, dz)) return true;
+                if (Math.abs(objeto.x - x) > alcance + objeto.alcance || Math.abs(objeto.z - z) > alcance + objeto.alcance) continue;
+                if (this.#resolverObjeto(carro, objeto, rectangulo, dx, dz)) return true;
             }
         }
         return false;
     }
 
-    // Choque del rectángulo del carro (centro en x, z) contra un objeto redondo
-    #resolverObjeto(carro, objeto, x, z, dx, dz) {
-        const fx = Math.sin(carro.rotY), fz = Math.cos(carro.rotY);   // hacia el frente
-        const sx = fz, sz = -fx;                                       // hacia el costado
-        const ox = objeto.x - x, oz = objeto.z - z;
+    // Choque del rectángulo del carro contra el punto del objeto más cercano
+    // a él, rodeado por el radio del objeto
+    #resolverObjeto(carro, objeto, rectangulo, dx, dz) {
+        const punto = objeto.puntoCercano(rectangulo);
+        const x = rectangulo.x, z = rectangulo.z;
+        const fx = rectangulo.fx, fz = rectangulo.fz, sx = rectangulo.sx, sz = rectangulo.sz;
+        const ox = punto.x - x, oz = punto.z - z;
         const adelante = ox * fx + oz * fz, costado = ox * sx + oz * sz;
         const cercaA = Math.max(-this.#medioLargo, Math.min(this.#medioLargo, adelante));
         const cercaC = Math.max(-this.#medioAncho, Math.min(this.#medioAncho, costado));
