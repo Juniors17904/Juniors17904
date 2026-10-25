@@ -4,6 +4,7 @@
 //   RF-02 → en horizontal, la pista ocupa toda la pantalla
 //   RF-03 → en horizontal: HUD arriba, timón abajo a la izquierda, ACEL/FRENO abajo
 //           a la derecha con el velocímetro encima; nada se corta ni se tapa
+//   RF-04 → después de girar, la cámara horizontal (55°, aspecto de la pantalla) ve 30 m adelante
 //   RF-05 → al girar en plena carrera sigue el mismo carro, en el mismo lugar, el
 //           cronómetro y los rivales siguen
 //   RF-06 → después de girar, ACEL y el timón reciben el toque
@@ -53,6 +54,15 @@ async function abrir(vp, movil) {
     Carro.prototype.actualizar = function (dt) { window.__carros.add(this); return actualizar.call(this, dt); };
     const formatear = window.Cronometro.prototype.formatear;
     window.Cronometro.prototype.formatear = function (ms) { window.__tiempo = ms; return formatear.call(this, ms); };
+    // Textos del HUD (dónde se dibujan) y la cámara con que se dibuja la pista
+    const THREE = await import('three');
+    window.__THREE = THREE; window.__textosHud = [];
+    const fillText = CanvasRenderingContext2D.prototype.fillText;
+    CanvasRenderingContext2D.prototype.fillText = function (t, x, y, ...r) {
+      if (this.canvas.id === 'canvas-hud-carrera-solo') window.__textosHud.push({ t: String(t), x, y, alto: this.canvas.clientHeight, ancho: this.canvas.clientWidth });
+      return fillText.call(this, t, x, y, ...r);
+    };
+    THREE.Scene.prototype.onBeforeRender = function (renderer, scene, camera) { if (renderer.domElement.id === 'canvas-carrera-solo') window.__camara = camera; };
     const dibujar = window.RenderizadorVelocimetro.dibujar.bind(window.RenderizadorVelocimetro);
     window.RenderizadorVelocimetro.dibujar = (ctx, cx, cy, r, ...resto) => { window.__velocimetro = { cx, cy, r }; return dibujar(ctx, cx, cy, r, ...resto); };
   });
@@ -93,7 +103,7 @@ const solapa = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < 
   const antes = await page.evaluate(() => {
     const carros = [...window.__carros], jugador = carros.find(c => c.entradaAcel === 1) ?? carros[0];
     window.__jugador = jugador;
-    return { tiempo: window.__tiempo, x: jugador.px, z: jugador.pz, carros: carros.length, rivales: carros.filter(c => c !== jugador).map(c => [c.px, c.pz]) };
+    return { tiempo: window.__tiempo, x: jugador.px, z: jugador.pz, carros: window.__carros.size, rivales: carros.filter(c => c !== jugador).map(c => [c.px, c.pz]) };
   });
   await page.setViewportSize({ width: 844, height: 390 });
   await page.waitForTimeout(300);
@@ -101,14 +111,15 @@ const solapa = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < 
   await page.waitForTimeout(1500);
   const despues = await page.evaluate(() => {
     const carros = [...window.__carros], j = window.__jugador;
-    return { tiempo: window.__tiempo, x: j.px, z: j.pz, vel: j.velocidad, mismo: carros.includes(j),
+    return { tiempo: window.__tiempo, x: j.px, z: j.pz, vel: j.velocidad, carros: window.__carros.size,
       rivales: carros.filter(c => c !== j).map(c => [c.px, c.pz]), pantalla: document.querySelector('.pantalla.activa')?.id };
   });
   await page.keyboard.up('ArrowUp');
   const salto = Math.hypot(justo.x - antes.x, justo.z - antes.z);
   const avanzaron = despues.rivales.filter((p, i) => antes.rivales[i] && Math.hypot(p[0] - antes.rivales[i][0], p[1] - antes.rivales[i][1]) > 1).length;
-  check(despues.pantalla === 'pantalla-carrera-solo' && despues.mismo && despues.tiempo > antes.tiempo + 1500,
-    `RF-05 al girar sigue la carrera, el mismo carro y el cronómetro (${antes.tiempo.toFixed(0)} → ${despues.tiempo.toFixed(0)} ms)`);
+  // Ningún carro nuevo: los mismos 5 de antes siguen andando (si se creara otro, el conjunto crecería)
+  check(despues.pantalla === 'pantalla-carrera-solo' && despues.carros === antes.carros && antes.carros === 5 && despues.tiempo > antes.tiempo + 1500,
+    `RF-05 al girar sigue la carrera con los mismos ${antes.carros} carros (${despues.carros} después) y el cronómetro (${antes.tiempo.toFixed(0)} → ${despues.tiempo.toFixed(0)} ms)`);
   check(salto < 25 && Math.hypot(despues.x - antes.x, despues.z - antes.z) > 1,
     `RF-05 el carro sigue desde donde estaba (en 300 ms avanzó ${salto.toFixed(1)} m, sin saltos) y sigue andando`);
   check(antes.rivales.length === 4 && avanzaron === 4, `RF-05 los 4 rivales siguen corriendo (${avanzaron} de ${antes.rivales.length} avanzaron)`);
@@ -116,6 +127,22 @@ const solapa = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < 
   const h = await medir(page);
   check(h.diseno === 'horizontal' && h.pista === 844 && h.hud === 844 && h.columna.width === 844,
     `RF-02 en horizontal la pista y el HUD ocupan toda la pantalla (${h.diseno}, pista ${h.pista}, HUD ${h.hud})`);
+  // RF-03: vuelta, posición y tiempo en la franja de arriba, dentro de la pantalla
+  const arriba = await page.evaluate(() => {
+    const ultimos = window.__textosHud.slice(-12);
+    const busca = re => ultimos.filter(e => re.test(e.t)).at(-1);
+    return [busca(/^VUELTA/), busca(/\/5$/), busca(/^\d+:\d\d\.\d\d$/)];
+  });
+  check(arriba.every(e => e && e.y <= 52 && e.x >= 0 && e.x <= 844 && e.ancho === 844),
+    `RF-03 en horizontal la vuelta, la posición y el tiempo se dibujan arriba (${arriba.map(e => e ? e.t + '@' + Math.round(e.x) + ',' + Math.round(e.y) : '—').join(' · ')})`);
+  // RF-04: después de girar, la cámara horizontal ve 30 m adelante del carro
+  const ve = await page.evaluate(() => {
+    const THREE = window.__THREE, cam = window.__camara, j = window.__jugador;
+    const p = new THREE.Vector3(j.px + Math.sin(j.rotY) * 30, 0, j.pz + Math.cos(j.rotY) * 30).project(cam);
+    return { fov: cam.fov, aspecto: cam.aspect, x: p.x, y: p.y, z: p.z };
+  });
+  check(ve.fov === 55 && Math.abs(ve.aspecto - 844 / 390) < 0.01 && Math.abs(ve.x) <= 1 && Math.abs(ve.y) <= 1 && ve.z < 1,
+    `RF-04 después de girar la cámara ve 30 m adelante (fov ${ve.fov}, aspecto ${ve.aspecto.toFixed(2)}, punto en ${ve.x.toFixed(2)}, ${ve.y.toFixed(2)})`);
   check(h.timon && h.timon.r <= h.W / 2 && h.timon.b >= h.H - 200, 'RF-03 el timón queda abajo a la izquierda');
   check(h.acel && h.freno && h.acel.x >= h.W / 2 && h.freno.x >= h.W / 2 && h.freno.b >= h.H - 80, 'RF-03 ACEL y FRENO quedan abajo a la derecha');
   check(h.vel && h.vel.x >= h.W / 2 && h.vel.b <= h.acel.y + 1, `RF-03 el velocímetro queda a la derecha, encima de ACEL (${JSON.stringify(h.vel)})`);
@@ -127,6 +154,17 @@ const solapa = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < 
     return { acel: en(acel), timon: en(timon) };
   }, { acel: h.acel, timon: h.timon });
   check(toque.acel === 'btn-acelerar' && toque.timon === 'canvas-timon', `RF-06 después de girar, ACEL y el timón reciben el toque (${JSON.stringify(toque)})`);
+  // RF-06: el carro responde de verdad a ACEL y al timón en el diseño nuevo
+  await page.evaluate(() => document.getElementById('btn-acelerar').dispatchEvent(new Event('touchstart')));
+  await page.waitForTimeout(400);
+  await page.mouse.move((h.timon.x + h.timon.r) / 2, (h.timon.y + h.timon.b) / 2);
+  await page.mouse.down();
+  await page.mouse.move((h.timon.x + h.timon.r) / 2 + 50, (h.timon.y + h.timon.b) / 2, { steps: 5 });
+  await page.waitForTimeout(300);
+  const responde = await page.evaluate(() => ({ acel: window.__jugador.entradaAcel, giro: window.__jugador.entradaDireccion }));
+  await page.mouse.up();
+  await page.evaluate(() => document.getElementById('btn-acelerar').dispatchEvent(new Event('touchend')));
+  check(responde.acel === 1 && responde.giro !== 0, `RF-06 después de girar el carro acelera con ACEL y gira con el timón (${JSON.stringify(responde)})`);
   await page.screenshot({ path: `${CARPETA}/horizontal_despues_de_girar.png` });
 
   // RF-07: el panel de resultado en horizontal

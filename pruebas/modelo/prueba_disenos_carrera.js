@@ -3,7 +3,9 @@
 // Sin navegador:
 //   D8    más ancha que alta → horizontal; si no, vertical (también en el borde)
 //   D4/D5 anchoArea: vertical hasta 480 px, horizontal todo el ancho
-//   D9    DisenoVertical y DisenoHorizontal heredan de DisenoCarrera; aplicar() marca la pantalla
+//   D9    DisenoVertical y DisenoHorizontal heredan de DisenoCarrera; aplicar() marca la pantalla;
+//         cada uno dice qué cámara usa (vertical 78°, horizontal 55°)
+//   RF-09 el estilo del aviso de girar ya no está en src/style.css ni en index.html
 //   D2    AdaptadorDisenoCarrera sigue el giro y destruir() deja de escuchar
 //   RF-10 notas de D12 en los PRD, CLAUDE.md y backlog B20
 //   RNF-03 VisorCarreraSolo no crece (376 líneas o menos)
@@ -24,6 +26,7 @@ class PruebaDisenosCarrera {
         this.#probarSelector();
         this.#probarJerarquia();
         this.#probarAdaptador();
+        this.#probarEstiloViejo();
         this.#probarDocumentos();
         for (const f of this.#fallos) console.log('❌ ' + f);
         console.log(this.#fallos.length ? `${this.#fallos.length} fallo(s)` : 'Todo OK');
@@ -61,6 +64,10 @@ class PruebaDisenosCarrera {
         const pantalla = { dataset: {} };
         new c.DisenoHorizontal().aplicar(pantalla);
         this.#ok(pantalla.dataset.diseno === 'horizontal', 'D9 aplicar() marca la pantalla con su diseño');
+        const v = new c.DisenoVertical(), h = new c.DisenoHorizontal();
+        this.#ok(v.camaraVertical && v.fovCamara === 78 && !h.camaraVertical && h.fovCamara === 55, 'D9 cada diseño dice su cámara: vertical 78°, horizontal 55°');
+        const visor = this.#leer('src/view/pistas/visor_carrera_solo.js').replace(/\/\/.*$/gm, '');
+        this.#ok(!/aspecto < 1/.test(visor) && /camaraVertical/.test(visor) && /fovCamara/.test(visor), 'RNF-02 el visor elige la cámara con la regla del diseño, no con su propia regla');
         // D11: los diseños no conocen ninguna pantalla en particular
         const textos = ['diseno_carrera.js', 'diseno_vertical.js', 'diseno_horizontal.js', 'selector_diseno_carrera.js', 'adaptador_diseno_carrera.js']
             .map(f => this.#leer('src/view/disenos/' + f).replace(/\/\/.*$/gm, ''));
@@ -74,12 +81,17 @@ class PruebaDisenosCarrera {
         this.#ok(pantalla.dataset.diseno === 'vertical', 'D2 al empezar, la pantalla queda en vertical');
         c.innerWidth = 844; c.innerHeight = 390;
         this.#escuchas.orientationchange();
-        this.#ok(pantalla.dataset.diseno === 'horizontal' && adaptador.diseno.nombre === 'horizontal', 'D2 al girar el celular, pasa a horizontal');
+        this.#ok(pantalla.dataset.diseno === 'horizontal', 'D2 al girar el celular, pasa a horizontal');
         c.innerWidth = 390; c.innerHeight = 844;
         this.#escuchas.resize();
         this.#ok(pantalla.dataset.diseno === 'vertical', 'D2 al volver, pasa a vertical');
         adaptador.destruir();
         this.#ok(!this.#escuchas.resize && !this.#escuchas.orientationchange && pantalla.dataset.diseno === undefined, 'D2 destruir() deja de escuchar y quita la marca');
+    }
+
+    #probarEstiloViejo() {
+        const estilos = this.#leer('src/style.css') + this.#leer('index.html');
+        this.#ok(!/pantalla-rotar|rotar-icono|rotar-msg|rotar-titulo|rotar-sub|balanceo/.test(estilos), 'RF-09 no queda nada del estilo del aviso de girar');
     }
 
     #probarDocumentos() {

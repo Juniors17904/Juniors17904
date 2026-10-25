@@ -10,7 +10,6 @@ try {
 class AdaptadorDisenoCarrera {
     #pantalla;
     #selector = new window.SelectorDisenoCarrera();
-    #diseno   = null;
     #alCambiar;
 
     constructor(pantalla) {
@@ -21,8 +20,6 @@ class AdaptadorDisenoCarrera {
         this.#aplicar();
     }
 
-    get diseno() { return this.#diseno; }
-
     destruir() {
         window.removeEventListener('resize', this.#alCambiar);
         window.removeEventListener('orientationchange', this.#alCambiar);
@@ -30,8 +27,7 @@ class AdaptadorDisenoCarrera {
     }
 
     #aplicar() {
-        this.#diseno = this.#selector.elegir();
-        this.#diseno.aplicar(this.#pantalla);
+        this.#selector.elegir().aplicar(this.#pantalla);
     }
 }
 

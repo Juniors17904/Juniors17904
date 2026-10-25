@@ -5,12 +5,16 @@ try {
 // VIEW — DisenoCarrera: cómo se acomoda una carrera 3D en la pantalla
 // (PRD 015, D9). Superclase de DisenoVertical y DisenoHorizontal.
 //   - anchoArea(): cuánto ancho usan la pista y el HUD.
+//   - camaraVertical / fovCamara: qué cámara de seguimiento usa la pista.
 //   - aplicar(pantalla): marca la pantalla con su nombre (data-diseno),
 //     y el CSS acomoda la columna y los controles según esa marca.
 // Sirve para cualquier carrera 3D, no solo la de un jugador (D11).
 // ================================================================
 class DisenoCarrera {
     get nombre() { return ''; }
+
+    get camaraVertical() { return false; }
+    get fovCamara()      { return 55; }
 
     anchoArea(anchoVentana) { return anchoVentana; }
 

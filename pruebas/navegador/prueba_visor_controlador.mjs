@@ -235,10 +235,9 @@ async function pasosEn2s(hz) {
   await crearVisor(page);
   await esperar(page, 800);
   const fovPc = await leer(page, () => window.__fovs.at(-1));
-  check(fovPc === 78 || fovPc === 55, 'RF-14 FOV válido en PC (fov ' + fovPc + ')');
-  // la columna es ≤ 480 px de ancho, así que el aspecto sigue siendo < 1 → 78
+  // PRD 015 (D7): la ventana de PC es más ancha que alta → diseño horizontal, todo el ancho y FOV 55
   const aspecto = await leer(page, () => { const c = document.getElementById('canvas-carrera-solo'); return c.width / c.height; });
-  check(aspecto < 1 ? fovPc === 78 : fovPc === 55, 'RF-14 FOV coherente con el aspecto ' + aspecto.toFixed(2));
+  check(fovPc === 55 && aspecto > 1, 'RF-14 y PRD 015 D7 en PC, diseño horizontal: fov ' + fovPc + ', aspecto ' + aspecto.toFixed(2));
   await leer(page, () => window.__visor.detener());
   await ctx.close();
 }

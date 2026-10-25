@@ -24,7 +24,6 @@ import { RivalesCarreraSolo }        from './carrera_solo/rivales_carrera_solo.j
 // ================================================================
 class VisorCarreraSolo extends VisorBase {
     // ── Constantes internas de la vista ──────────────────────────
-    static #FOV_VERTICAL    = 78;
     static #DIST_VERTICAL   = 9;
     static #ALTURA_VERTICAL = 3.6;
     static #MUESTRAS_RIVALES = 1000;
@@ -279,8 +278,9 @@ class VisorCarreraSolo extends VisorBase {
         this.#escena.add(relleno);
     }
 
+    // La cámara la decide el diseño (PRD 015): misma regla que el HUD y la pantalla
     #crearCamara(aspecto) {
-        this.#esVertical = aspecto < 1;
+        this.#esVertical = new window.SelectorDisenoCarrera().elegir().camaraVertical;
         this.#camara = this.#esVertical
             ? new CamaraSeguimiento(aspecto, {
                 distancia: VisorCarreraSolo.#DIST_VERTICAL,
@@ -295,7 +295,7 @@ class VisorCarreraSolo extends VisorBase {
     #aplicarReglaFov(aspecto) {
         const camara = this.#camara?.camera;
         if (!camara) return;
-        camara.fov    = aspecto < 1 ? VisorCarreraSolo.#FOV_VERTICAL : 55;
+        camara.fov    = new window.SelectorDisenoCarrera().elegir().fovCamara;
         camara.aspect = aspecto;
         camara.updateProjectionMatrix();
     }
@@ -312,7 +312,7 @@ class VisorCarreraSolo extends VisorBase {
         if (this.#detenido || !this.#renderer) return;
         const { ancho, alto } = this.#dimensionarCanvas();
         const aspecto = ancho / alto;
-        if ((aspecto < 1) !== this.#esVertical) this.#crearCamara(aspecto);
+        if (new window.SelectorDisenoCarrera().elegir().camaraVertical !== this.#esVertical) this.#crearCamara(aspecto);
         else {
             this.#camara.resize(aspecto);
             this.#aplicarReglaFov(aspecto);

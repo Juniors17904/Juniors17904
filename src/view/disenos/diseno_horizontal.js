@@ -5,12 +5,11 @@ try {
 // VIEW — DisenoHorizontal: la carrera con el celular acostado o en una
 // ventana más ancha que alta (PRD 015, D5 y D7). La pista y el HUD usan
 // todo el ancho; el timón queda abajo a la izquierda y ACEL/FRENO abajo a
-// la derecha, con el velocímetro encima (lo acomoda el CSS).
+// la derecha, con el velocímetro encima (lo acomoda el CSS). La cámara
+// es la de seguimiento común, con 55° de visión (los de DisenoCarrera).
 // ================================================================
 class DisenoHorizontal extends window.DisenoCarrera {
     get nombre() { return 'horizontal'; }
-
-    anchoArea(anchoVentana) { return anchoVentana; }
 }
 
 window.DisenoHorizontal = DisenoHorizontal;
