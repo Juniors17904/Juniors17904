@@ -186,12 +186,12 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Superficie` | `SuperficieAsfalto`, `SuperficiePiano`, `SuperficiePasto` (las entrega `DetectorSuperficie`) | `nombre`, `rozamiento`, `esPasto` |
 | `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida`, `FlechaCurvaSolida` (los crea `FabricaObjetosSolidos`; los usa `DetectorChoques`) | `x`, `z`, `radio`, `tipo`, `alcance`, `puntoCercano(rectangulo)` (cada objeto calcula su propio choque contra el `RectanguloCarro`, PRD 011) |
 | `TrazadoPiso` | `TrazadoPisoCurva`, `TrazadoPisoRecto` (los usa `ConstructorPisoPista`, PRD 012) | `largo`, `cerrado`, `puntoEn(s)`, `distanciasEntre(s0, s1)` |
-| `DisenoCarrera` | `DisenoVertical`, `DisenoHorizontal` (los elige `SelectorDisenoCarrera` por la forma de la pantalla y los aplica `AdaptadorDisenoCarrera`, PRD 015) | `nombre`, `anchoArea(anchoVentana)`, `camaraVertical`, `fovCamara`, `aplicar(pantalla)` |
+| `DisenoCarrera` | `DisenoVertical`, `DisenoHorizontal` (los elige `SelectorDisenoCarrera` por la forma de la pantalla y los aplica `AdaptadorDisenoCarrera`, PRD 015) | `nombre`, `anchoArea(anchoVentana)`, `camaraVertical`, `fovCamara`, `aplicar(pantalla)`; y los controles (PRD 016): `ladoPedal`, `separacionPedales`, `pedalesApilados`, `altoControles`, `recorridoGiro(anchoVentana)` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 | `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
-- `src/view/controles/` → `ControlEntrada` + subclases + timones
+- `src/view/controles/` → `ControlEntrada` + subclases + timones; también `RespuestaToque` (el botón apretado se ilumina y vibra) y `EstiloControlesCarrera` (lleva las medidas de cada diseño a los controles de la carrera), del PRD 016
 - `src/view/velocimetros/` → `Velocimetro` + subclases
 - `src/view/minimapas/` → `MinimapBase` + subclases, y `MapaConduccion` / `ParMapasConduccion` + subclases
 - `src/view/paneles/` → `PanelDatos` + subclases

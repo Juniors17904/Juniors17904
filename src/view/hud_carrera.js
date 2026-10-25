@@ -10,8 +10,10 @@ try {
 // Sin lógica de negocio: solo pinta lo que le pasa el controlador.
 // ================================================================
 class HudCarrera {
-    static #ALTO_BANDA_CONTROLES = 120;
     static #RADIO_VELOCIMETRO = 40;
+    // Altura mínima del centro del velocímetro sobre el borde de abajo (la de antes del PRD 016):
+    // así no baja sobre los botones del modo botones ni sobre los pedales en horizontal
+    static #ALTURA_MINIMA_VELOCIMETRO = 176;
     static #MARGEN_VELOCIMETRO = 56;
     static #Z_INDEX_RESULTADO = '30';
 
@@ -282,7 +284,9 @@ class HudCarrera {
         if (!renderizador || typeof renderizador.dibujar !== 'function') return;
         const m = HudCarrera.#MARGEN_VELOCIMETRO;
         const cx = this.#ancho - m;
-        const cy = this.#alto - HudCarrera.#ALTO_BANDA_CONTROLES - m;
+        // Encima de ACEL/FRENO: el alto de los controles lo da el diseño (PRD 016, D5)
+        const encimaControles = new window.SelectorDisenoCarrera().elegir().altoControles + HudCarrera.#RADIO_VELOCIMETRO + 8;
+        const cy = this.#alto - Math.max(HudCarrera.#ALTURA_MINIMA_VELOCIMETRO, encimaControles);
         const f = Number.isFinite(fraccionVel) ? Math.max(0, Math.min(1, fraccionVel)) : 0;
         try {
             renderizador.dibujar(ctx, cx, cy, HudCarrera.#RADIO_VELOCIMETRO, f, indiceVelocimetro ?? 0);

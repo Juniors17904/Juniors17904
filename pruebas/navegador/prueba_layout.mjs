@@ -37,7 +37,9 @@ for (const c of casos) {
   const m = await page.evaluate(() => {
     const r = id => { const e=document.getElementById(id); if(!e) return null; const b=e.getBoundingClientRect(); const vis=getComputedStyle(e).display!=='none' && b.width>0; return vis?{x:b.left,y:b.top,r:b.right,b:b.bottom}:null; };
     const ancho=innerWidth>innerHeight?innerWidth:Math.min(innerWidth,480), izq=(innerWidth-ancho)/2;
-    const v={x:izq+ancho-56-48, y:innerHeight-176-48, r:izq+ancho-56+48, b:innerHeight-176+48};
+    // PRD 016: el velocímetro sube según el alto de los controles de cada diseño
+    const cy=innerHeight-Math.max(176,new window.SelectorDisenoCarrera().elegir().altoControles+48);
+    const v={x:izq+ancho-56-48, y:cy-48, r:izq+ancho-56+48, b:cy+48};
     return { H:innerHeight, W:innerWidth, izq, der:izq+ancho, vel:v,
       elems:{ 'canvas-timon':r('canvas-timon'), 'btn-acelerar':r('btn-acelerar'), 'btn-freno':r('btn-freno'),
               'btn-izq':r('btn-izq'), 'btn-der':r('btn-der'), 'btn-gas':r('btn-gas'), 'btn-rev':r('btn-rev') } };

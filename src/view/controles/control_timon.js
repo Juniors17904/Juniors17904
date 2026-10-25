@@ -4,7 +4,11 @@ try {
 // ================================================================
 // CLASS: ControlTimon — timón táctil para el circuito
 //        Extiende ControlEntrada: activar(circuito) monta todo,
-//        destruir() desmonta y limpia.
+//        destruir() desmonta y limpia (también sus escuchas de toque).
+//        En Jugar Solo (PRD 016) también gira desde la zona de giro
+//        (#zona-giro, solo visible en esa pantalla) y el arrastre para el
+//        giro máximo sale del diseño (--carrera-recorrido-giro); en las
+//        otras pantallas sigue igual. Un segundo dedo no lo endereza.
 // ================================================================
 class ControlTimon extends ControlEntrada {
     #canvasId;
@@ -23,7 +27,9 @@ class ControlTimon extends ControlEntrada {
     #startX          = 0;
     #startWheelAngle = 0;
     #maxAngle        = Math.PI / 3;
-    #sensitivity     = 80;
+    #sensitivity     = 80;          // arrastre para el giro máximo fuera de Jugar Solo
+    #recorrido       = 80;          // el de este arrastre
+    #escuchasGiro    = [];          // [elemento, tipo, fn] para quitarlas al destruir
     #mouseDown       = false;
 
     // Handlers guardados para poder removerlos
@@ -74,6 +80,8 @@ class ControlTimon extends ControlEntrada {
             el.removeEventListener('mouseup',     onEnd);
         }
         this.#aceleradorHandlers = [];
+        for (const [el, tipo, fn] of this.#escuchasGiro) el.removeEventListener(tipo, fn);
+        this.#escuchasGiro = [];
 
         this.ocultarOverlay();
         if (this.#cir) { this.#cir.entradaAcel = 0; this.#cir.entradaDireccion = 0; }
@@ -84,18 +92,33 @@ class ControlTimon extends ControlEntrada {
 
     // ── Configurar canvas del timón ──────────────────────────────
     #setupCanvas() {
-        const c = this.#canvas;
-        c.addEventListener('touchstart',  e => { e.preventDefault(); this.#onTouchStart(e); }, { passive: false });
-        c.addEventListener('touchmove',   e => { e.preventDefault(); this.#onTouchMove(e);  }, { passive: false });
-        c.addEventListener('touchend',    () => this.#reset());
-        c.addEventListener('touchcancel', () => this.#reset());
-        c.addEventListener('mousedown',   e => {
-            this.#mouseDown      = true;
-            this.#startX         = e.clientX;
-            this.#startWheelAngle = this.#angle;
-        });
-        window.addEventListener('mousemove', e => { if (this.#mouseDown) this.#applyX(e.clientX); });
-        window.addEventListener('mouseup',   () => this.#reset());
+        const escuchar = (el, tipo, fn, opciones) => {
+            if (!el) return;
+            el.addEventListener(tipo, fn, opciones);
+            this.#escuchasGiro.push([el, tipo, fn]);
+        };
+        // El timón y, en Jugar Solo, la zona de giro responden igual
+        for (const el of [this.#canvas, document.getElementById('zona-giro')]) {
+            escuchar(el, 'touchstart',  e => { e.preventDefault(); this.#onTouchStart(e); }, { passive: false });
+            escuchar(el, 'touchmove',   e => { e.preventDefault(); this.#onTouchMove(e);  }, { passive: false });
+            escuchar(el, 'touchend',    e => this.#onTouchEnd(e));
+            escuchar(el, 'touchcancel', e => this.#onTouchEnd(e));
+            escuchar(el, 'mousedown',   e => {
+                this.#mouseDown       = true;
+                this.#startX          = e.clientX;
+                this.#startWheelAngle = this.#angle;
+                this.#recorrido       = this.#recorridoGiro();
+            });
+        }
+        escuchar(window, 'mousemove', e => { if (this.#mouseDown) this.#applyX(e.clientX); });
+        escuchar(window, 'mouseup',   () => { if (this.#mouseDown) this.#reset(); });
+    }
+
+    // Arrastre para el giro máximo: el del diseño de la carrera, si lo hay (PRD 016)
+    #recorridoGiro() {
+        const controles = document.getElementById('ctrl-timon');
+        const valor = controles ? parseFloat(getComputedStyle(controles).getPropertyValue('--carrera-recorrido-giro')) : NaN;
+        return valor > 0 ? valor : this.#sensitivity;
     }
 
     // ── Botones acelerar / freno + teclado para accel ────────────
@@ -146,7 +169,7 @@ class ControlTimon extends ControlEntrada {
     // ── Lógica interna del timón ─────────────────────────────────
     #applyX(x) {
         const dx     = x - this.#startX;
-        const target = this.#startWheelAngle + (dx / this.#sensitivity) * this.#maxAngle;
+        const target = this.#startWheelAngle + (dx / this.#recorrido) * this.#maxAngle;
         this.#targetAngle = Math.max(-this.#maxAngle, Math.min(this.#maxAngle, target));
         this.#entradaDireccion  = this.#targetAngle / this.#maxAngle;
     }
@@ -164,6 +187,12 @@ class ControlTimon extends ControlEntrada {
         this.#touchId         = t.identifier;
         this.#startX          = t.clientX;
         this.#startWheelAngle = this.#angle;
+        this.#recorrido       = this.#recorridoGiro();
+    }
+
+    // Solo el dedo que gira endereza el timón al levantarse (PRD 016, D7)
+    #onTouchEnd(e) {
+        if (Array.from(e.changedTouches ?? []).some(t => t.identifier === this.#touchId)) this.#reset();
     }
 
     #onTouchMove(e) {

@@ -49,15 +49,41 @@
             align-items: flex-end;
             padding-bottom: 6px;
         }
-        /* Modo timón: ACEL/FRENO de 52 px (52 + 8 + 52 + 6 = 118 px) caben en la banda de
-           120 px y dejan libre el velocímetro de RF-25 (centro alto − 176, disco r + 8 = 48 px) */
-        #pantalla-carrera-solo.activa ~ #ctrl-timon > div:last-child { gap: 8px !important; }
-        #pantalla-carrera-solo.activa ~ #ctrl-timon .btn-dir {
-            width: 52px;
-            height: 52px;
-            font-size: 10px !important;
-            letter-spacing: 0 !important;
+        /* Modo timón (PRD 016): el lado, la separación y si ACEL/FRENO van apilados o lado a
+           lado como pedales (FRENO a la izquierda) los pone cada diseño como variables CSS
+           (EstiloControlesCarrera). El velocímetro se ubica encima, según el mismo diseño. */
+        #pantalla-carrera-solo.activa ~ #ctrl-timon > div:last-child {
+            gap: var(--carrera-separacion-pedales, 16px) !important;
+            flex-direction: var(--carrera-direccion-pedales, column) !important;
         }
+        #pantalla-carrera-solo.activa ~ #ctrl-timon .btn-dir {
+            width: var(--carrera-lado-pedal, 72px);
+            height: var(--carrera-lado-pedal, 72px);
+            font-size: 13px !important;
+            letter-spacing: 0 !important;
+            transition: transform 0.06s, background 0.06s, box-shadow 0.06s;
+        }
+        /* Se nota el toque (PRD 016, D6): RespuestaToque pone la clase mientras se aprieta */
+        #pantalla-carrera-solo.activa ~ #ctrl-timon .btn-dir.apretado {
+            transform: scale(0.9);
+            background: rgba(167, 139, 250, 0.75);
+            box-shadow: 0 0 36px rgba(167, 139, 250, 0.95), inset 0 4px 10px rgba(0, 0, 0, 0.45);
+            color: #fff;
+        }
+        /* Zona de giro (PRD 016, D3): el tercio izquierdo de abajo, nunca más chica que el
+           timón; arrastrar ahí gira igual que el timón. Fuera de Jugar Solo no existe. */
+        #zona-giro { display: none; }
+        #pantalla-carrera-solo.activa ~ #ctrl-timon #zona-giro {
+            display: block;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: max(33.34vw, 200px);
+            height: max(45vh, 200px);
+            pointer-events: all;
+            touch-action: none;
+        }
+        #pantalla-carrera-solo.activa ~ #ctrl-timon #timon-wrap { position: relative; z-index: 1; }
         /* Con el panel de resultado visible la pantalla sube por encima de .ctrl-overlay (z 20):
            el z-index del panel solo vale dentro del contexto de apilamiento de la pantalla */
         #pantalla-carrera-solo.activa.con-resultado { z-index: 25; }
@@ -765,6 +791,8 @@
         <button id="btn-der" class="btn-dir">▶</button>
     </div>
     <div id="ctrl-timon" class="ctrl-overlay" style="display:none">
+        <!-- Zona de giro de Jugar Solo (PRD 016): solo se ve en esa pantalla -->
+        <div id="zona-giro"></div>
         <div id="timon-wrap">
             <canvas id="canvas-timon" width="160" height="160" style="background:transparent;display:block"></canvas>
         </div>
@@ -843,6 +871,9 @@
     <script src="src/view/velocimetros/renderizador_velocimetro.js"></script>
     <script src="src/view/velocimetros/galeria_velocimetros.js"></script>
     <script src="src/view/tabla_final_carrera.js"></script>
+    <!-- View: respuesta al toque y estilo de los controles de la carrera (PRD 016) -->
+    <script src="src/view/controles/respuesta_toque.js"></script>
+    <script src="src/view/controles/estilo_controles_carrera.js"></script>
     <!-- View: diseños de la carrera 3D, vertical y horizontal (PRD 015) -->
     <script src="src/view/disenos/diseno_carrera.js"></script>
     <script src="src/view/disenos/diseno_vertical.js"></script>
