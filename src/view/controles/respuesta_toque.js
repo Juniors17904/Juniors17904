@@ -10,13 +10,19 @@ try {
 // ================================================================
 class RespuestaToque {
     static #VIBRACION_MS = 12;
+    // Tras un toque, el navegador manda un mousedown de compatibilidad: se ignora
+    static #ESPERA_RATON_MS = 800;
 
     #escuchas = [];
+    #ultimoToque = -Infinity;
 
     constructor(botones) {
         for (const boton of botones ?? []) {
             if (!boton) continue;
-            const apretar = () => {
+            const apretar = e => {
+                const ahora = Date.now();
+                if (e?.type === 'touchstart') this.#ultimoToque = ahora;
+                else if (ahora - this.#ultimoToque < RespuestaToque.#ESPERA_RATON_MS) return;
                 boton.classList.add('apretado');
                 try { navigator.vibrate?.(RespuestaToque.#VIBRACION_MS); } catch { /* sin vibración */ }
             };

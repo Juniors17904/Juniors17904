@@ -8,7 +8,7 @@ try {
 //        En Jugar Solo (PRD 016) también gira desde la zona de giro
 //        (#zona-giro, solo visible en esa pantalla) y el arrastre para el
 //        giro máximo sale del diseño (--carrera-recorrido-giro); en las
-//        otras pantallas sigue igual. Un segundo dedo no lo endereza.
+//        otras pantallas sigue igual. En Jugar Solo un segundo dedo no lo endereza.
 // ================================================================
 class ControlTimon extends ControlEntrada {
     #canvasId;
@@ -111,7 +111,14 @@ class ControlTimon extends ControlEntrada {
             });
         }
         escuchar(window, 'mousemove', e => { if (this.#mouseDown) this.#applyX(e.clientX); });
-        escuchar(window, 'mouseup',   () => { if (this.#mouseDown) this.#reset(); });
+        escuchar(window, 'mouseup',   () => { if (this.#mouseDown || !this.#enZonaGiro()) this.#reset(); });
+    }
+
+    // La zona de giro solo se ve en Jugar Solo: ahí rigen los toques del PRD 016;
+    // en las otras pantallas el timón sigue como siempre (D1)
+    #enZonaGiro() {
+        const zona = document.getElementById('zona-giro');
+        return !!zona && getComputedStyle(zona).display !== 'none';
     }
 
     // Arrastre para el giro máximo: el del diseño de la carrera, si lo hay (PRD 016)
@@ -190,9 +197,10 @@ class ControlTimon extends ControlEntrada {
         this.#recorrido       = this.#recorridoGiro();
     }
 
-    // Solo el dedo que gira endereza el timón al levantarse (PRD 016, D7)
+    // En Jugar Solo, solo el dedo que gira endereza el timón al levantarse (PRD 016, D7)
     #onTouchEnd(e) {
-        if (Array.from(e.changedTouches ?? []).some(t => t.identifier === this.#touchId)) this.#reset();
+        const soltoElQueGira = Array.from(e.changedTouches ?? []).some(t => t.identifier === this.#touchId);
+        if (soltoElQueGira || !this.#enZonaGiro()) this.#reset();
     }
 
     #onTouchMove(e) {

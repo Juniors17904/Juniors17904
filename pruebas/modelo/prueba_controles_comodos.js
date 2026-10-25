@@ -6,7 +6,8 @@
 //         16 px entre ellos; cada diseño dice cuánto alto ocupan
 //   D9    EstiloControlesCarrera lleva las medidas del diseño como variables CSS
 //         y quitar() las borra
-//   D6    RespuestaToque marca el botón apretado y vibra si se puede (sin error si no)
+//   D6    RespuestaToque marca el botón apretado y vibra si se puede (sin error si no),
+//         una sola vez por toque
 //   D5    el velocímetro sube en vertical y nunca baja de su altura de antes
 //   RF-10 notas en los PRD de D11, CLAUDE.md y backlog B23
 //   RNF-03 las clases nuevas no pasan de 400 líneas
@@ -36,7 +37,7 @@ class PruebaControlesComodos {
     #leer(relativo) { return fs.readFileSync(path.join(PruebaControlesComodos.#RAIZ, relativo), 'utf8'); }
 
     #cargar() {
-        const ctx = { console, Math, String, innerWidth: 844, innerHeight: 390, navigator: {} };
+        const ctx = { console, Math, String, Date, innerWidth: 844, innerHeight: 390, navigator: {} };
         ctx.window = ctx;
         vm.createContext(ctx);
         const archivos = ['src/view/disenos/diseno_carrera.js', 'src/view/disenos/diseno_vertical.js', 'src/view/disenos/diseno_horizontal.js',
@@ -78,16 +79,18 @@ class PruebaControlesComodos {
             addEventListener: (t, f) => { escuchas[t] = f; }, removeEventListener: t => { delete escuchas[t]; } };
         this.#ctx.navigator.vibrate = ms => vibraciones.push(ms);
         const r = new this.#ctx.RespuestaToque([boton, null]);
-        escuchas.touchstart();
+        escuchas.touchstart({ type: 'touchstart' });
         this.#ok(clases.has('apretado') && vibraciones.length === 1 && vibraciones[0] <= 20, 'D6 al apretar se marca el botón y vibra muy corto');
-        escuchas.touchend();
+        escuchas.touchend({ type: 'touchend' });
         this.#ok(!clases.has('apretado'), 'D6 al soltar vuelve a su aspecto');
+        escuchas.mousedown({ type: 'mousedown' });
+        this.#ok(!clases.has('apretado') && vibraciones.length === 1, 'D6 el mousedown que el navegador manda tras el toque no vuelve a vibrar');
         this.#ctx.navigator.vibrate = () => { throw new Error('no permitido'); };
         let error = null;
-        try { escuchas.mousedown(); } catch (e) { error = e; }
+        try { escuchas.touchstart({ type: 'touchstart' }); } catch (e) { error = e; }
         this.#ok(!error && clases.has('apretado'), 'RF-07 si el celular no deja vibrar no hay error');
         delete this.#ctx.navigator.vibrate;
-        try { escuchas.touchstart(); } catch (e) { error = e; }
+        try { escuchas.touchstart({ type: 'touchstart' }); } catch (e) { error = e; }
         this.#ok(!error, 'RF-07 sin vibración (iPhone) no hay error');
         r.destruir();
         this.#ok(Object.keys(escuchas).length === 0 && !clases.has('apretado'), 'D6 destruir() deja de escuchar');
