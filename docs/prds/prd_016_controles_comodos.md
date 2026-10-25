@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — programado |
+| Estado | v3 — programado y en `main` |
 | Fecha | 2026-10-25 |
 | Backlog | B23 (`docs/BACKLOG.md`) |
 | Depende de | PRD 015 (diseños vertical y horizontal) |
