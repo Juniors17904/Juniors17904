@@ -34,6 +34,11 @@ class TrazadoVuelta {
         if (Math.hypot(fx - ix, fz - iz) <= medidas.distanciaPistaAbierta) return;   // pista cerrada (Ciudad)
 
         const cierre = new window.CierrePistaAbierta(this.#puntos, medidas);
+        if (!cierre.valido) {
+            window.__modelErrors = window.__modelErrors || [];
+            window.__modelErrors.push('[TrazadoVuelta] el camino de vuelta no puede rodear la pista sin acercarse a ella');
+            console.warn('[TrazadoVuelta] el camino de vuelta no puede rodear la pista sin acercarse a ella');
+        }
         const poses = cierre.poses;
         this.#puntos.push(...poses.map(p => [p.x, p.z]));
         this.#flechas = new window.FlechasCierre(poses, this.#puntosPista, medidas).decoraciones;

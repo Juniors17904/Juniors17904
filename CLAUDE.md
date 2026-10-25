@@ -109,7 +109,7 @@ class NivelCiudad extends Nivel {
 - **Excepción permitida — visores 3D:** un visor de pista (subclase de `VisorBase`) puede crear su `Ruta` y su `Carro` y avanzar la física con paso fijo, porque la integración va atada al render. Las **reglas de negocio** (vueltas, tiempos, penalizaciones como el pasto) viven siempre en clases del modelo (`CarreraVueltas`, `Cronometro`…); el visor solo aplica lo que el modelo calcula.
 
 ### Escala del juego 3D
-- **1 unidad = 1 metro** (PRD 009). Las medidas del carro (por tipo) y de la pista viven en `MedidasEscena` (`src/model/medidas_escena.js`); ahí también viven las medidas de los objetos (árbol, poste y señal de curva) y la distancia de postes y señales al centro de la pista (PRD 010), las del piso (PRD 012) las de la señalética: flechas de curva, arcos de meta y salida y cartel de aviso (PRD 011), y el radio mínimo del cierre de las pistas abiertas (PRD 014). Nadie repite esos números.
+- **1 unidad = 1 metro** (PRD 009). Las medidas del carro (por tipo) y de la pista viven en `MedidasEscena` (`src/model/medidas_escena.js`); ahí también viven las medidas de los objetos (árbol, poste y señal de curva) y la distancia de postes y señales al centro de la pista (PRD 010), las del piso (PRD 012) las de la señalética: flechas de curva, arcos de meta y salida y cartel de aviso (PRD 011), y las medidas del cierre de las pistas abiertas, como el radio mínimo del cierre (PRD 014). Nadie repite esos números.
 
 ### POO obligatorio — checklist antes de escribir cualquier código nuevo
 1. ¿Tiene nombre propio? → clase con ese nombre en español

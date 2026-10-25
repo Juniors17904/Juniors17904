@@ -78,6 +78,9 @@ class MedidasEscena {
     static #MARGEN_CIERRE           = 45;   // el camino de vuelta rodea la pista a esta distancia
     static #DISTANCIA_MINIMA_CIERRE = 20;   // lo más cerca que el camino de vuelta pasa de la pista
     static #DISTANCIA_UNION_CIERRE  = 50;   // en las uniones con la pista no rige la distancia mínima
+    static #SEPARACION_CONTORNO     = 60;   // metros entre los vértices del contorno que rodea la pista
+    static #RADIO_CURVA_FLECHAS     = 150;  // un tramo del camino de vuelta más cerrado que esto es curva
+    static #LARGO_MINIMO_CURVA      = 20;   // metros de curva para ponerle flechas
 
     // Largo real (D3) y proporciones ancho/largo y alto/largo de cada modelo GLB
     #carros = new Map([
@@ -163,6 +166,9 @@ class MedidasEscena {
     get margenCierre()          { return MedidasEscena.#MARGEN_CIERRE; }
     get distanciaMinimaCierre() { return MedidasEscena.#DISTANCIA_MINIMA_CIERRE; }
     get distanciaUnionCierre()  { return MedidasEscena.#DISTANCIA_UNION_CIERRE; }
+    get separacionContorno()    { return MedidasEscena.#SEPARACION_CONTORNO; }
+    get radioCurvaFlechas()     { return MedidasEscena.#RADIO_CURVA_FLECHAS; }
+    get largoMinimoCurva()      { return MedidasEscena.#LARGO_MINIMO_CURVA; }
 
     // Sin tipo o con un tipo desconocido se usan las del deportivo (carro básico)
     medidaCarro(tipo) {

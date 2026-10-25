@@ -6,21 +6,20 @@ try {
 // (PRD 014, D3 a D6). Sale del final de la pista con su rumbo, la rodea
 // por fuera (ContornoPista) y entra a la largada con su rumbo, encadenando
 // TrayectoDubins con curvas de radio mínimo. Prueba los dos sentidos y se
-// queda con el más corto que no se acerca a la pista.
-// Las medidas salen de MedidasEscena.
+// queda con el más corto que no se acerca a la pista; si ninguno cumple,
+// "valido" es false y TrazadoVuelta lo avisa. Las medidas salen de MedidasEscena.
 // ================================================================
 class CierrePistaAbierta {
-    static #SEPARACION_CONTORNO = 60;   // metros entre vértices del contorno
-
     #poses = [];               // PoseCierre del camino de vuelta, sin la largada
     #largo = 0;
     #distanciaMinima = Infinity;
+    #valido = false;
 
     constructor(puntos, medidas = new window.MedidasEscena()) {
         const N = puntos.length;
         const fin    = this.#pose(puntos, N - 1, N - 2, N - 1);
         const inicio = this.#pose(puntos, 0, 0, 1);
-        const contorno = new window.ContornoPista(puntos, CierrePistaAbierta.#SEPARACION_CONTORNO, 0, N - 1);
+        const contorno = new window.ContornoPista(puntos, medidas.separacionContorno, 0, N - 1);
         let mejor = null;
         for (const sentido of [1, -1]) {
             const intermedias = contorno.recorrido(N - 1, 0, sentido, medidas.margenCierre);
@@ -35,11 +34,15 @@ class CierrePistaAbierta {
         this.#poses = mejor.camino.slice(0, -1);   // la última es la largada, que ya está en la pista
         this.#largo = mejor.largo;
         this.#distanciaMinima = mejor.cerca;
+        this.#valido = mejor.valido && contorno.tiene(0) && contorno.tiene(N - 1);
     }
 
     get poses()           { return [...this.#poses]; }
     get largo()           { return this.#largo; }
     get distanciaMinima() { return this.#distanciaMinima; }
+    // false si la pista no se puede rodear por fuera (sus puntas no están en el
+    // borde de afuera) o si el camino de vuelta pasa demasiado cerca de ella
+    get valido()          { return this.#valido; }
 
     #pose(puntos, i, a, b) {
         return new window.PoseCierre(puntos[i][0], puntos[i][1],

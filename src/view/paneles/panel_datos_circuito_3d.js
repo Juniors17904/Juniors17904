@@ -54,7 +54,7 @@ class PanelDatosCircuito3D extends PanelDatos {
         document.getElementById('dbg-recor').textContent = (cir.progress * cir.pathLen / 1000).toFixed(3);
         const pp  = cir.pathPos;
         const off = Math.sqrt((cir.px-pp.x)**2 + (cir.pz-pp.z)**2);
-        const seg = (cir.progress * pistaCfg.totalSegs) | 0;
+        const seg = (cir.progresoPista * pistaCfg.totalSegs) | 0;   // en el camino de vuelta (PRD 014) pasa de totalSegs y no hay tramo
         const trP = pistaCfg.tramos.find(([d,h]) => seg>=d && seg<h);
         document.getElementById('dbg-seg').textContent    = seg;
         document.getElementById('dbg-curva').textContent  = trP ? trP[2].toFixed(1) : '0.0';

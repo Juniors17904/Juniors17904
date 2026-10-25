@@ -91,26 +91,23 @@ async function capturaDesdeArriba(page, lienzo, archivo) {
   await page.screenshot({ path: `${CARPETA}/${archivo}` });
 }
 
-// ── Pantalla Pistas: el mapa de Costa dibuja la vuelta entera (RF-07) ──
-{
+// ── Pantalla Pistas y Diseño de Pistas en las 4 pistas abiertas (RF-07) ──
+const puntosDisenio = {};
+for (const nombre of ['costa', 'desierto', 'montana', 'volcan']) {
   const { page, errores } = await abrir(390, 844);
-  await elegirPista(page, 'costa');
+  await elegirPista(page, nombre);
   const mapa = await page.evaluate(() => window.__trazados[window.__trazados.length - 1]);
-  check(mapa && mapa.puntos > mapa.pista, `RF-07 el mapa de la pantalla Pistas arma la vuelta entera de Costa (${mapa?.puntos} puntos, la pista ${mapa?.pista})`);
-  await page.screenshot({ path: `${CARPETA}/pantalla_pistas_costa.png` });
-
-  // ── Diseño de Pistas: el visor y su minimapa con la vuelta entera ──
+  check(mapa && mapa.puntos > mapa.pista, `RF-07 el mapa de la pantalla Pistas arma la vuelta entera de ${nombre} (${mapa?.puntos} puntos, la pista ${mapa?.pista})`);
+  if (nombre === 'costa') await page.screenshot({ path: `${CARPETA}/pantalla_pistas_costa.png` });
   await clic(page, 'btn-seleccionar-pista');
   await page.waitForTimeout(5000);
-  const disenio = await page.evaluate(() => ({
-    trazados: window.__trazados.slice(1),
-    flechas: window.__objetos.filter(o => o.constructor.name === 'FlechaCurvaEscena' && o._grupo?.parent).length,
-  }));
-  check(disenio.trazados.length > 0 && disenio.trazados.every(t => t.puntos > t.pista),
-    `RF-07 Diseño de Pistas y su minimapa arman la vuelta entera (${disenio.trazados.map(t => t.puntos).join(', ')} puntos)`);
-  await page.screenshot({ path: `${CARPETA}/diseno_pistas_costa.png` });
+  const trazados = await page.evaluate(() => window.__trazados.slice(1));
+  puntosDisenio[nombre] = trazados[0]?.puntos;
+  check(trazados.length > 0 && trazados.every(t => t.puntos === mapa.puntos),
+    `RF-07 Diseño de Pistas (${nombre}) y su minimapa arman la misma vuelta que el mapa (${trazados.map(t => t.puntos).join(', ')} puntos)`);
+  if (nombre === 'costa') await page.screenshot({ path: `${CARPETA}/diseno_pistas_costa.png` });
   const reales = erroresReales(errores);
-  check(reales.length === 0, 'pantalla Pistas y Diseño de Pistas sin errores de consola ' + reales.join(' | '));
+  check(reales.length === 0, `pantalla Pistas y Diseño de Pistas (${nombre}) sin errores de consola ` + reales.join(' | '));
   await page.close();
 }
 
@@ -128,8 +125,8 @@ for (const nombre of ['costa', 'desierto', 'montana', 'volcan']) {
     const flechas = window.__objetos.filter(o => o.constructor.name === 'FlechaCurvaEscena' && o._grupo?.parent).length;
     return { t, flechas, pantalla: document.querySelector('.pantalla.activa')?.id };
   });
-  check(r.pantalla === 'pantalla-carrera-solo' && r.t && r.t.puntos > r.t.pista,
-    `RF-06 Jugar Solo (${nombre}) arma la vuelta entera: ${r.t?.puntos} puntos, ${r.t ? r.t.puntos - r.t.pista : 0} del camino de vuelta`);
+  check(r.pantalla === 'pantalla-carrera-solo' && r.t && r.t.puntos > r.t.pista && r.t.puntos === puntosDisenio[nombre],
+    `RF-06/RF-07 Jugar Solo (${nombre}) arma la vuelta entera, la misma que Diseño de Pistas: ${r.t?.puntos} puntos, ${r.t ? r.t.puntos - r.t.pista : 0} del camino de vuelta`);
   check(r.t && r.t.flechas > 0 && r.flechas >= r.t.flechas,
     `RF-05 Jugar Solo (${nombre}) dibuja las ${r.t?.flechas} flechas del camino de vuelta (${r.flechas} flechas en total)`);
   await capturaDesdeArriba(page, 'canvas-carrera-solo', `jugar_solo_${nombre}_camino_de_vuelta.png`);

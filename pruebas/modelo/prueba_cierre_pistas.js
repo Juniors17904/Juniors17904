@@ -8,6 +8,8 @@
 //   RF-05 el camino de vuelta tiene flechas, del lado de afuera, con distancia y paso de MedidasEscena, sólidas
 //   RF-06 CarreraVueltas cuenta la vuelta entera: la meta llega recién después del camino de vuelta
 //   RF-09 notas de D11, CLAUDE.md y backlog B19
+//   D9    Ruta: posicionEn mide en la pista, posicionVuelta en la vuelta entera, fraccionPista las une
+//   PRD 013 los 4 rivales terminan la carrera en Costa pasando por el camino de vuelta
 //   RNF-01 las medidas del cierre viven en MedidasEscena y el giro de los tramos en un solo lugar
 // ================================================================
 'use strict';
@@ -22,7 +24,7 @@ class PruebaCierrePistas {
     #fallos = [];
     #ctx;
     #m;
-    #THREE; #Ruta; #DetectorChoques; #Carro;
+    #THREE; #Ruta; #DetectorChoques; #Carro; #CarreraConRivales; #GrillaSalida;
 
     async ejecutar() {
         const src = p => path.join(PruebaCierrePistas.#RAIZ, 'src', p);
@@ -30,6 +32,8 @@ class PruebaCierrePistas {
         ({ Ruta: this.#Ruta } = await import(src('model/ruta.js')));
         ({ DetectorChoques: this.#DetectorChoques } = await import(src('model/choques/detector_choques.js')));
         ({ Carro: this.#Carro } = await import(src('model/carros/carro.js')));
+        ({ CarreraConRivales: this.#CarreraConRivales } = await import(src('model/carrera_con_rivales.js')));
+        ({ GrillaSalida: this.#GrillaSalida } = await import(src('model/grilla_salida.js')));
         this.#cargarClasicos();
         this.#m = new this.#ctx.MedidasEscena();
 
@@ -37,6 +41,8 @@ class PruebaCierrePistas {
         for (const nombre of PruebaCierrePistas.#ABIERTAS) this.#probarPistaAbierta(nombre);
         this.#probarCiudad();
         this.#probarVueltaCompleta();
+        this.#probarRutaVuelta();
+        this.#probarRivales();
         this.#probarDocumentos();
 
         for (const f of this.#fallos) console.log('❌ ' + f);
@@ -52,14 +58,14 @@ class PruebaCierrePistas {
         vm.createContext(ctx);
         const pistas = ['ciudad', ...PruebaCierrePistas.#ABIERTAS].map(n => `pistas/config_pista_${n}.js`);
         const carrera = ['muestra_ruta.js', 'superficies/superficie.js', 'superficies/superficie_asfalto.js', 'superficies/superficie_piano.js',
-            'superficies/superficie_pasto.js', 'superficies/detector_superficie.js', 'carrera_vueltas.js'];
+            'superficies/superficie_pasto.js', 'superficies/detector_superficie.js', 'carrera_vueltas.js', 'cronometro.js'];
         for (const f of ['registro_pistas.js', 'pistas/config_pista.js', ...pistas, 'medida_carro.js', 'medidas_escena.js', ...carrera]) {
             vm.runInContext(this.#leer('src/model/' + f), ctx, { filename: f });
         }
         new CargadorTrazadoVuelta().cargar(ctx);
         this.#ok(!(ctx.__modelErrors?.length), 'las clases del cierre cargan sin errores: ' + ctx.__modelErrors);
         this.#ctx = ctx;
-        globalThis.MedidasEscena = ctx.MedidasEscena;
+        for (const c of ['MedidasEscena', 'CarreraVueltas', 'Cronometro', 'MuestraRuta']) globalThis[c] = ctx[c];
     }
 
     #pista(nombre) { return this.#ctx.registroPistas.obtener(nombre); }
@@ -197,14 +203,48 @@ class PruebaCierrePistas {
         }
     }
 
+    // D9: posicionEn(prog) es la pista, posicionVuelta(f) la vuelta entera; a 95 % de la
+    // vuelta de Costa se está en el camino de vuelta, lejos de la pista
+    #probarRutaVuelta() {
+        const pista = this.#pista('costa'), ruta = this.#rutaDe(pista);
+        const trazado = new this.#ctx.TrazadoVuelta(pista.tramos, pista.totalSegs);
+        const N = trazado.puntosPista, M = trazado.puntos.length;
+        const enVuelta = ruta.posicionVuelta(0.95);
+        const cerca = Math.min(...trazado.puntos.slice(0, N).map(([x, z]) => Math.hypot(x - enVuelta.x, z - enVuelta.z)));
+        this.#ok(cerca > this.#m.distanciaMinimaCierre, `D9 a 95 % de la vuelta de Costa se está en el camino de vuelta (${cerca.toFixed(1)} m de la pista)`);
+        const igual = ruta.posicionEn(ruta.fraccionPista(0.95));
+        this.#ok(Math.hypot(igual.x - enVuelta.x, igual.z - enVuelta.z) < 1e-6 && Math.abs(ruta.fraccionPista(N / M) - 1) < 1e-9,
+            'D9 fraccionPista pasa de la vuelta a la pista (el camino de vuelta empieza en 1)');
+    }
+
+    // PRD 013 con el cierre: en Costa los 4 rivales terminan la carrera, con las
+    // flechas del camino de vuelta sólidas (sin jugador, sin ajuste de ritmo)
+    #probarRivales() {
+        const pista = this.#pista('costa'), ruta = this.#rutaDe(pista);
+        const muestras = Array.from({ length: 1000 }, (_, i) => {
+            const p = ruta.curve.getPointAt(i / 1000), t = ruta.curve.getTangentAt(i / 1000);
+            return new this.#ctx.MuestraRuta(p.x, p.z, Math.atan2(t.x, t.z));
+        });
+        let ahora = 0;
+        const carrera = new this.#CarreraConRivales(ruta, ruta.decoracionesCon(pista.decoraciones), muestras, 7, () => ahora);
+        carrera.colocarEnGrilla(new this.#GrillaSalida(this.#m).puntos(ruta.inicio, 5, muestras).slice(0, 4));
+        carrera.iniciar();
+        for (let paso = 0; paso < 60 * 900 && !carrera.todosTerminaron; paso++) {
+            ahora += 1000 / 60;
+            carrera.paso(null, null);
+        }
+        const tiempos = carrera.rivales.map(r => r.terminado ? (r.tiempoTotalMs / 1000).toFixed(0) + ' s' : 'no terminó');
+        this.#ok(carrera.todosTerminaron, `PRD 013 en Costa los 4 rivales terminan por el camino de vuelta (${tiempos.join(', ')})`);
+    }
+
     // RF-09: notas de D11, CLAUDE.md y backlog
     #probarDocumentos() {
         const prds = fs.readdirSync(path.join(PruebaCierrePistas.#RAIZ, 'docs/prds'));
         for (const n of ['001', '002', '004', '005', '006', '008', '011', '013']) {
             const f = prds.find(x => x.startsWith(`prd_${n}`));
-            this.#ok(f && /014/.test(this.#leer(`docs/prds/${f}`)), `RF-09 el PRD ${n} tiene la nota del PRD 014`);
+            this.#ok(f && /PRD 014/.test(this.#leer(`docs/prds/${f}`)), `RF-09 el PRD ${n} tiene la nota del PRD 014`);
         }
-        this.#ok(/radio mínimo del cierre[^\n]*PRD 014/.test(this.#leer('CLAUDE.md')), 'RF-09 CLAUDE.md dice que el radio mínimo del cierre vive en MedidasEscena');
+        this.#ok(/medidas del cierre de las pistas abiertas[^\n]*PRD 014/.test(this.#leer('CLAUDE.md')), 'RF-09 CLAUDE.md dice que las medidas del cierre viven en MedidasEscena');
         this.#ok(/B19[^\n]*prd_014/.test(this.#leer('docs/BACKLOG.md')), 'RF-09 el backlog enlaza B19 con el PRD 014');
     }
 }

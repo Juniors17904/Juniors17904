@@ -43,6 +43,8 @@ class VisorTestdriveRuta extends VisorBase {
     get aceleracion()    { return this.#mov?.aceleracion    ?? 0; }
     get velocidadMax() { return this.#mov?.velocidadMax ?? 0; }
     get progress() { return this.#progress; }
+    // Cuánto del trazado de la pista lleva (pasa de 1 en el camino de vuelta, PRD 014)
+    get progresoPista() { return this.#ruta.fraccionPista(this.#progress); }
     get rotY()     { return this.#mov?.rotY     ?? 0; }
     get rotZ()     { return this.#mov?.carLean  ?? 0; }
     get px()       { return this.#mov?.px       ?? 0; }

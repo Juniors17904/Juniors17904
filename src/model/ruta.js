@@ -61,6 +61,11 @@ export class Ruta {
         }
     }
 
+    // De la fracción de la vuelta entera a la fracción de la pista (pasa de 1 en el camino de vuelta)
+    fraccionPista(fraccionVuelta) {
+        return fraccionVuelta * this.#puntosVuelta / (this.#puntosPista || 1);
+    }
+
     muestras(n) {
         return Array.from({ length: n }, (_, i) => this.posicionVuelta(i / n));
     }
