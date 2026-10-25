@@ -52,10 +52,11 @@ for (const p of PANTALLAS) {
     const { ConstructorPisoPista } = await import('/src/view/pistas/comun/constructor_piso_pista.js');
     const construir = ConstructorPisoPista.prototype.construir;
     window.__pisos = [];
-    // El carro que maneja el visor (para ponerlo sobre el piano en RF-07)
-    const { Carro } = await import('/src/model/carros/carro.js');
-    const actualizar = Carro.prototype.actualizar;
-    Carro.prototype.actualizar = function (dt) { window.__carro = this; return actualizar.call(this, dt); };
+    // El carro que maneja el visor (para ponerlo sobre el piano en RF-07): el del
+    // ConductorPasoFijo, porque desde el PRD 013 los rivales de la PC también son Carro
+    const { ConductorPasoFijo } = await import('/src/view/pistas/comun/conductor_paso_fijo.js');
+    const avanzar = ConductorPasoFijo.prototype.avanzar;
+    ConductorPasoFijo.prototype.avanzar = function (...a) { if (this.carro) window.__carro = this.carro; return avanzar.apply(this, a); };
     ConstructorPisoPista.prototype.construir = function () { const g = construir.call(this); window.__pisos.push(g); return g; };
   });
   for (const paso of p.pasos) {
@@ -70,7 +71,7 @@ for (const p of PANTALLAS) {
     const h = new window.MedidasEscena().alturaAsfalto;
     const escena = g?.parent;
     // El carro: el grupo de la escena que se dibuja a la altura del asfalto y tiene hijos
-    const carro = escena?.children.find(c => c !== g && c.isGroup && c.children.length && Math.abs(c.position.y - h) < 1e-6);
+    const carro = escena?.children.find(c => c !== g && c.isGroup && !c.name.startsWith('rival:') && c.children.length && Math.abs(c.position.y - h) < 1e-6);
     return { nombre: g?.name, enEscena: !!escena, mallas: g ? g.children.map(m => m.name) : [], carroY: carro?.position.y ?? null, h };
   });
   check(r.nombre === 'pisoPista' && r.enEscena, `PRD 012 RF-08 ${p.nombre}: el piso lo dibuja ConstructorPisoPista y está en la escena`);
@@ -97,7 +98,7 @@ for (const p of PANTALLAS) {
     // RF-07: pone el carro sobre el piano más cercano, acelera y mide su altura en cada cuadro
     await page.evaluate(() => {
       const g = window.__pisos[window.__pisos.length - 1], h = new window.MedidasEscena().alturaAsfalto;
-      const carro = g.parent.children.find(c => c !== g && c.isGroup && c.children.length && Math.abs(c.position.y - h) < 1e-6);
+      const carro = g.parent.children.find(c => c !== g && c.isGroup && !c.name.startsWith('rival:') && c.children.length && Math.abs(c.position.y - h) < 1e-6);
       const c = window.__carro, p = g.getObjectByName('pianoRojo').geometry.getAttribute('position');
       let mejor = null, dMin = Infinity;
       for (let i = 0; i < p.count; i++) {

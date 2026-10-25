@@ -220,17 +220,20 @@ const medirDecoraciones = page => page.evaluate(() => {
   // señal, en un punto donde la pista va en el mismo rumbo que el carro
   const ubicado = await page.evaluate(async () => {
     const { Ruta } = await import('/src/model/ruta.js');
-    const { Carro } = await import('/src/model/carros/carro.js');
+    const { ConductorPasoFijo } = await import('/src/view/pistas/comun/conductor_paso_fijo.js');
     const pista = window.registroPistas.obtener('ciudad'), ruta = new Ruta();
     ruta.construir(pista.tramos, pista.totalSegs);
-    // El carro del visor: se captura en su próximo paso de física
-    const actualizar = Carro.prototype.actualizar;
-    const carro = await new Promise(r => { Carro.prototype.actualizar = function (dt) { r(this); return actualizar.call(this, dt); }; });
-    Carro.prototype.actualizar = actualizar;
+    // El carro del JUGADOR: el que mueve el ConductorPasoFijo del visor en su próximo cuadro
+    // (desde el PRD 013 los 4 rivales de la PC también son Carro)
+    const avanzar = ConductorPasoFijo.prototype.avanzar;
+    const carro = await new Promise(r => { ConductorPasoFijo.prototype.avanzar = function (...a) { if (this.carro) r(this.carro); return avanzar.apply(this, a); }; });
+    ConductorPasoFijo.prototype.avanzar = avanzar;
     const dif = (a, b) => Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
     let mejor = null;
     for (const s of pista.decoraciones.filter(d => d.tipo === 'senal_curva')) {
-      for (let d = 0.005; d <= 0.06; d += 0.0025) {
+      // Hasta 0,1 de vuelta antes de la señal: desde el PRD 013 el jugador sale del último
+      // lugar de la grilla, en la curva antes de la meta, con otro rumbo que el de la línea
+      for (let d = 0.005; d <= 0.1; d += 0.0025) {
         const p = ruta.posicionEn(((s.prog - d) % 1 + 1) % 1);
         const e = dif(p.angle, carro.velAngle);
         if (!mejor || e < mejor.e) mejor = { e, x: p.x, z: p.z };

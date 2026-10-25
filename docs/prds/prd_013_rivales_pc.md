@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para implementar después del PRD 011 |
+| Estado | v2 — implementado, con pruebas en `pruebas/` |
 | Fecha | 2026-10-25 |
 | Backlog | B5 (`docs/BACKLOG.md`) |
 | Depende de | PRD 011 (señalética): se programa cuando llegue a `main`, porque también toca Jugar Solo |

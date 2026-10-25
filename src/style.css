@@ -1119,3 +1119,41 @@ input[type="text"]::placeholder { color: #3a3a5a; }
     .barra-carro-nombre { flex: none; }
     .barra-carro-fondo  { flex: none; }
 }
+
+/* ── PRD 013: tabla de posiciones de Jugar Solo (TablaFinalCarrera) ── */
+.tabla-final-carrera {
+    flex-direction: column;
+    gap: 4px;
+    width: min(340px, calc(100vw - 32px));
+    margin-top: 6px;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+}
+.fila-tabla-final {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+.fila-tabla-final.es-jugador {
+    background: rgba(255, 204, 0, 0.22);
+    outline: 2px solid #ffcc00;
+    color: #ffcc00;
+}
+.puesto-tabla-final { flex: none; width: 34px; font-weight: 900; }
+.nombre-tabla-final {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+.tiempo-tabla-final {
+    flex: none;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+}

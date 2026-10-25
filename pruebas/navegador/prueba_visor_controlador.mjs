@@ -91,7 +91,10 @@ const leer    = (page, fn) => page.evaluate(fn);
   check(maxPasos >= 1 && maxPasos <= 5, 'RF-15 entre 1 y 5 pasos por frame (máx ' + maxPasos + ')');
 
   // RNF-01: muestras por longitud de arco, instancias de MuestraRuta
-  const muestras = await leer(page, () => {
+  const muestras = await leer(page, async () => {
+    const { Ruta } = await import('/src/model/ruta.js');
+    const pista = window.registroPistas.obtener('ciudad'), ruta = new Ruta();
+    ruta.construir(pista.tramos, pista.totalSegs);
     const m = window.__visor.muestrasRuta(400);
     const d = [];
     for (let i = 1; i < m.length; i++) d.push(Math.hypot(m[i].x - m[i - 1].x, m[i].z - m[i - 1].z));
@@ -100,14 +103,15 @@ const leer    = (page, fn) => page.evaluate(fn);
       total: m.length,
       clase: m.every(x => x instanceof window.MuestraRuta),
       desvio: Math.max(...d.map(x => Math.abs(x - media) / media)),
-      inicio: [m[0].x, m[0].z, window.__visor.px, window.__visor.pz],
+      inicio: [m[0].x, m[0].z, ruta.inicio.x, ruta.inicio.z],
+      salida: [window.__visor.px, window.__visor.pz],
     };
   });
   check(muestras.total === 400, 'RNF-01 muestrasRuta(400) devuelve 400');
   check(muestras.clase, 'RNF-01 todas las muestras son MuestraRuta');
   check(muestras.desvio <= 0.05, 'RNF-01 paso constante ±5 % (desvío ' + muestras.desvio.toFixed(3) + ')');
   check(Math.hypot(muestras.inicio[0] - muestras.inicio[2], muestras.inicio[1] - muestras.inicio[3]) < 0.5,
-        'RNF-01 la muestra 0 coincide con el inicio del carro');
+        'RNF-01 la muestra 0 coincide con el inicio de la ruta (la línea de salida)');
 
   // RF-04: congelado no se mueve aunque se acelere
   const congelado = await leer(page, async () => {
@@ -145,7 +149,8 @@ const leer    = (page, fn) => page.evaluate(fn);
     return { ...tras, velDespues: v.velocidad, base: v.velocidadMaxBase };
   });
   check(reinicio.vel === 0, 'RF-11 velocidad 0 tras reiniciar');
-  check(Math.hypot(reinicio.px - muestras.inicio[0], reinicio.pz - muestras.inicio[1]) < 0.5, 'RF-11 vuelve al inicio de la ruta');
+  // Desde el PRD 013 el jugador sale del último lugar de la grilla, detrás de la línea
+  check(Math.hypot(reinicio.px - muestras.salida[0], reinicio.pz - muestras.salida[1]) < 0.5, 'RF-11 / PRD 013 RF-01 vuelve a su lugar de salida en la grilla');
   check(reinicio.velDespues <= reinicio.base * 0.45, 'RF-11 reaplica la última superficie (vel ' + reinicio.velDespues + ')');
 
   // RF-12: detener() libera el contexto WebGL y es idempotente

@@ -167,9 +167,28 @@ const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
   const { page, errores } = await abrir(390, 844);
   await page.evaluate(async () => {
     const { Carro } = await import('/src/model/carros/carro.js');
+    const { ConductorPasoFijo } = await import('/src/view/pistas/comun/conductor_paso_fijo.js');
+    const { ChoqueEntreCarros } = await import('/src/model/choques/choque_entre_carros.js');
     const rebotar = Carro.prototype.rebotar;
     window.__rebotes = 0;
-    Carro.prototype.rebotar = function (...a) { window.__rebotes++; return rebotar.apply(this, a); };
+    // Rumbo de la pista en la línea de largada (ruta.inicio): desde el PRD 013 el carro del
+    // jugador sale del último lugar de la grilla, que puede estar en la curva antes de la meta
+    const { GrillaSalida } = await import('/src/model/grilla_salida.js');
+    const puntos = GrillaSalida.prototype.puntos;
+    GrillaSalida.prototype.puntos = function (inicio, ...x) { window.__inicioLargada = inicio; return puntos.call(this, inicio, ...x); };
+    // Solo los choques del carro del JUGADOR contra objetos: desde el PRD 013 los rivales
+    // también son Carro y los toques entre carros (ChoqueEntreCarros) no son el arco
+    const avanzar = ConductorPasoFijo.prototype.avanzar;
+    ConductorPasoFijo.prototype.avanzar = function (...x) { if (this.carro) window.__carroJugador = this.carro; return avanzar.apply(this, x); };
+    const entreCarros = ChoqueEntreCarros.prototype.resolver;
+    ChoqueEntreCarros.prototype.resolver = function (...x) {
+      window.__entreCarros = true;
+      try { return entreCarros.apply(this, x); } finally { window.__entreCarros = false; }
+    };
+    Carro.prototype.rebotar = function (...a) {
+      if (this === window.__carroJugador && !window.__entreCarros) window.__rebotes++;
+      return rebotar.apply(this, a);
+    };
     const formatear = window.Cronometro.prototype.formatear;
     window.Cronometro.prototype.formatear = function (ms) { window.__tiempo = ms; return formatear.call(this, ms); };
   });
@@ -194,11 +213,8 @@ const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
     const medio = [(ax + bx) / 2, (az + bz) / 2];
     check(cerca(ancho, 12, 0.05) && Math.hypot(medio[0] - meta[0], medio[1] - meta[1]) < 0.6,
       `RF-06 Jugar Solo: el arco cruza la pista de lado a lado, centrado en la meta (${ancho.toFixed(2)} m entre postes)`);
-    // Girado con la pista: el arco mira hacia donde mira el carro en la largada (aún en la cuenta)
-    const rumboCarro = await page.evaluate(() => {
-      const g = window.__pisos[window.__pisos.length - 1], h = new window.MedidasEscena().alturaAsfalto;
-      return g.parent.children.find(c => c !== g && c.isGroup && c.children.length && Math.abs(c.position.y - h) < 1e-6)?.rotation.y;
-    });
+    // Girado con la pista: el arco mira hacia donde va la pista en la línea de largada
+    const rumboCarro = await page.evaluate(() => window.__inicioLargada?.angle);
     const giro = Math.abs(Math.atan2(Math.sin(arco.rotY - rumboCarro), Math.cos(arco.rotY - rumboCarro)));
     check(giro < 0.05, `RF-06 Jugar Solo: el arco está girado con la pista (diferencia con el rumbo de largada ${giro.toFixed(3)} rad)`);
   }

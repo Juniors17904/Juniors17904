@@ -4,7 +4,9 @@ try {
 // ================================================================
 // CLASE: ControladorCarreraSolo — Controlador de la Carrera Solo 3D
 // Orquesta VisorCarreraSolo (vista 3D), CarreraVueltas y Cronometro
-// (modelo) y HudCarrera (vista 2D). Gestiona la cuenta regresiva,
+// (modelo) y HudCarrera (vista 2D). Con los 4 rivales de la PC (PRD 013):
+// arranca sus cronómetros en ¡YA!, muestra la posición ("2.º/5") y la
+// tabla final, que se completa a medida que llegan los rivales (D5). Gestiona la cuenta regresiva,
 // el ciclo por frame (callback del visor), el resultado y las
 // acciones Revancha / Menú. No tiene física ni dibujo directo y
 // no tiene RAF propio: el único RAF es el del visor.
@@ -16,6 +18,7 @@ class ControladorCarreraSolo {
     static #INTERVALO_CUENTA_MS = 900;
     static #REINTENTO_MS        = 150;
     static #LIMITE_CARGA_MS     = 6000;
+    static #NOMBRE_JUGADOR      = 'Tú';
 
     // Estados de la carrera (constantes internas, no un objeto global)
     static #ESTADO_PREPARANDO = 'preparando';
@@ -42,6 +45,7 @@ class ControladorCarreraSolo {
     #idReintento     = null;
     #idLimiteCarga   = null;
     #temporizadores  = [];
+    #llegadasEnTabla = -1;     // carros terminados la última vez que se dibujó la tabla
 
     constructor(estado, vistaConduccion, alSalir) {
         this.#estado          = estado ?? null;
@@ -137,6 +141,7 @@ class ControladorCarreraSolo {
         this.#visor.congelar(true);
         this.#visor.alActualizar(() => this.#alFrame());
         const carga = this.#visor.cargar(this.#estado?.tipoAuto ?? 'deportivo', this.#estado?.color ?? '#ef4444');
+        this.#ubicarEnSalida();
         this.#visor.iniciar();
         return carga;
     }
@@ -182,6 +187,7 @@ class ControladorCarreraSolo {
         this.#cancelarTemporizadores();
         this.#estadoCarrera = ControladorCarreraSolo.#ESTADO_CUENTA;
         this.#visor.congelar(true);
+        this.#visor.activarRivales(false);
 
         // Pasos encadenados: cada uno programa el siguiente, así un bloqueo del hilo
         // principal no dispara varios números de golpe
@@ -203,6 +209,10 @@ class ControladorCarreraSolo {
         this.#hud.mostrarCuenta('¡YA!');
         this.#visor.congelar(false);
         this.#cronometro.iniciar();
+        const rivales = this.#visor.rivales;
+        rivales?.seguirJugador(this.#carrera);
+        rivales?.iniciar();
+        this.#visor.activarRivales(true);
         this.#estadoCarrera = ControladorCarreraSolo.#ESTADO_CORRIENDO;
     }
 
@@ -240,6 +250,9 @@ class ControladorCarreraSolo {
 
         visor.aplicarSuperficie(carrera.superficie);
 
+        const filas = this.#filasPosicion();
+        if (this.#estadoCarrera === ControladorCarreraSolo.#ESTADO_TERMINADA) this.#refrescarTabla(filas);
+
         const base = visor.velocidadMaxBase;
         const fraccionVel = base > 0 ? Math.min(1, Math.abs(visor.velocidad) / base) : 0;
         this.#hud?.dibujar(
@@ -247,8 +260,40 @@ class ControladorCarreraSolo {
             carrera.totalVueltas,
             cronometro.formatear(cronometro.tiempoTotalMs),
             fraccionVel,
-            this.#estado?.velocimetroModelo ?? 0
+            this.#estado?.velocimetroModelo ?? 0,
+            this.#textoPosicion(filas)
         );
+    }
+
+    // ── Privados: posiciones con los rivales (PRD 013, D5) ──────
+    // La CarreraVueltas del jugador se ubica en su lugar de la grilla (detrás
+    // de la meta), así su posición se compara bien con la de los rivales
+    #ubicarEnSalida() {
+        this.#carrera.actualizar(this.#visor.px, this.#visor.pz);
+        this.#visor.rivales?.seguirJugador(this.#carrera);
+    }
+
+    #filasPosicion() {
+        const rivales = this.#visor?.rivales;
+        if (!rivales) return [];
+        const carrera = this.#carrera, cronometro = this.#cronometro;
+        // El jugador terminó cuando su carrera llegó a la meta (el controlador ya la cerró)
+        const terminado = carrera.terminada || this.#estadoCarrera === ControladorCarreraSolo.#ESTADO_TERMINADA;
+        return rivales.posiciones(ControladorCarreraSolo.#NOMBRE_JUGADOR,
+            terminado, cronometro.tiempoTotalMs);
+    }
+
+    #textoPosicion(filas) {
+        const fila = filas.find(f => f.esJugador);
+        return fila ? fila.puesto + '.º/' + filas.length : '';
+    }
+
+    // La tabla final se rehace solo cuando llega otro carro
+    #refrescarTabla(filas) {
+        const llegadas = filas.filter(f => f.terminado).length;
+        if (llegadas === this.#llegadasEnTabla) return;
+        this.#llegadasEnTabla = llegadas;
+        this.#hud?.actualizarTabla(filas);
     }
 
     // ── Privados: fin de carrera (RF-10) ────────────────────────
@@ -257,15 +302,19 @@ class ControladorCarreraSolo {
         this.#cancelarTemporizadores();
         this.#hud.ocultarCuenta();
         this.#visor.congelar(true);
+        this.#visor.rivales?.jugadorLlego();
         this.#vistaConduccion?.ocultarOverlay();
 
         const cronometro = this.#cronometro;
         const textoTotal = cronometro.formatear(cronometro.tiempoTotalMs);
         const mejor      = cronometro.mejorVueltaMs;
         const textoMejor = mejor === null ? '--' : cronometro.formatear(mejor);
+        const filas = this.#filasPosicion();
+        this.#llegadasEnTabla = filas.filter(f => f.terminado).length;
         this.#hud.mostrarResultado(textoTotal, textoMejor,
             () => this.#revancha(),
-            () => this.#irAlMenu());
+            () => this.#irAlMenu(),
+            filas);
     }
 
     // ── Privados: Revancha (RF-11) ──────────────────────────────
@@ -275,6 +324,9 @@ class ControladorCarreraSolo {
         this.#carrera.reiniciar();
         this.#cronometro.reiniciar();
         this.#visor.reiniciarCarro();
+        this.#visor.reiniciarRivales();
+        this.#ubicarEnSalida();
+        this.#llegadasEnTabla = -1;
         this.#vistaConduccion?.mostrarOverlay();
         this.#lanzarCuenta();
     }

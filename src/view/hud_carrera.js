@@ -3,8 +3,9 @@ try {
 
 // ================================================================
 // CLASE: HudCarrera — Vista del HUD de la Carrera Solo 3D (vertical)
-// Dibuja "VUELTA X/3", el cronómetro y el velocímetro en su canvas,
-// muestra la cuenta 3-2-1/¡YA! y el panel de resultado.
+// Dibuja "VUELTA X/3", la posición ("2.º/5", PRD 013), el cronómetro y el
+// velocímetro en su canvas, muestra la cuenta 3-2-1/¡YA! y el panel de
+// resultado con la tabla de posiciones (TablaFinalCarrera).
 // Sin lógica de negocio: solo pinta lo que le pasa el controlador.
 // ================================================================
 class HudCarrera {
@@ -22,6 +23,8 @@ class HudCarrera {
     #textoMejorVuelta = null;
     #botonRevancha = null;
     #botonMenu = null;
+    #contenedorTabla = null;
+    #tabla = null;   // TablaFinalCarrera (se crea al primer uso)
     #ancho = 0;
     #alto = 0;
     #escala = 1;
@@ -48,13 +51,13 @@ class HudCarrera {
     }
 
     // ── Dibujo por frame (RF-05, RF-08) ──────────────────────────
-    dibujar(vuelta, totalVueltas, textoCronometro, fraccionVel, indiceVelocimetro = 0) {
+    dibujar(vuelta, totalVueltas, textoCronometro, fraccionVel, indiceVelocimetro = 0, textoPosicion = '') {
         if (this.#destruido || !this.#ctx) return;
         const ctx = this.#ctx;
         ctx.setTransform(this.#escala, 0, 0, this.#escala, 0, 0);
         ctx.clearRect(0, 0, this.#ancho, this.#alto);
 
-        this.#dibujarBarraSuperior(ctx, vuelta, totalVueltas, textoCronometro);
+        this.#dibujarBarraSuperior(ctx, vuelta, totalVueltas, textoCronometro, textoPosicion);
         this.#dibujarVelocimetro(ctx, fraccionVel, indiceVelocimetro);
     }
 
@@ -71,11 +74,12 @@ class HudCarrera {
         this.#capaCuenta.textContent = '';
     }
 
-    // ── Panel de resultado (RF-10) ──────────────────────────────
-    mostrarResultado(textoTotal, textoMejorVuelta, alRevancha, alMenu) {
+    // ── Panel de resultado (RF-10; tabla de posiciones, PRD 013) ──
+    mostrarResultado(textoTotal, textoMejorVuelta, alRevancha, alMenu, filas = []) {
         if (!this.#panelResultado) return;
         if (this.#textoTotal) this.#textoTotal.textContent = 'TIEMPO TOTAL  ' + (textoTotal ?? '');
         if (this.#textoMejorVuelta) this.#textoMejorVuelta.textContent = 'MEJOR VUELTA  ' + (textoMejorVuelta ?? '');
+        this.actualizarTabla(filas);
 
         this.#resultadoActivo = true;
         this.#asignarBoton(this.#botonRevancha, alRevancha);
@@ -85,9 +89,19 @@ class HudCarrera {
         this.#marcarPantallaConResultado(true);
     }
 
+    // Los rivales siguen corriendo tras la meta del jugador (D5): la tabla se rehace
+    // con cada llegada. Sin filas, la tabla no se ve.
+    actualizarTabla(filas = []) {
+        const tabla = this.#obtenerTabla();
+        if (!tabla) return;
+        if (Array.isArray(filas) && filas.length > 0) tabla.mostrar(filas);
+        else tabla.ocultar();
+    }
+
     ocultarResultado() {
         this.#resultadoActivo = false;
         if (!this.#panelResultado) return;
+        this.#tabla?.ocultar();
         this.#panelResultado.style.display = 'none';
         this.#marcarPantallaConResultado(false);
         if (this.#botonRevancha) this.#botonRevancha.onclick = null;
@@ -176,6 +190,8 @@ class HudCarrera {
         }
         this.#textoTotal = this.#obtenerLinea(textos, 'resultado-carrera-total');
         this.#textoMejorVuelta = this.#obtenerLinea(textos, 'resultado-carrera-mejor');
+        this.#contenedorTabla = this.#obtenerLinea(textos, 'resultado-carrera-tabla');
+        this.#contenedorTabla.style.display = 'none';
 
         this.ocultarResultado();
     }
@@ -188,6 +204,16 @@ class HudCarrera {
             contenedor.appendChild(linea);
         }
         return linea;
+    }
+
+    // TablaFinalCarrera es otro script clásico: se busca al usarla, así no importa
+    // el orden de carga
+    #obtenerTabla() {
+        if (this.#tabla) return this.#tabla;
+        const Clase = window.TablaFinalCarrera;
+        if (!this.#contenedorTabla || typeof Clase !== 'function') return null;
+        this.#tabla = new Clase(this.#contenedorTabla);
+        return this.#tabla;
     }
 
     #asignarBoton(boton, callback) {
@@ -212,7 +238,7 @@ class HudCarrera {
     }
 
     // ── Privados: dibujo ────────────────────────────────────────
-    #dibujarBarraSuperior(ctx, vuelta, totalVueltas, textoCronometro) {
+    #dibujarBarraSuperior(ctx, vuelta, totalVueltas, textoCronometro, textoPosicion) {
         const ancho = this.#ancho;
         const altoBarra = 52;
         ctx.save();
@@ -229,6 +255,14 @@ class HudCarrera {
         ctx.strokeText(textoVuelta, 14, altoBarra / 2);
         ctx.fillStyle = '#ffcc00';
         ctx.fillText(textoVuelta, 14, altoBarra / 2);
+
+        const posicion = String(textoPosicion ?? '');
+        if (posicion) {
+            ctx.textAlign = 'center';
+            ctx.strokeText(posicion, ancho / 2, altoBarra / 2);
+            ctx.fillStyle = '#7df9ff';
+            ctx.fillText(posicion, ancho / 2, altoBarra / 2);
+        }
 
         const textoTiempo = String(textoCronometro ?? '0:00.00');
         ctx.textAlign = 'right';
