@@ -3,9 +3,10 @@ import * as THREE from 'three';
 import { ObjetoEscena } from './objeto_escena.js';
 
 // ================================================================
-// CLASS: FlechaCurvaEscena — tablero horizontal de chevrones (>>>)
-//        montado sobre dos postes con base, estilo baliza de curva
-//        reglamentaria. Altura total ≈ 70 cm (0.40 u).
+// CLASS: FlechaCurvaEscena — tablero de chevrones (>>>) de pista de
+//        carreras, a lo largo de la pista y mirando hacia ella, sobre dos
+//        palos. Tiene grosor: se ve también de costado (PRD 011, RF-01).
+//        Todas las medidas salen de MedidasEscena (PRD 011, D4).
 // ================================================================
 export class FlechaCurvaEscena extends ObjetoEscena {
     #lado;
@@ -16,31 +17,45 @@ export class FlechaCurvaEscena extends ObjetoEscena {
     }
 
     _poblar(grupo) {
-        const ancho  = 2.20;   // ancho del tablero (≈3.80 m)
-        const alto   = 0.70;   // alto del tablero  (≈1.21 m)
-        const hPoste = 0.36;   // altura poste      (≈0.62 m)
-        const yPanel = hPoste + alto / 2;  // centro panel → top ≈ 0.96 u ≈ 1.66 m
+        const m = new window.MedidasEscena();
+        const ancho  = m.anchoTableroFlecha;
+        const alto   = m.altoTableroFlecha;
+        const grosor = m.grosorTableroFlecha;
+        const radio  = m.radioPaloFlecha;
+        const yPanel = m.bordeInferiorFlecha + alto / 2;
+        const altoPalo = m.bordeInferiorFlecha + alto;
 
-        // ── Estructura: dos postes + base ───────────────────────
-        const matPoste = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6 });
-        const geoPoste = new THREE.CylinderGeometry(0.018, 0.018, hPoste, 6);
-        const geoBase  = new THREE.BoxGeometry(0.10, 0.018, 0.10);
-
+        // ── Dos palos detrás del tablero (del lado del pasto) ───
+        const matPalo = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.6 });
+        const geoPalo = new THREE.CylinderGeometry(radio, radio, altoPalo, 8);
+        const atras   = this.#lado * (grosor / 2 + radio);
         for (const s of [-1, 1]) {
-            const oz = s * (ancho / 2 - 0.08);
-
-            const poste = new THREE.Mesh(geoPoste, matPoste);
-            poste.position.set(0, hPoste / 2, oz);
-            poste.castShadow = true;
-            grupo.add(poste);
-
-            const base = new THREE.Mesh(geoBase, matPoste);
-            base.position.set(0, 0.009, oz);
-            base.castShadow = true;
-            grupo.add(base);
+            const palo = new THREE.Mesh(geoPalo, matPalo);
+            palo.position.set(atras, altoPalo / 2, s * (ancho / 2 - 4 * radio));
+            palo.castShadow = true;
+            grupo.add(palo);
         }
 
-        // ── Tablero con tres chevrones ───────────────────────────
+        // ── Tablero con tres chevrones, con grosor ───────────────
+        const textura = new THREE.CanvasTexture(this.#dibujarChevrones());
+        const matCara = new THREE.MeshStandardMaterial({
+            map:               textura,
+            emissiveMap:       textura,
+            emissive:          new THREE.Color(0xffffff),
+            emissiveIntensity: 0.75,
+        });
+        const matCanto = new THREE.MeshStandardMaterial({ color: 0xcc8800, roughness: 0.6 });
+        // Caras de la caja: +x, -x, +y, -y, +z (frente), -z (dorso)
+        const tablero = new THREE.Mesh(new THREE.BoxGeometry(ancho, alto, grosor),
+            [matCanto, matCanto, matCanto, matCanto, matCara, matCara]);
+        tablero.position.set(0, yPanel, 0);
+        tablero.rotation.y = -this.#lado * Math.PI / 2;
+        tablero.scale.x    = this.#lado;
+        tablero.castShadow = true;
+        grupo.add(tablero);
+    }
+
+    #dibujarChevrones() {
         const lienzo = document.createElement('canvas');
         lienzo.width  = 192;
         lienzo.height = 64;
@@ -54,29 +69,16 @@ export class FlechaCurvaEscena extends ObjetoEscena {
         ctx.strokeRect(2, 2, 188, 60);
 
         ctx.strokeStyle = '#111111';
-        ctx.lineWidth   = 20;
+        ctx.lineWidth   = 14;
         ctx.lineCap     = 'round';
         ctx.lineJoin    = 'round';
-        ctx.beginPath();
-        ctx.moveTo(72, 8);
-        ctx.lineTo(124, 32);
-        ctx.lineTo(72, 56);
-        ctx.stroke();
-
-        const textura = new THREE.CanvasTexture(lienzo);
-        const panel = new THREE.Mesh(
-            new THREE.PlaneGeometry(ancho, alto),
-            new THREE.MeshStandardMaterial({
-                map:              textura,
-                emissiveMap:      textura,
-                emissive:         new THREE.Color(0xffffff),
-                emissiveIntensity: 0.75,
-                side:             THREE.DoubleSide,
-            })
-        );
-        panel.position.set(0, yPanel, 0);
-        panel.rotation.y = -this.#lado * Math.PI / 2;
-        panel.scale.x    = this.#lado;
-        grupo.add(panel);
+        for (const x0 of [40, 82, 124]) {
+            ctx.beginPath();
+            ctx.moveTo(x0, 10);
+            ctx.lineTo(x0 + 26, 32);
+            ctx.lineTo(x0, 54);
+            ctx.stroke();
+        }
+        return lienzo;
     }
 }

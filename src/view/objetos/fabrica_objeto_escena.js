@@ -23,8 +23,8 @@ export class FabricaObjetoEscena {
             case 'arbol':          return new ArbolEscena(x, z, escala);
             case 'poste':          return new PosteEscena(x, z, rotY, lado, conLuz);
             case 'aviso':          return new AvisoEscena(x, z, texto);
-            case 'meta':           return new MetaEscena(x, z);
-            case 'salida':         return new SalidaEscena(x, z);
+            case 'meta':           return new MetaEscena(x, z, rotY);
+            case 'salida':         return new SalidaEscena(x, z, rotY);
             case 'barrera':        return new BarreraEscena(x, z);
             case 'flecha':         return new FlechaCurvaEscena(x, z, rotY, lado);
             case 'senal_curva':    return new SenalCurvaEscena(x, z, direccion, rotY);

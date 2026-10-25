@@ -7,7 +7,7 @@
 //   RF-07 la copa y el cartel quedan por encima del carro más alto
 //   RF-08 señales de las 5 pistas y postes de Ciudad a 6,0 m del centro
 //   RF-09 ningún carro alineado con la pista los toca con el centro en el asfalto
-//   RF-10 la fábrica solo crea sólidos para árbol, poste y señal (no flechas ni lo demás)
+//   RF-10 la fábrica solo crea sólidos para árbol, poste y señal (y flecha, PRD 011 RF-03; lo demás no)
 //   RNF-01 la distancia no se repite en las pistas y se lee al pedir las decoraciones
 // ================================================================
 'use strict';
@@ -207,14 +207,14 @@ class PruebaObjetosSolidos {
     #probarSoloTresSolidos() {
         const enPunto = { posicionEn: () => ({ x: 0, z: 0, angle: 0 }) };
         const fabrica = new this.#FabricaObjetosSolidos();
-        for (const tipo of ['flecha', 'baliza_chevron', 'meta', 'salida', 'barrera', 'guardarrail', 'aviso']) {
+        for (const tipo of ['meta', 'salida', 'barrera', 'guardarrail', 'aviso']) {
             const solidos = fabrica.crear([{ tipo, prog: 0, lado: 1, dist: 6 }], enPunto);
             this.#ok(solidos.length === 0, `PRD 010 RF-10 FabricaObjetosSolidos no crea un sólido para ${tipo} (${solidos.length})`);
         }
-        const tipos = ['arbol', 'poste', 'senal_curva'];
+        const tipos = ['arbol', 'poste', 'senal_curva', 'flecha'];   // la flecha, por el PRD 011 (D6)
         const solidos = fabrica.crear(tipos.map(tipo => ({ tipo, prog: 0, lado: 1, dist: 6 })), enPunto);
         this.#ok(solidos.map(s => s.tipo).join() === tipos.join(),
-            `PRD 010 RF-10 FabricaObjetosSolidos solo crea sólidos para arbol, poste y senal_curva (${solidos.map(s => s.tipo).join(', ')})`);
+            `PRD 010 RF-10 y PRD 011 RF-03 FabricaObjetosSolidos solo crea sólidos para arbol, poste, senal_curva y flecha (${solidos.map(s => s.tipo).join(', ')})`);
     }
 }
 

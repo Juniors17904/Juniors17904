@@ -91,7 +91,7 @@ class NivelCiudad extends Nivel {
 - **Excepción permitida — visores 3D:** un visor de pista (subclase de `VisorBase`) puede crear su `Ruta` y su `Carro` y avanzar la física con paso fijo, porque la integración va atada al render. Las **reglas de negocio** (vueltas, tiempos, penalizaciones como el pasto) viven siempre en clases del modelo (`CarreraVueltas`, `Cronometro`…); el visor solo aplica lo que el modelo calcula.
 
 ### Escala del juego 3D
-- **1 unidad = 1 metro** (PRD 009). Las medidas del carro (por tipo) y de la pista viven en `MedidasEscena` (`src/model/medidas_escena.js`); ahí también viven las medidas de los objetos (árbol, poste y señal de curva) y la distancia de postes y señales al centro de la pista (PRD 010). Nadie repite esos números.
+- **1 unidad = 1 metro** (PRD 009). Las medidas del carro (por tipo) y de la pista viven en `MedidasEscena` (`src/model/medidas_escena.js`); ahí también viven las medidas de los objetos (árbol, poste y señal de curva) y la distancia de postes y señales al centro de la pista (PRD 010), las del piso (PRD 012) y las de la señalética: flechas de curva, arcos de meta y salida y cartel de aviso (PRD 011). Nadie repite esos números.
 
 ### POO obligatorio — checklist antes de escribir cualquier código nuevo
 1. ¿Tiene nombre propio? → clase con ese nombre en español
@@ -166,7 +166,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `PanelDatos` | `PanelDatosCircuito3D`, `PanelDatosTestDriveRecto`, `PanelDatosDisenoGeneral` | `mostrar()`, `actualizar()` |
 | `Carro` | `CarroDeportivo`, `CarroSUV`, `CarroMusculo`, `CarroFormula`, `CarroPickup`, `CarroClasico` (las crea `RegistroCarros`) | `actualizar(dtMs)`, `constantes` (`ConstantesFisica`) |
 | `Superficie` | `SuperficieAsfalto`, `SuperficiePiano`, `SuperficiePasto` (las entrega `DetectorSuperficie`) | `nombre`, `rozamiento`, `esPasto` |
-| `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida` (los crea `FabricaObjetosSolidos`; los usa `DetectorChoques`) | `x`, `z`, `radio`, `tipo` |
+| `ObjetoSolido` | `ArbolSolido`, `PosteSolido`, `SenalCurvaSolida`, `FlechaCurvaSolida` (los crea `FabricaObjetosSolidos`; los usa `DetectorChoques`) | `x`, `z`, `radio`, `tipo`, `alcance`, `puntoCercano(rectangulo)` (cada objeto calcula su propio choque contra el `RectanguloCarro`, PRD 011) |
 | `TrazadoPiso` | `TrazadoPisoCurva`, `TrazadoPisoRecto` (los usa `ConstructorPisoPista`, PRD 012) | `largo`, `cerrado`, `puntoEn(s)`, `distanciasEntre(s0, s1)` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 
@@ -178,7 +178,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes); `src/view/pistas/comun/` → piezas que comparten (`BuclePasoFijo`, `ConductorPasoFijo` y el piso de la pista del PRD 012: `ConstructorPisoPista` con sus ayudantes `TrazadoPiso`, `TrazadoPisoCurva`, `TrazadoPisoRecto`, `PuntoPiso` y `AcumuladorGeometria`)
 - `src/model/carros/` → `Carro` + subclases, `ConstantesFisica` y `RegistroCarros`
 - `src/model/superficies/` → `Superficie` + subclases y `DetectorSuperficie`
-- `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos` y `DetectorChoques`
+- `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos`, `DetectorChoques`, `RectanguloCarro` y `PuntoChoque`
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes
 

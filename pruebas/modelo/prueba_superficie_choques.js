@@ -4,7 +4,7 @@
 //   RF-01 el pasto frena aunque se acelere · RF-02 se estabiliza entre 35 % y 45 %
 //   RF-03 al volver al asfalto acelera normal · RF-04 el piano frena poco
 //   RF-05 no atraviesa árboles, postes ni señales (también a máxima velocidad)
-//   RF-06 las flechas no son sólidas · RF-07 rebota y pierde más si va más rápido
+//   RF-06 las flechas no eran sólidas (reemplazado por PRD 011, RF-03: ahora sí) · RF-07 rebota y pierde más si va más rápido
 //   RF-08 nunca queda atrapado · RF-10 los otros visores no usan choques ni superficie
 //   RF-11 una vuelta con choque y pasto cuenta los puntos de control y la vuelta
 //   RNF-01 una clase por tipo · RNF-03 detectar choques es barato
@@ -135,15 +135,16 @@ class PruebaSuperficieChoques {
         const ciudad = this.#ctx.registroPistas.obtener('ciudad');
         const detector = new this.#DetectorChoques(ciudad.decoraciones, this.#rutaDe(ciudad));
         const tipos = new Set(detector.objetos.map(o => o.tipo));
-        const esperados = ciudad.decoraciones.filter(d => ['arbol', 'poste', 'senal_curva'].includes(d.tipo)).length;
-        this.#ok(detector.objetos.length === esperados, `RF-05 un objeto sólido por árbol, poste y señal (${detector.objetos.length}/${esperados})`);
-        this.#ok(tipos.has('arbol') && tipos.has('poste') && tipos.has('senal_curva') && !tipos.has('flecha'),
-            'RF-05/RF-06 sólidos: árbol, poste y señal; flechas no: ' + [...tipos]);
+        const esperados = ciudad.decoraciones.filter(d => ['arbol', 'poste', 'senal_curva', 'flecha'].includes(d.tipo)).length;
+        this.#ok(detector.objetos.length === esperados, `RF-05 y PRD 011 RF-03 un objeto sólido por árbol, poste, señal y flecha (${detector.objetos.length}/${esperados})`);
+        this.#ok(['arbol', 'poste', 'senal_curva', 'flecha'].every(t => tipos.has(t)),
+            'RF-05 y PRD 011 RF-03 sólidos: árbol, poste, señal y flecha: ' + [...tipos]);
         const costa = this.#ctx.registroPistas.obtener('costa');
         const enCosta = new this.#DetectorChoques(costa.decoraciones, this.#rutaDe(costa)).objetos;
-        this.#ok(enCosta.length > 0 && enCosta.every(o => o.tipo === 'senal_curva'), 'RF-05 en Costa solo hay señales sólidas');
+        this.#ok(enCosta.some(o => o.tipo === 'senal_curva') && enCosta.every(o => ['senal_curva', 'flecha'].includes(o.tipo)),
+            'RF-05 en Costa solo hay señales y flechas sólidas');
 
-        // RF-06: pasar por donde está una flecha no detiene al carro
+        // PRD 011 RF-03 (antes RF-06): pasar por donde está una flecha detiene al carro
         const flecha = ciudad.decoraciones.find(d => d.tipo === 'flecha');
         const ruta = this.#rutaDe(ciudad), pos = ruta.posicionEn(flecha.prog);
         const fx = pos.x + Math.cos(pos.angle) * flecha.dist * flecha.lado;
@@ -154,7 +155,8 @@ class PruebaSuperficieChoques {
         carro.setPosicion(fx - 1, fz);
         const v = carro.velocidad, px = carro.px, pz = carro.pz;
         carro.setPosicion(fx + 1, fz);
-        this.#ok(!soloFlecha.resolver(carro, px, pz) && carro.velocidad === v, 'RF-06 las flechas no detienen al carro');
+        const choco = soloFlecha.resolver(carro, px, pz);
+        this.#ok(choco, `PRD 011 RF-03 la flecha choca con el carro que la atraviesa (${choco}, ${v.toFixed(3)} → ${carro.velocidad.toFixed(3)})`);
     }
 
     // Lanza el carro contra un objeto desde un ángulo y velocidad dados

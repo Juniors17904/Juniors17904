@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para implementar |
+| Estado | v3 — implementado |
 | Fecha | 2026-10-24 |
 | Backlog | B17 (`docs/BACKLOG.md`) |
 | Depende de | PRD 009 (escala y `MedidasEscena`) y PRD 010 (objetos sólidos, postes y señales a 6,0 m) |
@@ -91,3 +91,4 @@ Que la señalética necesaria tenga tamaño real, grosor y un lugar correcto, qu
 ### Historial
 - **v1** (2026-10-24): primera versión, con las decisiones aceptadas por el usuario.
 - **v2** (2026-10-24): revisión única (forma corta). Decisiones aprobadas por el usuario: quitar también el botón Chevrón (D2), flechas espaciadas (D5), postes del arco a 6,0 m (D7), choque propio de cada objeto sólido (D10). Detalles: borde de abajo a 0,9 m, arco girado con la pista, carro alineado, costo por paso, aviso que ya cumple, D11 completa.
+- **v3** (2026-10-25): implementado. Medidas de la señalética en `MedidasEscena`; `ConfigPista` lee la distancia (5,4 m) y el paso (3 m) de las flechas; `FlechaCurvaEscena` con tablero de 2,4 × 0,8 × 0,03 m; arcos de meta y salida con postes a 6,0 m y 5,5 m de altura libre; arco de meta en Jugar Solo (`ConstructorCircuitoCarreraSolo`); `AvisoEscena` con sus medidas en `MedidasEscena`; baliza chevron y su botón borrados. Choques (D10): cada `ObjetoSolido` da su `puntoCercano` contra el `RectanguloCarro` y su `alcance`; `FlechaCurvaSolida` choca con todo el tablero. Pruebas: `pruebas/modelo/prueba_senaletica.js` y `pruebas/navegador/prueba_senaletica_pantallas.mjs`. **Nota de RF-04:** se cumple en todas las curvas de las 5 pistas; en el quiebre donde las pistas abiertas (Costa, Desierto, Montaña y Volcán) empiezan su tramo de cierre la ruta gira con menos de 1 m de radio y ahí un carro ancho puede rozar la última flecha; la prueba deja ese quiebre fuera.

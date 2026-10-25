@@ -9,7 +9,7 @@
 //           llega al menos la misma luz que antes del PRD
 //   RF-04 → en Diseño General (Ciudad) árboles de 7 m × tamaño propio,
 //           postes de 8 m y señales con palo de 2,2 m
-//   RF-10 → flechas y balizas siguen apareciendo como antes, y en Diseño
+//   RF-10 → las flechas siguen apareciendo (la baliza se borró: PRD 011, RF-10), y en Diseño
 //           de Objetos aviso, meta, salida, barrera y guardarrail se ven
 //   Sin errores de consola (lección 8). Capturas de cerca y de costado
 //   en /tmp/capturas_prd010/ (lecciones 13 y 16).
@@ -116,11 +116,10 @@ for (const [nombreVista, ancho, alto] of [['vertical', 390, 844], ['horizontal',
       await page.screenshot({ path: `${CARPETA}/diseno_objetos_${nombre}.png` });
     }
   }
-  // RF-10: la flecha sigue apareciendo y el chevrón se comporta como antes
+  // RF-10: la flecha sigue apareciendo (la baliza chevron se borró, PRD 011 RF-10)
   await clic(page, 'do-sel-flecha'); await page.waitForTimeout(600);
   const flecha = await medirEncuadre(page);
   check(flecha?.clase === 'FlechaCurvaEscena', `RF-10 (${nombreVista}) la flecha de curva sigue apareciendo (${flecha?.clase})`);
-  await clic(page, 'do-sel-baliza-chevron'); await page.waitForTimeout(600);
   // RF-10: los demás objetos (no sólidos) siguen apareciendo con su caja
   for (const [boton, clase] of [['do-sel-aviso', 'AvisoEscena'], ['do-sel-meta', 'MetaEscena'],
     ['do-sel-salida', 'SalidaEscena'], ['do-sel-barrera', 'BarreraEscena'], ['do-sel-guardarrail', 'GuardarrailEscena']]) {
