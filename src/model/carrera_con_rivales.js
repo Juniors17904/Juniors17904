@@ -40,6 +40,7 @@ export class CarreraConRivales {
     #medidor  = new MedidorAvance();
     #choque   = new ChoqueEntreCarros();
     #carreraJugador = null;
+    #jugadorLlego   = false;   // lo avisa el controlador al cerrar la carrera del jugador
 
     constructor(ruta, decoraciones, muestras, semilla = 1, reloj = null) {
         const registro = new RegistroCarros();
@@ -73,6 +74,12 @@ export class CarreraConRivales {
     // CarreraVueltas del jugador, para el ajuste de ritmo y la tabla
     seguirJugador(carreraJugador) {
         this.#carreraJugador = carreraJugador ?? null;
+        this.#jugadorLlego   = false;
+    }
+
+    // El jugador terminó: su carro queda quieto y ya no choca con los rivales (D5)
+    jugadorLlego() {
+        this.#jugadorLlego = true;
     }
 
     // Un paso de 1/60 s de los rivales y los choques entre los carros en carrera
@@ -94,12 +101,13 @@ export class CarreraConRivales {
 
     // Revancha: los mismos 4 rivales vuelven a la grilla
     reiniciar(puntos) {
+        this.#jugadorLlego = false;
         this.colocarEnGrilla(puntos);
     }
 
     #chocarEntreSi(carroJugador, medidaJugador) {
         const carros = this.#rivales.filter(r => !r.terminado).map(r => [r.carro, r.medida]);
-        if (carroJugador && medidaJugador && !this.#carreraJugador?.terminada) carros.push([carroJugador, medidaJugador]);
+        if (carroJugador && medidaJugador && !this.#jugadorLlego && !this.#carreraJugador?.terminada) carros.push([carroJugador, medidaJugador]);
         for (let i = 0; i < carros.length; i++) {
             for (let j = i + 1; j < carros.length; j++) {
                 this.#choque.resolver(carros[i][0], carros[i][1], carros[j][0], carros[j][1]);

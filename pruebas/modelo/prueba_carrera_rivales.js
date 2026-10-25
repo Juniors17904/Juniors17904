@@ -6,6 +6,7 @@
 //   D5    TablaPosiciones: terminados por tiempo, luego por avance (detrás de la meta = vuelta 0)
 //   D4    AjusteRitmo afloja al adelantado y deja arriesgar al atrasado
 //   RF-06 un Rival en el pasto frena igual que el jugador (misma superficie)
+//   RF-06 un Rival choca contra un árbol igual que el jugador (mismo DetectorChoques)
 //   RF-02/RF-03 con los pilotos reales: nombres distintos y los 4 terminan (semilla 42)
 // ================================================================
 'use strict';
@@ -30,6 +31,7 @@ class PruebaCarreraRivales {
         this.#probarTabla();
         this.#probarAjusteRitmo();
         this.#probarPasto();
+        this.#probarChoqueConArbol();
         this.#probarCarreraCompleta();
 
         for (const f of this.#fallos) console.log('❌ ' + f);
@@ -257,6 +259,45 @@ class PruebaCarreraRivales {
         this.#ok(rival.carro.velocidad < enAsfalto.velocidad * 0.6,
             `RF-06 el pasto frena al rival (${rival.carro.velocidad.toFixed(3)} < ${enAsfalto.velocidad.toFixed(3)} en asfalto)`);
         this.#ok(piloto.decisiones === pasos, `D6 el piloto decide en cada paso (${piloto.decisiones}/${pasos})`);
+    }
+
+    // RF-06: un Rival que va derecho contra un árbol choca igual que el jugador
+    // movido como en el visor (mismo DetectorChoques, mismos rebotes)
+    #probarChoqueConArbol() {
+        const pista = this.#ctx.registroPistas.obtener('ciudad'), ruta = this.#rutaDe(pista);
+        const muestras = this.#muestrasDe(ruta, 400);
+        const medida = new this.#ctx.MedidasEscena().medidaCarro('suv');
+        const arbol = new this.#m.DetectorChoques(pista.decoraciones, ruta, medida).objetos.find(o => o.tipo === 'arbol');
+        const angulo = Math.atan2(arbol.x - (arbol.x - 8), 0);   // apunta en +x hacia el árbol
+        const x = arbol.x - 8, z = arbol.z, pasos = 120;
+        const crear = () => new this.#m.RegistroCarros().crear('suv', x, z, angulo);
+
+        const rival = new this.#m.Rival(new PilotoFalso('suv'), crear(), new this.#ctx.CarreraVueltas(muestras, 3),
+            new this.#ctx.Cronometro(() => 0), new this.#m.DetectorChoques(pista.decoraciones, ruta, medida), medida);
+        rival.reiniciar(new this.#m.PuntoSalida(x, z, angulo));
+        let rebotesRival = 0;
+        const rebotar = rival.carro.rebotar.bind(rival.carro);
+        rival.carro.rebotar = (...a) => { rebotesRival++; rebotar(...a); };
+        for (let i = 0; i < pasos; i++) rival.paso(1);
+
+        const jugador = crear(), carrera = new this.#ctx.CarreraVueltas(muestras, 3);
+        const detector = new this.#m.DetectorChoques(pista.decoraciones, ruta, medida);
+        carrera.actualizar(jugador.px, jugador.pz); jugador.pisar(carrera.superficie);
+        let rebotesJugador = 0;
+        for (let i = 0; i < pasos; i++) {
+            const px = jugador.px, pz = jugador.pz;
+            jugador.entradaAcel = 1; jugador.entradaDireccion = 0;
+            jugador.actualizar(PruebaCarreraRivales.#PASO);
+            if (detector.resolver(jugador, px, pz)) rebotesJugador++;
+            carrera.actualizar(jugador.px, jugador.pz);
+            jugador.pisar(carrera.superficie);
+        }
+        const r = rival.carro;
+        this.#ok(rebotesRival > 0, `RF-06 el rival choca con el árbol (${rebotesRival} choques)`);
+        this.#ok(rebotesRival === rebotesJugador, `RF-06 el rival choca tantas veces como el jugador (${rebotesRival} = ${rebotesJugador})`);
+        this.#ok(Math.hypot(r.px - jugador.px, r.pz - jugador.pz) < 1e-9 && Math.abs(r.velocidad - jugador.velocidad) < 1e-9,
+            'RF-06 el rival termina en el mismo lugar y a la misma velocidad que el jugador');
+        this.#ok(Math.hypot(r.px - arbol.x, r.pz - arbol.z) > arbol.radio, 'RF-06 el rival no atraviesa el árbol');
     }
 
     // Con los pilotos reales (fase 2 si todavía no están): la carrera completa

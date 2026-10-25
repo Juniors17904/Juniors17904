@@ -302,6 +302,7 @@ class ControladorCarreraSolo {
         this.#cancelarTemporizadores();
         this.#hud.ocultarCuenta();
         this.#visor.congelar(true);
+        this.#visor.rivales?.jugadorLlego();
         this.#vistaConduccion?.ocultarOverlay();
 
         const cronometro = this.#cronometro;
