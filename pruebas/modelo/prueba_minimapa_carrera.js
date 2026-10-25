@@ -108,8 +108,8 @@ class PruebaMinimapaCarrera {
         const ultimoBorde = trazos.slice(trazos.indexOf(jugador)).find(t => t.tipo === 'borde');
         this.#ok(jugador.color === '#ef4444' && puntos.slice(0, -1).every(p => p.r < jugador.r) && ultimoBorde?.color === '#ffffff',
             `RF-04 (${nombre}) el jugador es más grande, con borde blanco, y se dibuja encima`);
-        const meta = trazos.find(t => t.tipo === 'rect' && t.w === 10);
-        this.#ok(meta && Math.abs(meta.x + 5 - jugador.x) < 0.01 && Math.abs(meta.y + 1.5 - jugador.y) < 0.01,
+        const meta = trazos.find(t => t.tipo === 'rect' && t.w === 7);
+        this.#ok(meta && Math.abs(meta.x + 3.5 - jugador.x) < 0.01 && Math.abs(meta.y + 3.5 - jugador.y) < 0.01,
             `RF-01/RF-03 (${nombre}) el carro en la meta cae justo sobre la línea de meta del mapa`);
         // El rival 1 está en un punto del recorrido: cae justo sobre ese punto del trazado dibujado
         const [r1, r2, , r4] = puntos;
@@ -125,12 +125,12 @@ class PruebaMinimapaCarrera {
 
     #probarDocumentos() {
         const prds = fs.readdirSync(path.join(PruebaMinimapaCarrera.#RAIZ, 'docs/prds'));
-        for (const n of ['001', '002', '004', '005', '006', '008', '009', '010', '011', '012', '014', '015', '016']) {
+        for (const n of ['001', '002', '004', '005', '015', '016']) {
             const f = prds.find(x => x.startsWith(`prd_${n}`));
             this.#ok(f && /según el PRD 017/.test(this.#leer(`docs/prds/${f}`)), `RF-11 el PRD ${n} tiene la nota del PRD 017`);
         }
         const claude = this.#leer('CLAUDE.md');
-        this.#ok(/`MinimapBase` \|[^\n]*MinimapaCarrera/.test(claude), 'RF-11 CLAUDE.md suma MinimapaCarrera a la jerarquía de MinimapBase');
+        this.#ok(/`MinimapBase` \|[^\n]*MinimapaCarrera/.test(claude) && /src\/view\/minimapas\/[^\n]*PuntoCarroMapa/.test(claude), 'RF-11 CLAUDE.md suma MinimapaCarrera a la jerarquía de MinimapBase');
         this.#ok(/`DisenoCarrera` \|[^\n]*anchoMapa[^\n]*altoMapa/.test(claude), 'RF-11 CLAUDE.md suma el tamaño del mapa a la interfaz de DisenoCarrera');
         this.#ok(/B22[^\n]*prd_017/.test(this.#leer('docs/BACKLOG.md')), 'RF-11 el backlog enlaza B22 con el PRD 017');
         const mapa = this.#leer('src/view/minimapas/minimapa_carrera.js').replace(/\/\/.*$/gm, '');

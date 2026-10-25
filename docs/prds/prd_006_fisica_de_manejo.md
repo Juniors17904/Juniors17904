@@ -45,7 +45,7 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - `HudCarrera`, la cuenta 3-2-1 y el resultado de Jugar Solo. *(`HudCarrera` y el resultado cambian según el PRD 013, D9: posición y tabla.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)*
 - El modo "movimiento libre" de Test Drive con ruta (botón y tecla M): no depende de la clase `MovimientoLibre`.
 - `Ruta` y su reexportación en `model_fisica.js`. *(`Ruta` cambia según el PRD 014, D9: cierre suave de las pistas abiertas.)*
-- `src/style.css`. *(Solo agregar estilos de las barras del garaje, según el PRD 007, D8.)* *(Solo agregar reglas de la posición y la tabla, según el PRD 013, D9.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)*
+- `src/style.css`. *(Solo agregar estilos de las barras del garaje, según el PRD 007, D8.)* *(Solo agregar reglas de la posición y la tabla, según el PRD 013, D9.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

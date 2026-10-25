@@ -44,7 +44,7 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 - Las vueltas, los puntos de control, `Cronometro`, `MuestraRuta` y el resultado. *(El resultado cambia según el PRD 013, D9: tabla de posiciones.)* *(El resultado: solo su ubicación cambia según el PRD 015, D12.)*
 - Los datos de cada pista (`ConfigPista*`) y `FabricaObjetoEscena`. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)* *(También según el PRD 011, D11: flechas.)*
 - `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana` y `VisorDisenoPista` (D7). *(Estos visores cambian según el PRD 009, D12: tamaño del carro y cámara.)* *(Estos visores cambian el dibujo del piso y la altura del carro según el PRD 012, D11.)*
-- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos, los velocímetros y `src/style.css`. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)* *(`src/style.css`: solo agregar reglas de la posición y la tabla, según el PRD 013, D9.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)*
+- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos, los velocímetros y `src/style.css`. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)* *(`src/style.css`: solo agregar reglas de la posición y la tabla, según el PRD 013, D9.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

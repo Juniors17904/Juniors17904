@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para programar |
+| Estado | v3 — programado |
 | Fecha | 2026-10-25 |
 | Backlog | B22 (`docs/BACKLOG.md`) |
 | Depende de | PRD 013 (rivales), PRD 014 (camino de vuelta), PRD 015 (diseños) y PRD 016 (controles) |
@@ -20,8 +20,8 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D4 | Usuarios | El mapa va arriba a la derecha, debajo de la barra de vuelta, posición y tiempo, en los dos diseños. No tapa el velocímetro, la posición, el tiempo ni los controles. Cada diseño dice su tamaño: en vertical, unos 90×120 px (como los mapas que ya existen); en horizontal, un poco más grande. |
 | D5 | Usuarios | El mapa es fijo: no gira con el carro. |
 | D6 | Usuarios | Se ve desde la cuenta 3-2-1 y se oculta cuando aparece el panel de resultado. Su fondo es semitransparente para no tapar la pista. No se puede ocultar con un toque. |
-| D7 | Técnico | Una clase nueva de la vista, `MinimapaCarrera`, que hereda de `MinimapBase` y vive en `src/view/minimapas/`. No nombra Jugar Solo: sirve para cualquier carrera 3D, también el multijugador futuro (B3). Los puntos salen de la posición real de cada carro en la pista. El modelo no cambia y `VisorCarreraSolo` no crece. Pruebas en navegador real en 390×844 y 844×390, con capturas. |
-| D8 | Dominio | **Reemplaza:** del PRD 001, el HUD de su In scope (vuelta, tiempo y velocímetro), su D10 (lo que va arriba en vertical) y `src/style.css` en su lista: ahora suma el mapa. Del PRD 015, su D4, su RF-01 y "el diseño vertical" en su lista: en vertical se suma el mapa; también crece la interfaz de `DisenoCarrera` con el tamaño del mapa. `ControladorCarreraSolo` en las listas de los PRD 002 ("todas las clases de la carrera 3D"), 005 y 016: crea el mapa y le pasa los carros. De los PRD 004 y 005, "el comportamiento y el aspecto del juego" (solo el mapa de Jugar Solo). De los PRD 002, 004, 005, 006, 008 a 012 y 014, `src/style.css` en sus listas, solo para agregar el lugar del mapa. `CLAUDE.md` suma `MinimapaCarrera` a la jerarquía de `MinimapBase` y el tamaño del mapa a la interfaz de `DisenoCarrera`. `MinimapBase` suma una forma de pasar un lugar de la pista a un punto del mapa, sin cambiar a sus otras subclases. Esos PRD llevan una nota que lo indica. |
+| D7 | Técnico | Una clase nueva de la vista, `MinimapaCarrera`, que hereda de `MinimapBase` y vive en `src/view/minimapas/` (con su ayudante `PuntoCarroMapa`). No nombra Jugar Solo: sirve para cualquier carrera 3D, también el multijugador futuro (B3). Los puntos salen de la posición real de cada carro en la pista. El modelo no cambia y `VisorCarreraSolo` no crece. Pruebas en navegador real en 390×844 y 844×390, con capturas. |
+| D8 | Dominio | **Reemplaza:** del PRD 001, el HUD de su In scope (vuelta, tiempo y velocímetro), y su D10 (lo que va arriba en vertical): ahora suma el mapa. Del PRD 015, su D4, su RF-01 y "el diseño vertical" en su lista: en vertical se suma el mapa; también crece la interfaz de `DisenoCarrera` con el tamaño del mapa. `ControladorCarreraSolo` en las listas de los PRD 002 ("todas las clases de la carrera 3D"), 005 y 016: crea el mapa y le pasa los carros. De los PRD 004 y 005, "el comportamiento y el aspecto del juego" (solo el mapa de Jugar Solo). El lugar del mapa se agrega en los estilos de Jugar Solo de `index.html`, que ningún PRD protege; `src/style.css` no cambia. `CLAUDE.md` suma `MinimapaCarrera` a la jerarquía de `MinimapBase`, `PuntoCarroMapa` (el lugar y el color de un carro) a la carpeta `src/view/minimapas/` y el tamaño del mapa a la interfaz de `DisenoCarrera`. `MinimapBase` suma una forma de pasar un lugar de la pista a un punto del mapa, sin cambiar a sus otras subclases. Esos PRD llevan una nota que lo indica. |
 
 ## 1. Contexto y problema
 En Jugar Solo se corre contra 4 rivales (PRD 013), pero no hay forma de ver la pista entera ni dónde va cada uno. Solo se sabe la posición (por ejemplo, "2.º/5"). Las pantallas Diseño de Pistas y Diseño General ya tienen minimapa; Jugar Solo no.
@@ -62,7 +62,7 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 - **RF-08 (D6):** el mapa se ve durante la cuenta 3-2-1 y la carrera, y se oculta cuando aparece el panel de resultado; con Revancha vuelve a aparecer.
 - **RF-09 (D6):** detrás del mapa se ve la pista (fondo semitransparente).
 - **RF-10 (D1):** en las otras pantallas no aparece este mapa y sus minimapas siguen igual.
-- **RF-11 (D8):** los PRD de D8 tienen su nota; `CLAUDE.md` suma `MinimapaCarrera` a la jerarquía de `MinimapBase` y el tamaño del mapa a la interfaz de `DisenoCarrera`; el backlog enlaza B22 con este PRD.
+- **RF-11 (D8):** los PRD de D8 tienen su nota; `CLAUDE.md` suma `MinimapaCarrera` a la jerarquía de `MinimapBase`, `PuntoCarroMapa` (el lugar y el color de un carro) a la carpeta `src/view/minimapas/` y el tamaño del mapa a la interfaz de `DisenoCarrera`; el backlog enlaza B22 con este PRD.
 
 ## 7. Requerimientos no funcionales
 - **RNF-01 (D7), reglas del proyecto:** `MinimapaCarrera` es una clase de la vista en su propio archivo, hereda de `MinimapBase` y no nombra Jugar Solo; el tamaño del mapa lo da cada diseño (PRD 015). Se cumple `CLAUDE.md`.
@@ -80,9 +80,10 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 ## 9. Riesgos y supuestos
 - **Pistas largas o angostas:** el recorrido se achica para entrar entero en el mapa; en pistas muy alargadas puede verse fino.
 - **Rendimiento:** dibujar el mapa en cada cuadro es poco trabajo; el recorrido se calcula una sola vez por carrera.
-- **Pantallas bajas en horizontal:** con 390 px de alto, el velocímetro queda cerca de la esquina de arriba a la derecha; por eso el mapa crece a lo ancho y no a lo alto (RF-06). RF-05 manda.
+- **Pantallas bajas en horizontal:** con 390 px de alto, el velocímetro queda cerca de la esquina de arriba a la derecha; por eso el mapa crece a lo ancho y no a lo alto (RF-06). RF-05 manda. En pantallas acostadas de menos de 390 px de alto el mapa puede rozar el velocímetro; queda fuera de este PRD.
 - **Pasto en el mapa:** a esta escala el pasto queda a 1 px o menos del recorrido dibujado, así que no se nota en el mapa; RF-03 pide el lugar real, que se prueba con números.
 
 ### Historial
 - **v1** (2026-10-25): primera versión, con las 8 decisiones aprobadas por el usuario (opción A).
 - **v2** (2026-10-25): revisión única (forma corta). Detalles: D8 completa (PRD 001 D10 y `src/style.css`, PRD 015 RF-01 y lista, `ControladorCarreraSolo` en los PRD 002 y 005, aspecto del juego en los PRD 004 y 005, sin `index.html`, y `MinimapBase`); RF-03 pide el lugar real (el pasto no se nota a esta escala); RF-06: en horizontal el mapa crece a lo ancho, porque a lo alto choca con el velocímetro; RNF-04 prueba sin navegador la clase de la vista.
+- **v3** (2026-10-25): programado. D8 dice dónde va el lugar del mapa (los estilos de Jugar Solo en `index.html`; `src/style.css` no cambia) y suma `PuntoCarroMapa`; sin notas en los PRD que solo protegían `src/style.css`. La meta es un cuadrado chico, visible hacia donde vaya la pista.

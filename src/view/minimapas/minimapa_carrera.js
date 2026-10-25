@@ -61,8 +61,9 @@ class MinimapaCarrera extends MinimapBase {
             ctx.lineCap = 'round'; ctx.lineJoin = 'round';
             this._dibujarTrazado(ctx);
             const meta = this._primerPunto;
+            // La meta es un cuadrado: se ve igual hacia donde vaya la pista
             ctx.fillStyle = '#ffffff';
-            ctx.fillRect(meta.x - 5, meta.y - 1.5, 10, 3);
+            ctx.fillRect(meta.x - 3.5, meta.y - 3.5, 7, 7);
             for (const carro of this.#ordenDibujo()) this.#dibujarCarro(ctx, carro);
         }
         ctx.restore();
