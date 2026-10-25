@@ -72,9 +72,9 @@ for (const [nombre, vp, ancho, alto] of [['vertical', { width: 390, height: 844 
   const { ctx, page, errores, cdp } = await abrir(vp);
   await page.evaluate(() => document.getElementById('btn-solo').click());
   // RF-08: durante la cuenta 3-2-1 el mapa ya se ve
-  await page.waitForFunction(() => document.getElementById('cuenta-carrera-solo')?.style.display === 'flex', null, { timeout: 20000 }).catch(() => {});
+  const huboCuenta = await page.waitForFunction(() => document.getElementById('cuenta-carrera-solo')?.style.display === 'flex', null, { timeout: 20000 }).then(() => true, () => false);
   const enCuenta = await medir(page);
-  check(enCuenta.mapa && enCuenta.mapa.w === ancho, `RF-08 (${nombre}) el mapa se ve durante la cuenta 3-2-1`);
+  check(huboCuenta && enCuenta.mapa && enCuenta.mapa.w === ancho, `RF-08 (${nombre}) el mapa se ve durante la cuenta 3-2-1`);
   await page.waitForFunction(() => window.__visor && document.getElementById('cuenta-carrera-solo')?.style.display === 'none', null, { timeout: 20000 }).catch(() => {});
   await esperar(500);
   const m = await medir(page);
@@ -92,17 +92,24 @@ for (const [nombre, vp, ancho, alto] of [['vertical', { width: 390, height: 844 
   const acel = { id: 1, x: (m.acel.x + m.acel.r) / 2, y: (m.acel.y + m.acel.b) / 2 };
   await tocar(cdp, 'touchStart', [acel]);
   await esperar(2500);
-  const despues = await page.evaluate(() => ({ u: JSON.parse(JSON.stringify(window.__ubicados)), px: window.__visor.px, pz: window.__visor.pz }));
+  const despues = await page.evaluate(() => ({ u: JSON.parse(JSON.stringify(window.__ubicados)), px: window.__visor.px, pz: window.__visor.pz,
+    rivales: window.__visor.rivales.rivales.map(r => ({ x: r.carro.px, z: r.carro.pz, color: r.piloto.color })) }));
   await tocar(cdp, 'touchEnd', [acel]);
   const movidos = despues.u.filter((c, i) => Math.hypot(c.x - u0[i].x, c.z - u0[i].z) > 5).length;
   check(movidos === 5, `RF-03 (${nombre}) los 5 puntos se mueven con sus carros (${movidos})`);
   check(Math.abs(despues.u[0].x - despues.px) < 3 && Math.abs(despues.u[0].z - despues.pz) < 3, `RF-03 (${nombre}) el punto del jugador está en su lugar real`);
+  check(despues.rivales.length === 4 && despues.rivales.every((r, i) => { const u = despues.u[i + 1]; return u.color === r.color && Math.hypot(u.x - r.x, u.z - r.z) < 3; }),
+    `RF-02/RF-03 (${nombre}) cada rival está en el lugar real de su carro y con el color de su auto`);
   await page.screenshot({ path: `${CARPETA}/${nombre}.png` });
   if (nombre === 'vertical') {
     // RF-06: al girar el celular cambia de tamaño sin cortar la carrera
+    const antes = await page.evaluate(() => window.__visor.px + ',' + window.__visor.pz);
     await page.setViewportSize({ width: 844, height: 390 });
     await esperar(800);
     const girado = await medir(page);
+    const sigue = await page.evaluate(v => !!window.__visor && document.getElementById('pantalla-carrera-solo').classList.contains('activa')
+      && !document.getElementById('pantalla-carrera-solo').classList.contains('con-resultado') && (window.__visor.px + ',' + window.__visor.pz) !== v, antes);
+    check(sigue, 'RF-06 al girar el celular la carrera sigue (el carro se sigue moviendo)');
     check(girado.mapa && girado.mapa.w === 140 && girado.mapa.h === 104 && girado.mapa.r <= 844, `RF-06 al girar a horizontal el mapa pasa a 140×104 (${girado.mapa?.w}×${girado.mapa?.h})`);
     await page.screenshot({ path: `${CARPETA}/vertical_girado.png` });
     await page.setViewportSize(vp);
@@ -131,7 +138,9 @@ for (const [nombre, vp, ancho, alto] of [['vertical', { width: 390, height: 844 
   await page.waitForTimeout(5000);
   const m = await medir(page);
   const recibio = await page.evaluate(() => window.__ubicados.length);
-  check(!m.mapa && recibio === 0, 'RF-10 en Diseño de Pistas no aparece el mapa de la carrera');
+  const enDiseno = await page.evaluate(() => !!document.querySelector('.pantalla.activa') && !document.getElementById('pantalla-carrera-solo').classList.contains('activa')
+    && !!document.getElementById('canvas-timon')?.getBoundingClientRect().width);
+  check(enDiseno && !m.mapa && recibio === 0, 'RF-10 en Diseño de Pistas no aparece el mapa de la carrera');
   const reales = erroresReales(errores);
   check(reales.length === 0, 'Diseño de Pistas sin errores de consola ' + reales.join(' | '));
   await ctx.close();
