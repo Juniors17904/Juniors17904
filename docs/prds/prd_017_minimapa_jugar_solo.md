@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — programado |
+| Estado | v3 — programado y en `main` |
 | Fecha | 2026-10-25 |
 | Backlog | B22 (`docs/BACKLOG.md`) |
 | Depende de | PRD 013 (rivales), PRD 014 (camino de vuelta), PRD 015 (diseños) y PRD 016 (controles) |
