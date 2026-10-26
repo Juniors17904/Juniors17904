@@ -39,8 +39,8 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 **Out of scope:** el campeonato, guardar récords (B7), elegir el carro o el color en esta pantalla (sigue en el garaje), el multijugador (B3) y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física de los carros, los choques, las vueltas y el cronómetro (PRD 006 a 012).
-- Las personalidades de los rivales (PRD 013, D2) y su manejo natural sin trampa (D3).
+- La física de los carros, los choques, las vueltas y el cronómetro (PRD 006 a 012). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
+- Las personalidades de los rivales (PRD 013, D2) y su manejo natural sin trampa (D3). *(Su manejo natural se puede ajustar según el PRD 019, D9, sin cambiar las personalidades.)*
 - Las pistas, el piso, los objetos, la señalética y el camino de vuelta (PRD 009 a 014).
 - Los diseños vertical y horizontal, los controles y el minimapa (PRD 015 a 017), salvo lo que dicen D6 y D8.
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
@@ -60,7 +60,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 - **RF-05 (D3):** con menos de 4 rivales, en Fácil corren primero el Novato y el Prudente; en Normal y Difícil, primero el Experto y el Agresivo.
 - **RF-06 (D4):** en Fácil los rivales son más lentos que en Normal; en Difícil, más rápidos que en Normal, sin pasar nunca el tope de su carro.
 - **RF-07 (D4):** en Difícil un rival que va adelante del jugador no afloja para esperarlo; en Normal afloja como hoy, y en Fácil afloja más que en Normal.
-- **RF-08 (D4):** en Normal los rivales corren igual que antes de este PRD.
+- **RF-08 (D4):** en Normal los rivales corren igual que antes de este PRD. *(Los números de manejo de los pilotos se pueden ajustar según el PRD 019, D9, si esto se sigue cumpliendo.)*
 - **RF-09 (D5):** al volver a "Preparar carrera" (también tras recargar la página) aparece la última elección; Revancha repite la misma carrera.
 - **RF-10 (D6):** Contra la PC, la posición dice "N.º/M" con M = rivales + 1, y la tabla final tiene M puestos.
 - **RF-11 (D6):** en Contrarreloj no se ve la posición ni la tabla de puestos; el resultado muestra el tiempo total y la mejor vuelta, y el minimapa tiene un solo punto.

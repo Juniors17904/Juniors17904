@@ -40,7 +40,7 @@ Que salirse de la pista se sienta: el pasto frena y los objetos son sólidos, si
 **Out of scope:** daños, reinicio, sonido de choque (B6), choques entre carros (B5), barreras a los lados de la pista (otro PRD; ya existen `BarreraEscena` y `GuardarrailEscena` en Diseño de Objetos) y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- Las reglas de física del PRD 006 y las físicas por carro del PRD 007.
+- Las reglas de física del PRD 006 y las físicas por carro del PRD 007. *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
 - Las vueltas, los puntos de control, `Cronometro`, `MuestraRuta` y el resultado. *(El resultado cambia según el PRD 013, D9: tabla de posiciones.)* *(El resultado: solo su ubicación cambia según el PRD 015, D12.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - Los datos de cada pista (`ConfigPista*`) y `FabricaObjetoEscena`. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)* *(También según el PRD 011, D11: flechas.)*
 - `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana` y `VisorDisenoPista` (D7). *(Estos visores cambian según el PRD 009, D12: tamaño del carro y cámara.)* *(Estos visores cambian el dibujo del piso y la altura del carro según el PRD 012, D11.)*

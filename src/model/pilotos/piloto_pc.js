@@ -284,17 +284,18 @@ export class PilotoPC {
         let error = Math.atan2(dx, dz) - carro.rotY;
         error = Math.atan2(Math.sin(error), Math.cos(error));
         const v = Math.abs(carro.velocidad);
-        const giroMax = this.#giroMaximo(carro.constantes, v);
+        const giroMax = this.#giroMaximo(carro.constantes, v, carro.factorPeso ?? 1);
         if (giroMax < 1e-6) return Math.max(-1, Math.min(1, -error * 4));
         const curvatura = 2 * Math.sin(error) / Math.max(1, Math.hypot(dx, dz));
         return Math.max(-1, Math.min(1, -curvatura * v / giroMax * Math.sign(carro.velocidad || 1)));
     }
 
-    // Radianes por paso que gira el carro con el volante a fondo (como Carro)
-    #giroMaximo(c, v) {
+    // Radianes por paso que gira el carro con el volante a fondo (como Carro);
+    // factorPeso lo lee del carro (PRD 019), la tabla de curvas usa la base
+    #giroMaximo(c, v, factorPeso = 1) {
         if (v <= 0.005) return 0;
         const u = v / c.velMaxAdelante;
-        return c.direccion * Math.min(1, v / c.velGiroPleno) / (1 + c.subviraje * u * u);
+        return c.direccion * Math.min(1, v / c.velGiroPleno) / (1 + c.subviraje * u * u) * factorPeso;
     }
 
     // La velocidad de curva de cada muestra, calculada una vez por carro

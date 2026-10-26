@@ -6,6 +6,8 @@
 //   RF-05  con menos de 4: Fácil → Novato y Prudente; Normal y Difícil → Experto y Agresivo
 //   RF-06  en el mismo tiempo, Fácil avanza menos que Normal y Difícil más, sin pasar el tope del carro
 //   RF-07  el que se escapó: Normal afloja, Fácil afloja más, Difícil no afloja
+//   PRD 019 RF-08 RF-06 y RF-07 se cumplen con el Carro nuevo: los rivales
+//          corren con TransferenciaPeso activa (factorPeso cambia al soltar)
 //   RF-08  Normal es la carrera de siempre: mismo ajuste y misma carrera que sin dificultad
 //   RF-09  PreferenciasCarrera recuerda la elección y la pista; un dato roto da la de siempre
 //   RF-13  notas en los PRD de D8, CLAUDE.md y backlog B21
@@ -120,11 +122,11 @@ class PruebaModosDificultad {
             dificil = new AjusteRitmo(this.#dificultad('dificil'));
         // El rival 0 se escapó: media vuelta delante del jugador y del resto
         const [rn] = normal.ritmos(0, [0.6, 0.05]), [rf] = facil.ritmos(0, [0.6, 0.05]), [rd] = dificil.ritmos(0, [0.6, 0.05]);
-        this.#ok(rn < 1 && rf < rn && rd >= 1.1, `RF-07 el que se escapó: Normal afloja (${rn.toFixed(2)}), Fácil más (${rf.toFixed(2)}), Difícil no (${rd.toFixed(2)})`);
+        this.#ok(rn < 1 && rf < rn && rd >= 1.1, `RF-07 / PRD 019 RF-08 el que se escapó: Normal afloja (${rn.toFixed(2)}), Fácil más (${rf.toFixed(2)}), Difícil no (${rd.toFixed(2)})`);
         const sinJugador = [facil, normal, dificil].map(a => a.ritmos(null, [0.1])[0]);
-        this.#ok(sinJugador[0] < 1 && sinJugador[1] === 1 && sinJugador[2] > 1, `RF-06 sin nadie que los apure: Fácil < Normal < Difícil (${sinJugador})`);
+        this.#ok(sinJugador[0] < 1 && sinJugador[1] === 1 && sinJugador[2] > 1, `RF-06 / PRD 019 RF-08 sin nadie que los apure: Fácil < Normal < Difícil (${sinJugador})`);
         const pegados = dificil.ritmos(0.5, [0.51, 0.5, 0.2]);
-        this.#ok(pegados.every(r => r >= dificil.base), 'RF-07 en Difícil nunca baja de su ritmo, ni pegado a otro');
+        this.#ok(pegados.every(r => r >= dificil.base), 'RF-07 / PRD 019 RF-08 en Difícil nunca baja de su ritmo, ni pegado a otro');
     }
 
     #probarNormalIgual() {
@@ -155,16 +157,23 @@ class PruebaModosDificultad {
     #probarRitmoEnCarrera() {
         const avance = clave => {
             const { carrera, avanzar } = this.#carrera(this.#dificultad(clave), 4);
-            let tope = true;
+            let tope = true, pesoBaja = false, pesoSube = false;
             for (let s = 0; s < 45; s++) {
-                avanzar(60);
+                for (let p = 0; p < 60; p++) {
+                    avanzar(1);
+                    for (const r of carrera.rivales) {
+                        if (r.carro.factorPeso < 1) pesoBaja = true;
+                        if (r.carro.factorPeso > 1) pesoSube = true;
+                    }
+                }
                 for (const r of carrera.rivales) if (r.carro.velocidad > r.carro.velMaxAdelante + 1e-6) tope = false;
             }
-            return { suma: carrera.rivales.reduce((t, r) => t + r.avance, 0), tope };
+            return { suma: carrera.rivales.reduce((t, r) => t + r.avance, 0), tope, peso: pesoBaja && pesoSube };
         };
         const f = avance('facil'), n = avance('normal'), d = avance('dificil');
-        this.#ok(f.suma < n.suma && n.suma < d.suma, `RF-06 en 45 s: Fácil avanza menos que Normal y Difícil más (${f.suma.toFixed(2)} < ${n.suma.toFixed(2)} < ${d.suma.toFixed(2)})`);
-        this.#ok(f.tope && n.tope && d.tope, 'RF-06/D4 ningún rival pasa el tope de su carro, en ninguna dificultad');
+        this.#ok(f.peso && n.peso && d.peso, 'PRD 019 RF-08 en Fácil, Normal y Difícil los rivales corren con TransferenciaPeso activa (factorPeso baja y sube de 1)');
+        this.#ok(f.suma < n.suma && n.suma < d.suma, `RF-06 / PRD 019 RF-08 en 45 s: Fácil avanza menos que Normal y Difícil más (${f.suma.toFixed(2)} < ${n.suma.toFixed(2)} < ${d.suma.toFixed(2)})`);
+        this.#ok(f.tope && n.tope && d.tope, 'RF-06/D4 / PRD 019 RF-08 ningún rival pasa el tope de su carro, en ninguna dificultad');
     }
 
     #probarPreferencias() {

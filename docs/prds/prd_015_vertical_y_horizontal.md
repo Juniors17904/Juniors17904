@@ -43,7 +43,7 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 **Out of scope:** cambiar el tamaño o la forma del timón y los botones (B23); el multijugador en 3D (B3, D11); las otras pantallas 3D (D1); y todo lo de la lista única de abajo. *(Lo hace el PRD 016.)*
 
 **Lista única de lo que NO se modifica:**
-- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): girar no cambia nada del juego. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
+- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): girar no cambia nada del juego. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(El giro y el derrape suman el peso del carro, y el manejo de los rivales se puede ajustar, según el PRD 019, D9.)*
 - Las pistas, el piso, los objetos y la señalética.
 - El diseño vertical de Jugar Solo (D4). *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)*
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.

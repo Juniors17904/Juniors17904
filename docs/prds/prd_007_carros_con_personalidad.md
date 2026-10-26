@@ -41,7 +41,7 @@ Que elegir carro sea una decisión de juego: cada uno se maneja distinto y el ga
 **Out of scope:** turbo por carro (B9), mejoras o compras de carros, pasto y choques (PRD 008) y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- Las reglas de física del PRD 006 (giro, aire y aceleración): cada carro solo cambia sus números.
+- Las reglas de física del PRD 006 (giro, aire y aceleración): cada carro solo cambia sus números. *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
 - `CarreraVueltas`, `Cronometro`, `MuestraRuta` y la regla del pasto (este PRD no los toca; el pasto lo cambia el PRD 008).
 - `PerfilCarro` y sus subclases, y los modelos 3D de los carros. *(La escala con que se dibujan los modelos 3D cambia según el PRD 009, D12.)*
 - `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos y los velocímetros. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)* *(Los timones y los velocímetros: solo su ubicación cambia según el PRD 015, D12.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)*

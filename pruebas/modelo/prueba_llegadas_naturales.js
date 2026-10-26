@@ -7,6 +7,8 @@
 //         entre 2 y 15 s en al menos 8 de 10 carreras
 //   RF-08 un jugador muy bueno puede ganar y uno muy lento queda último
 //   RF-04 sin ajuste de ritmo el Experto termina en promedio antes que el Novato
+//   PRD 019 RF-08 las llegadas siguen igual con el Carro nuevo: los rivales
+//         corren con TransferenciaPeso activa (factorPeso cambia al soltar)
 //   RNF-02 los choques entre los 5 carros tardan menos de 0,05 ms por paso
 //          y un paso entero de los rivales queda muy por debajo de un cuadro
 // Con DETALLE=1 muestra los tiempos de cada carrera.
@@ -39,6 +41,7 @@ class PruebaLlegadasNaturales {
         await this.#importar();
         this.#prepararPista();
 
+        this.#probarPesoActivo();
         this.#probarLlegadas();
         this.#probarJugadorBueno();
         this.#probarJugadorLento();
@@ -170,8 +173,8 @@ class PruebaLlegadasNaturales {
         for (const semilla of PruebaLlegadasNaturales.#SEMILLAS) {
             const r = this.#simular(semilla, 'normal');
             const todos = r.rivales.every(x => x.terminado);
-            this.#ok(todos, `PRD 013 RF-03 semilla ${semilla}: los 4 rivales terminan (${this.#texto(r)})`);
-            this.#ok(r.tiempoJugador !== null, `PRD 013 RF-07 semilla ${semilla}: el jugador simulado termina`);
+            this.#ok(todos, `PRD 013 RF-03 / PRD 019 RF-08 semilla ${semilla}: los 4 rivales terminan (${this.#texto(r)})`);
+            this.#ok(r.tiempoJugador !== null, `PRD 013 RF-07 / PRD 019 RF-08 semilla ${semilla}: el jugador simulado termina`);
             const tiempos = [...r.rivales.map(x => x.tiempo), r.tiempoJugador].filter(t => t !== null).sort((a, b) => a - b);
             const huecos = tiempos.slice(1).map((t, i) => t - tiempos[i]);
             const ok = tiempos.length === 5 && huecos.every(h => h >= 2 && h <= 15);
@@ -179,7 +182,34 @@ class PruebaLlegadasNaturales {
             this.#log(`semilla ${semilla} ${ok ? '✓' : '✗'} ${this.#texto(r)} | huecos ${huecos.map(h => h.toFixed(1)).join(', ')}`);
         }
         const total = PruebaLlegadasNaturales.#SEMILLAS.length;
-        this.#ok(separadas >= total * 0.8, `PRD 013 RF-07 los 5 llegan separados de 2 a 15 s en ${separadas} de ${total} carreras (al menos el 80 %)`);
+        this.#ok(separadas >= total * 0.8, `PRD 013 RF-07 / PRD 019 RF-08 los 5 llegan separados de 2 a 15 s en ${separadas} de ${total} carreras (al menos el 80 %)`);
+    }
+
+    // PRD 019 RF-08: el Carro de estas carreras (jugador y rivales) tiene la
+    // transferencia de peso activa: acelerando factorPeso baja de 1 y al soltar sube
+    #probarPesoActivo() {
+        const p = this.#puntos[4];
+        const carro = new this.#m.RegistroCarros().crear(PruebaLlegadasNaturales.#TIPO_JUGADOR, p.x, p.z, p.angulo);
+        carro.entradaAcel = 1;
+        for (let k = 0; k < 60; k++) carro.actualizar(PruebaLlegadasNaturales.#PASO);
+        const acelerando = carro.factorPeso;
+        carro.entradaAcel = 0; carro.entradaDireccion = 1;
+        for (let k = 0; k < 30; k++) carro.actualizar(PruebaLlegadasNaturales.#PASO);
+        const soltando = carro.factorPeso;
+        this.#ok(acelerando < 1 && soltando > 1,
+            `PRD 019 RF-08 el Carro de la carrera tiene TransferenciaPeso activa (acelerando ${acelerando.toFixed(3)}, al soltar ${soltando.toFixed(3)})`);
+        let ahora = 0;
+        const carrera = new this.#m.CarreraConRivales(this.#ruta, this.#pista.decoraciones, this.#muestras, 11, () => ahora);
+        carrera.colocarEnGrilla(this.#puntos.slice(0, 4));
+        carrera.iniciar();
+        const rango = carrera.rivales.map(r => [r.carro.factorPeso, r.carro.factorPeso]);
+        for (let k = 0; k < 60 * 40; k++) {
+            ahora += PruebaLlegadasNaturales.#PASO;
+            carrera.paso(null, null);
+            carrera.rivales.forEach((r, i) => { rango[i][0] = Math.min(rango[i][0], r.carro.factorPeso); rango[i][1] = Math.max(rango[i][1], r.carro.factorPeso); });
+        }
+        this.#ok(rango.every(([min, max]) => min < 1 && max > 1),
+            `PRD 019 RF-08 los rivales corren con la física nueva: su factorPeso baja y sube de 1 (${rango.map(([a, b]) => `${a.toFixed(3)}..${b.toFixed(3)}`).join(' · ')})`);
     }
 
     // RF-08: un jugador muy bueno puede ganar
