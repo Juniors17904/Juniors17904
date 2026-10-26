@@ -20,7 +20,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D4 | Usuarios | El récord se ve en **"Preparar carrera"**, debajo de la pista elegida ("Récord 1:23.45 · Mejor vuelta 0:27.10", o "Sin récord todavía"), y en el **resultado**, junto al tiempo de la carrera. |
 | D5 | Usuarios | Si se bate el récord, el resultado muestra **"¡Nuevo récord!"** bien visible. El tiempo total y la mejor vuelta se comparan cada uno por su lado. |
 | D6 | Alcance | Borrar los récords queda fuera de este PRD. |
-| D7 | Técnico y dominio | Clases nuevas del modelo: `RecordPista` (los dos tiempos de una pista) y `RegistroRecords` (los récords de todas las pistas, con su propia clave de guardado). Ningún archivo pasa de 400 líneas. Pruebas en el modelo y en navegador real, en vertical y en horizontal. **Reemplaza (solo para guardar y mostrar el récord):** "récords guardados" del Out of scope del PRD 001 y "guardar récords (B7)" del Out of scope del PRD 018; `HudCarrera` y el resultado en las listas de los PRD 002, 006, 008, 009 a 012, 014 y 017, y "el HUD" en la del PRD 019; `ControladorCarreraSolo` en las listas de los PRD 002, 005 y 016; "el comportamiento y el aspecto del juego" de los PRD 004 y 005. `CLAUDE.md` nombra las clases nuevas. Esos PRD llevan una nota que lo indica. |
+| D7 | Técnico y dominio | Clases nuevas del modelo: `RecordPista` (los dos tiempos de una pista) y `RegistroRecords` (los récords de todas las pistas, con su propia clave de guardado). Ningún archivo pasa de 400 líneas. Pruebas en el modelo y en navegador real, en vertical y en horizontal. **Reemplaza (solo para guardar y mostrar el récord):** "récords guardados" del Out of scope del PRD 001, "récords (B7)" del Out of scope del PRD 013 y "guardar récords (B7)" del Out of scope del PRD 018; amplía lo que muestra el resultado (PRD 001 D2 y RF-10, PRD 018 RF-11); `HudCarrera` y el resultado en las listas de los PRD 002, 006, 008, 009 a 012, 014 y 017, y "el HUD" en la del PRD 019; `ControladorCarreraSolo` en las listas de los PRD 002, 005 y 016; "el comportamiento y el aspecto del juego" de los PRD 004 y 005. Los estilos van en `index.html`; `src/style.css` no cambia. `CLAUDE.md` nombra las clases nuevas. Esos PRD llevan una nota que lo indica. |
 
 ## 1. Contexto y problema
 Al terminar una carrera de Jugar Solo se ve el tiempo, pero se pierde: no hay forma de saber si se mejoró ni cuál es la mejor marca de cada pista. Con el modo Contrarreloj (PRD 018) eso es lo que más falta.
@@ -54,19 +54,19 @@ Que el jugador tenga una marca que superar en cada pista y vea cuándo la bate.
 - **RF-03 (D2):** el récord es el mismo en Contra la PC y en Contrarreloj, y en cualquier dificultad.
 - **RF-04 (D3):** salir con "Menú" o con el botón atrás antes de terminar no cambia ningún récord.
 - **RF-05 (D1):** los récords siguen ahí después de recargar la página; cada pista tiene el suyo.
-- **RF-06 (D4):** en "Preparar carrera", debajo de las pistas, se ve el récord de la pista elegida, o "Sin récord todavía"; al cambiar de pista cambia el texto.
+- **RF-06 (D4):** en "Preparar carrera", debajo de la pista elegida, se ve el récord de la pista elegida, o "Sin récord todavía"; al cambiar de pista cambia el texto.
 - **RF-07 (D4):** el resultado muestra el récord de la pista junto al tiempo de la carrera.
-- **RF-08 (D5):** si se bate el tiempo total o la mejor vuelta, el resultado muestra "¡Nuevo récord!"; si no, no aparece.
-- **RF-09 (D4):** el texto del récord se ve completo en 390×844 y en 844×390, en "Preparar carrera" y en el resultado.
+- **RF-08 (D5):** si se bate el tiempo total o la mejor vuelta, el resultado muestra "¡Nuevo récord!"; si no, no aparece. La primera carrera terminada en una pista también es un récord nuevo.
+- **RF-09 (D4):** el texto del récord se ve completo en 390×844 y en 844×390, en "Preparar carrera" y en el resultado (que en horizontal ya se puede desplazar, PRD 015 RF-07). Los diseños vertical y horizontal no cambian.
 - **RF-10:** un dato guardado roto o raro no rompe el juego: esa pista queda "Sin récord todavía".
 - **RF-11 (D7):** los PRD de D7 tienen su nota; `CLAUDE.md` nombra las clases nuevas; el backlog enlaza B7 con este PRD.
 
 ## 7. Requerimientos no funcionales
-- **RNF-01 (D7), reglas del proyecto:** `RecordPista` y `RegistroRecords` son clases del modelo, cada una en su archivo; el récord no se guarda como objeto suelto en ninguna clase. Se cumple `CLAUDE.md`.
-- **RNF-02, MVC:** decidir si hay récord nuevo y guardarlo es del modelo; el controlador se lo pide al terminar y la vista solo muestra el texto.
-- **RNF-03 (D7), anti-monolito:** ningún archivo pasa de 400 líneas; `VisorCarreraSolo` no se toca.
+- **RNF-01 (D7), reglas del proyecto:** `RecordPista` y `RegistroRecords` son clases del modelo, cada una en su archivo; el récord no se guarda como objeto suelto en ninguna clase (para escribirlo en el almacenamiento solo se arma un dato temporal dentro de un método, como permite `CLAUDE.md`).
+- **RNF-02 (D7), MVC:** decidir si hay récord nuevo y guardarlo es del modelo; el controlador se lo pide al terminar y la vista solo muestra el texto.
+- **RNF-03 (D7), anti-monolito:** ningún archivo pasa de 400 líneas; `VisorCarreraSolo` no se toca, y el texto del récord se arma fuera de `ControladorCarreraSolo` (que está cerca del límite).
 - **RNF-04 (D7), pruebas:** en el modelo, comparar y guardar récords y los datos rotos; en navegador real (390×844 y 844×390), el texto en "Preparar carrera", el aviso de récord nuevo y que se recuerda al recargar, con capturas.
-- **RNF-05, entrega:** llega a `main` cumpliendo la forma corta de `CLAUDE.md`.
+- **RNF-05 (D7), entrega:** llega a `main` cumpliendo la forma corta de `CLAUDE.md`.
 
 ## 8. Criterios de aceptación del MVP
 1. Al terminar una carrera se guarda el récord de la pista si es mejor.
