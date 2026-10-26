@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — programado |
+| Estado | v3.1 — programado y en `main` |
 | Fecha | 2026-10-26 |
 | Backlog | B7 (`docs/BACKLOG.md`) |
 | Depende de | PRD 001 (carrera y resultado) y PRD 018 ("Preparar carrera") |
