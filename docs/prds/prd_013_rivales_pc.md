@@ -63,7 +63,7 @@ Que Jugar Solo sea una carrera de verdad contra 4 rivales que manejan como perso
 - **RF-04 (D2, D3):** en 10 carreras simuladas sin ajuste de ritmo, el Experto termina en promedio antes que el Novato, y el Novato pisa el pasto más veces que el Prudente.
 - **RF-05 (D3, D6):** con semillas distintas, dos carreras no son iguales: los tiempos de cada rival cambian.
 - **RF-06 (D3):** los rivales sufren el mismo freno del pasto y los mismos choques que el jugador.
-- **RF-07 (D4):** con un jugador simulado que maneja a un ritmo normal, los 5 carros llegan separados entre 2 y 15 segundos en al menos 8 de cada 10 carreras simuladas. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
+- **RF-07 (D4):** con un jugador simulado que maneja a un ritmo normal, los 5 carros llegan separados entre 2 y 15 segundos en al menos 8 de cada 10 carreras simuladas. *(Cambia según el PRD 018, D8: vale solo en Normal con 4 rivales.)*
 - **RF-08 (D4):** un jugador que maneja bien puede ganar, y uno que maneja muy lento queda último.
 - **RF-09 (D5):** durante la carrera se ve la posición del jugador ("2.º/5") y cambia al adelantar o ser adelantado. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-10 (D5):** si el jugador llega antes, los rivales siguen hasta terminar; después se ve la tabla con los 5 puestos, nombres y tiempos, y la mejor vuelta del jugador. Revancha vuelve a la grilla con los mismos 4 rivales y Menú vuelve a Inicio. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
@@ -80,7 +80,7 @@ Que Jugar Solo sea una carrera de verdad contra 4 rivales que manejan como perso
 ## 8. Criterios de aceptación del MVP
 1. Jugar Solo arranca con 5 carros en la grilla y los 4 rivales terminan la carrera. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 2. Cada rival maneja distinto y comete errores propios de su personalidad.
-3. Las llegadas quedan separadas de forma natural y se ve la posición y la tabla final.
+3. Las llegadas quedan separadas de forma natural y se ve la posición y la tabla final. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 4. `npm run test:todo` pasa en verde.
 
 ## 9. Riesgos y supuestos

@@ -191,7 +191,7 @@ class PruebaModosDificultad {
 
     #probarDocumentos() {
         const prds = fs.readdirSync(path.join(PruebaModosDificultad.#RAIZ, 'docs/prds'));
-        for (const n of ['001', '002', '004', '005', '006', '009', '010', '011', '012', '013', '014', '015', '016', '017']) {
+        for (const n of ['001', '002', '004', '005', '006', '008', '009', '010', '011', '012', '013', '014', '015', '016', '017']) {
             const f = prds.find(x => x.startsWith(`prd_${n}`));
             this.#ok(f && /según el PRD 018/.test(this.#leer(`docs/prds/${f}`)), `RF-13 el PRD ${n} tiene la nota del PRD 018`);
         }
