@@ -39,7 +39,7 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 **Out of scope:** ocultar o agrandar el mapa con un toque; un mapa que gire con el carro; el minimapa de las otras pantallas; y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): el mapa solo lee dónde está cada carro. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
+- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): el mapa solo lee dónde está cada carro. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(El giro y el derrape suman el peso del carro, y el manejo de los rivales se puede ajustar, según el PRD 019, D9.)*
 - `VisorCarreraSolo` (no crece) y `HudCarrera`. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - Los controles de Jugar Solo (PRD 016) y el velocímetro.
 - Los minimapas de las otras pantallas (`MinimapaDisenoGeneral`, `MinimapaCircuito3D`, `MapaDetallePista` y los de Test Drive).

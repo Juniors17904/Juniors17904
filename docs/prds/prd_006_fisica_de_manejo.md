@@ -17,7 +17,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D1 | Alcance | Entran tres cambios de física: el giro depende de la velocidad, el aire frena más cuanto más rápido se va y la aceleración baja al acercarse al tope. |
 | D2 | Alcance | Se aplica a las 5 pantallas que manejan un `Carro`: Jugar Solo (`VisorCarreraSolo`), Test Drive recto (`VisorTestdriveRecto`), Test Drive con ruta (`VisorTestdriveRuta`), Diseño de Pistas → Entrar (`VisorCarreraUrbana`) y Diseño General (`VisorDisenoPista`). *(v2: suma Diseño de Pistas)* |
 | D3 | Usuarios | Con el carro básico de referencia, la velocidad máxima y el tiempo de una vuelta en Ciudad quedan casi igual que hoy (±10 %). Las diferencias entre carros son del PRD 007. *(v2)* |
-| D4 | Usuarios | El derrape y la inclinación se sienten como ahora: se ajustan números, no la idea. |
+| D4 | Usuarios | El derrape y la inclinación se sienten como ahora: se ajustan números, no la idea. *(Se amplía según el PRD 019, D9: derrape al frenar en curva.)* |
 | D5 | Dominio | La física usa el tiempo real de cada paso. Los 5 visores avanzan con paso fijo de 60 Hz reutilizando `BuclePasoFijo`, que se mueve de `src/view/pistas/carrera_solo/` a `src/view/pistas/comun/`; hoy solo Jugar Solo lo usa. *(v2; v4 aprobado por el usuario)* |
 | D6 | Técnico | Se borra la clase `MovimientoLibre` (`movimiento_libre.js`, nadie la crea) y su reexportación en `model_fisica.js`. Se quita de `CLAUDE.md` (ejemplo MVC) y de los comentarios de `carro.js` que la nombran. |
 | D7 | Técnico | Las constantes de la física viven en una clase propia del modelo. Se borran sus copias en `get physics()` de `VisorTestdriveRecto` y `VisorTestdriveRuta` (la distancia de cámara `camDist` se queda en el visor), y los paneles de depuración (`PanelDatosTestDriveRecto`, `PanelDatosCircuito3D`) leen las del carro activo. *(v2)* |
@@ -57,14 +57,14 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 | Constantes de física | Clase del modelo con los números que definen cómo se maneja un carro. |
 
 ## 6. Requerimientos funcionales
-- **RF-01 (D1):** con el timón al máximo, el carro da una curva más cerrada a baja velocidad que a velocidad alta.
+- **RF-01 (D1):** con el timón al máximo, el carro da una curva más cerrada a baja velocidad que a velocidad alta. *(Se amplía según el PRD 019, D9: el giro depende también del pedal.)*
 - **RF-02 (D1):** detenido, el carro no gira aunque se mueva el timón (igual que hoy).
 - **RF-03 (D1):** al soltar el pedal, el carro pierde velocidad más rápido cuando va rápido que cuando va lento, y termina detenido.
 - **RF-04 (D1):** acelerando a fondo desde cero, el carro gana velocidad más rápido al principio que cerca del tope.
 - **RF-05 (D3):** con el carro básico, la velocidad máxima en recta queda dentro de ±10 % de la actual.
 - **RF-06 (D3):** con el carro básico, una vuelta en Ciudad, con el mismo recorrido de prueba, tarda dentro de ±10 % de lo que tarda hoy.
 - **RF-07 (D1):** frenar y la reversa funcionan como hoy: el freno detiene el carro y luego da marcha atrás con un tope menor.
-- **RF-08 (D4):** el carro sigue derrapando en curvas rápidas y se inclina hacia afuera de la curva.
+- **RF-08 (D4):** el carro sigue derrapando en curvas rápidas y se inclina hacia afuera de la curva. *(Se amplía según el PRD 019, D9: derrape al frenar en curva.)*
 - **RF-09 (D5):** en las 5 pantallas de D2, con el mismo recorrido, el carro llega al mismo lugar en una pantalla de 30, 60 o 120 Hz.
 - **RF-10 (D2):** las 5 pantallas de D2 se manejan con la física nueva.
 - **RF-11 (D7):** los paneles de depuración de Test Drive muestran los valores de física del carro que se está manejando.

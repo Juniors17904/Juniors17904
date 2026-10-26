@@ -43,7 +43,7 @@ Que la señalética necesaria tenga tamaño real, grosor y un lugar correcto, qu
 **Out of scope:** relieves y espesores del piso (PRD 012); árbol, poste y señal de curva (PRD 010); barreras y guardarraíles; pasar los datos de las pistas a clases (B16); y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física, la forma de choque del carro, las vueltas, los puntos de control y `Cronometro`: el arco de meta es solo un adorno sobre la meta que ya existe.
+- La física, la forma de choque del carro, las vueltas, los puntos de control y `Cronometro`: el arco de meta es solo un adorno sobre la meta que ya existe. *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
 - La forma, los tramos, el nombre, los colores y los demás objetos de cada pista: de `ConfigPista*` solo cambian la distancia y el paso de las flechas.
 - `ArbolEscena`, `PosteEscena`, `SenalCurvaEscena`, `BarreraEscena` y `GuardarrailEscena`.
 - La cámara de las pantallas de manejo, los cielos, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*

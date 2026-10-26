@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para implementar |
+| Estado | v2 — implementado, con pruebas en `pruebas/` |
 | Fecha | 2026-10-26 |
 | Backlog | B24 (`docs/BACKLOG.md`) |
 | Depende de | PRD 006 (física), PRD 007 (masa y agarre), PRD 013 y PRD 018 (rivales y dificultad) |
