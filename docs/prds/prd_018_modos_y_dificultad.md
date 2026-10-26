@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v3 — programado |
+| Estado | v3 — programado y en `main` |
 | Fecha | 2026-10-26 |
 | Backlog | B21 (`docs/BACKLOG.md`) |
 | Depende de | PRD 013 (rivales) y PRD 017 (minimapa) |
