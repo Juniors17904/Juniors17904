@@ -46,7 +46,7 @@ const cuenta = () => page.evaluate(()=>{const c=document.getElementById('cuenta-
 await page.evaluate(()=>{ window.__linea=[]; const c=document.getElementById('cuenta-carrera-solo'); const t0=performance.now();
   new MutationObserver(()=>{ const v=c.style.display==='none'?'':c.textContent; const u=window.__linea[window.__linea.length-1];
     if(!u||u[0]!==v) window.__linea.push([v, Math.round(performance.now()-t0)]); }).observe(c,{childList:true,attributes:true,characterData:true,subtree:true}); });
-await page.evaluate(()=>document.getElementById('btn-solo').click());
+await page.evaluate(()=>(document.getElementById('btn-solo').click(), document.getElementById('btn-correr').click()));
 check(await activa()==='pantalla-carrera-solo','pantalla activa carrera-solo');
 // "GIRA TU CELULAR" ya no existe (PRD 005 RF-02): vale que no exista o que no se vea
 check(await page.evaluate(()=>{ const r=document.getElementById('pantalla-rotar'); return !r || getComputedStyle(r).display==='none'; }),'RF-01 / PRD 005 RF-02 sin pantalla-rotar');
@@ -106,7 +106,7 @@ check(await activa()!=='pantalla-carrera-solo','adelante no deja pantalla vacía
 // Atrás a mitad de carrera
 const n0 = await page.evaluate(()=>window.__llamadas);
 await page.evaluate(()=>{ history.pushState({pantalla:'pantalla-inicio'},''); });
-await page.click('#btn-solo');
+await page.click('#btn-solo'); await page.click('#btn-correr');
 const llegoYa = await page.waitForFunction(()=>document.getElementById('cuenta-carrera-solo').textContent==='¡YA!',null,{timeout:10000}).then(()=>true,()=>false);
 check(llegoYa,'segunda entrada llega a ¡YA!');
 await page.waitForTimeout(1500);

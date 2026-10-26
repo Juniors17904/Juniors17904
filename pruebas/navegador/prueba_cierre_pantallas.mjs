@@ -118,7 +118,7 @@ for (const nombre of ['costa', 'desierto', 'montana', 'volcan']) {
   await page.evaluate(() => { window.__trazados.length = 0; window.__objetos.length = 0; });
   await page.evaluate(() => document.querySelector('.pantalla.activa .btn-volver, #btn-volver-pista')?.click());
   await page.evaluate(() => history.pushState({ pantalla: 'pantalla-inicio' }, ''));
-  await clic(page, 'btn-solo');
+  await clic(page, 'btn-solo'); await clic(page, 'btn-correr');
   await page.waitForTimeout(6000);
   const r = await page.evaluate(() => {
     const t = window.__trazados[window.__trazados.length - 1];

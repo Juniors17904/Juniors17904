@@ -6,36 +6,39 @@ import { EscenaRivales }     from './escena_rivales.js';
 
 // ================================================================
 // VIEW — RivalesCarreraSolo: junta lo que VisorCarreraSolo necesita de
-// los 4 rivales de la PC (PRD 013, D8).
+// los rivales de la PC (PRD 013, D8): de 1 a 4, con la dificultad elegida
+// (EleccionCarrera, PRD 018). Sin elección, los 4 de siempre en Normal.
 //   - Crea la CarreraConRivales (modelo) con una semilla nueva por carrera
 //     y los lugares de la GrillaSalida (el último es del jugador).
 //   - Crea EscenaRivales (los carros 3D) y la avanza en cada cuadro solo
 //     mientras está activa (desde ¡YA!; sigue aunque el jugador ya llegó, D5).
-//   - reiniciar() devuelve a los 4 rivales a la grilla (Revancha).
+//   - reiniciar() devuelve a los rivales a la grilla (Revancha).
 // No decide reglas de carrera: todo lo calcula el modelo.
 // ================================================================
 export class RivalesCarreraSolo {
-    static #CANTIDAD_PUESTOS = 5;
-    static #INDICE_JUGADOR   = 4;
+    static #RIVALES_SIEMPRE = 4;
     static #MAX_SEMILLA      = 2147483647;
 
     #carrera;          // CarreraConRivales (modelo)
     #escena3D;         // EscenaRivales (vista)
-    #puntos;           // PuntoSalida[] (los 4 primeros son de los rivales)
+    #puntos;           // PuntoSalida[] (los primeros son de los rivales; el último, del jugador)
+    #cantidad;         // rivales en la pista
     #activo = false;
     #carga  = null;
 
     // muestras: MuestraRuta[] por longitud de arco de la misma ruta
-    constructor(escena, ruta, decoraciones, muestras, medidas) {
+    constructor(escena, ruta, decoraciones, muestras, medidas, eleccion = null) {
         const semilla = Date.now() % RivalesCarreraSolo.#MAX_SEMILLA;
-        this.#carrera = new CarreraConRivales(ruta, decoraciones ?? [], muestras, semilla);
-        this.#puntos  = new GrillaSalida(medidas).puntos(ruta.inicio, RivalesCarreraSolo.#CANTIDAD_PUESTOS, muestras);
-        this.#carrera.colocarEnGrilla(this.#puntos.slice(0, RivalesCarreraSolo.#INDICE_JUGADOR));
+        this.#cantidad = eleccion?.cantidadRivales ?? RivalesCarreraSolo.#RIVALES_SIEMPRE;
+        this.#carrera = new CarreraConRivales(ruta, decoraciones ?? [], muestras, semilla, null,
+            eleccion?.dificultad ?? null, this.#cantidad);
+        this.#puntos  = new GrillaSalida(medidas).puntos(ruta.inicio, this.#cantidad + 1, muestras);
+        this.#carrera.colocarEnGrilla(this.#puntos.slice(0, this.#cantidad));
         this.#escena3D = new EscenaRivales(escena, this.#carrera, medidas);
     }
 
     get carrera()      { return this.#carrera; }
-    get puntoJugador() { return this.#puntos[RivalesCarreraSolo.#INDICE_JUGADOR]; }
+    get puntoJugador() { return this.#puntos[this.#cantidad]; }
     get activo()       { return this.#activo; }
 
     set activo(valor) {
@@ -57,7 +60,7 @@ export class RivalesCarreraSolo {
 
     reiniciar() {
         this.#activo = false;
-        this.#carrera.reiniciar(this.#puntos.slice(0, RivalesCarreraSolo.#INDICE_JUGADOR));
+        this.#carrera.reiniciar(this.#puntos.slice(0, this.#cantidad));
         this.#escena3D.reiniciar();
     }
 

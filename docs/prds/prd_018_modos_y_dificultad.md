@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v1 — escrito, con las decisiones aprobadas por el usuario |
+| Estado | v2 — revisado (forma corta), listo para programar |
 | Fecha | 2026-10-26 |
 | Backlog | B21 (`docs/BACKLOG.md`) |
 | Depende de | PRD 013 (rivales) y PRD 017 (minimapa) |
@@ -53,7 +53,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 | Preparar carrera | Pantalla donde se eligen modo, pista, rivales y dificultad. |
 
 ## 6. Requerimientos funcionales
-- **RF-01 (D1):** al tocar "Jugar Solo" se abre "Preparar carrera", no la carrera. "¡Correr!" arranca la carrera con lo elegido; "Volver" regresa a Inicio.
+- **RF-01 (D1):** al tocar "Jugar Solo" se abre "Preparar carrera", no la carrera. "¡Correr!" arranca la carrera con lo elegido; "Volver" regresa a Inicio. Al terminar la carrera, "Menú" sigue volviendo a Inicio (PRD 001, RF-11).
 - **RF-02 (D1):** en "Preparar carrera" se elige la pista entre las 5; la pista elegida es la que se corre.
 - **RF-03 (D2):** en Contrarreloj la carrera no tiene rivales en la pista.
 - **RF-04 (D2, D3):** Contra la PC corren entre 1 y 4 rivales, según lo elegido; por omisión, 4.
@@ -82,8 +82,10 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 
 ## 9. Riesgos y supuestos
 - **Llegada pareja:** en Difícil los rivales ya no esperan, así que pueden llegar muy separados del jugador; es lo buscado.
+- **Margen de Difícil:** varios rivales ya van al tope de su carro en las rectas; en Difícil ganan sobre todo en las curvas y porque no aflojan. La diferencia con Normal es real pero moderada.
 - **Lugar en el visor:** el visor está en 376 de 400 líneas; si la cantidad de rivales lo hace crecer, se saca código a clases nuevas (D7).
 - **Pista elegida en dos lugares:** la pantalla Pistas y "Preparar carrera" eligen la misma pista; las dos guardan la misma elección.
 
 ### Historial
 - **v1** (2026-10-26): primera versión, con las 8 decisiones aprobadas por el usuario (opción A).
+- **v2** (2026-10-26): revisión única (forma corta). Detalles: D8 completa (PRD 001 RF-01, D4 y RF-03; PRD 013 Out of scope, RF y criterio; PRD 015 y 017 por la posición y el punto único; `HudCarrera`, `ControladorCarreraSolo`, `ControladorInicio` y `Aplicacion` en sus listas); D3 dice el orden en Normal; D6 y RF-10 usan las mismas letras; RF-07 suma Fácil; D7 nombra las superclases `ModoCarrera` y `DificultadCarrera` (no heredan de `Modo`); "Menú" sigue yendo a Inicio; riesgo del margen de Difícil.

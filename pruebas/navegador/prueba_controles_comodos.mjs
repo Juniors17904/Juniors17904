@@ -76,7 +76,7 @@ const dentro = (b, W, H) => b && b.x >= -0.5 && b.y >= -0.5 && b.r <= W + 0.5 &&
 
 for (const [nombre, vp, recorrido] of [['vertical', { width: 390, height: 844 }, 85], ['horizontal', { width: 844, height: 390 }, 844 / 4]]) {
   const { ctx, page, errores, cdp } = await abrir(vp);
-  await page.evaluate(() => document.getElementById('btn-solo').click());
+  await page.evaluate(() => (document.getElementById('btn-solo').click(), document.getElementById('btn-correr').click()));
   await page.waitForFunction(() => window.__visor && document.getElementById('cuenta-carrera-solo')?.style.display === 'none', null, { timeout: 20000 }).catch(() => {});
   await page.waitForTimeout(800);
   const m = await medir(page);

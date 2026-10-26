@@ -49,7 +49,7 @@ Que cada carro y la pista tengan tamaños reales y coherentes, guardados en un s
 - Los archivos de los modelos 3D (GLB) y `PerfilCarro`.
 - Los cielos y su niebla (D8).
 - `VistaConduccion`, `DeslizadorAlturaCamara` y los rangos de los deslizadores de altura (D7).
-- `ControlTimon`, `ControlTeclado`, los velocímetros, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Según el PRD 015, D12: de `ControlTimon`, `ControlTeclado` y los velocímetros solo cambia su ubicación; `HudCarrera` y `src/style.css` cambian para el diseño horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)*
+- `ControlTimon`, `ControlTeclado`, los velocímetros, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Según el PRD 015, D12: de `ControlTimon`, `ControlTeclado` y los velocímetros solo cambia su ubicación; `HudCarrera` y `src/style.css` cambian para el diseño horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

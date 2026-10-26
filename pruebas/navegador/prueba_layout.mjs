@@ -32,7 +32,7 @@ for (const c of casos) {
   await page.route('**', parchear);
   await page.goto('http://localhost:8099/', { waitUntil:'load' });
   await page.waitForTimeout(2500);
-  await page.click('#btn-solo');
+  await page.click('#btn-solo'); await page.click('#btn-correr');
   await page.waitForTimeout(6000);
   const m = await page.evaluate(() => {
     const r = id => { const e=document.getElementById(id); if(!e) return null; const b=e.getBoundingClientRect(); const vis=getComputedStyle(e).display!=='none' && b.width>0; return vis?{x:b.left,y:b.top,r:b.right,b:b.bottom}:null; };

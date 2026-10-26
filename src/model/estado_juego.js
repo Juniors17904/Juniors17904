@@ -3,7 +3,7 @@
 // ================================================================
 // CLASE: EstadoJuego — lo que el jugador eligió y que comparten las
 // pantallas: nombre, color y tipo de carro, control, modelos de timón
-// y velocímetro, y pista.
+// y velocímetro, pista y cómo quiere correr en Jugar Solo (EleccionCarrera, PRD 018).
 // Aplicacion crea una sola instancia y se la pasa a los controladores.
 // Los datos son privados; cada uno se lee y se cambia por su propiedad.
 // ================================================================
@@ -15,6 +15,7 @@ class EstadoJuego {
     #velocimetroModelo = 0;
     #tipoAuto          = 'deportivo';
     #pista             = 'ciudad';
+    #eleccion          = null;   // EleccionCarrera; la carga PreferenciasCarrera
 
     get nombre()            { return this.#nombre; }
     set nombre(valor)       { this.#nombre = valor; }
@@ -36,4 +37,7 @@ class EstadoJuego {
 
     get pista()             { return this.#pista; }
     set pista(valor)        { this.#pista = valor; }
+
+    get eleccion()          { return this.#eleccion; }
+    set eleccion(valor)     { this.#eleccion = valor; }
 }

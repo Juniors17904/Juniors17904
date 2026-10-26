@@ -90,7 +90,7 @@ const solapa = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < 
 // ── RF-01, RF-02, RF-03, RF-05, RF-06: vertical → horizontal en plena carrera ──
 {
   const { ctx, page, errores } = await abrir({ width: 390, height: 844 }, true);
-  await page.evaluate(() => document.getElementById('btn-solo').click());
+  await page.evaluate(() => (document.getElementById('btn-solo').click(), document.getElementById('btn-correr').click()));
   const ya = await page.waitForFunction(() => (window.__tiempo ?? 0) > 500, null, { timeout: 20000 }).then(() => true, () => false);
   check(ya, 'la carrera arranca');
   const v = await medir(page);
@@ -199,7 +199,7 @@ const solapa = (a, b) => a && b && a.x < b.r && b.x < a.r && a.y < b.b && b.y < 
 // ── RF-08: PC con la ventana más ancha que alta ──
 {
   const { ctx, page, errores } = await abrir({ width: 1280, height: 960 }, false);
-  await page.evaluate(() => document.getElementById('btn-solo').click());
+  await page.evaluate(() => (document.getElementById('btn-solo').click(), document.getElementById('btn-correr').click()));
   await page.waitForTimeout(5000);
   const pc = await medir(page);
   check(pc.diseno === 'horizontal' && pc.pista === 1280, `RF-08 en PC 1280×960 se usa el diseño horizontal (${pc.diseno}, pista ${pc.pista} px)`);

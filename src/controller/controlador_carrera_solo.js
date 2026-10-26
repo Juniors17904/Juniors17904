@@ -4,9 +4,10 @@ try {
 // ================================================================
 // CLASE: ControladorCarreraSolo — Controlador de la Carrera Solo 3D
 // Orquesta VisorCarreraSolo (vista 3D), CarreraVueltas y Cronometro
-// (modelo) y HudCarrera (vista 2D). Con los 4 rivales de la PC (PRD 013):
-// arranca sus cronómetros en ¡YA!, muestra la posición ("2.º/5") y la
-// tabla final, que se completa a medida que llegan los rivales (D5). Gestiona la cuenta regresiva,
+// (modelo) y HudCarrera (vista 2D). Con los rivales de la PC (PRD 013) que
+// pide la elección (PRD 018): arranca sus cronómetros en ¡YA!, muestra la
+// posición ("2.º/5") y la tabla final, que se completa a medida que llegan
+// los rivales (D5). En Contrarreloj no hay rivales: ni posición ni tabla. Gestiona la cuenta regresiva,
 // el ciclo por frame (callback del visor), el resultado y las
 // acciones Revancha / Menú. No tiene física ni dibujo directo y
 // no tiene RAF propio: el único RAF es el del visor.
@@ -129,7 +130,7 @@ class ControladorCarreraSolo {
         this.#adaptadorDiseno = new window.AdaptadorDisenoCarrera(document.getElementById('pantalla-carrera-solo'));
         const pista = this.#resolverPista();
         this.#visor = new window.VisorCarreraSolo(
-            document.getElementById('canvas-carrera-solo'), pista
+            document.getElementById('canvas-carrera-solo'), pista, this.#estado?.eleccion ?? null
         );
         this.#carrera = new window.CarreraVueltas(
             this.#visor.muestrasRuta(ControladorCarreraSolo.#MUESTRAS_RUTA),

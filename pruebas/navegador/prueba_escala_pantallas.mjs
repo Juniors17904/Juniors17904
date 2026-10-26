@@ -71,7 +71,7 @@ const LARGO_DEPORTIVO = 4.5;
 // Jugar Solo: RF-01, RF-07 y RF-08 en vertical y horizontal
 for (const [ancho, alto, nombre, referencia] of [[390, 844, 'vertical', 9 / 2.6], [844, 390, 'horizontal', 7 / 2.6]]) {
   const { page, errores } = await abrir(ancho, alto);
-  await clic(page, 'btn-solo');
+  await clic(page, 'btn-solo'); await clic(page, 'btn-correr');
   await page.waitForFunction(() => document.getElementById('cuenta-carrera-solo')?.textContent === '¡YA!', null, { timeout: 15000 }).catch(() => {});
   await page.waitForTimeout(800);
   const r = await page.evaluate(() => ({ largo: window.__largoDibujado, camara: window.__medirCamara() }));
@@ -138,7 +138,7 @@ for (const [nombre, pasos, captura] of PANTALLAS) {
   const { page } = await abrir(390, 844);
   await page.evaluate(() => localStorage.setItem('vc_preferencias', JSON.stringify({ tipoCamara: 'chase', alturaCamara: 2.8, tipoControl: 'botones' })));
   await page.reload(); await page.waitForTimeout(2000);
-  await clic(page, 'btn-solo'); await page.waitForTimeout(5000);
+  await clic(page, 'btn-solo'); await clic(page, 'btn-correr'); await page.waitForTimeout(5000);
   const guardada = await page.evaluate(() => JSON.parse(localStorage.getItem('vc_preferencias') ?? '{}').alturaCamara);
   check(guardada === 2.8, `RF-09 la altura guardada sigue en 2.8 (${guardada})`);
   await page.close();

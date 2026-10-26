@@ -11,6 +11,7 @@ class Aplicacion {
     #backNav            = false;
     #vistaConduccion    = new VistaConduccion().cargar();
     #carreraSolo        = null;
+    #preferenciasCarrera = new PreferenciasCarrera();   // PRD 018: recuerda la última elección de Jugar Solo
     #modos              = new ModosDisponibles();   // PRD 002 D8: decide qué modos se ven y se abren
 
     // PRD 004 D5/D6: un controlador por pantalla
@@ -18,6 +19,7 @@ class Aplicacion {
     #ajustes                    = null;
     #giroscopio                 = null;
     #pistas                     = null;
+    #prepararCarrera            = null;   // PRD 018: "Preparar carrera" antes de Jugar Solo
     #controles                  = null;
     #velocimetro                = null;
     #controladorVistaConduccion = null;
@@ -129,8 +131,14 @@ class Aplicacion {
         this.#disenoGeneral = new ControladorDisenoGeneral(this.#estado, this.#vistaConduccion, navegar);
         this.#disenoObjetos = new ControladorDisenoObjetos(navegar);
         this.#controles   = new ControladorControles(this.#estado, navegar);
-        this.#inicio      = new ControladorInicio(this.#estado, navegar,
-            this.#controles, () => this.#iniciarCarreraSolo());
+        this.#preferenciasCarrera.cargar(this.#estado);
+        this.#prepararCarrera = new ControladorPrepararCarrera(this.#estado, navegar,
+            this.#preferenciasCarrera, () => this.#iniciarCarreraSolo());
+        // "Jugar Solo" abre "Preparar carrera" (PRD 018, RF-01)
+        this.#inicio      = new ControladorInicio(this.#estado, navegar, this.#controles, () => {
+            this.#prepararCarrera.mostrar();
+            this.#mostrar('pantalla-preparar-carrera');
+        });
         this.#ajustes     = new ControladorAjustes(navegar);
         this.#velocimetro = new ControladorVelocimetro(this.#estado, navegar);
         this.#giroscopio  = new ControladorGiroscopio(navegar);
@@ -145,6 +153,7 @@ class Aplicacion {
         this.#giroscopio.iniciar();
         this.#controladorVistaConduccion.iniciar();
         this.#pistas.iniciar();
+        this.#prepararCarrera.iniciar();
         // Mismo orden de registro que antes de la Fase 1b
         this.#testDrive3D.iniciar();
         this.#disenoPistas.iniciar();

@@ -33,7 +33,7 @@ const reales = errores => errores.filter(t => !/ServiceWorker|sw\.js|ERR_FAILED|
 const MALLAS = ['asfalto', 'pianoRojo', 'pianoBlanco', 'lineasBorde', 'lineaCentral', 'metaBlanca', 'metaNegra'];
 
 const PANTALLAS = [
-  { nombre: 'jugar_solo',        pasos: ['btn-solo'], espera: 7000, vertical: true },
+  { nombre: 'jugar_solo',        pasos: ['btn-solo', 'btn-correr'], espera: 7000, vertical: true },
   { nombre: 'diseno_general',    pasos: ['btn-garage', 'btn-ir-diseno-general'], espera: 5000 },
   { nombre: 'diseno_pistas',     pasos: ['btn-garage', 'btn-ir-pista', '.pista-card[data-pista="ciudad"]', 'btn-seleccionar-pista'], espera: 4500, aerea: true },
   { nombre: 'test_drive_ruta',   pasos: ['btn-garage', 'btn-test-drive-3d', 'btn-td3d-con-ruta'], espera: 4500, aerea: true },

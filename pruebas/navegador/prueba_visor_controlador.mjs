@@ -245,7 +245,7 @@ async function pasosEn2s(hz) {
 // ── RF-13: si el módulo del visor no carga, avisa y vuelve a Inicio ──
 {
   const { ctx, page } = await abrir({ width: 390, height: 844 }, { bloquearVisor: true });
-  await page.click('#btn-solo');
+  await page.click('#btn-solo'); await page.click('#btn-correr');
   await esperar(page, 7000);
   const estado = await leer(page, () => ({
     activa: document.querySelector('.pantalla.activa')?.id,
@@ -260,7 +260,7 @@ async function pasosEn2s(hz) {
 {
   const { ctx, page } = await abrir({ width: 390, height: 844 }, { colgarGlb: true });
   const errAntes = await leer(page, () => (window.__modelErrors || []).length);
-  await page.click('#btn-solo');
+  await page.click('#btn-solo'); await page.click('#btn-correr');
   const enCarrera = await leer(page, () => document.querySelector('.pantalla.activa')?.id);
   await esperar(page, 7000);
   const estado = await leer(page, () => ({
@@ -284,7 +284,7 @@ async function pasosEn2s(hz) {
     document.getElementById('btn-solo').addEventListener('click',
       () => setTimeout(() => { window.VisorCarreraSolo = Visor; }, 4000), { once: true, capture: true });
   });
-  await page.click('#btn-solo');
+  await page.click('#btn-solo'); await page.click('#btn-correr');
   await esperar(page, 7000);
   const activa = await leer(page, () => document.querySelector('.pantalla.activa')?.id);
   check(activa === 'pantalla-inicio', 'RF-13 plazo único: módulo lento (4 s) + GLB colgado vuelve a Inicio en ~7 s (' + activa + ')');

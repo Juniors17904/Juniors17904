@@ -173,7 +173,7 @@ const medirDecoraciones = page => page.evaluate(() => {
 // ── RF-01/02/03/06 y luces en la escena real de Jugar Solo ──────────
 {
   const { page, errores } = await abrir(390, 844);
-  await clic(page, 'btn-solo');
+  await clic(page, 'btn-solo'); await clic(page, 'btn-correr');
   const ya = await page.waitForFunction(() => document.getElementById('cuenta-carrera-solo')?.textContent === '¡YA!',
     null, { timeout: 15000 }).then(() => true, () => false);
   check(ya, 'la carrera de Jugar Solo arranca (¡YA!)');

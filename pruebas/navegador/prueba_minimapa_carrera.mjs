@@ -70,7 +70,7 @@ const ALTO_BARRA = 52;
 
 for (const [nombre, vp, ancho, alto] of [['vertical', { width: 390, height: 844 }, 90, 120], ['horizontal', { width: 844, height: 390 }, 140, 104]]) {
   const { ctx, page, errores, cdp } = await abrir(vp);
-  await page.evaluate(() => document.getElementById('btn-solo').click());
+  await page.evaluate(() => (document.getElementById('btn-solo').click(), document.getElementById('btn-correr').click()));
   // RF-08: durante la cuenta 3-2-1 el mapa ya se ve
   const huboCuenta = await page.waitForFunction(() => document.getElementById('cuenta-carrera-solo')?.style.display === 'flex', null, { timeout: 20000 }).then(() => true, () => false);
   const enCuenta = await medir(page);

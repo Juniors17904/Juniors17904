@@ -90,7 +90,10 @@ const PASOS = [
     volver:['btn-volver-diseno-general','pantalla-ajustes'] },
   { nombre:'diseno-objetos', desde:'ajustes', entrar:'btn-ir-diseno-objetos', pantalla:'pantalla-diseno-objetos', espera:5000,
     volver:['btn-volver-diseno-objetos','pantalla-ajustes'] },
-  { nombre:'jugar-solo', desde:'inicio', entrar:'btn-solo', pantalla:'pantalla-carrera-solo', ya:true,
+  // PRD 018: "Jugar Solo" pasa por "Preparar carrera"
+  { nombre:'preparar-carrera', desde:'inicio', entrar:'btn-solo', pantalla:'pantalla-preparar-carrera',
+    volver:['btn-volver-preparar','pantalla-inicio'] },
+  { nombre:'jugar-solo', desde:'preparar-carrera', entrar:'btn-correr', pantalla:'pantalla-carrera-solo', ya:true,
     adelante:'pantalla-inicio', volver:null },
 ];
 const PASO = new Map(PASOS.map(p=>[p.nombre,p]));

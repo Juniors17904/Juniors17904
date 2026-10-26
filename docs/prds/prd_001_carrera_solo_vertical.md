@@ -14,7 +14,7 @@ Las decisiones se tomaron con el usuario y son definitivas. Si algún requerimie
 | D1 | "Jugar Solo" abre una carrera 3D **en vertical**. La carrera 2D se conserva intacta en ⚙ con el botón "Clásico 2D", que sigue en horizontal. *(Reemplazado por PRD 002, D6.)* |
 | D2 | El MVP tiene 3 vueltas, cuenta 3-2-1, cronómetro, velocímetro, contador de vuelta y un resultado (tiempo total y mejor vuelta) con los botones Revancha y Menú. *(Se amplía según el PRD 013, D9: la posición y la tabla con los rivales.)* |
 | D3 | Salirse al pasto baja la velocidad máxima al 40 %. No hay choques ni reinicio. *(Reemplazado por PRD 008, D8.)* |
-| D4 | Se usan la pista elegida en ⚙ → Pistas (Ciudad por defecto) y el carro, el color, el timón y el velocímetro del garaje. *(Ampliado por PRD 007, D8: el carro también trae su física.)* |
+| D4 | Se usan la pista elegida en ⚙ → Pistas (Ciudad por defecto) y el carro, el color, el timón y el velocímetro del garaje. *(Ampliado por PRD 007, D8: el carro también trae su física.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* |
 | D5 | Una vuelta solo vale si se pasan 3 puntos de control en orden: 33 %, 66 % y meta. |
 | D6 | Clases nuevas, una por archivo: `CarreraVueltas`, `Cronometro` y `MuestraRuta` en el modelo; `VisorCarreraSolo` y `HudCarrera` en la vista; `ControladorCarreraSolo` en el controlador. |
 | D7 | De los archivos existentes del juego solo cambian `index.html` y `aplicacion.js`. También pueden cambiar `pruebas/`, `package.json` (comandos `npm test`) y, con permiso del usuario, `CLAUDE.md`. *(Limita solo la entrega del PRD 001; los PRD 004 a 008 cambian otros archivos según sus decisiones.)* |
@@ -50,9 +50,9 @@ Que "Jugar Solo" sea una carrera 3D de 3 vueltas que se juega con el celular der
 | Muestra de ruta (`MuestraRuta`) | Uno de los puntos de la pista que el modelo usa para calcular el progreso. |
 
 ## 6. Requerimientos funcionales
-- **RF-01:** "Jugar Solo" abre la carrera en vertical y en ningún momento muestra "GIRA TU CELULAR". *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)*
+- **RF-01:** "Jugar Solo" abre la carrera en vertical y en ningún momento muestra "GIRA TU CELULAR". *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-02:** "Clásico 2D" en ⚙ abre la carrera 2D de siempre, en horizontal. *(Reemplazado por PRD 002, D6.)*
-- **RF-03:** La carrera usa la pista, el carro y el color elegidos. Si la pista no existe, usa Ciudad y registra el error.
+- **RF-03:** La carrera usa la pista, el carro y el color elegidos. Si la pista no existe, usa Ciudad y registra el error. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-04:** Hay una cuenta 3-2-1-¡YA! con unos 900 ms por número. El carro no se mueve hasta ¡YA!, aunque se acelere.
 - **RF-05:** Arriba se ven "Vuelta X/3" y el cronómetro en formato `m:ss.cc`.
 - **RF-06:** La vuelta solo cuenta si se pasan los puntos de control en orden y hacia adelante. Cortar camino o cruzar la meta en reversa no suma.

@@ -21,15 +21,18 @@ export class Rival {
     #piloto; #carro; #carrera; #cronometro; #detector; #medida;
     #terminado = false;
     #ritmo     = 1;   // sigue de a poco al ritmo pedido (no cambia de golpe)
+    #ritmoBase = 1;   // con el que arranca: el de la dificultad (PRD 018)
     #medidor   = new MedidorAvance();
 
-    constructor(piloto, carro, carrera, cronometro, detectorChoques, medidaCarro) {
+    constructor(piloto, carro, carrera, cronometro, detectorChoques, medidaCarro, ritmoBase = 1) {
         this.#piloto     = piloto;
         this.#carro      = carro;
         this.#carrera    = carrera;
         this.#cronometro = cronometro;
         this.#detector   = detectorChoques;
         this.#medida     = medidaCarro;
+        this.#ritmoBase  = Number.isFinite(ritmoBase) ? ritmoBase : 1;
+        this.#ritmo      = this.#ritmoBase;
     }
 
     get nombre()        { return this.#piloto.nombre; }
@@ -77,7 +80,7 @@ export class Rival {
         this.#carro.pisar(this.#carrera.superficie);
         this.#cronometro.reiniciar();
         this.#terminado = false;
-        this.#ritmo = 1;
+        this.#ritmo = this.#ritmoBase;
         this.#piloto.reiniciar(this.#carro);
     }
 }

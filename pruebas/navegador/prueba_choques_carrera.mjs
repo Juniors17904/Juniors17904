@@ -58,7 +58,7 @@ await page.evaluate(async () => {
   window.Cronometro.prototype.formatear = function (ms) { window.__tiempo = ms; return formatear.call(this, ms); };
 });
 
-await page.evaluate(() => document.getElementById('btn-solo').click());
+await page.evaluate(() => (document.getElementById('btn-solo').click(), document.getElementById('btn-correr').click()));
 const ya = await page.waitForFunction(() => document.getElementById('cuenta-carrera-solo')?.textContent === '¡YA!',
   null, { timeout: 15000 }).then(() => true, () => false);
 check(ya, 'la carrera arranca (¡YA!)');

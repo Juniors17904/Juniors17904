@@ -18,7 +18,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D2 | Alcance | Se puede jugar con el celular en vertical o en horizontal. Al girarlo en plena carrera, la carrera **sigue sin pausa**: no se reinicia, el cronómetro sigue y los rivales siguen. |
 | D3 | Alcance | No se bloquea la orientación ni aparece un aviso de "gira tu celular". Se borra el estilo del aviso viejo `#pantalla-rotar`, que quedó sin uso. |
 | D4 | Usuarios | El diseño **vertical** queda igual que hoy (PRD 001, D10). *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)* |
-| D5 | Usuarios | El diseño **horizontal** usa la pantalla completa, sin franjas a los lados: arriba la vuelta, la posición y el tiempo; abajo a la izquierda el timón; abajo a la derecha ACEL y FRENO, con el velocímetro encima. Con el control de botones (teclado), los botones conservan su orden de hoy, a lo ancho. |
+| D5 | Usuarios | El diseño **horizontal** usa la pantalla completa, sin franjas a los lados: arriba la vuelta, la posición y el tiempo; abajo a la izquierda el timón; abajo a la derecha ACEL y FRENO, con el velocímetro encima. Con el control de botones (teclado), los botones conservan su orden de hoy, a lo ancho. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* |
 | D6 | Usuarios | En horizontal se ve más pista hacia los costados y la cámara sigue mostrando al menos 30 m hacia adelante (PRD 009). |
 | D7 | Usuarios | En PC, si la ventana es más ancha que alta, se usa el diseño horizontal. |
 | D8 | Dominio | El diseño se elige solo por la forma de la pantalla: más ancha que alta es horizontal; si no, vertical. *(v2: hoy la cámara se elige por la forma del lienzo, que en PC 1280×960 mide 480×960 y queda vertical; con D7 pasa a horizontal.)* |
@@ -43,7 +43,7 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 **Out of scope:** cambiar el tamaño o la forma del timón y los botones (B23); el multijugador en 3D (B3, D11); las otras pantallas 3D (D1); y todo lo de la lista única de abajo. *(Lo hace el PRD 016.)*
 
 **Lista única de lo que NO se modifica:**
-- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): girar no cambia nada del juego.
+- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): girar no cambia nada del juego. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - Las pistas, el piso, los objetos y la señalética.
 - El diseño vertical de Jugar Solo (D4). *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)*
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
@@ -58,7 +58,7 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 ## 6. Requerimientos funcionales
 - **RF-01 (D4):** en vertical, Jugar Solo se ve igual que hoy. *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)*
 - **RF-02 (D5):** en horizontal, la pista ocupa toda la pantalla, sin franjas a los lados.
-- **RF-03 (D5):** en horizontal, la vuelta, la posición y el tiempo se ven arriba; el timón abajo a la izquierda; ACEL y FRENO abajo a la derecha, con el velocímetro encima; nada se corta ni se tapa.
+- **RF-03 (D5):** en horizontal, la vuelta, la posición y el tiempo se ven arriba; el timón abajo a la izquierda; ACEL y FRENO abajo a la derecha, con el velocímetro encima; nada se corta ni se tapa. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-04 (D6):** en horizontal la cámara muestra al menos 30 m hacia adelante.
 - **RF-05 (D2):** al girar el celular en plena carrera, la carrera sigue: el mismo carro, en el mismo lugar, el cronómetro sigue y los rivales siguen.
 - **RF-06 (D2):** después de girar, el timón, ACEL y FRENO responden en el diseño nuevo.

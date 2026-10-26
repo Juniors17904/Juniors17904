@@ -17,8 +17,8 @@ import { RivalesCarreraSolo }        from './carrera_solo/rivales_carrera_solo.j
 // VIEW — VisorCarreraSolo: escena 3D de la carrera "Jugar Solo" en vertical.
 //   - La superficie de la pista la arma ConstructorCircuitoCarreraSolo.
 //   - Mueve el Carro con pasos fijos de 60 Hz (ConductorPasoFijo).
-//   - Crea, avanza y dibuja a los 4 rivales de la PC (RivalesCarreraSolo,
-//     PRD 013); el jugador sale del último lugar de la grilla.
+//   - Crea, avanza y dibuja a los rivales de la PC que pide la elección
+//     (RivalesCarreraSolo, PRD 013 y 018); el jugador sale del último lugar.
 //   - NO decide reglas de carrera: aplica la superficie que le pasa el
 //     controlador y los choques que calcula DetectorChoques (modelo).
 // ================================================================
@@ -69,13 +69,13 @@ class VisorCarreraSolo extends VisorBase {
     get entradaDireccion()   { return this.#entradaDireccion; }
     set entradaDireccion(v)  { this.#entradaDireccion = Number(v) || 0; }
 
-    constructor(canvas, pista) {
+    constructor(canvas, pista, eleccion = null) {   // eleccion: EleccionCarrera (PRD 018)
         super();
         this.#canvas = this.#canvasLimpio(canvas);
         this.#pista  = pista;
         this.#dimensionarCanvas();
         this.#iniciarEscena();
-        this.#construirCircuito();
+        this.#construirCircuito(eleccion);
     }
 
     // ── Compatibilidad con VistaConduccion ───────────────────────
@@ -322,13 +322,13 @@ class VisorCarreraSolo extends VisorBase {
     }
 
     // ── Circuito: superficie (ConstructorCircuitoCarreraSolo) y decoraciones ──
-    #construirCircuito() {
+    #construirCircuito(eleccion) {
         if (this.#pista?.tramos) this.#ruta.construir(this.#pista.tramos, this.#pista.totalSegs);
         const curva = this.#ruta.curve;
         const decoraciones = this.#ruta.decoracionesCon(this.#pista?.decoraciones);   // con las flechas del camino de vuelta (PRD 014)
-        if (curva) {
+        if (curva && (eleccion?.hayRivales ?? true)) {   // en Contrarreloj, sin rivales (PRD 018)
             this.#rivales = new RivalesCarreraSolo(this.#escena, this.#ruta, decoraciones,
-                this.muestrasRuta(VisorCarreraSolo.#MUESTRAS_RIVALES), this.#medidas);
+                this.muestrasRuta(VisorCarreraSolo.#MUESTRAS_RIVALES), this.#medidas, eleccion);
         }
         this.reiniciarCarro();
         if (!curva) return;

@@ -14,11 +14,11 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 
 | # | Categoría | Decisión |
 |---|---|---|
-| D1 | Alcance | Solo en Jugar Solo: **4 rivales de la PC y el jugador**, 5 carros en total. Las otras 4 pantallas 3D no cambian. |
+| D1 | Alcance | Solo en Jugar Solo: **4 rivales de la PC y el jugador**, 5 carros en total. Las otras 4 pantallas 3D no cambian. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* |
 | D2 | Usuarios | 4 personalidades fijas, cada una con nombre visible, carro y color distintos: **Prudente** (frena antes de las curvas, casi no se equivoca), **Agresivo** (rápido, frena tarde, a veces se sale), **Novato** (lento e irregular, pisa pasto) y **Experto** (el más rápido, con errores muy raros). |
 | D3 | Usuarios | Manejo natural: cada rival sigue la pista con pequeñas variaciones y comete errores al azar según su personalidad. Nunca hace trampa: usa la misma física, el mismo pasto y los mismos choques que el jugador. |
-| D4 | Usuarios | Llegada natural **de los 5 carros** *(v2, decisión del usuario)*: cada uno llega entre 2 y 15 segundos después del anterior. Para lograrlo, los rivales ajustan su ritmo según el jugador: el que va muy adelante afloja y el que va muy atrás arriesga más, sin pasar nunca el tope de su física. Si el jugador es más rápido o más lento de lo que la física de los rivales permite alcanzar, la diferencia puede salir de ese rango. |
-| D5 | Usuarios | Arriba se ve la posición en vivo ("2.º/5"). Si el jugador llega antes, los rivales **siguen corriendo** hasta terminar y la tabla final se completa con sus tiempos reales *(v2, decisión del usuario)*. La tabla muestra los 5 puestos con nombre y tiempo, y la mejor vuelta del jugador. |
+| D4 | Usuarios | Llegada natural **de los 5 carros** *(v2, decisión del usuario)*: cada uno llega entre 2 y 15 segundos después del anterior. Para lograrlo, los rivales ajustan su ritmo según el jugador: el que va muy adelante afloja y el que va muy atrás arriesga más, sin pasar nunca el tope de su física. Si el jugador es más rápido o más lento de lo que la física de los rivales permite alcanzar, la diferencia puede salir de ese rango. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* |
+| D5 | Usuarios | Arriba se ve la posición en vivo ("2.º/5"). Si el jugador llega antes, los rivales **siguen corriendo** hasta terminar y la tabla final se completa con sus tiempos reales *(v2, decisión del usuario)*. La tabla muestra los 5 puestos con nombre y tiempo, y la mejor vuelta del jugador. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* |
 | D6 | Dominio | Cada rival es una clase: una superclase `PilotoPC` y una subclase por personalidad (`PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto`), en `src/model/pilotos/`. El piloto decide las entradas del carro (acelerar, frenar y girar) en cada paso de la física, no una vez por cuadro. Su azar sale de una semilla que se puede fijar para las pruebas. Cada rival tiene su propio `Carro`, `CarreraVueltas` y `Cronometro`, sin modificar esas clases. |
 | D7 | Técnico | Los carros chocan entre sí con la misma forma rectangular del PRD 009 (D6) y rebotan como con los árboles. Se agrega a `DetectorChoques` sin cambiar los choques que ya existen, revisando solo lo cercano (como pide el PRD 011, RNF-04). |
 | D8 | Técnico | Lo nuevo va en clases aparte. `VisorCarreraSolo` crea, avanza con paso fijo y dibuja a los rivales (excepción de visores de `CLAUDE.md`). Se permite **sacar código del visor a clases nuevas** para hacer espacio, sin cambiar cómo se juega *(v2, decisión del usuario)*. Ningún archivo pasa de 400 líneas. |
@@ -37,7 +37,7 @@ Que Jugar Solo sea una carrera de verdad contra 4 rivales que manejan como perso
 ## 4. Alcance
 **In scope:** D1 a D9.
 
-**Out of scope:** el multijugador en línea (B3); elegir la cantidad de rivales o su dificultad; rivales en las otras 4 pantallas; sonido (B6); récords (B7); turbo (B9); y todo lo de la lista única de abajo.
+**Out of scope:** el multijugador en línea (B3); elegir la cantidad de rivales o su dificultad; rivales en las otras 4 pantallas; sonido (B6); récords (B7); turbo (B9); y todo lo de la lista única de abajo. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 
 **Lista única de lo que NO se modifica:**
 - La física: `Carro`, `ConstantesFisica` y las 6 físicas de carro. Los rivales las usan tal cual (el pedal es todo o nada; la dirección, gradual).
@@ -57,16 +57,16 @@ Que Jugar Solo sea una carrera de verdad contra 4 rivales que manejan como perso
 | Grilla de salida | Los lugares de salida en filas, para que los 5 carros no aparezcan en el mismo punto. |
 
 ## 6. Requerimientos funcionales
-- **RF-01 (D1):** al arrancar Jugar Solo hay 5 carros en la grilla de salida, sin tocarse, y todos esperan la cuenta 3-2-1-¡YA!
+- **RF-01 (D1):** al arrancar Jugar Solo hay 5 carros en la grilla de salida, sin tocarse, y todos esperan la cuenta 3-2-1-¡YA! *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-02 (D2):** cada rival tiene nombre, carro y color distintos, y su nombre se ve en la tabla final.
-- **RF-03 (D3):** los 4 rivales completan las 3 vueltas sin quedarse atascados ni salirse de la pista para siempre.
+- **RF-03 (D3):** los 4 rivales completan las 3 vueltas sin quedarse atascados ni salirse de la pista para siempre. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-04 (D2, D3):** en 10 carreras simuladas sin ajuste de ritmo, el Experto termina en promedio antes que el Novato, y el Novato pisa el pasto más veces que el Prudente.
 - **RF-05 (D3, D6):** con semillas distintas, dos carreras no son iguales: los tiempos de cada rival cambian.
 - **RF-06 (D3):** los rivales sufren el mismo freno del pasto y los mismos choques que el jugador.
-- **RF-07 (D4):** con un jugador simulado que maneja a un ritmo normal, los 5 carros llegan separados entre 2 y 15 segundos en al menos 8 de cada 10 carreras simuladas.
+- **RF-07 (D4):** con un jugador simulado que maneja a un ritmo normal, los 5 carros llegan separados entre 2 y 15 segundos en al menos 8 de cada 10 carreras simuladas. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-08 (D4):** un jugador que maneja bien puede ganar, y uno que maneja muy lento queda último.
-- **RF-09 (D5):** durante la carrera se ve la posición del jugador ("2.º/5") y cambia al adelantar o ser adelantado.
-- **RF-10 (D5):** si el jugador llega antes, los rivales siguen hasta terminar; después se ve la tabla con los 5 puestos, nombres y tiempos, y la mejor vuelta del jugador. Revancha vuelve a la grilla con los mismos 4 rivales y Menú vuelve a Inicio.
+- **RF-09 (D5):** durante la carrera se ve la posición del jugador ("2.º/5") y cambia al adelantar o ser adelantado. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
+- **RF-10 (D5):** si el jugador llega antes, los rivales siguen hasta terminar; después se ve la tabla con los 5 puestos, nombres y tiempos, y la mejor vuelta del jugador. Revancha vuelve a la grilla con los mismos 4 rivales y Menú vuelve a Inicio. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-11 (D7):** el jugador y los rivales no se atraviesan: al tocarse rebotan y pierden algo de velocidad.
 - **RF-12 (D1):** las otras 4 pantallas 3D se ven y se manejan igual que antes.
 - **RF-13 (D9):** los PRD de D9 tienen su nota; `CLAUDE.md` agrega la jerarquía `PilotoPC` y su carpeta `src/model/pilotos/`; el backlog enlaza B5 con este PRD.
@@ -78,7 +78,7 @@ Que Jugar Solo sea una carrera de verdad contra 4 rivales que manejan como perso
 - **RNF-04, entrega:** llega a `main` cumpliendo la forma corta de `CLAUDE.md` y la lista "Antes de llevar algo a main".
 
 ## 8. Criterios de aceptación del MVP
-1. Jugar Solo arranca con 5 carros en la grilla y los 4 rivales terminan la carrera.
+1. Jugar Solo arranca con 5 carros en la grilla y los 4 rivales terminan la carrera. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 2. Cada rival maneja distinto y comete errores propios de su personalidad.
 3. Las llegadas quedan separadas de forma natural y se ve la posición y la tabla final.
 4. `npm run test:todo` pasa en verde.

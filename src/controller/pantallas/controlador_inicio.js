@@ -10,7 +10,7 @@
 class ControladorInicio extends ControladorPantalla {
     #estado      = null;
     #controles   = null;   // ControladorControles: abre el diseño del timón
-    #alJugarSolo = null;   // Aplicacion crea y guarda el ControladorCarreraSolo
+    #alJugarSolo = null;   // Aplicacion abre "Preparar carrera" (PRD 018)
 
     constructor(estado, navegar, controles, alJugarSolo) {
         super(navegar);

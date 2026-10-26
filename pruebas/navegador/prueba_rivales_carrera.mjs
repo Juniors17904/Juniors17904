@@ -100,7 +100,7 @@ const tabla = () => page.evaluate(() => [...document.querySelectorAll('#resultad
   .map(f => ({ texto: f.innerText.replace(/\s+/g, ' ').trim(), jugador: f.classList.contains('es-jugador') })));
 
 // ── RF-01: la grilla de salida ───────────────────────────────
-await page.evaluate(() => document.getElementById('btn-solo').click());
+await page.evaluate(() => (document.getElementById('btn-solo').click(), document.getElementById('btn-correr').click()));
 check(await esperarCuenta('2'), 'la cuenta 3-2-1 arranca');
 const grilla = await poses();
 const info = await page.evaluate(() => ({

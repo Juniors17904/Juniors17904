@@ -15,7 +15,9 @@
 //       · detrás del jugador y muy lejos del de adelante → arriesga.
 //   - Fuera de eso maneja normal (ritmo 1): cerca del jugador no cambia.
 // El ritmo pedido puede saltar; el Rival lo sigue de a poco.
-// Avances en vueltas (MedidorAvance). Sin jugador (null) todos van a 1.
+// Avances en vueltas (MedidorAvance). Sin jugador (null) todos van a su ritmo base.
+// La dificultad (DificultadCarrera, PRD 018) cambia el ritmo base, los topes y
+// cuánto esperan; sin dificultad (null) es la de siempre (Normal).
 // ================================================================
 export class AjusteRitmo {
     static #MINIMO   = 0.85;
@@ -26,27 +28,41 @@ export class AjusteRitmo {
     static #FUERZA_ESPERAR   = 1.0;   // ritmo que baja por vuelta de hueco de más atrás
     static #FUERZA_ARRIESGAR = 0.5;   // ritmo que sube por vuelta de hueco de más adelante
 
-    get minimo() { return AjusteRitmo.#MINIMO; }
-    get maximo() { return AjusteRitmo.#MAXIMO; }
+    #base    = 1;
+    #minimo  = AjusteRitmo.#MINIMO;
+    #maximo  = AjusteRitmo.#MAXIMO;
+    #esperar = AjusteRitmo.#FUERZA_ESPERAR;
+
+    constructor(dificultad = null) {
+        if (!dificultad) return;
+        this.#base    = dificultad.ritmoBase;
+        this.#minimo  = dificultad.ritmoMinimo;
+        this.#maximo  = dificultad.ritmoMaximo;
+        this.#esperar = dificultad.fuerzaEsperar;
+    }
+
+    get base()   { return this.#base; }
+    get minimo() { return this.#minimo; }
+    get maximo() { return this.#maximo; }
 
     ritmos(avanceJugador, avancesRivales) {
         const avances = (avancesRivales ?? []).map(a => Number(a) || 0);
-        if (!Number.isFinite(avanceJugador)) return avances.map(() => 1);
+        if (!Number.isFinite(avanceJugador)) return avances.map(() => this.#base);
         return avances.map((avance, i) => {
             const otros   = [avanceJugador, ...avances.filter((_, j) => j !== i)];
             const delante = this.#hueco(otros.filter(a => a > avance).map(a => a - avance));
             const atras   = this.#hueco(otros.filter(a => a <= avance).map(a => avance - a));
-            let ritmo = 1;
+            let ritmo = this.#base;
             if (delante !== null && delante < AjusteRitmo.#CERCA) {
                 ritmo -= (AjusteRitmo.#CERCA - delante) / AjusteRitmo.#CERCA * AjusteRitmo.#FUERZA_PEGADO;
             }
             if (atras !== null && atras > AjusteRitmo.#LEJOS) {
-                ritmo -= (atras - AjusteRitmo.#LEJOS) * AjusteRitmo.#FUERZA_ESPERAR;
+                ritmo -= (atras - AjusteRitmo.#LEJOS) * this.#esperar;
             }
             if (avance < avanceJugador && delante > AjusteRitmo.#LEJOS) {
                 ritmo += (delante - AjusteRitmo.#LEJOS) * AjusteRitmo.#FUERZA_ARRIESGAR;
             }
-            return Math.min(AjusteRitmo.#MAXIMO, Math.max(AjusteRitmo.#MINIMO, ritmo));
+            return Math.min(this.#maximo, Math.max(this.#minimo, ritmo));
         });
     }
 

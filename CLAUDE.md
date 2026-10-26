@@ -176,7 +176,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
 | `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo`, `Visor3D` (vista previa del garaje) | (utilidades Three.js) |
 | `MinimapBase` | `MinimapaDisenoGeneral`, `MinimapaCarrera` (minimapa de una carrera 3D con un punto por carro, PRD 017) | `setCircuito(cfg)`, `dibujar(ctx, …)` |
-| `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos` | `iniciar()`, `detener()`, `irA(id)` |
+| `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorPrepararCarrera` ("Preparar carrera" de Jugar Solo, PRD 018), `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos` | `iniciar()`, `detener()`, `irA(id)` |
 | `ControladorPantallaJuego` (hereda de `ControladorPantalla`) | `ControladorTestDrive3D`, `ControladorDisenoPistas` | `tieneVisor`, `ocupaPantallaJuego`, `cancelarArranque()` |
 | `DestinoCircuito3D` | `DestinoCarreraUrbana`, `DestinoTestDriveRuta` | `claseVisor`, `titulo`, `origen` |
 | `MapaConduccion` | `MinimapaCircuito3D`, `RecorridoCircuito3D`, `MinimapaTestDriveRecto`, `RecorridoTestDriveRecto` | `mostrar()`, `dibujar(visor)`, `visible` |
@@ -188,6 +188,8 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `TrazadoPiso` | `TrazadoPisoCurva`, `TrazadoPisoRecto` (los usa `ConstructorPisoPista`, PRD 012) | `largo`, `cerrado`, `puntoEn(s)`, `distanciasEntre(s0, s1)` |
 | `DisenoCarrera` | `DisenoVertical`, `DisenoHorizontal` (los elige `SelectorDisenoCarrera` por la forma de la pantalla y los aplica `AdaptadorDisenoCarrera`, PRD 015) | `nombre`, `anchoArea(anchoVentana)`, `camaraVertical`, `fovCamara`, `aplicar(pantalla)`; y los controles (PRD 016): `ladoPedal`, `separacionPedales`, `pedalesApilados`, `altoControles`, `recorridoGiro(anchoVentana)`; y el minimapa (PRD 017): `anchoMapa`, `altoMapa` |
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
+| `ModoCarrera` | `ModoContraPC`, `ModoContrarreloj` (PRD 018; no heredan de `Modo`, los modos de Inicio) | `clave`, `nombre`, `hayRivales` |
+| `DificultadCarrera` | `DificultadFacil`, `DificultadNormal`, `DificultadDificil` (PRD 018; las usan `AjusteRitmo` y `CarreraConRivales`) | `clave`, `nombre`, `ritmoBase`, `ritmoMinimo`, `ritmoMaximo`, `fuerzaEsperar`, `indicesPilotos(cantidad, total)` |
 | `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
@@ -201,6 +203,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos`, `DetectorChoques`, `RectanguloCarro` y `PuntoChoque`
 - `src/model/cierre/` → camino de vuelta de las pistas abiertas (PRD 014): `PoseCierre`, `TrayectoDubins`, `ContornoPista`, `CierrePistaAbierta` y `FlechasCierre`. La vuelta entera la arma `TrazadoVuelta` (`src/model/trazado_vuelta.js`) y la usan `Ruta` y los mapas
 - `src/model/pilotos/` → `PilotoPC` + subclases y `Rival` (PRD 013)
+- `src/model/modos_carrera/` → `ModoCarrera` + subclases; `src/model/dificultades/` → `DificultadCarrera` + subclases (PRD 018). La elección entera es `EleccionCarrera`; `CatalogoCarrera` lista las opciones y `PreferenciasCarrera` recuerda la última (en `src/model/`)
 - `src/view/disenos/` → `DisenoCarrera` + subclases, `SelectorDisenoCarrera` y `AdaptadorDisenoCarrera`: cómo se acomoda una carrera 3D en vertical u horizontal (PRD 015); sirven para cualquier carrera 3D, también el multijugador futuro
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes

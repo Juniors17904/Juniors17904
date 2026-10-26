@@ -17,7 +17,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D1 | Alcance | Solo Jugar Solo, en los dos diseños (vertical y horizontal). Los minimapas de las otras pantallas no cambian. |
 | D2 | Alcance | El mapa muestra el recorrido entero de la pista (con el camino de vuelta de las pistas abiertas, PRD 014), la línea de meta y un punto por cada carro, cada uno con el color de su auto. |
 | D3 | Usuarios | El punto del jugador se distingue: es más grande, tiene borde blanco y siempre se dibuja encima de los rivales. |
-| D4 | Usuarios | El mapa va arriba a la derecha, debajo de la barra de vuelta, posición y tiempo, en los dos diseños. No tapa el velocímetro, la posición, el tiempo ni los controles. Cada diseño dice su tamaño: en vertical, unos 90×120 px (como los mapas que ya existen); en horizontal, un poco más grande. |
+| D4 | Usuarios | El mapa va arriba a la derecha, debajo de la barra de vuelta, posición y tiempo, en los dos diseños. No tapa el velocímetro, la posición, el tiempo ni los controles. Cada diseño dice su tamaño: en vertical, unos 90×120 px (como los mapas que ya existen); en horizontal, un poco más grande. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* |
 | D5 | Usuarios | El mapa es fijo: no gira con el carro. |
 | D6 | Usuarios | Se ve desde la cuenta 3-2-1 y se oculta cuando aparece el panel de resultado. Su fondo es semitransparente para no tapar la pista. No se puede ocultar con un toque. |
 | D7 | Técnico | Una clase nueva de la vista, `MinimapaCarrera`, que hereda de `MinimapBase` y vive en `src/view/minimapas/` (con su ayudante `PuntoCarroMapa`). No nombra Jugar Solo: sirve para cualquier carrera 3D, también el multijugador futuro (B3). Los puntos salen de la posición real de cada carro en la pista. El modelo no cambia y `VisorCarreraSolo` no crece. Pruebas en navegador real en 390×844 y 844×390, con capturas. |
@@ -39,8 +39,8 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 **Out of scope:** ocultar o agrandar el mapa con un toque; un mapa que gire con el carro; el minimapa de las otras pantallas; y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): el mapa solo lee dónde está cada carro.
-- `VisorCarreraSolo` (no crece) y `HudCarrera`.
+- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): el mapa solo lee dónde está cada carro. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
+- `VisorCarreraSolo` (no crece) y `HudCarrera`. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - Los controles de Jugar Solo (PRD 016) y el velocímetro.
 - Los minimapas de las otras pantallas (`MinimapaDisenoGeneral`, `MinimapaCircuito3D`, `MapaDetallePista` y los de Test Drive).
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
@@ -53,10 +53,10 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 
 ## 6. Requerimientos funcionales
 - **RF-01 (D1, D2):** al empezar Jugar Solo, el mapa muestra el recorrido entero de la pista elegida, también el camino de vuelta en las pistas abiertas, y la línea de meta.
-- **RF-02 (D2):** el mapa tiene 5 puntos: el jugador y los 4 rivales, cada uno con el color de su auto.
+- **RF-02 (D2):** el mapa tiene 5 puntos: el jugador y los 4 rivales, cada uno con el color de su auto. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-03 (D2, D7):** los puntos se mueven a medida que cada carro avanza y marcan su lugar real en la pista, no solo cuánto avanzó en la vuelta.
 - **RF-04 (D3):** el punto del jugador es más grande que el de los rivales, tiene borde blanco y queda encima si se cruzan.
-- **RF-05 (D4):** en vertical (390×844) y en horizontal (844×390) el mapa está arriba a la derecha, debajo de la barra de vuelta, posición y tiempo, sin taparla, y no toca el velocímetro ni los controles.
+- **RF-05 (D4):** en vertical (390×844) y en horizontal (844×390) el mapa está arriba a la derecha, debajo de la barra de vuelta, posición y tiempo, sin taparla, y no toca el velocímetro ni los controles. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RF-06 (D4):** en horizontal el mapa ocupa más lugar que en vertical: es más ancho y un poco más bajo, para dejar lugar al velocímetro. Al girar el celular cambia de tamaño sin cortar la carrera.
 - **RF-07 (D5):** el mapa no gira cuando gira el carro.
 - **RF-08 (D6):** el mapa se ve durante la cuenta 3-2-1 y la carrera, y se oculta cuando aparece el panel de resultado; con Revancha vuelve a aparecer.
@@ -68,11 +68,11 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 - **RNF-01 (D7), reglas del proyecto:** `MinimapaCarrera` es una clase de la vista en su propio archivo, hereda de `MinimapBase` y no nombra Jugar Solo; el tamaño del mapa lo da cada diseño (PRD 015). Se cumple `CLAUDE.md`.
 - **RNF-02, MVC:** el modelo no cambia; el controlador de Jugar Solo le pasa al mapa dónde está cada carro y el mapa solo dibuja.
 - **RNF-03 (D7), anti-monolito:** `VisorCarreraSolo` no crece y ningún archivo pasa de 400 líneas.
-- **RNF-04 (D7), pruebas:** sin navegador (Node), el cálculo del lugar de cada punto en `MinimapaCarrera`; en navegador real en 390×844 y 844×390, la ubicación, los 5 puntos, el ocultarse con el resultado y capturas (lecciones 13 y 16).
+- **RNF-04 (D7), pruebas:** sin navegador (Node), el cálculo del lugar de cada punto en `MinimapaCarrera`; en navegador real en 390×844 y 844×390, la ubicación, los 5 puntos, el ocultarse con el resultado y capturas (lecciones 13 y 16). *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 - **RNF-05, entrega:** llega a `main` cumpliendo la forma corta de `CLAUDE.md`.
 
 ## 8. Criterios de aceptación del MVP
-1. En Jugar Solo se ve un mapa chico con la pista entera y 5 puntos que se mueven.
+1. En Jugar Solo se ve un mapa chico con la pista entera y 5 puntos que se mueven. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
 2. El jugador se distingue de los rivales.
 3. El mapa no tapa nada importante, en vertical ni en horizontal.
 4. `npm run test:todo` pasa en verde.

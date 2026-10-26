@@ -160,7 +160,7 @@ async function entrarTestDrive3D(page, boton, salida, lienzo, etiqueta) {
 
   // RF-03: Jugar Solo llega a ¡YA!
   await irAInicio(page);
-  await clic(page,'btn-solo'); await esperar(page,200);
+  await clic(page,'btn-solo'); await clic(page, 'btn-correr'); await esperar(page,200);
   check(await activa(page)==='pantalla-carrera-solo', 'PRD 002 RF-03 Jugar Solo abre pantalla-carrera-solo (no redirige)');
   const llegoYa = await page.waitForFunction(()=>document.getElementById('cuenta-carrera-solo')?.textContent==='¡YA!',null,{timeout:12000}).then(()=>true,()=>false);
   check(llegoYa, 'PRD 002 RF-03 Jugar Solo llega a ¡YA!');
@@ -203,7 +203,7 @@ async function entrarTestDrive3D(page, boton, salida, lienzo, etiqueta) {
   await entrarTestDrive3D(page, 'btn-td3d-simple', 'btn-exit-td3d', 'canvas-td3d', 'td3d_simple_horizontal');
   await entrarTestDrive3D(page, 'btn-td3d-con-ruta', 'btn-exit-cir3d', 'canvas-cir3d', 'td3d_con_ruta_horizontal');
   await irAInicio(page);
-  await clic(page,'btn-solo');
+  await clic(page,'btn-solo'); await clic(page, 'btn-correr');
   const llegoYa = await page.waitForFunction(()=>document.getElementById('cuenta-carrera-solo')?.textContent==='¡YA!',null,{timeout:12000}).then(()=>true,()=>false);
   check(llegoYa, `PRD 002 RF-03 ${H}: Jugar Solo llega a ¡YA!`);
   await irAInicio(page);

@@ -92,7 +92,7 @@ const PANTALLAS = [
   ['Test Drive con ruta', ['btn-garage', 'btn-test-drive-3d', 'btn-td3d-con-ruta']],
   ['Diseño de Pistas',    ['btn-garage', 'btn-ir-pista', '.pista-card[data-pista="ciudad"]', 'btn-seleccionar-pista']],
   ['Diseño General',      ['btn-garage', 'btn-ir-diseno-general']],
-  ['Jugar Solo',          ['btn-solo']],
+  ['Jugar Solo',          ['btn-solo', 'btn-correr']],
 ];
 for (const [nombre, pasos] of PANTALLAS) {
   const { page, errores } = await abrir(844, 390);

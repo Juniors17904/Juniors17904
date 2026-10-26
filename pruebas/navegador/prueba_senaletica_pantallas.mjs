@@ -192,7 +192,7 @@ const cerca = (a, b, tol = 0.02) => Math.abs(a - b) <= tol;
     const formatear = window.Cronometro.prototype.formatear;
     window.Cronometro.prototype.formatear = function (ms) { window.__tiempo = ms; return formatear.call(this, ms); };
   });
-  await clic(page, 'btn-solo');
+  await clic(page, 'btn-solo'); await clic(page, 'btn-correr');
   await page.waitForTimeout(3500);
   const arco = await medirArco(page, 'MetaEscena');
   check(!!arco, 'RF-06 Jugar Solo tiene un arco de meta');

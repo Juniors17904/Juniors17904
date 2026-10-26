@@ -15,7 +15,10 @@ import { MedidorAvance }     from './medidor_avance.js';
 import { ParticipanteCarrera } from './participante_carrera.js';
 
 // ================================================================
-// MODEL — CarreraConRivales: los 4 rivales de la PC de Jugar Solo (PRD 013).
+// MODEL — CarreraConRivales: los rivales de la PC de Jugar Solo (PRD 013).
+//   - Corren de 1 a 4 según la elección, y la dificultad (DificultadCarrera)
+//     decide quiénes y con qué ritmo (PRD 018, D3 y D4). Sin dificultad
+//     (null) son los 4 de siempre, en Normal.
 //   - Crea un Rival por personalidad (D2), cada uno con su piloto, su carro,
 //     su CarreraVueltas de 3 vueltas, su Cronometro y su DetectorChoques
 //     con las medidas de su carro (D6, RF-06).
@@ -35,18 +38,24 @@ export class CarreraConRivales {
     static #SALTO_SEMILLA = 7919;
 
     #rivales  = [];
-    #ajuste   = new AjusteRitmo();
+    #ajuste;
     #tabla    = new TablaPosiciones();
     #medidor  = new MedidorAvance();
     #choque   = new ChoqueEntreCarros();
     #carreraJugador = null;
     #jugadorLlego   = false;   // lo avisa el controlador al cerrar la carrera del jugador
 
-    constructor(ruta, decoraciones, muestras, semilla = 1, reloj = null) {
+    constructor(ruta, decoraciones, muestras, semilla = 1, reloj = null, dificultad = null, cantidad = CarreraConRivales.#PILOTOS.length) {
         const registro = new RegistroCarros();
         const medidas  = new globalThis.MedidasEscena();
         const inicio   = ruta.inicio;
-        CarreraConRivales.#PILOTOS.forEach((ClasePiloto, i) => {
+        const total   = CarreraConRivales.#PILOTOS.length;
+        const indices = dificultad ? dificultad.indicesPilotos(cantidad, total)
+            : Array.from({ length: Math.max(0, Math.min(total, cantidad)) }, (_, i) => i);
+        this.#ajuste = new AjusteRitmo(dificultad);
+        // Cada piloto conserva su semilla por su lugar en la lista: con los 4 en Normal, la carrera de siempre
+        indices.forEach(i => {
+            const ClasePiloto = CarreraConRivales.#PILOTOS[i];
             const azar   = new AzarSemilla((Number(semilla) || 0) + (i + 1) * CarreraConRivales.#SALTO_SEMILLA);
             const piloto = new ClasePiloto(muestras, ruta.longitud, azar);
             const carro  = registro.crear(piloto.tipoAuto, inicio.x, inicio.z, inicio.angle);
@@ -54,14 +63,14 @@ export class CarreraConRivales {
             const carrera    = new globalThis.CarreraVueltas(muestras, CarreraConRivales.#VUELTAS);
             const cronometro = reloj ? new globalThis.Cronometro(reloj) : new globalThis.Cronometro();
             const detector   = new DetectorChoques(decoraciones, ruta, medida);
-            this.#rivales.push(new Rival(piloto, carro, carrera, cronometro, detector, medida));
+            this.#rivales.push(new Rival(piloto, carro, carrera, cronometro, detector, medida, this.#ajuste.base));
         });
     }
 
     get rivales()         { return [...this.#rivales]; }
     get todosTerminaron() { return this.#rivales.every(r => r.terminado); }
 
-    // Los 4 primeros PuntoSalida de GrillaSalida, uno por rival
+    // Los primeros PuntoSalida de GrillaSalida, uno por rival
     colocarEnGrilla(puntos) {
         this.#rivales.forEach((rival, i) => { if (puntos?.[i]) rival.reiniciar(puntos[i]); });
     }
@@ -92,14 +101,14 @@ export class CarreraConRivales {
         this.#chocarEntreSi(carroJugador, medidaJugador);
     }
 
-    // Tabla de los 5 carros (FilaPosicion[]), del 1.º al 5.º
+    // Tabla de todos los carros (FilaPosicion[]), del 1.º al último
     posiciones(nombreJugador, terminadoJugador = false, tiempoJugadorMs = 0) {
         const jugador = new ParticipanteCarrera(nombreJugador, true, terminadoJugador, tiempoJugadorMs,
             this.#medidor.avanceDe(this.#carreraJugador));
         return this.#tabla.ordenar([...this.#rivales, jugador]);
     }
 
-    // Revancha: los mismos 4 rivales vuelven a la grilla
+    // Revancha: los mismos rivales vuelven a la grilla
     reiniciar(puntos) {
         this.#jugadorLlego = false;
         this.colocarEnGrilla(puntos);

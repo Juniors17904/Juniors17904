@@ -87,6 +87,20 @@
         /* Con el panel de resultado visible la pantalla sube por encima de .ctrl-overlay (z 20):
            el z-index del panel solo vale dentro del contexto de apilamiento de la pantalla */
         #pantalla-carrera-solo.activa.con-resultado { z-index: 25; }
+        /* Preparar carrera (PRD 018): se desplaza si no entra; en pantallas anchas, dos columnas */
+        #pantalla-preparar-carrera { overflow-y: auto; justify-content: flex-start; padding: 16px 0; }
+        #pantalla-preparar-carrera .card-preparar { gap: 14px; margin: auto 0; width: min(92vw, 420px); }
+        #pantalla-preparar-carrera .titulo-preparar { font-family: var(--font); font-size: 18px; font-weight: 900; letter-spacing: 2px; text-align: center; color: #fff; }
+        #pantalla-preparar-carrera .campos-preparar { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        #pantalla-preparar-carrera .campo label { margin-bottom: 6px; }
+        #pantalla-preparar-carrera .opciones-carrera { display: flex; flex-wrap: wrap; gap: 6px; }
+        #pantalla-preparar-carrera .opcion-carrera { flex: 1 1 auto; min-height: 36px; background: #0a0a1e; border: 1px solid var(--border); border-radius: 8px;
+            color: var(--txt2); font-family: var(--font); font-size: 10px; letter-spacing: 1px; padding: 8px 8px; cursor: pointer; }
+        #pantalla-preparar-carrera .opcion-carrera.sel { background: var(--neon-v); border-color: var(--neon-v); color: #fff; box-shadow: 0 0 16px rgba(124,58,237,0.5); }
+        @media (min-aspect-ratio: 1/1) {
+            #pantalla-preparar-carrera .card-preparar { width: min(94vw, 760px); padding: 14px 20px; gap: 10px; }
+            #pantalla-preparar-carrera .campos-preparar { grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+        }
         /* Minimapa (PRD 017): arriba a la derecha, bajo la barra del HUD (52 px); se oculta con el resultado */
         #pantalla-carrera-solo #minimapa-carrera-solo { position: absolute; top: 58px; right: 8px; pointer-events: none; border-radius: 6px; }
         #pantalla-carrera-solo.con-resultado #minimapa-carrera-solo { display: none; }
@@ -771,6 +785,21 @@
         </div>
     </div>
 
+    <!-- Pantalla: Preparar carrera de Jugar Solo (PRD 018) -->
+    <div id="pantalla-preparar-carrera" class="pantalla">
+        <div class="card-setup card-preparar">
+            <div class="titulo-preparar">PREPARAR <span class="neon-c">CARRERA</span></div>
+            <div class="campos-preparar">
+                <div class="campo" id="campo-modo"><label>Modo</label><div class="opciones-carrera" id="opciones-modo"></div></div>
+                <div class="campo" id="campo-pista"><label>Pista</label><div class="opciones-carrera" id="opciones-pista"></div></div>
+                <div class="campo" id="campo-rivales"><label>Rivales</label><div class="opciones-carrera" id="opciones-rivales"></div></div>
+                <div class="campo" id="campo-dificultad"><label>Dificultad</label><div class="opciones-carrera" id="opciones-dificultad"></div></div>
+            </div>
+            <button id="btn-correr" class="btn-neon">¡Correr!</button>
+            <button id="btn-volver-preparar" class="btn-link">Volver</button>
+        </div>
+    </div>
+
     <!-- Pantalla: Carrera Solo 3D (vertical) -->
     <div id="pantalla-carrera-solo" class="pantalla">
         <div class="columna-carrera-solo">
@@ -851,6 +880,17 @@
     <script src="src/model/punto_mundo.js"></script>
     <script src="src/model/historial_recorrido.js"></script>
     <script src="src/model/estado_juego.js"></script>
+    <!-- Model: modo y dificultad de Jugar Solo (PRD 018) -->
+    <script src="src/model/modos_carrera/modo_carrera.js"></script>
+    <script src="src/model/modos_carrera/modo_contra_pc.js"></script>
+    <script src="src/model/modos_carrera/modo_contrarreloj.js"></script>
+    <script src="src/model/dificultades/dificultad_carrera.js"></script>
+    <script src="src/model/dificultades/dificultad_facil.js"></script>
+    <script src="src/model/dificultades/dificultad_normal.js"></script>
+    <script src="src/model/dificultades/dificultad_dificil.js"></script>
+    <script src="src/model/eleccion_carrera.js"></script>
+    <script src="src/model/catalogo_carrera.js"></script>
+    <script src="src/model/preferencias_carrera.js"></script>
 
     <!-- View: controles base -->
     <script src="src/view/controles/control_entrada.js"></script>
@@ -944,6 +984,7 @@
     <script src="src/controller/pantallas/controlador_ajustes.js"></script>
     <script src="src/controller/pantallas/controlador_giroscopio.js"></script>
     <script src="src/controller/pantallas/controlador_pistas.js"></script>
+    <script src="src/controller/pantallas/controlador_preparar_carrera.js"></script>
     <script src="src/controller/pantallas/controlador_controles.js"></script>
     <script src="src/controller/pantallas/controlador_velocimetro.js"></script>
     <script src="src/controller/pantallas/controlador_vista_conduccion.js"></script>
