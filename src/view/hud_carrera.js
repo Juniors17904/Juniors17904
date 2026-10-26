@@ -27,6 +27,8 @@ class HudCarrera {
     #botonMenu = null;
     #contenedorTabla = null;
     #tabla = null;   // TablaFinalCarrera (se crea al primer uso)
+    #textos = null;  // contenedor de los textos del resultado
+    #aviso = null;   // AvisoRecord (PRD 020; se crea al primer uso)
     #ancho = 0;
     #alto = 0;
     #escala = 1;
@@ -101,10 +103,17 @@ class HudCarrera {
         else tabla.ocultar();
     }
 
+    // El récord de la pista y, si se batió, "¡Nuevo récord!" (PRD 020)
+    mostrarRecord(texto, esNuevo) {
+        if (!this.#aviso && this.#textos && typeof window.AvisoRecord === 'function') this.#aviso = new window.AvisoRecord(this.#textos);
+        this.#aviso?.mostrar(texto, esNuevo);
+    }
+
     ocultarResultado() {
         this.#resultadoActivo = false;
         if (!this.#panelResultado) return;
         this.#tabla?.ocultar();
+        this.#aviso?.ocultar();
         this.#panelResultado.style.display = 'none';
         this.#marcarPantallaConResultado(false);
         if (this.#botonRevancha) this.#botonRevancha.onclick = null;
@@ -194,6 +203,7 @@ class HudCarrera {
             const ancla = primerBoton && primerBoton.parentNode === panel ? primerBoton : null;
             panel.insertBefore(textos, ancla ?? panel.firstChild);
         }
+        this.#textos = textos;
         this.#textoTotal = this.#obtenerLinea(textos, 'resultado-carrera-total');
         this.#textoMejorVuelta = this.#obtenerLinea(textos, 'resultado-carrera-mejor');
         this.#contenedorTabla = this.#obtenerLinea(textos, 'resultado-carrera-tabla');

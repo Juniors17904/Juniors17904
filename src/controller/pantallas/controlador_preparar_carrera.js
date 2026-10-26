@@ -7,6 +7,7 @@
 // guarda la elección y pide a Aplicacion que arranque la carrera; "Volver"
 // regresa a Inicio. Cada toque se recuerda enseguida, aunque no se corra.
 // En Contrarreloj no se muestran rivales ni dificultad.
+// Debajo de la pista elegida se ve su récord (PRD 020).
 // Las opciones salen del modelo (CatalogoCarrera y registroPistas): la
 // pantalla solo las muestra y guarda lo elegido en EstadoJuego.
 // ================================================================
@@ -38,13 +39,20 @@ class ControladorPrepararCarrera extends ControladorPantalla {
             clave => { eleccion.modo = catalogo.modo(clave); });
         const registro = window.registroPistas;
         this.#opciones('opciones-pista', (registro?.claves ?? []).map(c => [c, registro.obtener(c).nombre]), this.#estado.pista,
-            clave => { this.#estado.pista = clave; });
+            clave => { this.#estado.pista = clave; this.#mostrarRecord(); });
         const cantidades = Array.from({ length: eleccion.maxRivales }, (_, i) => [String(i + 1), String(i + 1)]);
         this.#opciones('opciones-rivales', cantidades, String(eleccion.rivales),
             clave => { eleccion.rivales = Number(clave); });
         this.#opciones('opciones-dificultad', catalogo.dificultades.map(d => [d.clave, d.nombre]), eleccion.dificultad.clave,
             clave => { eleccion.dificultad = catalogo.dificultad(clave); });
         this.#mostrarSegunModo();
+        this.#mostrarRecord();
+    }
+
+    // El récord de la pista elegida, debajo de las pistas (PRD 020, D4)
+    #mostrarRecord() {
+        const record = new window.RegistroRecords().obtener(this.#estado.pista);
+        document.getElementById('record-pista').textContent = new window.TextoRecordPista().texto(record);
     }
 
     // Un botón por opción; al tocarlo queda marcado y se guarda en el estado

@@ -16,6 +16,7 @@ class ControladorCarreraSolo {
     static #PISTA_RESPALDO      = 'ciudad';
     static #MUESTRAS_RUTA       = 400;
     static #TOTAL_VUELTAS       = 3;
+    #clavePista = null;   // la pista que de verdad se corre, para su récord (PRD 020)
     static #INTERVALO_CUENTA_MS = 900;
     static #REINTENTO_MS        = 150;
     static #LIMITE_CARGA_MS     = 6000;
@@ -161,6 +162,7 @@ class ControladorCarreraSolo {
         const registro = window.registroPistas;
         const clave    = this.#estado?.pista;
         const pista    = clave ? registro?.obtener(clave) : null;
+        this.#clavePista = pista ? clave : ControladorCarreraSolo.#PISTA_RESPALDO;
         if (pista) return pista;
         if (clave) {
             this.#registrarError('pista "' + clave + '" no existe, se usa "' +
@@ -336,6 +338,11 @@ class ControladorCarreraSolo {
             () => this.#revancha(),
             () => this.#irAlMenu(),
             filas);
+        // Récord de la pista (PRD 020): solo una carrera con todas sus vueltas
+        const records = new window.RegistroRecords();
+        const esNuevo = records.registrar(this.#clavePista, cronometro.tiempoTotalMs, mejor,
+            cronometro.tiemposVuelta.length, ControladorCarreraSolo.#TOTAL_VUELTAS);
+        this.#hud.mostrarRecord(new window.TextoRecordPista().texto(records.obtener(this.#clavePista)), esNuevo);
     }
 
     // ── Privados: Revancha (RF-11) ──────────────────────────────

@@ -37,7 +37,7 @@ Que Jugar Solo sea una carrera de verdad contra 4 rivales que manejan como perso
 ## 4. Alcance
 **In scope:** D1 a D9.
 
-**Out of scope:** el multijugador en línea (B3); elegir la cantidad de rivales o su dificultad; rivales en las otras 4 pantallas; sonido (B6); récords (B7); turbo (B9); y todo lo de la lista única de abajo. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)*
+**Out of scope:** el multijugador en línea (B3); elegir la cantidad de rivales o su dificultad; rivales en las otras 4 pantallas; sonido (B6); récords (B7); turbo (B9); y todo lo de la lista única de abajo. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)*
 
 **Lista única de lo que NO se modifica:**
 - La física: `Carro`, `ConstantesFisica` y las 6 físicas de carro. Los rivales las usan tal cual (el pedal es todo o nada; la dirección, gradual). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*

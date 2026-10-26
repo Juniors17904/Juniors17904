@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para programar |
+| Estado | v3 — programado |
 | Fecha | 2026-10-26 |
 | Backlog | B7 (`docs/BACKLOG.md`) |
 | Depende de | PRD 001 (carrera y resultado) y PRD 018 ("Preparar carrera") |
@@ -83,3 +83,4 @@ Que el jugador tenga una marca que superar en cada pista y vea cuándo la bate.
 ### Historial
 - **v1** (2026-10-26): primera versión, con las 7 decisiones aprobadas por el usuario (opción A).
 - **v2** (2026-10-26): revisión única (forma corta). Detalles: D7 suma el Out of scope del PRD 013, que el resultado se amplía (PRD 001 y 018) y que los estilos van en `index.html`; D7 deja nombrar las clases de la vista del texto; RF-04 dice que durante la carrera se sale con el botón atrás; RF-06 y D4 dicen el mismo lugar; RF-07 muestra el récord ya actualizado; RF-08 dice que la primera carrera también es récord; RF-09 aclara que los diseños no cambian; RNF citan D7; riesgo de metas forzadas.
+- **v3** (2026-10-26): programado. Clases `RecordPista` y `RegistroRecords` (modelo) y `TextoRecordPista` y `AvisoRecord` (vista).

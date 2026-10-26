@@ -36,7 +36,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 ## 4. Alcance
 **In scope:** D1 a D8.
 
-**Out of scope:** el campeonato, guardar récords (B7), elegir el carro o el color en esta pantalla (sigue en el garaje), el multijugador (B3) y todo lo de la lista única de abajo.
+**Out of scope:** el campeonato, guardar récords (B7), elegir el carro o el color en esta pantalla (sigue en el garaje), el multijugador (B3) y todo lo de la lista única de abajo. *(Cambia según el PRD 020, D7: récords por pista.)*
 
 **Lista única de lo que NO se modifica:**
 - La física de los carros, los choques, las vueltas y el cronómetro (PRD 006 a 012). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
@@ -63,7 +63,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 - **RF-08 (D4):** en Normal los rivales corren igual que antes de este PRD. *(Los números de manejo de los pilotos se pueden ajustar según el PRD 019, D9, si esto se sigue cumpliendo.)*
 - **RF-09 (D5):** al volver a "Preparar carrera" (también tras recargar la página) aparece la última elección; Revancha repite la misma carrera.
 - **RF-10 (D6):** Contra la PC, la posición dice "N.º/M" con M = rivales + 1, y la tabla final tiene M puestos.
-- **RF-11 (D6):** en Contrarreloj no se ve la posición ni la tabla de puestos; el resultado muestra el tiempo total y la mejor vuelta, y el minimapa tiene un solo punto.
+- **RF-11 (D6):** en Contrarreloj no se ve la posición ni la tabla de puestos; el resultado muestra el tiempo total y la mejor vuelta, y el minimapa tiene un solo punto. *(Cambia según el PRD 020, D7: récords por pista.)*
 - **RF-12 (D1, D7):** "Preparar carrera" se ve completa y se puede usar en 390×844 y en 844×390.
 - **RF-13 (D8):** los PRD de D8 tienen su nota; `CLAUDE.md` suma las jerarquías del modo y la dificultad y el controlador nuevo; el backlog enlaza B21 con este PRD.
 

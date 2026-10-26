@@ -204,6 +204,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/model/cierre/` → camino de vuelta de las pistas abiertas (PRD 014): `PoseCierre`, `TrayectoDubins`, `ContornoPista`, `CierrePistaAbierta` y `FlechasCierre`. La vuelta entera la arma `TrazadoVuelta` (`src/model/trazado_vuelta.js`) y la usan `Ruta` y los mapas
 - `src/model/pilotos/` → `PilotoPC` + subclases y `Rival` (PRD 013)
 - `src/model/modos_carrera/` → `ModoCarrera` + subclases; `src/model/dificultades/` → `DificultadCarrera` + subclases (PRD 018). La elección entera es `EleccionCarrera`; `CatalogoCarrera` lista las opciones y `PreferenciasCarrera` recuerda la última (en `src/model/`)
+- Récords por pista (PRD 020): `RecordPista` y `RegistroRecords` en `src/model/`; en la vista, `TextoRecordPista` (cómo se lee el récord) y `AvisoRecord` (el récord y "¡Nuevo récord!" en el resultado), en `src/view/`
 - `src/view/disenos/` → `DisenoCarrera` + subclases, `SelectorDisenoCarrera` y `AdaptadorDisenoCarrera`: cómo se acomoda una carrera 3D en vertical u horizontal (PRD 015); sirven para cualquier carrera 3D, también el multijugador futuro
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes

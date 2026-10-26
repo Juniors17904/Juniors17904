@@ -45,7 +45,7 @@ Que soltar el acelerador o frenar ayude a meter el carro en la curva, y que acel
 - Las personalidades de los rivales (nombre y estilo, PRD 013 D2).
 - El pasto, el piano y los choques (PRD 008, 010 y 011).
 - Las vueltas, `Cronometro`, `MuestraRuta` y `Ruta`.
-- La cámara, los controles, el HUD y `src/style.css`.
+- La cámara, los controles, el HUD y `src/style.css`. *(Cambia según el PRD 020, D7: récords por pista.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
