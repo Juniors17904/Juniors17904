@@ -92,7 +92,9 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
 
   // RF-03/RF-11/RF-02: Contrarreloj en Costa
   await clic(page, 'btn-solo'); await esperar(300);
-  await elegir(page, 'opciones-modo', 'contrarreloj');
+  const pistas = await page.evaluate(() => document.querySelectorAll('#opciones-pista .opcion-carrera').length);
+  check(pistas === 5, `RF-02 (${nombre}) se puede elegir entre las 5 pistas (${pistas})`);
+  await page.click('#opciones-modo .opcion-carrera[data-clave="contrarreloj"]');   // toque real: el botón no está tapado (RF-12)
   await elegir(page, 'opciones-pista', 'costa');
   check(!(await visible(page, 'campo-rivales')) && !(await visible(page, 'campo-dificultad')), `D6 (${nombre}) en Contrarreloj no se muestran rivales ni dificultad`);
   if (nombre === 'vertical') await page.screenshot({ path: `${CARPETA}/preparar_contrarreloj.png` });
@@ -109,7 +111,7 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
     const panel = document.getElementById('resultado-carrera-solo'), tabla = panel.querySelector('.resultado-carrera-tabla');
     return { visible: getComputedStyle(panel).display !== 'none', tabla: tabla ? getComputedStyle(tabla).display !== 'none' && tabla.children.length > 0 : false, texto: panel.textContent };
   });
-  check(resultado.visible && !resultado.tabla && /mejor/i.test(resultado.texto), `RF-11 (${nombre}) el resultado muestra tiempo y mejor vuelta, sin tabla de puestos`);
+  check(resultado.visible && !resultado.tabla && /mejor/i.test(resultado.texto) && /\d+:\d\d/.test(resultado.texto), `RF-11 (${nombre}) el resultado muestra tiempo y mejor vuelta, sin tabla de puestos`);
   await quitarMeta(page);
 
   // RF-09: tras recargar aparece la última elección
@@ -140,11 +142,13 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   const filas = await page.evaluate(() => document.querySelector('#resultado-carrera-solo .resultado-carrera-tabla')?.children.length ?? 0);
   check(filas === 3, `RF-10 (${nombre}) la tabla final tiene 3 puestos (${filas})`);
   await quitarMeta(page);
-  // Revancha repite la misma carrera
+  // Revancha repite la misma carrera: se esconde el resultado, vuelve la cuenta y siguen los mismos rivales en la misma pista
   await clic(page, 'btn-revancha-solo');
-  await esperar(1500);
-  const revancha = await page.evaluate(() => ({ n: window.__visor.rivales?.rivales.length, pantalla: document.querySelector('.pantalla.activa')?.id }));
-  check(revancha.n === 2 && revancha.pantalla === 'pantalla-carrera-solo', `RF-09 (${nombre}) Revancha repite la carrera con los mismos 2 rivales`);
+  const huboCuenta = await page.waitForFunction(() => document.getElementById('cuenta-carrera-solo')?.style.display === 'flex', null, { timeout: 5000 }).then(() => true, () => false);
+  const revancha = await page.evaluate(() => ({ nombres: window.__visor.rivales?.rivales.map(r => r.nombre.split(' · ')[1]).join(), pista: window.__pista,
+    resultado: getComputedStyle(document.getElementById('resultado-carrera-solo')).display, pantalla: document.querySelector('.pantalla.activa')?.id }));
+  check(huboCuenta && revancha.resultado === 'none' && revancha.nombres === 'Prudente,Novato' && revancha.pista === 'Circuito Urbano' && revancha.pantalla === 'pantalla-carrera-solo',
+    `RF-09 (${nombre}) Revancha repite la carrera: cuenta de nuevo, mismos rivales y misma pista (${JSON.stringify(revancha)})`);
   const reales = erroresReales(errores);
   check(reales.length === 0, `(${nombre}) sin errores de consola ` + reales.join(' | '));
   await ctx.close();

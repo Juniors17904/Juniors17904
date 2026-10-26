@@ -137,6 +137,12 @@ class PruebaModosDificultad {
             if (a.some((r, i) => r !== b[i])) iguales = false;
         }
         this.#ok(iguales, 'RF-08 en Normal el ajuste de ritmo es el de siempre');
+        // Valores fijos de la carrera de siempre (PRD 013): ritmo 1, entre 0,85 y 1,1, y espera de fuerza 1
+        const n = this.#dificultad('normal');
+        this.#ok(n.ritmoBase === 1 && n.ritmoMinimo === 0.85 && n.ritmoMaximo === 1.1 && n.fuerzaEsperar === 1,
+            'RF-08 Normal usa los valores de siempre (1; 0,85 a 1,1; espera 1)');
+        const [atrasado] = normal.ritmos(1, [0]), [escapado] = normal.ritmos(0, [2, 0.01]);
+        this.#ok(atrasado === 1.1 && escapado === 0.85, `RF-08 en Normal los topes siguen en 1,1 y 0,85 (${atrasado}, ${escapado})`);
         const antes = this.#carrera(undefined), ahora = this.#carrera(this.#dificultad('normal'), 4);
         antes.avanzar(1800); ahora.avanzar(1800);
         const igual = antes.carrera.rivales.every((r, i) => {
