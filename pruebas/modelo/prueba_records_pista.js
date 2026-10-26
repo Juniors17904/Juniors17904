@@ -90,6 +90,11 @@ class PruebaRecordsPista {
         let error = null;
         try { sinAlmacen.registrar('ciudad', 90000, 29000, 3, 3); sinAlmacen.obtener('ciudad'); } catch (e) { error = e; }
         this.#ok(!error, 'RF-10 sin almacenamiento del navegador no hay error');
+        this.#ok(sinAlmacen.registrar('costa', 90000, 29000, 3, 3) === false, 'RF-08 si no se pudo guardar, no se anuncia récord nuevo');
+        const casi = new c.RegistroRecords(this.#almacen());
+        casi.registrar('ciudad', 90004, 29000, 3, 3);
+        this.#ok(casi.registrar('ciudad', 90001, 29000, 3, 3) === false && casi.obtener('ciudad').totalMs === 90000,
+            'RF-08 se compara en centésimas: una mejora que no se ve no es récord');
     }
 
     #probarTexto() {

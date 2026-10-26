@@ -163,7 +163,7 @@ class HudCarrera {
         s.width = '100%';
         s.height = '100%';
         s.alignItems = 'center';
-        s.justifyContent = 'center';
+        s.justifyContent = 'safe center';
         s.fontFamily = "'Arial Black', Arial, sans-serif";
         s.fontWeight = '900';
         s.fontSize = 'clamp(72px, 28vw, 140px)';
@@ -182,7 +182,8 @@ class HudCarrera {
         s.zIndex = HudCarrera.#Z_INDEX_RESULTADO;
         s.flexDirection = 'column';
         s.alignItems = 'center';
-        s.justifyContent = 'center';
+        // "safe": si no entra (horizontal con tabla y récord), arranca arriba y se desplaza sin cortar ¡META!
+        s.justifyContent = 'safe center';
         s.gap = '14px';
 
         this.#botonRevancha = panel.querySelector('#btn-revancha-solo');

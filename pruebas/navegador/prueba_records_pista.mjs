@@ -39,6 +39,11 @@ async function abrir(ctx) {
   await page.route('**/*', parchear);
   await page.goto(URL_JUEGO);
   await page.waitForTimeout(2000);
+  // Espía: el visor, para reconocer la carrera del jugador (los rivales también tienen 3 vueltas)
+  await page.evaluate(() => {
+    const Original = window.VisorCarreraSolo;
+    window.VisorCarreraSolo = class extends Original { constructor(...a) { super(...a); window.__visor = this; } };
+  });
   return { page, errores };
 }
 const clic = (page, id) => page.evaluate(i => document.getElementById(i).click(), id);
@@ -46,14 +51,15 @@ const elegir = (page, contenedor, clave) => page.evaluate(([c, k]) => document.q
 const textoRecord = page => page.evaluate(() => document.getElementById('record-pista')?.textContent ?? '');
 const esperarCarrera = page => page.waitForFunction(() => document.querySelector('.pantalla.activa')?.id === 'pantalla-carrera-solo'
   && document.getElementById('cuenta-carrera-solo')?.style.display === 'none', null, { timeout: 25000 }).then(() => true, () => false);
-// Fuerza los eventos de la carrera del jugador, uno cada 0,4 s: así hay tiempos de vuelta de verdad
+// Fuerza los eventos de la carrera del jugador (la que se actualiza con su lugar), uno cada 0,4 s
 const forzar = (page, eventos) => page.evaluate(lista => {
   const o = window.__actualizarOriginal ?? window.CarreraVueltas.prototype.actualizar;
   window.__actualizarOriginal = o;
   window.__eventos = [...lista]; window.__siguiente = performance.now() + 400;
   window.CarreraVueltas.prototype.actualizar = function (...a) {
     const r = o.apply(this, a);
-    if (this.totalVueltas === 3 && window.__eventos.length && performance.now() > window.__siguiente) { window.__siguiente = performance.now() + 400; return window.__eventos.shift(); }
+    const delJugador = window.__visor && a[0] === window.__visor.px && a[1] === window.__visor.pz;
+    if (delJugador && window.__eventos.length && performance.now() > window.__siguiente) { window.__siguiente = performance.now() + 400; return window.__eventos.shift(); }
     return r;
   };
 }, eventos);
@@ -103,6 +109,31 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   await esperar(300);
   const r2 = await resultado(page);
   check(r2.panel && r2.nuevo === '' && r2.record === r1.record, `RF-04 (${nombre}) una meta sin las 3 vueltas no cambia el récord ni muestra el aviso`);
+
+  // RF-06: volviendo con el botón atrás, "Preparar carrera" muestra el récord al día
+  await page.goBack(); await esperar(600);
+  const alVolver = await page.evaluate(() => ({ pantalla: document.querySelector('.pantalla.activa')?.id, texto: document.getElementById('record-pista')?.textContent }));
+  check(alVolver.pantalla === 'pantalla-preparar-carrera' && alVolver.texto === r1.record, `RF-06 (${nombre}) al volver con atrás se ve el récord al día (${alVolver.texto})`);
+
+  // RF-09: Contra la PC con 4 rivales y récord nuevo: el panel no corta ¡META! ni Menú (se puede desplazar)
+  await elegir(page, 'opciones-modo', 'contra-pc');
+  await elegir(page, 'opciones-pista', 'volcan');
+  await clic(page, 'btn-correr');
+  check(await esperarCarrera(page), `(${nombre}) Contra la PC arranca`);
+  await forzar(page, ['vuelta', 'vuelta', 'meta']);
+  await page.waitForFunction(() => getComputedStyle(document.getElementById('resultado-carrera-solo')).display !== 'none', null, { timeout: 10000 }).catch(() => {});
+  await esperar(500);
+  const alto = await page.evaluate(() => {
+    const panel = document.getElementById('resultado-carrera-solo');
+    const textos = panel.querySelector('.resultado-carrera-textos'), menu = document.getElementById('btn-menu-solo');
+    const arriba = textos.getBoundingClientRect().top;
+    panel.scrollTop = panel.scrollHeight;
+    const abajo = menu.getBoundingClientRect().bottom;
+    return { arriba, abajo, alto: innerHeight, nuevo: panel.querySelector('.resultado-carrera-nuevo-record')?.textContent };
+  });
+  check(alto.nuevo === '¡Nuevo récord!' && alto.arriba >= 0 && alto.abajo <= alto.alto + 0.5,
+    `RF-09 (${nombre}) con rivales y récord nuevo, ¡META! no se corta y Menú se alcanza (${JSON.stringify(alto)})`);
+  await page.screenshot({ path: `${CARPETA}/resultado_rivales_${nombre}.png` });
 
   // RF-05/RF-06: tras recargar sigue el récord; otra pista no tiene
   await page.close();

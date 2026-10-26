@@ -24,22 +24,29 @@ class RegistroRecords {
         return dato && typeof dato === 'object' ? new window.RecordPista(dato.total, dato.vuelta) : new window.RecordPista();
     }
 
-    // true si el tiempo total o la mejor vuelta son un récord nuevo
+    // true si el tiempo total o la mejor vuelta son un récord nuevo y quedó guardado
     registrar(clavePista, totalMs, mejorVueltaMs, vueltas, totalVueltas) {
         if (!clavePista || vueltas !== totalVueltas) return false;
+        totalMs = this.#centesimas(totalMs);
+        mejorVueltaMs = this.#centesimas(mejorVueltaMs);
         const actual = this.obtener(clavePista);
         const mejoraTotal = actual.mejoraTotal(totalMs), mejoraVuelta = actual.mejoraVuelta(mejorVueltaMs);
         if (!mejoraTotal && !mejoraVuelta) return false;
         const nuevo = new window.RecordPista(mejoraTotal ? totalMs : actual.totalMs, mejoraVuelta ? mejorVueltaMs : actual.vueltaMs);
-        this.#escribir(clavePista, nuevo);
-        return true;
+        return this.#escribir(clavePista, nuevo);
     }
 
+    // Se compara y guarda en centésimas, como se muestra: una mejora invisible no es récord
+    #centesimas(ms) {
+        return typeof ms === 'number' && Number.isFinite(ms) ? Math.floor(ms / 10) * 10 : ms;
+    }
+
+    // true si quedó guardado (sin almacenamiento no hay récord que mostrar)
     #escribir(clavePista, record) {
-        if (!this.#almacen) return;
+        if (!this.#almacen) return false;
         const datos = this.#leer();
         datos[clavePista] = { total: record.totalMs, vuelta: record.vueltaMs };
-        try { this.#almacen.setItem(RegistroRecords.#CLAVE, JSON.stringify(datos)); } catch { /* sin almacenamiento */ }
+        try { this.#almacen.setItem(RegistroRecords.#CLAVE, JSON.stringify(datos)); return true; } catch { return false; }
     }
 
     // Lo guardado, como dato temporal para leer o escribir (nunca se guarda en la clase)

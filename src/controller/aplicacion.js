@@ -74,6 +74,8 @@ class Aplicacion {
             id = 'pantalla-inicio';
             if (this.#backNav) history.replaceState({ pantalla: id }, '');
         }
+        // "Preparar carrera" se rehace cada vez que se abre, también con atrás (récord al día, PRD 020)
+        if (id === 'pantalla-preparar-carrera') this.#prepararCarrera?.mostrar();
 
         if (id !== 'pantalla-juego') {
             this.#testDrive3D.cancelarArranque();
@@ -135,10 +137,8 @@ class Aplicacion {
         this.#prepararCarrera = new ControladorPrepararCarrera(this.#estado, navegar,
             this.#preferenciasCarrera, () => this.#iniciarCarreraSolo());
         // "Jugar Solo" abre "Preparar carrera" (PRD 018, RF-01)
-        this.#inicio      = new ControladorInicio(this.#estado, navegar, this.#controles, () => {
-            this.#prepararCarrera.mostrar();
-            this.#mostrar('pantalla-preparar-carrera');
-        });
+        this.#inicio      = new ControladorInicio(this.#estado, navegar, this.#controles,
+            () => this.#mostrar('pantalla-preparar-carrera'));
         this.#ajustes     = new ControladorAjustes(navegar);
         this.#velocimetro = new ControladorVelocimetro(this.#estado, navegar);
         this.#giroscopio  = new ControladorGiroscopio(navegar);
