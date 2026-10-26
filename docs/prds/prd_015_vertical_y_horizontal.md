@@ -62,7 +62,7 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 - **RF-04 (D6):** en horizontal la cámara muestra al menos 30 m hacia adelante.
 - **RF-05 (D2):** al girar el celular en plena carrera, la carrera sigue: el mismo carro, en el mismo lugar, el cronómetro sigue y los rivales siguen.
 - **RF-06 (D2):** después de girar, el timón, ACEL y FRENO responden en el diseño nuevo.
-- **RF-07 (D4, D5):** el panel de resultado (¡META!, la tabla de posiciones, Revancha y Menú) se ve completo en los dos diseños; en horizontal, si no entra, se puede desplazar.
+- **RF-07 (D4, D5):** el panel de resultado (¡META!, la tabla de posiciones, Revancha y Menú) se ve completo en los dos diseños; en horizontal, si no entra, se puede desplazar. *(Cambia según el PRD 020, D7: récords por pista.)*
 - **RF-08 (D7, D8):** en PC, con la ventana más ancha que alta, se usa el diseño horizontal.
 - **RF-09 (D3):** no aparece ningún aviso de "gira tu celular" y el estilo viejo ya no existe (`#pantalla-rotar`, `.rotar-icono`, `@keyframes balanceo`, `.rotar-msg`, `.rotar-titulo`, `.rotar-sub` y su media query).
 - **RF-10 (D12):** los PRD de D12 tienen su nota; `CLAUDE.md` suma la jerarquía de los diseños y su carpeta, y la tabla de visores deja de decir que Jugar Solo es solo vertical; el backlog enlaza B20 con este PRD.
