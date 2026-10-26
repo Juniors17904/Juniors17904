@@ -62,7 +62,7 @@ Que soltar el acelerador o frenar ayude a meter el carro en la curva, y que acel
 - **RF-04 (D4):** frenando, el carro gira entre un 20 % y un 25 % más cerrado que la base.
 - **RF-05 (D4):** frenando y girando a fondo, ningún carro da un trompo: sigue apuntando hacia adelante y se puede enderezar.
 - **RF-06 (D5):** el carro más pesado nota menos la diferencia que el más liviano, y el de menos agarre derrapa más al frenar en curva.
-- **RF-07 (D7):** con el piloto automático, el tiempo de vuelta en Ciudad cambia menos de un 5 % para los 6 carros, el más lento sigue a menos de un 15 % del más rápido y todos completan las 3 vueltas (PRD 007, RF-06 y RF-07).
+- **RF-07 (D7):** con el piloto automático (`pruebas/modelo/piloto_automatico.cjs`, que no se ajusta), el promedio de 3 vueltas en Ciudad cambia menos de un 5 % para los 6 carros, el más lento sigue a menos de un 15 % del más rápido y todos completan las 3 vueltas (PRD 007, RF-06 y RF-07).
 - **RF-08 (D7):** los rivales siguen terminando la carrera; en Normal con 4 rivales llegan separados de 2 a 15 s en al menos 8 de cada 10 carreras, y en Fácil y Difícil se cumplen los RF-06 y RF-07 del PRD 018.
 - **RF-09 (D1, D6):** las 5 pantallas 3D y los rivales usan la misma regla; en Test Drive se nota igual que en Jugar Solo.
 - **RF-10 (D9):** los PRD de D9 tienen su nota, `CLAUDE.md` nombra `TransferenciaPeso` en `src/model/carros/` y el backlog enlaza B24 con este PRD.
@@ -80,10 +80,13 @@ Que soltar el acelerador o frenar ayude a meter el carro en la curva, y que acel
 
 ## 9. Riesgos y supuestos
 - **Rivales:** al girar mejor sin pedal, los pilotos pueden ir más rápido o más lento en las curvas; se vuelven a medir las llegadas (RF-08).
-- **Pedal todo o nada:** el acelerador del juego es 1, 0 o -1, por eso el efecto entra y sale de a poco (RF-02) para que no se sienta a saltos.
+- **Pedal todo o nada:** el acelerador del juego es 1, 0 o -1, por eso el efecto entra y sale de a poco (RF-02) para que no se sienta a saltos. Acelerar es siempre "a fondo": el -5 % vale también en las rectas. El -1 frena si el carro avanza y da reversa si está parado; en reversa no hay transferencia de peso.
+- **Freno corto:** una frenada a fondo dura menos de medio segundo, por eso el efecto del freno entra más rápido (unos 0,1 s) que el de soltar el acelerador.
+- **Balance del PRD 007:** el carro más liviano (fórmula) es también el más rápido; para no romper el balance se usan los valores bajos permitidos por D2 y D4 (alrededor de 10 % al soltar y 20 % al frenar), que ya cumplen RF-01 y RF-04.
+- **Piezas que copian el giro:** `PilotoPC` calcula el giro máximo de los rivales con la misma fórmula de `Carro`; se le pasa el factor del peso desde el carro para que no quede corrido.
 - **Celulares:** el cálculo nuevo es pequeño; no debería bajar los cuadros por segundo.
 - **Tiempo contra la física de antes:** el RF-06 del PRD 006 se mide contra la física anterior al PRD 006; el ±5 % de este PRD se suma a lo que ya cambió.
 
 ### Historial
 - **v1** (2026-10-26): primera versión, con las 9 decisiones aceptadas por el usuario (opción A).
-- **v2** (2026-10-26): revisión única (forma corta). Decisión del usuario: las llegadas de los rivales quedan como hoy (D7, opción A). Detalles: D9 completa (PRD 002, 004, 005, 007, 008, 013 D6 y RF-12, 015 a 018, derrape del PRD 006), números solo en `TransferenciaPeso`, derrape en D6, balance del PRD 007 en RF-07.
+- **v2** (2026-10-26): revisión única (forma corta). Revisor de código: freno distinto de reversa, efecto del freno más rápido, valores bajos de D2/D4 para el balance, `PilotoPC` lee el factor del peso, RF-07 con promedio de 3 vueltas. Decisión del usuario: las llegadas de los rivales quedan como hoy (D7, opción A). Detalles: D9 completa (PRD 002, 004, 005, 007, 008, 013 D6 y RF-12, 015 a 018, derrape del PRD 006), números solo en `TransferenciaPeso`, derrape en D6, balance del PRD 007 en RF-07.
