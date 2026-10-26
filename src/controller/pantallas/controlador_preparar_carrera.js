@@ -5,7 +5,8 @@
 // Jugar Solo (PRD 018, D1). Muestra para elegir el modo, la pista, cuántos
 // rivales y la dificultad, con la última elección marcada (D5). "¡Correr!"
 // guarda la elección y pide a Aplicacion que arranque la carrera; "Volver"
-// regresa a Inicio. En Contrarreloj no se muestran rivales ni dificultad.
+// regresa a Inicio. Cada toque se recuerda enseguida, aunque no se corra.
+// En Contrarreloj no se muestran rivales ni dificultad.
 // Las opciones salen del modelo (CatalogoCarrera y registroPistas): la
 // pantalla solo las muestra y guarda lo elegido en EstadoJuego.
 // ================================================================
@@ -58,6 +59,7 @@ class ControladorPrepararCarrera extends ControladorPantalla {
             boton.addEventListener('click', () => {
                 contenedor.querySelectorAll('.opcion-carrera').forEach(b => b.classList.toggle('sel', b === boton));
                 alElegir(clave);
+                this.#preferencias.guardar(this.#estado);
                 this.#mostrarSegunModo();
             });
             contenedor.appendChild(boton);

@@ -26,7 +26,7 @@ class PreferenciasCarrera {
         if (datos) {
             eleccion.modo       = this.#catalogo.modo(datos.modo);
             eleccion.dificultad = this.#catalogo.dificultad(datos.dificultad);
-            if (datos.rivales !== undefined) eleccion.rivales = datos.rivales;
+            if (typeof datos.rivales === 'number') eleccion.rivales = datos.rivales;
             if (datos.pista && window.registroPistas?.obtener(datos.pista)) estado.pista = datos.pista;
         }
         estado.eleccion = eleccion;

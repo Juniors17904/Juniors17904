@@ -182,6 +182,10 @@ class PruebaModosDificultad {
         const roto = new c.EstadoJuego();
         new c.PreferenciasCarrera(almacen).cargar(roto);
         this.#ok(roto.eleccion.modo.clave === 'contra-pc' && roto.eleccion.rivales === 4, 'RF-09 un dato guardado roto da la carrera de siempre');
+        datos.set('tr_carrera', JSON.stringify({ rivales: null }));
+        const nulo = new c.EstadoJuego();
+        new c.PreferenciasCarrera(almacen).cargar(nulo);
+        this.#ok(nulo.eleccion.rivales === 4, `RF-09 rivales vacíos guardados dan los 4 de siempre (${nulo.eleccion.rivales})`);
         datos.set('tr_carrera', JSON.stringify({ modo: 'x', dificultad: 'y', rivales: 'z', pista: 'nada' }));
         const raro = new c.EstadoJuego();
         new c.PreferenciasCarrera(almacen).cargar(raro);

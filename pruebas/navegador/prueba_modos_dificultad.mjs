@@ -118,6 +118,13 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   await clic(page, 'btn-solo'); await esperar(300);
   check(await marcada(page, 'opciones-modo') === 'contrarreloj' && await marcada(page, 'opciones-pista') === 'costa', `RF-09 (${nombre}) tras recargar aparece la última elección`);
 
+  // RF-09: lo tocado se recuerda aunque no se corra
+  await elegir(page, 'opciones-dificultad', 'dificil');
+  await page.close();
+  ({ page, errores } = await abrir(ctx));
+  await clic(page, 'btn-solo'); await esperar(300);
+  check(await marcada(page, 'opciones-dificultad') === 'dificil', `RF-09 (${nombre}) lo elegido se recuerda aunque no se corra`);
+
   // RF-04/RF-05/RF-10: Contra la PC, 2 rivales, Fácil
   await elegir(page, 'opciones-modo', 'contra-pc');
   await elegir(page, 'opciones-rivales', '2');

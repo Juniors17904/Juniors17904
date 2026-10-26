@@ -84,7 +84,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 - **Llegada pareja:** en Difícil los rivales ya no esperan, así que pueden llegar muy separados del jugador; es lo buscado.
 - **Margen de Difícil:** varios rivales ya van al tope de su carro en las rectas; en Difícil ganan sobre todo en las curvas y porque no aflojan. La diferencia con Normal es real pero moderada.
 - **Lugar en el visor:** el visor está en 376 de 400 líneas; si la cantidad de rivales lo hace crecer, se saca código a clases nuevas (D7).
-- **Pista elegida en dos lugares:** la pantalla Pistas y "Preparar carrera" eligen la misma pista; las dos guardan la misma elección.
+- **Pista elegida en dos lugares:** la pantalla Pistas y "Preparar carrera" comparten la pista elegida mientras el juego está abierto; tras recargar, la que se recuerda es la de "Preparar carrera". La pantalla Pistas no cambia (sigue marcando su tarjeta y ajustando timón y velocímetro como antes).
 
 ### Historial
 - **v1** (2026-10-26): primera versión, con las 8 decisiones aprobadas por el usuario (opción A).
