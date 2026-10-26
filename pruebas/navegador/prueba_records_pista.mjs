@@ -115,8 +115,11 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   const alVolver = await page.evaluate(() => ({ pantalla: document.querySelector('.pantalla.activa')?.id, texto: document.getElementById('record-pista')?.textContent }));
   check(alVolver.pantalla === 'pantalla-preparar-carrera' && alVolver.texto === r1.record, `RF-06 (${nombre}) al volver con atrás se ve el récord al día (${alVolver.texto})`);
 
-  // RF-09: Contra la PC con 4 rivales y récord nuevo: el panel no corta ¡META! ni Menú (se puede desplazar)
+  // RF-03: el récord hecho en Contrarreloj es el mismo en Contra la PC y en Difícil
   await elegir(page, 'opciones-modo', 'contra-pc');
+  await elegir(page, 'opciones-dificultad', 'dificil');
+  check(await textoRecord(page) === r1.record, `RF-03 (${nombre}) el récord es el mismo en cualquier modo y dificultad`);
+  // RF-09: Contra la PC con 4 rivales y récord nuevo: el panel no corta ¡META! ni Menú (se puede desplazar)
   await elegir(page, 'opciones-pista', 'volcan');
   await clic(page, 'btn-correr');
   check(await esperarCarrera(page), `(${nombre}) Contra la PC arranca`);
@@ -129,11 +132,24 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
     const arriba = textos.getBoundingClientRect().top;
     panel.scrollTop = panel.scrollHeight;
     const abajo = menu.getBoundingClientRect().bottom;
-    return { arriba, abajo, alto: innerHeight, nuevo: panel.querySelector('.resultado-carrera-nuevo-record')?.textContent };
+    const linea = panel.querySelector('.resultado-carrera-record');
+    return { arriba, abajo, alto: innerHeight, nuevo: panel.querySelector('.resultado-carrera-nuevo-record')?.textContent,
+      total: panel.querySelector('.resultado-carrera-total')?.textContent.replace('TIEMPO TOTAL', '').trim(), record: linea?.textContent,
+      desborda: linea ? linea.scrollWidth > linea.clientWidth + 1 : true };
   });
   check(alto.nuevo === '¡Nuevo récord!' && alto.arriba >= 0 && alto.abajo <= alto.alto + 0.5,
     `RF-09 (${nombre}) con rivales y récord nuevo, ¡META! no se corta y Menú se alcanza (${JSON.stringify(alto)})`);
+  check(alto.record?.startsWith('Récord ' + alto.total + ' ·') && !alto.desborda, `RF-07/RF-09 (${nombre}) el récord ya actualizado va junto al tiempo de la carrera y no se corta (${alto.total} / ${alto.record})`);
   await page.screenshot({ path: `${CARPETA}/resultado_rivales_${nombre}.png` });
+
+  // RF-04: salir con el botón atrás a mitad de carrera (2 vueltas) no cambia el récord
+  const guardado = await page.evaluate(() => localStorage.getItem('tr_records'));
+  await clic(page, 'btn-revancha-solo');
+  check(await esperarCarrera(page), `(${nombre}) otra revancha arranca`);
+  await forzar(page, ['vuelta', 'vuelta']);
+  await esperar(1400);
+  await page.goBack(); await esperar(600);
+  check(await page.evaluate(() => localStorage.getItem('tr_records')) === guardado, `RF-04 (${nombre}) salir con atrás a mitad de carrera no cambia el récord`);
 
   // RF-05/RF-06: tras recargar sigue el récord; otra pista no tiene
   await page.close();

@@ -122,7 +122,7 @@ class PruebaRecordsPista {
 
     #probarDocumentos() {
         const prds = fs.readdirSync(path.join(PruebaRecordsPista.#RAIZ, 'docs/prds'));
-        for (const n of ['001', '002', '004', '005', '006', '008', '009', '010', '011', '012', '013', '014', '016', '017', '018', '019']) {
+        for (const n of ['001', '002', '004', '005', '006', '008', '009', '010', '011', '012', '013', '014', '015', '016', '017', '018', '019']) {
             const f = prds.find(x => x.startsWith(`prd_${n}`));
             this.#ok(f && /según el PRD 020/.test(this.#leer(`docs/prds/${f}`)), `RF-11 el PRD ${n} tiene la nota del PRD 020`);
         }
@@ -130,6 +130,8 @@ class PruebaRecordsPista {
         this.#ok(['RecordPista', 'RegistroRecords', 'TextoRecordPista', 'AvisoRecord'].every(c => claude.includes('`' + c + '`')), 'RF-11 CLAUDE.md nombra las clases nuevas');
         this.#ok(/B7[^\n]*prd_020/.test(this.#leer('docs/BACKLOG.md')), 'RF-11 el backlog enlaza B7 con el PRD 020');
         this.#ok(!this.#leer('src/style.css').includes('record'), 'D7 src/style.css no cambia');
+        const visor = this.#leer('src/view/pistas/visor_carrera_solo.js');
+        this.#ok(visor.split('\n').length - 1 <= 376 && !/[Rr]ecord/.test(visor), 'RNF-03 VisorCarreraSolo no se toca');
         for (const f of ['src/controller/controlador_carrera_solo.js', 'src/view/hud_carrera.js', 'src/controller/pantallas/controlador_preparar_carrera.js']) {
             this.#ok(this.#leer(f).split('\n').length <= 400, `RNF-03 ${f} no pasa de 400 líneas`);
         }
