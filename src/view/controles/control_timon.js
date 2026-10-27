@@ -36,6 +36,7 @@ class ControlTimon extends ControlEntrada {
     #accelKeyDown    = null;
     #accelKeyUp      = null;
     #aceleradorHandlers = [];
+    #deslizador         = null;   // DeslizadorPedales (PRD 024): deslizar entre ACEL y FRENO en Jugar Solo
 
     constructor(canvasId = 'canvas-timon', modelo = 0) {
         super();
@@ -80,6 +81,8 @@ class ControlTimon extends ControlEntrada {
             el.removeEventListener('mouseup',     onEnd);
         }
         this.#aceleradorHandlers = [];
+        this.#deslizador?.destruir();
+        this.#deslizador = null;
         for (const [el, tipo, fn] of this.#escuchasGiro) el.removeEventListener(tipo, fn);
         this.#escuchasGiro = [];
 
@@ -145,6 +148,8 @@ class ControlTimon extends ControlEntrada {
         };
         addBtn('btn-acelerar',  1, 0);
         addBtn('btn-freno',    -1, 0);
+        this.#deslizador = window.DeslizadorPedales && new window.DeslizadorPedales(document.getElementById('btn-acelerar'),
+            document.getElementById('btn-freno'), cir, () => this.#enZonaGiro());
 
         // Teclado para aceleración y panning de cámara aérea
         this.#accelKeyDown = e => {

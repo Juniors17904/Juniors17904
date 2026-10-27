@@ -22,7 +22,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D6 | Dominio | Los choques usan la **forma rectangular** (largo × ancho) del carro que se maneja, no un círculo: de costado choca con el costado y de frente con el parachoques. *(v2, aprobado)* |
 | D7 | Dominio | La cámara multiplica su distancia y su altura por el tamaño del carro. La altura que guardó el jugador y los rangos de los deslizadores no cambian. *(v2, aprobado)* |
 | D8 | Técnico | Los cielos y la niebla no se tocan: con la cámara más atrás se acepta un poco más de niebla, siempre que se vean 30 m delante. *(v2, aprobado)* |
-| D9 | Técnico | La física no cambia de unidades: un carro más grande no va más rápido. La vuelta en Ciudad sigue dentro del ±10 % del PRD 006 (D3). |
+| D9 | Técnico | La física no cambia de unidades: un carro más grande no va más rápido. La vuelta en Ciudad sigue dentro del ±10 % del PRD 006 (D3). *(Cambia según el PRD 024, D8: con el arranque más vivo los tiempos de vuelta bajan.)* |
 | D10 | Técnico | Aplica en las 5 pantallas 3D (`VisorCarreraSolo`, `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`) y en la vista previa del garaje (`Visor3D`). |
 | D11 | Alcance | Dónde van los postes y las señales (hoy a 5,5 m del centro) lo decide el PRD 010. *(v2, aprobado)* |
 | D12 | Dominio | **Reemplaza:** del PRD 001, la cámara en su D8 y `CamaraSeguimiento`, `VisorBase` y `VisorDisenoPista` en su lista (amplía su RF-14: cambia cómo se ve el carro). Del PRD 002, `VisorCarreraSolo`, `ConstructorCircuitoCarreraSolo`, `CamaraSeguimiento`, `VisorBase`, `DetectorSuperficie` y `DetectorChoques` dentro de "todas las clases de la carrera 3D". Del PRD 004, "el comportamiento y el aspecto del juego" (tamaño del carro, cámara y piano de la recta). Del PRD 005, ese mismo punto, los 5 visores, `Visor3D` y `RecorridoTestDriveRecto`. Del PRD 006, `CamaraSeguimiento`. Del PRD 007, la escala de "los modelos 3D de los carros" y `CamaraSeguimiento`. Del PRD 008, `CamaraSeguimiento` y los 4 visores de su D7 en su lista, y en su D5 dónde viven las medidas de la superficie. Esos PRD llevan una nota que lo indica. *(v2: completa)* |
@@ -43,13 +43,13 @@ Que cada carro y la pista tengan tamaños reales y coherentes, guardados en un s
 **Out of scope:** árboles, postes y señales y su posición (PRD 010), flechas, balizas y arcos (PRD 011), relieve del piano y espesores (PRD 012), cambios de física (PRD 006) y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física: `Carro`, `ConstantesFisica` y las 6 físicas del PRD 007 (D9). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
+- La física: `Carro`, `ConstantesFisica` y las 6 físicas del PRD 007 (D9). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`.
 - Los datos de cada pista (`ConfigPista*`), `FabricaObjetoEscena` y sus objetos de escena. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)* *(También según el PRD 011, D11: señalética.)*
 - Los archivos de los modelos 3D (GLB) y `PerfilCarro`.
 - Los cielos y su niebla (D8).
 - `VistaConduccion`, `DeslizadorAlturaCamara` y los rangos de los deslizadores de altura (D7).
-- `ControlTimon`, `ControlTeclado`, los velocímetros, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Según el PRD 015, D12: de `ControlTimon`, `ControlTeclado` y los velocímetros solo cambia su ubicación; `HudCarrera` y `src/style.css` cambian para el diseño horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(`ControlTimon` y `src/style.css` —solo los estilos de los pedales y de las galerías— cambian según el PRD 021, D9.)*
+- `ControlTimon`, `ControlTeclado`, los velocímetros, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Según el PRD 015, D12: de `ControlTimon`, `ControlTeclado` y los velocímetros solo cambia su ubicación; `HudCarrera` y `src/style.css` cambian para el diseño horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(`ControlTimon` y `src/style.css` —solo los estilos de los pedales y de las galerías— cambian según el PRD 021, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

@@ -41,7 +41,7 @@ Que el árbol, el poste y la señal de curva tengan tamaño real, choquen exacta
 **Out of scope:** flechas, balizas y arcos (PRD 011); relieves y espesores del piso (PRD 012); barreras y guardarraíles; pasar los datos de las pistas a clases (B16); y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física (`Carro`, `ConstantesFisica` y las 6 físicas) y la forma de choque del carro (PRD 009, D6). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
+- La física (`Carro`, `ConstantesFisica` y las 6 físicas) y la forma de choque del carro (PRD 009, D6). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`.
 - La forma, los tramos, el nombre, los colores y los árboles de cada pista: de `ConfigPista*` solo cambia de dónde sale la distancia de postes y señales (D7). *(La distancia de las flechas cambia según el PRD 011, D11.)*
 - `FlechaCurvaEscena`, `BalizaChevronEscena`, `MetaEscena`, `SalidaEscena`, `BarreraEscena`, `GuardarrailEscena` y `AvisoEscena`. *(Cambian según el PRD 011, D11; `BalizaChevronEscena` se borra.)*

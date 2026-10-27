@@ -39,10 +39,10 @@ Que la carrera se oiga: motor, cuenta, llantas, choques y meta, con un botón pa
 **Out of scope:** la música (D4), los motores de los rivales (D3), el volumen por separado de cada sonido, el sonido de las otras pantallas y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física, los choques, los rivales, las vueltas, el cronómetro y los récords (PRD 006 a 014 y 018 a 020): el sonido solo escucha lo que ya pasa.
+- La física, los choques, los rivales, las vueltas, el cronómetro y los récords (PRD 006 a 014 y 018 a 020): el sonido solo escucha lo que ya pasa. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - `VisorCarreraSolo` (no crece) y `HudCarrera`.
-- Los diseños vertical y horizontal, los controles, el minimapa y el velocímetro (PRD 015 a 017 y 021), salvo sumar el botón sin moverlos.
-- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
+- Los diseños vertical y horizontal, los controles, el minimapa y el velocímetro (PRD 015 a 017 y 021), salvo sumar el botón sin moverlos. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
+- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

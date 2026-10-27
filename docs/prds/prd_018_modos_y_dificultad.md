@@ -17,7 +17,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D1 | Alcance | Al tocar "Jugar Solo" en Inicio aparece una pantalla nueva, **"Preparar carrera"**, antes de correr. Ahí se elige el modo, la pista, cuántos rivales y la dificultad, y un botón grande "¡Correr!" arranca la carrera. |
 | D2 | Alcance | Dos modos: **Contra la PC** (como hoy) y **Contrarreloj** (solo el jugador, sin rivales, contra el reloj). El campeonato y guardar récords (B7) quedan fuera. |
 | D3 | Usuarios | Rivales: de 1 a 4 (por omisión, 4). Con menos de 4, la dificultad decide quiénes corren: en Fácil entran primero el Novato y el Prudente; en Normal y Difícil, el Experto y el Agresivo. |
-| D4 | Usuarios | Tres dificultades: **Fácil** (los rivales van más lentos y aflojan más: es más fácil ganar), **Normal** (igual que hoy) y **Difícil** (los rivales corren a fondo y nunca aflojan para esperar al jugador). En ninguna hacen trampa: usan la misma física que el jugador. |
+| D4 | Usuarios | Tres dificultades: **Fácil** (los rivales van más lentos y aflojan más: es más fácil ganar), **Normal** (igual que hoy) y **Difícil** (los rivales corren a fondo y nunca aflojan para esperar al jugador). En ninguna hacen trampa: usan la misma física que el jugador. *(Cambia según el PRD 024, D8: arranque más vivo y freno de motor; el ritmo de Difícil sube un poco para que siga más rápido que Normal.)* |
 | D5 | Usuarios | Se recuerda la última elección: la pantalla aparece con lo que se eligió antes. Revancha repite la misma carrera (mismo modo, pista, rivales y dificultad). |
 | D6 | Usuarios | Contra la PC, la posición dice "2.º/M", con M = cantidad de carros. En Contrarreloj no hay posición ni tabla de puestos: el resultado muestra el tiempo total y la mejor vuelta, y el minimapa solo muestra al jugador. *(Cambia según el PRD 020, D7: récords por pista.)* |
 | D7 | Técnico | El modo y la dificultad son clases del modelo con su superclase: `ModoCarrera` (`ModoContraPC`, `ModoContrarreloj`) y `DificultadCarrera` (`DificultadFacil`, `DificultadNormal`, `DificultadDificil`). No heredan de `Modo` (los modos de Inicio, PRD 002). La pantalla nueva tiene su propio controlador. `VisorCarreraSolo` no crece; si hace falta lugar, se saca código a clases nuevas (como permitió el PRD 013, D8). Pruebas en navegador real en vertical y en horizontal. |
@@ -39,11 +39,11 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 **Out of scope:** el campeonato, guardar récords (B7), elegir el carro o el color en esta pantalla (sigue en el garaje), el multijugador (B3) y todo lo de la lista única de abajo. *(Cambia según el PRD 020, D7: récords por pista.)*
 
 **Lista única de lo que NO se modifica:**
-- La física de los carros, los choques, las vueltas y el cronómetro (PRD 006 a 012). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
-- Las personalidades de los rivales (PRD 013, D2) y su manejo natural sin trampa (D3). *(Su manejo natural se puede ajustar según el PRD 019, D9, sin cambiar las personalidades.)*
+- La física de los carros, los choques, las vueltas y el cronómetro (PRD 006 a 012). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
+- Las personalidades de los rivales (PRD 013, D2) y su manejo natural sin trampa (D3). *(Su manejo natural se puede ajustar según el PRD 019, D9, sin cambiar las personalidades.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Las pistas, el piso, los objetos, la señalética y el camino de vuelta (PRD 009 a 014).
-- Los diseños vertical y horizontal, los controles y el minimapa (PRD 015 a 017), salvo lo que dicen D6 y D8. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles cambian según el PRD 021, D9: estilos de timón y pedales.)*
-- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
+- Los diseños vertical y horizontal, los controles y el minimapa (PRD 015 a 017), salvo lo que dicen D6 y D8. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles cambian según el PRD 021, D9: estilos de timón y pedales.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
+- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -60,7 +60,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 - **RF-05 (D3):** con menos de 4 rivales, en Fácil corren primero el Novato y el Prudente; en Normal y Difícil, primero el Experto y el Agresivo.
 - **RF-06 (D4):** en Fácil los rivales son más lentos que en Normal; en Difícil, más rápidos que en Normal, sin pasar nunca el tope de su carro.
 - **RF-07 (D4):** en Difícil un rival que va adelante del jugador no afloja para esperarlo; en Normal afloja como hoy, y en Fácil afloja más que en Normal.
-- **RF-08 (D4):** en Normal los rivales corren igual que antes de este PRD. *(Los números de manejo de los pilotos se pueden ajustar según el PRD 019, D9, si esto se sigue cumpliendo.)*
+- **RF-08 (D4):** en Normal los rivales corren igual que antes de este PRD. *(Los números de manejo de los pilotos se pueden ajustar según el PRD 019, D9, si esto se sigue cumpliendo.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - **RF-09 (D5):** al volver a "Preparar carrera" (también tras recargar la página) aparece la última elección; Revancha repite la misma carrera.
 - **RF-10 (D6):** Contra la PC, la posición dice "N.º/M" con M = rivales + 1, y la tabla final tiene M puestos.
 - **RF-11 (D6):** en Contrarreloj no se ve la posición ni la tabla de puestos; el resultado muestra el tiempo total y la mejor vuelta, y el minimapa tiene un solo punto. *(Cambia según el PRD 020, D7: récords por pista.)*

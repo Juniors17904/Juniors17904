@@ -125,10 +125,11 @@ export class Carro {
         }
         if (this.entradaAcel === -1) {
             if (v > 0.01) return Math.max(0, v - c.freno / c.masa * k);
-            return Math.max(-c.velMaxReversa, v - c.aceleracion * 0.6 / c.masa * k);
+            return Math.max(-c.velMaxReversa, v - c.aceleracionReversa / c.masa * k);
         }
+        // Sin pedal: rodadura, aire y freno de motor (PRD 024)
         const u = v / c.velMaxAdelante;
-        const arrastre = (c.rodadura + c.aire * u * u) / c.masa * k;
+        const arrastre = (c.rodadura + c.aire * u * u + c.frenoMotor) / c.masa * k;
         return v > 0 ? Math.max(0, v - arrastre) : Math.min(0, v + arrastre);
     }
 

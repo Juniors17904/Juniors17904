@@ -37,10 +37,10 @@ Que el jugador tenga una marca que superar en cada pista y vea cuándo la bate.
 **Out of scope:** borrar récords (D6), récords en línea o compartidos, un récord por modo o por dificultad, mostrar la diferencia con el récord durante la carrera, y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física, los rivales, las vueltas y el cronómetro (PRD 006 a 014, 018 y 019): el récord solo lee el tiempo que ya se calcula.
-- Las pistas, los controles, el minimapa y los diseños vertical y horizontal (PRD 015 a 017). *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles cambian según el PRD 021, D9: estilos de timón y pedales.)*
+- La física, los rivales, las vueltas y el cronómetro (PRD 006 a 014, 018 y 019): el récord solo lee el tiempo que ya se calcula. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
+- Las pistas, los controles, el minimapa y los diseños vertical y horizontal (PRD 015 a 017). *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles cambian según el PRD 021, D9: estilos de timón y pedales.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - La elección de "Preparar carrera" y cómo se recuerda (PRD 018): solo se suma el texto del récord. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
-- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
+- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -78,7 +78,7 @@ Que el jugador tenga una marca que superar en cada pista y vea cuándo la bate.
 - **Otro celular u otro navegador:** los récords no se comparten; cada uno guarda los suyos.
 - **Borrar los datos del navegador** borra también los récords (y la última elección del PRD 018).
 - **Carreras que no son de verdad:** solo cuenta una carrera con sus 3 vueltas completas y tiempos válidos; así una meta forzada (por ejemplo, en una prueba) no deja un récord falso.
-- **Física nueva (PRD 019):** si la física cambia los tiempos, los récords viejos pueden quedar más difíciles o más fáciles de batir; no se ajustan solos.
+- **Física nueva (PRD 019):** si la física cambia los tiempos, los récords viejos pueden quedar más difíciles o más fáciles de batir; no se ajustan solos. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 
 ### Historial
 - **v1** (2026-10-26): primera versión, con las 7 decisiones aprobadas por el usuario (opción A).

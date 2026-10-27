@@ -39,11 +39,11 @@ Que el jugador vea de un vistazo la forma de la pista y por dónde va él y cada
 **Out of scope:** ocultar o agrandar el mapa con un toque; un mapa que gire con el carro; el minimapa de las otras pantallas; y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): el mapa solo lee dónde está cada carro. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(El giro y el derrape suman el peso del carro, y el manejo de los rivales se puede ajustar, según el PRD 019, D9.)*
+- La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): el mapa solo lee dónde está cada carro. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(El giro y el derrape suman el peso del carro, y el manejo de los rivales se puede ajustar, según el PRD 019, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - `VisorCarreraSolo` (no crece) y `HudCarrera`. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)*
-- Los controles de Jugar Solo (PRD 016) y el velocímetro. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles cambian según el PRD 021, D9: estilos de timón y pedales.)*
+- Los controles de Jugar Solo (PRD 016) y el velocímetro. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles cambian según el PRD 021, D9: estilos de timón y pedales.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Los minimapas de las otras pantallas (`MinimapaDisenoGeneral`, `MinimapaCircuito3D`, `MapaDetallePista` y los de Test Drive).
-- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
+- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje. *(Cambia según el PRD 024, D8: la física nueva también llega a ellas.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
