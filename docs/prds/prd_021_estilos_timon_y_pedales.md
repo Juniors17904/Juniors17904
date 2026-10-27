@@ -42,7 +42,7 @@ Que el jugador arme el aspecto de sus controles a su gusto (timón y pedales) y 
 **Lista única de lo que NO se modifica:**
 - La física, los rivales, las vueltas, el cronómetro y los récords (PRD 006 a 014 y 018 a 020): solo cambia cómo se ven los controles.
 - Cómo se toca: la zona de giro, el recorrido de giro y los toques a la vez (PRD 016, D3, D4 y D7), y el control por teclado en PC, que no muestra timón ni pedales.
-- Los diseños vertical y horizontal y sus medidas (PRD 015 y 016, D9), y el lugar del velocímetro.
+- Los diseños vertical y horizontal y sus medidas (PRD 015 y 016, D9), y el lugar del velocímetro. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
 - Los dibujos de los 4 timones de hoy, los 4 velocímetros y su galería.
 - Test Drive, Diseño de Objetos y el garaje; en Diseño General y Diseño de Pistas solo se suman los 2 timones nuevos (D1) y, en Diseño de Pistas, el velocímetro de fábrica (D6).
 

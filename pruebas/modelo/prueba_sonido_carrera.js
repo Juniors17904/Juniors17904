@@ -174,7 +174,7 @@ class PruebaSonidoCarrera {
 
     #probarDocumentos() {
         const prds = fs.readdirSync(path.join(PruebaSonidoCarrera.#RAIZ, 'docs/prds'));
-        for (const n of ['001', '002', '004', '005', '006', '008', '013', '015', '016', '017', '018', '019', '020']) {
+        for (const n of ['001', '002', '004', '005', '006', '008', '013', '015', '016', '017', '018', '019', '020', '021']) {
             const f = prds.find(x => x.startsWith(`prd_${n}`));
             this.#ok(f && /según el PRD 022/.test(this.#leer(`docs/prds/${f}`)), `RF-12 el PRD ${n} tiene la nota del PRD 022`);
         }

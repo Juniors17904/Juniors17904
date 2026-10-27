@@ -125,7 +125,7 @@ class NivelCiudad extends Nivel {
 
 - **Máximo 400 líneas** por archivo `.js` o `.mjs` en `src/`, en la raíz y en `pruebas/`. No aplica a `docs/`.
 - **Responsabilidad única:** si para describir lo que hace una clase hay que decir "y además…", se divide en dos clases.
-- **Cada pantalla tiene su propio controlador** (por ejemplo, Jugar Solo → `ControladorCarreraSolo`). `Aplicacion` solo guarda el controlador de cada pantalla.
+- **Cada pantalla tiene su propio controlador** (por ejemplo, Jugar Solo → `ControladorCarreraSolo`). `Aplicacion` solo guarda el controlador de cada pantalla y lo que comparten varias pantallas (como las preferencias de la carrera y el audio, PRD 018 y 022).
 - **MVC sigue igual:** Model, View y Controller como dice la sección "MVC obligatorio".
 
 No hay excepciones: `scripts/archivos_grandes_aceptados.txt` está vacío (B10 cerrado por el PRD 004).
