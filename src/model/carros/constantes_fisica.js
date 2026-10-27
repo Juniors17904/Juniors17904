@@ -10,8 +10,8 @@
 //   el acelerador frenan un poco solos (freno de motor, una parte del freno).
 // ================================================================
 export class ConstantesFisica {
-    static #FACTOR_ARRANQUE = 1.65;
-    static #PARTE_FRENO_MOTOR = 0.1;
+    static #FACTOR_ARRANQUE = 1.64;
+    static #PARTE_FRENO_MOTOR = 0.12;
     static #PARTE_REVERSA = 0.6;          // la marcha atrás no cambia con el PRD 024
 
     #velMaxAdelante;

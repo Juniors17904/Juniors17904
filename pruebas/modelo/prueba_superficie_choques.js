@@ -253,6 +253,9 @@ class PruebaSuperficieChoques {
 
     // RF-11: el piloto da una vuelta en Ciudad; cerca del inicio se lo lleva contra
     // un árbol (en el pasto) y luego retoma. Deben salir 2 puntos de control y la vuelta.
+    // El piloto de prueba no sabe dar marcha atrás: tras el choque forzado retoma desde
+    // la pista, a la altura donde quedó (con el arranque del PRD 024 quedaba perdido
+    // entre los árboles).
     #probarVueltaConChoquesYPasto() {
         const pista = this.#ctx.registroPistas.obtener('ciudad'), ruta = this.#rutaDe(pista);
         const muestras = Array.from({ length: 400 }, (_, i) => {
@@ -262,7 +265,8 @@ class PruebaSuperficieChoques {
         const carrera  = new this.#ctx.CarreraVueltas(muestras, 1);
         const detector = new this.#DetectorChoques(pista.decoraciones, ruta);
         const arbol    = detector.objetos.find(o => o.tipo === 'arbol');
-        const inicio   = ruta.inicio, carro = new this.#Carro(inicio.x, inicio.z, inicio.angle);
+        const inicio   = ruta.inicio;
+        let carro      = new this.#Carro(inicio.x, inicio.z, inicio.angle);
         const piloto   = new PilotoAutomatico(ruta);
         const eventos = [];
         let choques = 0, pisoPasto = false, forzado = false;
@@ -283,6 +287,9 @@ class PruebaSuperficieChoques {
                     if (ev !== 'nada') eventos.push(ev);
                 }
                 piloto.reubicar(carro);
+                const retoma = ruta.posicionVuelta(piloto.progreso);
+                carro = new this.#Carro(retoma.x, retoma.z, retoma.angle);
+                carro.pisar(carrera.superficie);
             }
             piloto.pasoAutomatico(carro, alPaso);
             const ev = carrera.actualizar(carro.px, carro.pz);

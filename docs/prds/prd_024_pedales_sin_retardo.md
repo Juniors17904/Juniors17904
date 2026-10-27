@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para programar |
+| Estado | v3 — programado y en `main` |
 | Fecha | 2026-10-27 |
 | Backlog | B26 (`docs/BACKLOG.md`) |
 | Depende de | PRD 006 y 007 (física), PRD 013 y 018 (rivales y dificultad), PRD 016 y 021 (controles y pedales), PRD 019 (peso al girar). El PRD 023 es de la otra sesión (impares). |
@@ -86,3 +86,4 @@ Que los pedales respondan al instante y que el carro se sienta ágil para maniob
 ### Historial
 - **v1** (2026-10-27): primera versión, con las 8 decisiones aprobadas por el usuario (opción A).
 - **v2** (2026-10-27): revisión única (forma corta). Decisión del usuario: opción A (la física nueva vale en las 5 pantallas 3D; deslizar entre pedales solo en Jugar Solo). Detalles: D8 completa (PRD 002, 004, 005, 006 D3 y RF-06, listas de los PRD 006 a 022, PRD 013 y 018 si se ajustan los pilotos, PRD 021 D4); D7 cuida el pasto y permite ajustar pilotos; D6 no abre el paso fijo ni el visor; RF-08b (balance y pasto), RF-12 (otras pantallas) y `CLAUDE.md` en RF-11; números en `ConstantesFisica`.
+- **v3** (2026-10-27): programado. Arranque ×1,64 y freno de motor del 12 % del freno en `ConstantesFisica` (la marcha atrás queda como antes); `DeslizadorPedales` en `src/view/controles/`; ritmo de Difícil 1,15/1,2. Revisión después de programar: D8 suma el PRD 001 (`ControlTimon`), el PRD 007 ("cada carro solo cambia sus números") y el ±10 % del PRD 009 (D9); la marcha atrás entra en la lista de lo que no se modifica; RF-12 nombra Test Drive. La prueba del RF-11 del PRD 008 retoma desde la pista después del choque forzado (su piloto de prueba no sabe dar marcha atrás).
