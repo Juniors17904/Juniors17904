@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), falta una decisión del usuario (ver D6) |
+| Estado | v2 — revisado (forma corta), listo para implementar |
 | Fecha | 2026-10-27 |
 | Backlog | B25 (`docs/BACKLOG.md`) |
 | Depende de | PRD 016 (controles cómodos) y PRD 015 (vertical y horizontal) |
@@ -19,7 +19,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | D3 | Usuarios | **4 estilos de pedales:** **Clásico** (los de hoy, elegido de fábrica), **Deportivo** (pedal metálico: el acelerador alto y angosto, el freno ancho), **F1** (con forma de leva) y **Retro** (botón de arcade con borde grueso). |
 | D4 | Usuarios | **Solo cambia el dibujo de los pedales.** El área que se toca es la misma caja del PRD 016 (su tamaño, lugar y separación, D5) y cada estilo dibuja su forma dentro de ella; la luz y la vibración al tocar quedan como en el PRD 016 (D6). Así el velocímetro no se mueve. |
 | D5 | Usuarios | **2 timones nuevos:** **Rally** (con una marca roja arriba) y **Camión** (de dos rayos y aro grueso, que llena su lugar), en el mismo lugar y tamaño que los de hoy. Los 4 de hoy no cambian. |
-| D6 | Usuarios | El juego **recuerda** el timón y los pedales elegidos, también después de recargar la página. Elegir una pista **ya no cambia** el timón ni el velocímetro elegidos (hoy Ciudad pone el timón Clásico y el velocímetro F1). El velocímetro sigue sin guardarse al recargar, como hoy. **Pendiente del usuario:** quien nunca eligió velocímetro hoy ve el F1 en Diseño de Pistas (por tocar Ciudad); al quitar esa regla verá el de fábrica (Clásico), como ya pasa en Jugar Solo. |
+| D6 | Usuarios | El juego **recuerda** el timón y los pedales elegidos, también después de recargar la página. Elegir una pista **ya no cambia** el timón ni el velocímetro elegidos (hoy Ciudad pone el timón Clásico y el velocímetro F1). El velocímetro sigue sin guardarse al recargar, como hoy. Quien nunca eligió velocímetro ve el de fábrica (Clásico) en todas partes, también en Diseño de Pistas, donde hoy veía el F1 por tocar Ciudad *(v2: opción A, decisión del usuario)*. |
 | D7 | Técnico | Una superclase `EstiloPedales` (`clave`, `nombre`) con sus 4 subclases en `src/view/controles/` (`PedalesClasicos`, `PedalesDeportivos`, `PedalesF1`, `PedalesRetro`); `TimonRally` y `TimonCamion` heredan de `Timon`. Una clase del modelo, `PreferenciasControles`, guarda el timón y los pedales elegidos por su clave (por ejemplo `rally`), no por número, con su propia clave de guardado; si lo guardado no se conoce, usa el Clásico. La galería de pedales es una pantalla nueva con su propio controlador. El estilo llega a los pedales de Jugar Solo por las piezas de diseño del PRD 015 y 016, sin sumar lógica a `ControladorCarreraSolo`. Ningún archivo pasa de 400 líneas. |
 | D8 | Técnico | Pruebas en el modelo (lo elegido se recuerda, lo roto cae en Clásico) y en navegador real en 390×844 y 844×390: cada estilo de pedal mide la caja del PRD 016, se ilumina al tocar y funciona con toques a la vez; las dos galerías se ven enteras; capturas. |
 | D9 | Dominio | **Reemplaza (solo para sumar los estilos de pedales, los 2 timones nuevos y recordar lo elegido):** del PRD 001, su D4 (el timón sale de lo guardado) y `src/style.css`, `ControlTimon` y `VistaConduccion` de su lista; del PRD 002, "cambiar los elementos dibujados en 2D" de su Out of scope y "los timones", "todas las clases de la carrera 3D" y "los elementos dibujados en 2D" de su lista (su RF-06 sigue valiendo); de los PRD 004 y 005, "el comportamiento y el aspecto del juego" (solo los controles); del PRD 005, "los timones y los velocímetros" y "solo cambia cómo piden una pista" (`ControladorPistas` y `ControladorControles`); de los PRD 006 a 009, los timones (`ControlTimon`) de sus listas; de los PRD 013, 017, 019 y 020, "los controles" de sus listas; del PRD 015, su D1, "las otras pantallas no cambian" y "cambiar la forma del timón y los botones" de su Out of scope; del PRD 016, su D1, "los controles de las otras pantallas" y "los modelos de timón del garaje" de su Out of scope, y `VistaConduccion`, `ControladorCarreraSolo` y "los dibujos de los timones" de su lista (sus D5, D6 y D9 siguen valiendo por D4); del PRD 018, "la pantalla Pistas… sigue ajustando timón y velocímetro" de sus riesgos y "los controles" de su lista; y `src/style.css` en las listas de los PRD 001, 002, 004 a 014 y 019 (solo los estilos de los pedales y de las galerías). Esos PRD llevan una nota que lo indica. |
@@ -44,7 +44,7 @@ Que el jugador arme el aspecto de sus controles a su gusto (timón y pedales) y 
 - Cómo se toca: la zona de giro, el recorrido de giro y los toques a la vez (PRD 016, D3, D4 y D7), y el control por teclado en PC, que no muestra timón ni pedales.
 - Los diseños vertical y horizontal y sus medidas (PRD 015 y 016, D9), y el lugar del velocímetro.
 - Los dibujos de los 4 timones de hoy, los 4 velocímetros y su galería.
-- Test Drive, Diseño de Objetos y el garaje; en Diseño General y Diseño de Pistas solo se suman los 2 timones nuevos (D1).
+- Test Drive, Diseño de Objetos y el garaje; en Diseño General y Diseño de Pistas solo se suman los 2 timones nuevos (D1) y, en Diseño de Pistas, el velocímetro de fábrica (D6).
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -84,4 +84,4 @@ Que el jugador arme el aspecto de sus controles a su gusto (timón y pedales) y 
 
 ### Historial
 - **v1** (2026-10-27): primera versión, con las decisiones aceptadas por el usuario (opción A).
-- **v2** (2026-10-27): revisión única (forma corta). Detalles: D9 completa (PRD 001, 002, 005 a 009, 013, 015 a 020 y la lista exacta de `src/style.css`); la caja que se toca es la del PRD 016 (D4); las galerías se ven enteras (D2); las 3 pantallas del timón (D1); lo elegido se guarda por clave y lo roto cae en Clásico (D7); el velocímetro no se guarda; nombres de clases y carpeta; RF-10 con `CLAUDE.md` completo. Pendiente: decisión del usuario sobre el velocímetro de fábrica en Diseño de Pistas (D6).
+- **v2** (2026-10-27): revisión única (forma corta). Detalles: D9 completa (PRD 001, 002, 005 a 009, 013, 015 a 020 y la lista exacta de `src/style.css`); la caja que se toca es la del PRD 016 (D4); las galerías se ven enteras (D2); las 3 pantallas del timón (D1); lo elegido se guarda por clave y lo roto cae en Clásico (D7); el velocímetro no se guarda; nombres de clases y carpeta; RF-10 con `CLAUDE.md` completo. Decisión del usuario: quien nunca eligió velocímetro ve el Clásico en todas partes (D6, opción A).
