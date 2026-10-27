@@ -35,12 +35,14 @@ class ControladorCarreraSolo {
     #estado          = null;   // estado compartido de Aplicacion (solo lectura)
     #vistaConduccion = null;
     #alSalir         = null;
+    #audio           = null;   // AudioJuego de la partida (PRD 022)
 
     #visor      = null;
     #carrera    = null;
     #cronometro = null;
     #hud        = null;
     #mapa       = null;   // MinimapaCarrera (PRD 017)
+    #sonidos    = null;   // SonidosCarrera (PRD 022)
     #adaptadorDiseno = null;   // AdaptadorDisenoCarrera (PRD 015)
 
     #estadoCarrera   = ControladorCarreraSolo.#ESTADO_PREPARANDO;
@@ -51,7 +53,8 @@ class ControladorCarreraSolo {
     #temporizadores  = [];
     #llegadasEnTabla = -1;     // carros terminados la última vez que se dibujó la tabla
 
-    constructor(estado, vistaConduccion, alSalir) {
+    constructor(estado, vistaConduccion, alSalir, audio = null) {
+        this.#audio           = audio;
         this.#estado          = estado ?? null;
         this.#vistaConduccion = vistaConduccion ?? null;
         this.#alSalir         = typeof alSalir === 'function' ? alSalir : null;
@@ -116,6 +119,8 @@ class ControladorCarreraSolo {
         this.#visor?.detener();
         this.#hud?.destruir();
         this.#mapa?.destruir();
+        this.#sonidos?.destruir();
+        this.#sonidos = null;
 
         this.#visor      = null;
         this.#carrera    = null;
@@ -144,6 +149,7 @@ class ControladorCarreraSolo {
             document.getElementById('resultado-carrera-solo')
         );
 
+        this.#sonidos = window.SonidosCarrera ? new window.SonidosCarrera(this.#audio) : null;
         this.#mapa = new window.MinimapaCarrera(document.getElementById('minimapa-carrera-solo'), pista);
 
         const timonModelo = this.#estado?.timonModelo ?? 0;
@@ -201,15 +207,16 @@ class ControladorCarreraSolo {
         this.#estadoCarrera = ControladorCarreraSolo.#ESTADO_CUENTA;
         this.#visor.congelar(true);
         this.#visor.activarRivales(false);
+        this.#sonidos?.reiniciar();
 
         // Pasos encadenados: cada uno programa el siguiente, así un bloqueo del hilo
         // principal no dispara varios números de golpe
         const paso = ControladorCarreraSolo.#INTERVALO_CUENTA_MS;
-        this.#hud.mostrarCuenta('3');
+        this.#mostrarCuenta('3');
         this.#programar(() => {
-            this.#hud.mostrarCuenta('2');
+            this.#mostrarCuenta('2');
             this.#programar(() => {
-                this.#hud.mostrarCuenta('1');
+                this.#mostrarCuenta('1');
                 this.#programar(() => {
                     this.#arrancar();
                     this.#programar(() => this.#hud.ocultarCuenta(), paso);
@@ -218,8 +225,14 @@ class ControladorCarreraSolo {
         }, paso);
     }
 
+    // La cuenta se ve y se oye (PRD 022)
+    #mostrarCuenta(texto) {
+        this.#hud.mostrarCuenta(texto);
+        this.#sonidos?.cuenta(texto);
+    }
+
     #arrancar() {
-        this.#hud.mostrarCuenta('¡YA!');
+        this.#mostrarCuenta('¡YA!');
         this.#visor.congelar(false);
         this.#cronometro.iniciar();
         const rivales = this.#visor.rivales;
@@ -251,6 +264,7 @@ class ControladorCarreraSolo {
         const cronometro = this.#cronometro;
 
         if (this.#estadoCarrera === ControladorCarreraSolo.#ESTADO_CORRIENDO) {
+            this.#sonidos?.escuchar(visor);
             const evento = carrera.actualizar(visor.px, visor.pz);
             if (evento === ControladorCarreraSolo.#EVENTO_VUELTA) {
                 cronometro.marcarVuelta();
@@ -343,6 +357,7 @@ class ControladorCarreraSolo {
         const esNuevo = records.registrar(this.#clavePista, cronometro.tiempoTotalMs, mejor,
             cronometro.tiemposVuelta.length, ControladorCarreraSolo.#TOTAL_VUELTAS);
         this.#hud.mostrarRecord(new window.TextoRecordPista().texto(records.obtener(this.#clavePista)), esNuevo);
+        this.#sonidos?.meta(esNuevo);
     }
 
     // ── Privados: Revancha (RF-11) ──────────────────────────────

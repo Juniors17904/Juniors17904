@@ -190,6 +190,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `PerfilCarro` | `PerfilCarroDeportivo`, `PerfilCarroSuv`, `PerfilCarroMuscle`, `PerfilCarroFormula`, `PerfilCarroPickup`, `PerfilCarroClasico` | `tipo`, `nombre`, `dibujar(ctx, color)` |
 | `ModoCarrera` | `ModoContraPC`, `ModoContrarreloj` (PRD 018; no heredan de `Modo`, los modos de Inicio) | `clave`, `nombre`, `hayRivales` |
 | `DificultadCarrera` | `DificultadFacil`, `DificultadNormal`, `DificultadDificil` (PRD 018; las usan `AjusteRitmo` y `CarreraConRivales`) | `clave`, `nombre`, `ritmoBase`, `ritmoMinimo`, `ritmoMaximo`, `fuerzaEsperar`, `indicesPilotos(cantidad, total)` |
+| `EfectoSonido` | `SonidoMotor`, `SonidoLlantas`, `SonidoCuenta`, `SonidoChoque`, `SonidoMeta` (PRD 022; los maneja `SonidosCarrera`) | `sonar(...)`, `callar()` |
 | `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
@@ -205,6 +206,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/model/pilotos/` → `PilotoPC` + subclases y `Rival` (PRD 013)
 - `src/model/modos_carrera/` → `ModoCarrera` + subclases; `src/model/dificultades/` → `DificultadCarrera` + subclases (PRD 018). La elección entera es `EleccionCarrera`; `CatalogoCarrera` lista las opciones y `PreferenciasCarrera` recuerda la última (en `src/model/`)
 - Récords por pista (PRD 020): `RecordPista` y `RegistroRecords` en `src/model/`; en la vista, `TextoRecordPista` (cómo se lee el récord) y `AvisoRecord` (el récord y "¡Nuevo récord!" en el resultado), en `src/view/`
+- `src/view/sonidos/` → `EfectoSonido` + subclases, `SonidosCarrera` (todos los sonidos de una carrera), `OidoCarrera` (reconoce choques y derrapes), `AudioJuego` (el audio de la partida y su silencio), `PreferenciaSonido` (recuerda 🔊/🔇) y `BotonSonido` (PRD 022)
 - `src/view/disenos/` → `DisenoCarrera` + subclases, `SelectorDisenoCarrera` y `AdaptadorDisenoCarrera`: cómo se acomoda una carrera 3D en vertical u horizontal (PRD 015); sirven para cualquier carrera 3D, también el multijugador futuro
 
 ### Visores de pista — REGLA: uno por pantalla, todos independientes

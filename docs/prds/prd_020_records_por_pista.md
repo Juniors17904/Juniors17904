@@ -38,8 +38,8 @@ Que el jugador tenga una marca que superar en cada pista y vea cuándo la bate.
 
 **Lista única de lo que NO se modifica:**
 - La física, los rivales, las vueltas y el cronómetro (PRD 006 a 014, 018 y 019): el récord solo lee el tiempo que ya se calcula.
-- Las pistas, los controles, el minimapa y los diseños vertical y horizontal (PRD 015 a 017).
-- La elección de "Preparar carrera" y cómo se recuerda (PRD 018): solo se suma el texto del récord.
+- Las pistas, los controles, el minimapa y los diseños vertical y horizontal (PRD 015 a 017). *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
+- La elección de "Preparar carrera" y cómo se recuerda (PRD 018): solo se suma el texto del récord. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
 
 ## 5. Conceptos de dominio

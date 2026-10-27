@@ -12,6 +12,7 @@ class Aplicacion {
     #vistaConduccion    = new VistaConduccion().cargar();
     #carreraSolo        = null;
     #preferenciasCarrera = new PreferenciasCarrera();   // PRD 018: recuerda la última elección de Jugar Solo
+    #audio              = new AudioJuego();             // PRD 022: el sonido de la partida y su silencio
     #modos              = new ModosDisponibles();   // PRD 002 D8: decide qué modos se ven y se abren
 
     // PRD 004 D5/D6: un controlador por pantalla
@@ -135,7 +136,7 @@ class Aplicacion {
         this.#controles   = new ControladorControles(this.#estado, navegar);
         this.#preferenciasCarrera.cargar(this.#estado);
         this.#prepararCarrera = new ControladorPrepararCarrera(this.#estado, navegar,
-            this.#preferenciasCarrera, () => this.#iniciarCarreraSolo());
+            this.#preferenciasCarrera, () => this.#iniciarCarreraSolo(), this.#audio);
         // "Jugar Solo" abre "Preparar carrera" (PRD 018, RF-01)
         this.#inicio      = new ControladorInicio(this.#estado, navegar, this.#controles,
             () => this.#mostrar('pantalla-preparar-carrera'));
@@ -168,7 +169,7 @@ class Aplicacion {
         // Se crea antes de #mostrar para que la pantalla no se redirija a Inicio;
         // el constructor no toca el DOM: todo arranca en iniciar()
         const carrera = new ControladorCarreraSolo(
-            this.#estado, this.#vistaConduccion, () => this.#mostrar('pantalla-inicio'));
+            this.#estado, this.#vistaConduccion, () => this.#mostrar('pantalla-inicio'), this.#audio);
         this.#carreraSolo = carrera;
         this.#mostrar('pantalla-carrera-solo');
         carrera.iniciar();

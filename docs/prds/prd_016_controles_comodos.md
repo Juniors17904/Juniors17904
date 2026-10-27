@@ -44,7 +44,7 @@ Que manejar en Jugar Solo sea cómodo e intuitivo en el celular, en vertical y e
 **Lista única de lo que NO se modifica:**
 - La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): solo cambia cómo se toca, no cómo maneja el carro. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(El giro y el derrape suman el peso del carro, y el manejo de los rivales se puede ajustar, según el PRD 019, D9.)*
 - El control por teclado en PC (flechas y WASD) y los botones táctiles ◀ ▲ ▼ ▶ del modo botones.
-- `VistaConduccion` y `ControladorCarreraSolo`: el timón reconoce solo la zona de giro de Jugar Solo. *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)*
+- `VistaConduccion` y `ControladorCarreraSolo`: el timón reconoce solo la zona de giro de Jugar Solo. *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
 - Los dibujos de los timones (`TimonClasico`, `TimonDeportivo`, `TimonF1`, `TimonRetro`) y el velocímetro.
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
 

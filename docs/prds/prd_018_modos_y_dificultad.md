@@ -42,7 +42,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 - La física de los carros, los choques, las vueltas y el cronómetro (PRD 006 a 012). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
 - Las personalidades de los rivales (PRD 013, D2) y su manejo natural sin trampa (D3). *(Su manejo natural se puede ajustar según el PRD 019, D9, sin cambiar las personalidades.)*
 - Las pistas, el piso, los objetos, la señalética y el camino de vuelta (PRD 009 a 014).
-- Los diseños vertical y horizontal, los controles y el minimapa (PRD 015 a 017), salvo lo que dicen D6 y D8.
+- Los diseños vertical y horizontal, los controles y el minimapa (PRD 015 a 017), salvo lo que dicen D6 y D8. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
 
 ## 5. Conceptos de dominio

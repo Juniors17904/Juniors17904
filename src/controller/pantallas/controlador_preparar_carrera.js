@@ -15,16 +15,21 @@ class ControladorPrepararCarrera extends ControladorPantalla {
     #estado       = null;
     #preferencias = null;   // PreferenciasCarrera
     #alCorrer     = null;   // Aplicacion crea y guarda el ControladorCarreraSolo
+    #audio        = null;   // AudioJuego (PRD 022): "¡Correr!" es el toque que lo despierta
 
-    constructor(estado, navegar, preferencias, alCorrer) {
+    constructor(estado, navegar, preferencias, alCorrer, audio = null) {
         super(navegar);
         this.#estado       = estado;
         this.#preferencias = preferencias;
         this.#alCorrer     = alCorrer;
+        this.#audio        = audio;
     }
 
     iniciar() {
+        // Los botones 🔊/🔇 de esta pantalla y de la carrera muestran el mismo estado (PRD 022)
+        if (this.#audio) new window.BotonSonido(document.querySelectorAll('.btn-sonido'), this.#audio);
         document.getElementById('btn-correr').addEventListener('click', () => {
+            this.#audio?.despertar();
             this.#preferencias.guardar(this.#estado);
             this.#alCorrer?.();
         });
