@@ -125,7 +125,7 @@ export class Carro {
         }
         if (this.entradaAcel === -1) {
             if (v > 0.01) return Math.max(0, v - c.freno / c.masa * k);
-            return Math.max(-c.velMaxReversa, v - c.aceleracion * 0.6 / c.masa * k);
+            return Math.max(-c.velMaxReversa, v - c.aceleracionReversa / c.masa * k);
         }
         // Sin pedal: rodadura, aire y freno de motor (PRD 024)
         const u = v / c.velMaxAdelante;

@@ -12,6 +12,7 @@
 export class ConstantesFisica {
     static #FACTOR_ARRANQUE = 1.65;
     static #PARTE_FRENO_MOTOR = 0.1;
+    static #PARTE_REVERSA = 0.6;          // la marcha atrás no cambia con el PRD 024
 
     #velMaxAdelante;
     #velMaxReversa;
@@ -54,6 +55,7 @@ export class ConstantesFisica {
     get velMaxAdelante() { return this.#velMaxAdelante; }
     get velMaxReversa()  { return this.#velMaxReversa; }
     get aceleracion()    { return this.#aceleracion * ConstantesFisica.#FACTOR_ARRANQUE; }
+    get aceleracionReversa() { return this.#aceleracion * ConstantesFisica.#PARTE_REVERSA; }
     get freno()          { return this.#freno; }
     get frenoMotor()     { return this.#freno * ConstantesFisica.#PARTE_FRENO_MOTOR; }
     get rodadura()       { return this.#rodadura; }

@@ -44,7 +44,7 @@ Que el jugador arme el aspecto de sus controles a su gusto (timón y pedales) y 
 - Cómo se toca: la zona de giro, el recorrido de giro y los toques a la vez (PRD 016, D3, D4 y D7), y el control por teclado en PC, que no muestra timón ni pedales. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Los diseños vertical y horizontal y sus medidas (PRD 015 y 016, D9), y el lugar del velocímetro. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
 - Los dibujos de los 4 timones de hoy, los 4 velocímetros y su galería.
-- Test Drive, Diseño de Objetos y el garaje; en Diseño General y Diseño de Pistas solo se suman los 2 timones nuevos (D1) y, en Diseño de Pistas, el velocímetro de fábrica (D6).
+- Test Drive, Diseño de Objetos y el garaje; en Diseño General y Diseño de Pistas solo se suman los 2 timones nuevos (D1) y, en Diseño de Pistas, el velocímetro de fábrica (D6). *(Cambia según el PRD 024, D8: la física nueva también llega a ellas.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
@@ -55,7 +55,7 @@ Que el jugador arme el aspecto de sus controles a su gusto (timón y pedales) y 
 
 ## 6. Requerimientos funcionales
 - **RF-01 (D2):** en Ajustes → "Diseño de botones y pedales" hay un acceso a la galería de pedales, que muestra los 4 estilos con su nombre y su dibujo, y marca el elegido.
-- **RF-02 (D1, D3):** con el control de timón, al elegir un estilo de pedales y entrar a Jugar Solo, ACEL y FRENO se ven con ese estilo; sin elección previa se ve el Clásico, igual que hoy. En las otras pantallas los botones no cambian. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
+- **RF-02 (D1, D3):** con el control de timón, al elegir un estilo de pedales y entrar a Jugar Solo, ACEL y FRENO se ven con ese estilo; sin elección previa se ve el Clásico, igual que hoy. En las otras pantallas los botones no cambian.
 - **RF-03 (D3):** los 4 estilos se distinguen a simple vista por su forma o su borde, y en todos ACEL y FRENO conservan su texto o un ícono con su nombre.
 - **RF-04 (D4):** con cualquier estilo, en 390×844 y en 844×390, el área que se toca de ACEL y FRENO mide lo que pide el PRD 016 (72 px en vertical, 88 px en horizontal), en el mismo lugar y con la misma separación, y el velocímetro queda donde estaba.
 - **RF-05 (D4):** con cualquier estilo, el pedal apretado se ilumina y se ve hundido, y acelerar, frenar y girar a la vez funciona igual que hoy.

@@ -83,7 +83,7 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   const acel = { id: 1, ...(await caja(page, 'btn-acelerar')) }, freno = await caja(page, 'btn-freno');
 
   // RF-09: del toque en ACEL a que sube la velocidad
-    await tocar(cdp, 'touchStart', [acel]);
+  await tocar(cdp, 'touchStart', [acel]);
   await esperarEstado(page, () => window.__visor.entradaAcel === 1);
   await esperar(500);
   const arranque = await cuadrosHastaCambio(page, +1);
@@ -126,7 +126,7 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   // RF-09 con pocas imágenes por segundo (CPU 6 veces más lenta)
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: 6 });
   await esperar(500);
-    await tocar(cdp, 'touchStart', [acel]);
+  await tocar(cdp, 'touchStart', [acel]);
   await esperarEstado(page, () => window.__visor.entradaAcel === 1);
   await esperar(1500);
   const lento = await cuadrosHastaCambio(page, +1);

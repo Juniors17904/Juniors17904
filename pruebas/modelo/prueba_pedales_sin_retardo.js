@@ -2,6 +2,7 @@
 // CLASE: PruebaPedalesSinRetardo — PRD 024 (docs/prds/prd_024_pedales_sin_retardo.md)
 // En el modelo, comparando con lo medido antes de este PRD (tabla fija):
 //   RF-05 cada carro llega a la mitad de su velocidad en 0,5-0,7 s y su tope no cambia
+//   Lista D8: la marcha atrás tarda lo mismo que antes
 //   RF-06 el orden de rapidez al arrancar es el de antes
 //   RF-07 al soltar pierde la mitad de la velocidad más rápido que antes
 //   RF-08 frenar a fondo tarda lo mismo que antes
@@ -19,10 +20,11 @@ const vm   = require('vm');
 class PruebaPedalesSinRetardo {
     static #RAIZ = path.join(__dirname, '..', '..');
     static #PASO = 1000 / 60;
-    // Medido antes del PRD 024 (s): mitad de la velocidad, perder la mitad al soltar, frenar a 0; y tope
+    // Medido antes del PRD 024: mitad de la velocidad, perder la mitad al soltar y frenar a 0 (s),
+    // tope (unidades por paso) y pasos de marcha atrás hasta la mitad de su tope
     static #ANTES = {
-        formula:   [0.83, 0.60, 0.42], deportivo: [0.92, 0.68, 0.48], muscle: [1.00, 0.92, 0.65],
-        clasico:   [1.02, 0.73, 0.52], suv:       [1.05, 0.83, 0.58], pickup: [1.07, 0.88, 0.63],
+        formula:   [0.83, 0.60, 0.42, 0.82, 27], deportivo: [0.92, 0.68, 0.48, 0.80, 30], muscle: [1.00, 0.92, 0.65, 0.84, 32],
+        clasico:   [1.02, 0.73, 0.52, 0.74, 36], suv:       [1.05, 0.83, 0.58, 0.68, 41], pickup: [1.07, 0.88, 0.63, 0.70, 40],
     };
     #fallos = [];
     #RegistroCarros;
@@ -57,13 +59,13 @@ class PruebaPedalesSinRetardo {
     #probarFisica() {
         const reg = new this.#RegistroCarros();
         const fraccionA = {};
-        for (const [tipo, [mitad0, soltar0, frenar0]] of Object.entries(PruebaPedalesSinRetardo.#ANTES)) {
+        for (const [tipo, [mitad0, soltar0, frenar0, tope0, reversa0]] of Object.entries(PruebaPedalesSinRetardo.#ANTES)) {
             const carro = reg.crear(tipo, 0, 0, 0), max = carro.velMaxAdelante;
             const cruza = objetivo => (a, b) => (a < objetivo && b >= objetivo) || (a > objetivo && b <= objetivo) ? (objetivo - a) / (b - a) : null;
             const mitad = this.#tiempoHasta(carro, 1, cruza(max / 2));
             this.#ok(mitad >= 0.5 && mitad <= 0.7, `RF-05 ${tipo} llega a la mitad en ${mitad?.toFixed(2)} s (antes ${mitad0})`);
             for (let i = 0; i < 600; i++) { carro.entradaAcel = 1; carro.actualizar(PruebaPedalesSinRetardo.#PASO); }
-            this.#ok(Math.abs(carro.velocidad - max) < 1e-6, `RF-05 ${tipo} su tope no cambia (${carro.velocidad.toFixed(3)})`);
+            this.#ok(Math.abs(max - tope0) < 1e-9 && Math.abs(carro.velocidad - max) < 1e-6, `RF-05 ${tipo} su tope no cambia (${carro.velocidad.toFixed(3)}, antes ${tope0})`);
             const soltar = this.#tiempoHasta(carro, 0, cruza(max / 2));
             this.#ok(soltar !== null && soltar < soltar0 - 0.05, `RF-07 ${tipo} al soltar pierde la mitad en ${soltar?.toFixed(2)} s (antes ${soltar0})`);
             for (let i = 0; i < 600; i++) { carro.entradaAcel = 1; carro.actualizar(PruebaPedalesSinRetardo.#PASO); }
@@ -73,6 +75,11 @@ class PruebaPedalesSinRetardo {
             const otro = reg.crear(tipo, 0, 0, 0);
             for (let i = 0; i < 24; i++) { otro.entradaAcel = 1; otro.actualizar(PruebaPedalesSinRetardo.#PASO); }
             fraccionA[tipo] = otro.velocidad / otro.velMaxAdelante;
+            // La marcha atrás no cambia (lista de lo que NO se modifica)
+            const atras = reg.crear(tipo, 0, 0, 0), mitadAtras = -atras.constantes.velMaxReversa / 2;
+            let pasos = 0;
+            while (atras.velocidad > mitadAtras && pasos < 600) { atras.entradaAcel = -1; atras.actualizar(PruebaPedalesSinRetardo.#PASO); pasos++; }
+            this.#ok(pasos === reversa0, `D8 ${tipo} la marcha atrás tarda lo mismo que antes (${pasos} pasos, antes ${reversa0})`);
         }
         const ordenAntes = Object.keys(PruebaPedalesSinRetardo.#ANTES);   // del más rápido al más lento al arrancar
         const ordenAhora = Object.keys(fraccionA).sort((a, b) => fraccionA[b] - fraccionA[a]);
@@ -132,7 +139,7 @@ class PruebaPedalesSinRetardo {
 
     #probarDocumentos() {
         const prds = fs.readdirSync(path.join(PruebaPedalesSinRetardo.#RAIZ, 'docs/prds'));
-        for (const n of ['002', '004', '005', '006', '007', '008', '013', '016', '017', '018', '019', '020', '021', '022']) {
+        for (const n of ['001', '002', '004', '005', '006', '007', '008', '009', '010', '011', '012', '013', '014', '015', '016', '017', '018', '019', '020', '021', '022']) {
             const f = prds.find(x => x.startsWith(`prd_${n}`));
             this.#ok(f && /según el PRD 024/.test(this.#leer(`docs/prds/${f}`)), `RF-11 el PRD ${n} tiene la nota del PRD 024`);
         }
