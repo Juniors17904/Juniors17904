@@ -16,7 +16,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 |---|---|---|
 | D1 | Alcance | Entran tres cambios de física: el giro depende de la velocidad, el aire frena más cuanto más rápido se va y la aceleración baja al acercarse al tope. |
 | D2 | Alcance | Se aplica a las 5 pantallas que manejan un `Carro`: Jugar Solo (`VisorCarreraSolo`), Test Drive recto (`VisorTestdriveRecto`), Test Drive con ruta (`VisorTestdriveRuta`), Diseño de Pistas → Entrar (`VisorCarreraUrbana`) y Diseño General (`VisorDisenoPista`). *(v2: suma Diseño de Pistas)* |
-| D3 | Usuarios | Con el carro básico de referencia, la velocidad máxima y el tiempo de una vuelta en Ciudad quedan casi igual que hoy (±10 %). Las diferencias entre carros son del PRD 007. *(v2)* |
+| D3 | Usuarios | Con el carro básico de referencia, la velocidad máxima y el tiempo de una vuelta en Ciudad quedan casi igual que hoy (±10 %). Las diferencias entre carros son del PRD 007. *(v2)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)* |
 | D4 | Usuarios | El derrape y la inclinación se sienten como ahora: se ajustan números, no la idea. *(Se amplía según el PRD 019, D9: derrape al frenar en curva.)* |
 | D5 | Dominio | La física usa el tiempo real de cada paso. Los 5 visores avanzan con paso fijo de 60 Hz reutilizando `BuclePasoFijo`, que se mueve de `src/view/pistas/carrera_solo/` a `src/view/pistas/comun/`; hoy solo Jugar Solo lo usa. *(v2; v4 aprobado por el usuario)* |
 | D6 | Técnico | Se borra la clase `MovimientoLibre` (`movimiento_libre.js`, nadie la crea) y su reexportación en `model_fisica.js`. Se quita de `CLAUDE.md` (ejemplo MVC) y de los comentarios de `carro.js` que la nombran. |
@@ -41,7 +41,7 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 
 **Lista única de lo que NO se modifica:**
 - `CarreraVueltas`, `Cronometro`, `MuestraRuta` y la regla del pasto (este PRD no los toca; el pasto lo cambia el PRD 008).
-- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos y los velocímetros. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)* *(Los timones y los velocímetros: solo su ubicación cambia según el PRD 015, D12.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)*
+- `ControlTimon`, `ControlTeclado`, `CamaraSeguimiento`, los cielos y los velocímetros. *(`CamaraSeguimiento` sale de esta lista según el PRD 009, D12.)* *(Los timones y los velocímetros: solo su ubicación cambia según el PRD 015, D12.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - `HudCarrera`, la cuenta 3-2-1 y el resultado de Jugar Solo. *(`HudCarrera` y el resultado cambian según el PRD 013, D9: posición y tabla.)* *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
 - El modo "movimiento libre" de Test Drive con ruta (botón y tecla M): no depende de la clase `MovimientoLibre`.
 - `Ruta` y su reexportación en `model_fisica.js`. *(`Ruta` cambia según el PRD 014, D9: cierre suave de las pistas abiertas.)*
@@ -62,7 +62,7 @@ Que el carro responda como uno de verdad (gira cerrado a poca velocidad, abierto
 - **RF-03 (D1):** al soltar el pedal, el carro pierde velocidad más rápido cuando va rápido que cuando va lento, y termina detenido.
 - **RF-04 (D1):** acelerando a fondo desde cero, el carro gana velocidad más rápido al principio que cerca del tope.
 - **RF-05 (D3):** con el carro básico, la velocidad máxima en recta queda dentro de ±10 % de la actual.
-- **RF-06 (D3):** con el carro básico, una vuelta en Ciudad, con el mismo recorrido de prueba, tarda dentro de ±10 % de lo que tarda hoy.
+- **RF-06 (D3):** con el carro básico, una vuelta en Ciudad, con el mismo recorrido de prueba, tarda dentro de ±10 % de lo que tarda hoy. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - **RF-07 (D1):** frenar y la reversa funcionan como hoy: el freno detiene el carro y luego da marcha atrás con un tope menor.
 - **RF-08 (D4):** el carro sigue derrapando en curvas rápidas y se inclina hacia afuera de la curva. *(Se amplía según el PRD 019, D9: derrape al frenar en curva.)*
 - **RF-09 (D5):** en las 5 pantallas de D2, con el mismo recorrido, el carro llega al mismo lugar en una pantalla de 30, 60 o 120 Hz.

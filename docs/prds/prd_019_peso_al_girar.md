@@ -41,11 +41,11 @@ Que soltar el acelerador o frenar ayude a meter el carro en la curva, y que acel
 **Out of scope:** el giroscopio y el selector de control (B4), el turbo (B9), los sonidos (B6), el derrape visual nuevo (humo o marcas) y todo lo de la lista única de abajo. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
 
 **Lista única de lo que NO se modifica:**
-- La velocidad máxima, la aceleración, el freno, el aire y la rodadura de cada carro: `ConstantesFisica` y las 6 físicas no cambian.
+- La velocidad máxima, la aceleración, el freno, el aire y la rodadura de cada carro: `ConstantesFisica` y las 6 físicas no cambian. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Las personalidades de los rivales (nombre y estilo, PRD 013 D2).
 - El pasto, el piano y los choques (PRD 008, 010 y 011).
 - Las vueltas, `Cronometro`, `MuestraRuta` y `Ruta`.
-- La cámara, los controles, el HUD y `src/style.css`. *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
+- La cámara, los controles, el HUD y `src/style.css`. *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

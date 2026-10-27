@@ -5,8 +5,14 @@
 //   Las velocidades van en unidades por paso de referencia (1/60 s).
 //   Los valores por defecto son los del carro básico de referencia.
 //   Cada tipo de carro crea su propia instancia (PRD 007).
+//   PRD 024: el arranque de todos los carros es más vivo (un mismo factor,
+//   así se mantiene el orden y el pasto sigue cerca del 40 %) y al soltar
+//   el acelerador frenan un poco solos (freno de motor, una parte del freno).
 // ================================================================
 export class ConstantesFisica {
+    static #FACTOR_ARRANQUE = 1.65;
+    static #PARTE_FRENO_MOTOR = 0.1;
+
     #velMaxAdelante;
     #velMaxReversa;
     #aceleracion;
@@ -47,8 +53,9 @@ export class ConstantesFisica {
 
     get velMaxAdelante() { return this.#velMaxAdelante; }
     get velMaxReversa()  { return this.#velMaxReversa; }
-    get aceleracion()    { return this.#aceleracion; }
+    get aceleracion()    { return this.#aceleracion * ConstantesFisica.#FACTOR_ARRANQUE; }
     get freno()          { return this.#freno; }
+    get frenoMotor()     { return this.#freno * ConstantesFisica.#PARTE_FRENO_MOTOR; }
     get rodadura()       { return this.#rodadura; }
     get aire()           { return this.#aire; }
     get direccion()      { return this.#direccion; }
@@ -57,5 +64,5 @@ export class ConstantesFisica {
     get masa()           { return this.#masa; }
     get agarre()         { return this.#agarre; }
     // Fuerza del motor por unidad de masa: cuánto empuja de verdad
-    get empuje()         { return this.#aceleracion / this.#masa; }
+    get empuje()         { return this.aceleracion / this.#masa; }
 }

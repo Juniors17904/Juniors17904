@@ -6,8 +6,8 @@
 // base. Igual usan la física de su carro, sin pasar su tope (D4).
 // ================================================================
 class DificultadDificil extends window.DificultadCarrera {
-    static #RITMO_BASE   = 1.1;
-    static #RITMO_MAXIMO = 1.15;
+    static #RITMO_BASE   = 1.15;
+    static #RITMO_MAXIMO = 1.2;
 
     get clave()         { return 'dificil'; }
     get nombre()        { return 'Difícil'; }

@@ -194,12 +194,12 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
-- `src/view/controles/` → `ControlEntrada` + subclases + timones; también `RespuestaToque` (el botón apretado se ilumina y vibra) y `EstiloControlesCarrera` (lleva las medidas de cada diseño a los controles de la carrera), del PRD 016
+- `src/view/controles/` → `ControlEntrada` + subclases + timones; también `RespuestaToque` (el botón apretado se ilumina y vibra) y `EstiloControlesCarrera` (lleva las medidas de cada diseño a los controles de la carrera), del PRD 016; y `DeslizadorPedales` (deslizar el dedo entre ACEL y FRENO en Jugar Solo, PRD 024)
 - `src/view/velocimetros/` → `Velocimetro` + subclases
 - `src/view/minimapas/` → `MinimapBase` + subclases, y `MapaConduccion` / `ParMapasConduccion` + subclases; `PuntoCarroMapa` (lugar y color de un carro en `MinimapaCarrera`, PRD 017)
 - `src/view/paneles/` → `PanelDatos` + subclases
 - `src/view/pistas/` → visores de pista (uno por pantalla, todos independientes); `src/view/pistas/comun/` → piezas que comparten (`BuclePasoFijo`, `ConductorPasoFijo` y el piso de la pista del PRD 012: `ConstructorPisoPista` con sus ayudantes `TrazadoPiso`, `TrazadoPisoCurva`, `TrazadoPisoRecto`, `PuntoPiso` y `AcumuladorGeometria`)
-- `src/model/carros/` → `Carro` + subclases, `ConstantesFisica`, `RegistroCarros` y `TransferenciaPeso` (cuánto peso pasa adelante o atrás según el pedal, PRD 019)
+- `src/model/carros/` → `Carro` + subclases, `ConstantesFisica`, `RegistroCarros` y `TransferenciaPeso` (cuánto peso pasa adelante o atrás según el pedal, PRD 019). El arranque y el freno de motor de todos los carros viven en `ConstantesFisica` (PRD 024)
 - `src/model/superficies/` → `Superficie` + subclases y `DetectorSuperficie`
 - `src/model/choques/` → `ObjetoSolido` + subclases, `FabricaObjetosSolidos`, `DetectorChoques`, `RectanguloCarro` y `PuntoChoque`
 - `src/model/cierre/` → camino de vuelta de las pistas abiertas (PRD 014): `PoseCierre`, `TrayectoDubins`, `ContornoPista`, `CierrePistaAbierta` y `FlechasCierre`. La vuelta entera la arma `TrazadoVuelta` (`src/model/trazado_vuelta.js`) y la usan `Ruta` y los mapas

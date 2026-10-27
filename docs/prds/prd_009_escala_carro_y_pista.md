@@ -43,13 +43,13 @@ Que cada carro y la pista tengan tamaños reales y coherentes, guardados en un s
 **Out of scope:** árboles, postes y señales y su posición (PRD 010), flechas, balizas y arcos (PRD 011), relieve del piano y espesores (PRD 012), cambios de física (PRD 006) y todo lo de la lista única de abajo.
 
 **Lista única de lo que NO se modifica:**
-- La física: `Carro`, `ConstantesFisica` y las 6 físicas del PRD 007 (D9). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
+- La física: `Carro`, `ConstantesFisica` y las 6 físicas del PRD 007 (D9). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Las vueltas, los puntos de control, `Cronometro` y `MuestraRuta`.
 - Los datos de cada pista (`ConfigPista*`), `FabricaObjetoEscena` y sus objetos de escena. *(Cambian según el PRD 010, D9: árbol, poste, señal y su distancia.)* *(También según el PRD 011, D11: señalética.)*
 - Los archivos de los modelos 3D (GLB) y `PerfilCarro`.
 - Los cielos y su niebla (D8).
 - `VistaConduccion`, `DeslizadorAlturaCamara` y los rangos de los deslizadores de altura (D7).
-- `ControlTimon`, `ControlTeclado`, los velocímetros, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Según el PRD 015, D12: de `ControlTimon`, `ControlTeclado` y los velocímetros solo cambia su ubicación; `HudCarrera` y `src/style.css` cambian para el diseño horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)*
+- `ControlTimon`, `ControlTeclado`, los velocímetros, `HudCarrera` y `src/style.css`. *(`HudCarrera` y `src/style.css` —solo agregar reglas— cambian según el PRD 013, D9: posición y tabla.)* *(Según el PRD 015, D12: de `ControlTimon`, `ControlTeclado` y los velocímetros solo cambia su ubicación; `HudCarrera` y `src/style.css` cambian para el diseño horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
