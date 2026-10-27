@@ -36,6 +36,7 @@ class DeslizadorPedales {
     destruir() {
         for (const [el, tipo, fn] of this.#escuchas) el.removeEventListener(tipo, fn);
         this.#escuchas = [];
+        if (this.#dedo !== null) for (const b of [this.#acel, this.#freno]) b.classList.remove('apretado');
         this.#dedo = null;
     }
 
