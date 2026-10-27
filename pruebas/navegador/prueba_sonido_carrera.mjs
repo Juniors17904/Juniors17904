@@ -49,6 +49,7 @@ const espiarAudio = () => {
         window.__audio.osciladores.push(registro);
         const start = o.start.bind(o), stop = o.stop.bind(o), fijar = o.frequency.setValueAtTime.bind(o.frequency);
         o.frequency.setValueAtTime = (v, t) => { registro.freq = v; return fijar(v, t); };   // la frecuencia pedida (value no la muestra aún)
+        o.addEventListener('ended', () => { registro.sonando = false; });   // los tonos cortos terminan solos
         o.start = (...x) => { registro.tipo = o.type; registro.freq ||= o.frequency.value; registro.sonando = true; return start(...x); };
         o.stop = (...x) => { if (!x.length || x[0] <= this.currentTime + 0.001) registro.sonando = false; return stop(...x); };
         return o;
@@ -83,6 +84,10 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
     if (!localStorage.getItem('__prueba_limpia')) { localStorage.removeItem('tr_sonido'); localStorage.setItem('__prueba_limpia', '1'); }
   });
   await ctx.addInitScript(espiarAudio);
+  await ctx.addInitScript(() => window.addEventListener('load', () => {
+    const dibujar = window.RenderizadorVelocimetro.dibujar.bind(window.RenderizadorVelocimetro);
+    window.RenderizadorVelocimetro.dibujar = (c, cx, cy, r, ...resto) => { window.__velocimetro = { x: cx - r, y: cy - r, r: cx + r, b: cy + r }; return dibujar(c, cx, cy, r, ...resto); };
+  }));
   let { page, errores } = await abrir(ctx);
   await clic(page, 'btn-solo'); await esperar(300);
   check((await page.evaluate(() => window.__audio.contextos.length)) === 0, `D7 (${nombre}) sin tocar "¡Correr!" no hay audio`);
@@ -97,10 +102,14 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   const pitidos = sonidos.filter(o => o.tipo === 'square' && (o.freq === 440 || o.freq === 880));
   check(pitidos.filter(o => o.freq === 440).length === 3 && pitidos.filter(o => o.freq === 880).length === 1, `RF-02 (${nombre}) tres pitidos y uno más agudo en ¡YA! (${pitidos.map(o => o.freq)})`);
   check(sonidos.some(o => o.tipo === 'sawtooth' && o.sonando), `RF-01 (${nombre}) con ¡YA! suena el motor`);
+  const motores = sonidos.filter(o => o.tipo === 'sawtooth' && o.sonando).length;
+  const hayRivales = await page.evaluate(() => document.getElementById('minimapa-carrera-solo') && true);
+  check(motores === 1 && hayRivales, `RF-06 (${nombre}) con 4 rivales en la pista suena un solo motor, el del jugador (${motores})`);
   // RF-07: el botón de la carrera no tapa nada
   const m = { boton: await caja(page, 'btn-sonido-carrera'), mapa: await caja(page, 'minimapa-carrera-solo'), acel: await caja(page, 'btn-acelerar'),
-    freno: await caja(page, 'btn-freno'), timon: await caja(page, 'canvas-timon') };
-  check(m.boton && m.boton.y >= 52 && m.boton.x >= 0 && ![m.mapa, m.acel, m.freno, m.timon].some(b => solapa(m.boton, b)),
+    freno: await caja(page, 'btn-freno'), timon: await caja(page, 'canvas-timon'), vel: await page.evaluate(() => window.__velocimetro ?? null) };
+  check([m.mapa, m.acel, m.freno, m.timon, m.vel].every(Boolean), `RF-07 (${nombre}) se midieron el mapa, el velocímetro y los controles`);
+  check(m.boton && m.boton.y >= 52 && m.boton.x >= 0 && ![m.mapa, m.acel, m.freno, m.timon, m.vel].some(b => solapa(m.boton, b)),
     `RF-07 (${nombre}) el botón de la carrera queda bajo la barra y no tapa el mapa ni los controles (${JSON.stringify(m.boton)})`);
   await page.screenshot({ path: `${CARPETA}/carrera_${nombre}.png` });
   // RF-08: 🔇 deja el volumen general en cero
@@ -133,6 +142,24 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   await page.screenshot({ path: `${CARPETA}/preparar_${nombre}.png` });
   const reales = erroresReales(errores);
   check(reales.length === 0, `(${nombre}) sin errores de consola ` + reales.join(' | '));
+  await ctx.close();
+}
+
+// ── RF-10: después de correr, en Diseño General no suena nada ──
+{
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  await ctx.addInitScript(espiarAudio);
+  const { page, errores } = await abrir(ctx);
+  await clic(page, 'btn-solo'); await esperar(300);
+  await page.click('#btn-correr');
+  await esperarCarrera(page);
+  await page.goBack(); await esperar(400); await page.goBack(); await esperar(400);
+  await clic(page, 'btn-garage'); await esperar(300);
+  await clic(page, 'btn-ir-diseno-general'); await esperar(2500);
+  const despues = await page.evaluate(() => ({ activa: document.querySelector('.pantalla.activa')?.id, sonando: window.__audio.osciladores.filter(o => o.sonando).length }));
+  check(despues.activa === 'pantalla-diseno-general' && despues.sonando === 0, `RF-09/RF-10 después de correr, en Diseño General no suena nada (${JSON.stringify(despues)})`);
+  const reales = erroresReales(errores);
+  check(reales.length === 0, 'Diseño General sin errores de consola ' + reales.join(' | '));
   await ctx.close();
 }
 

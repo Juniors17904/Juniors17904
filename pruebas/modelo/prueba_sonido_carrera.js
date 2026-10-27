@@ -114,9 +114,12 @@ class PruebaSonidoCarrera {
         visor.velocidad = -0.21; s.escuchar(visor);
         this.#ok(golpe === 2 && r.osciladores.length === antes + 2, 'RF-04 un choque suena una sola vez');
         // Página oculta y vuelta
+        const reanudasAntes = r.reanudar;
         c.document.hidden = true; this.#escuchas.visibilitychange();
         c.document.hidden = false; this.#escuchas.visibilitychange();
-        this.#ok(r.suspender === 1 && r.reanudar >= 1, 'RF-09 con la página oculta se pausa y con la carrera en curso vuelve');
+        this.#ok(r.suspender === 1 && r.reanudar === reanudasAntes + 1, 'RF-09 con la página oculta se pausa y con la carrera en curso vuelve');
+        this.#escuchas['w:pagehide']();
+        this.#ok(r.suspender === 2 && r.reanudar === reanudasAntes + 1, 'RF-09 al salir de la página (pagehide) se pausa, no se reanuda');
         // Meta sin récord y con récord
         const enMeta = r.osciladores.length;
         s.meta(false);
@@ -167,6 +170,10 @@ class PruebaSonidoCarrera {
         this.#ok(o.hayChoque({ velocidad: -0.02, pasosUltimoFrame: 5, entradaAcel: -1 }, 400) === false, 'RF-04 frenar hasta la reversa en un cuadro lento no es un choque');
         o.reiniciar(); o.hayChoque(v(0.9), 1000);
         this.#ok(o.hayChoque(v(0.4), 1016) === true, 'RF-04 una frenada brusca que no viene del pedal es un choque');
+        o.hayChoque(v(0.9), 1032);
+        this.#ok(o.hayChoque(v(0.3), 1100) === false, 'RF-04 dos golpes seguidos (menos de 300 ms) suenan una sola vez');
+        o.hayChoque(v(0.9), 1400);
+        this.#ok(o.hayChoque(v(0.3), 1500) === true, 'RF-04 pasado el ratito, otro choque vuelve a sonar');
         this.#ok(o.hayDerrape({ velocidad: 0.9, velocidadMaxBase: 1, entradaAcel: 0, entradaDireccion: 1 }) === true
             && o.hayDerrape({ velocidad: 0.2, velocidadMaxBase: 1, entradaAcel: -1, entradaDireccion: 1 }) === false,
             'RF-03 girar a fondo yendo rápido derrapa; despacio, no');

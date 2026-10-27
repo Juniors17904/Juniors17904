@@ -17,6 +17,7 @@ class SonidosCarrera {
     #oido = new window.OidoCarrera();
     #enCurso = false;
     #alCambiarVisibilidad = () => this.#cambioVisibilidad();
+    #alSalirDePagina      = () => this.#audio?.suspender();   // pagehide: siempre pausa
 
     constructor(audio) {
         this.#audio   = audio ?? null;
@@ -26,7 +27,7 @@ class SonidosCarrera {
         this.#choque  = new window.SonidoChoque(audio);
         this.#meta    = new window.SonidoMeta(audio);
         document.addEventListener('visibilitychange', this.#alCambiarVisibilidad);
-        window.addEventListener('pagehide', this.#alCambiarVisibilidad);
+        window.addEventListener('pagehide', this.#alSalirDePagina);
     }
 
     cuenta(texto) {
@@ -56,7 +57,7 @@ class SonidosCarrera {
     destruir() {
         this.#callarTodo();
         document.removeEventListener('visibilitychange', this.#alCambiarVisibilidad);
-        window.removeEventListener('pagehide', this.#alCambiarVisibilidad);
+        window.removeEventListener('pagehide', this.#alSalirDePagina);
     }
 
     // También los tonos cortos que sigan sonando (la fanfarria al tocar Menú o Revancha)
