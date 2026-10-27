@@ -50,7 +50,7 @@ class PruebaModosDificultad {
         const archivos = ['medida_carro.js', 'medidas_escena.js', 'muestra_ruta.js', 'superficies/superficie.js',
             'superficies/superficie_asfalto.js', 'superficies/superficie_piano.js', 'superficies/superficie_pasto.js',
             'superficies/detector_superficie.js', 'carrera_vueltas.js', 'cronometro.js', 'registro_pistas.js',
-            'pistas/config_pista.js', 'pistas/config_pista_ciudad.js', 'pistas/config_pista_costa.js', 'estado_juego.js',
+            'pistas/config_pista.js', 'pistas/config_pista_ciudad.js', 'pistas/config_pista_costa.js', 'catalogo_controles.js', 'estado_juego.js',
             'modos_carrera/modo_carrera.js', 'modos_carrera/modo_contra_pc.js', 'modos_carrera/modo_contrarreloj.js',
             'dificultades/dificultad_carrera.js', 'dificultades/dificultad_facil.js', 'dificultades/dificultad_normal.js',
             'dificultades/dificultad_dificil.js', 'eleccion_carrera.js', 'catalogo_carrera.js', 'preferencias_carrera.js'];

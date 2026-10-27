@@ -3,7 +3,8 @@ try {
 
 // ================================================================
 // VIEW — RenderizadorTimon  (antes TimonRenderer)
-// Orquesta los 4 modelos de timón. Cada modelo es una clase propia.
+// Orquesta los 6 modelos de timón. Cada modelo es una clase propia.
+// Rally y Camión van al final (PRD 021, D5): los 4 de hoy no se mueven.
 // ================================================================
 class RenderizadorTimon {
     static MODELOS = [
@@ -11,6 +12,8 @@ class RenderizadorTimon {
         new TimonDeportivo(),
         new TimonF1(),
         new TimonRetro(),
+        new TimonRally(),
+        new TimonCamion(),
     ];
 
     static dibujar(ctx, S, indice) {

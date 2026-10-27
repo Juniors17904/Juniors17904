@@ -173,10 +173,11 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `ControlEntrada` | `ControlTimon`, `ControlTeclado` | `activar(cir)`, `destruir()` |
 | `ConfigPista` | `ConfigPistaCiudad`, `ConfigPistaDesierto`, … | `nombre`, `tramos`, `totalSegs` |
 | `Velocimetro` | `VelocimetroClasico`, `VelocimetroF1`, … | `dibujar(ctx, S, vel)` |
-| `Timon` | `TimonClasico`, `TimonDeportivo`, … | `dibujar(ctx, S)` |
+| `Timon` | `TimonClasico`, `TimonDeportivo`, `TimonF1`, `TimonRetro` ("Vintage"), `TimonRally`, `TimonCamion` (los 2 últimos del PRD 021; los dibuja `RenderizadorTimon` por número, en el orden de `CatalogoControles`) | `dibujar(ctx, S)` |
+| `EstiloPedales` | `PedalesClasicos`, `PedalesDeportivos`, `PedalesF1`, `PedalesRetro` (los entrega `RegistroEstilosPedales` por clave; los muestra `GaleriaPedales` y los aplica `EstiloControlesCarrera` solo en Jugar Solo, PRD 021) | `clave`, `nombre`, `claseCss`, `aplicarA(elementos)`, `quitar()` |
 | `VisorBase` | `VisorTestdriveRecto`, `VisorTestdriveRuta`, `VisorCarreraUrbana`, `VisorDisenoPista`, `VisorCarreraSolo`, `Visor3D` (vista previa del garaje) | (utilidades Three.js) |
 | `MinimapBase` | `MinimapaDisenoGeneral`, `MinimapaCarrera` (minimapa de una carrera 3D con un punto por carro, PRD 017) | `setCircuito(cfg)`, `dibujar(ctx, …)` |
-| `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorPrepararCarrera` ("Preparar carrera" de Jugar Solo, PRD 018), `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos` | `iniciar()`, `detener()`, `irA(id)` |
+| `ControladorPantalla` | `ControladorInicio`, `ControladorAjustes`, `ControladorGaraje`, `ControladorGiroscopio`, `ControladorPistas`, `ControladorPrepararCarrera` ("Preparar carrera" de Jugar Solo, PRD 018), `ControladorDisenoPistas`, `ControladorTestDrive3D`, `ControladorControles`, `ControladorPedales` (galería "Elige tus pedales", PRD 021), `ControladorVelocimetro`, `ControladorVistaConduccion`, `ControladorDisenoGeneral`, `ControladorDisenoObjetos` | `iniciar()`, `detener()`, `irA(id)` |
 | `ControladorPantallaJuego` (hereda de `ControladorPantalla`) | `ControladorTestDrive3D`, `ControladorDisenoPistas` | `tieneVisor`, `ocupaPantallaJuego`, `cancelarArranque()` |
 | `DestinoCircuito3D` | `DestinoCarreraUrbana`, `DestinoTestDriveRuta` | `claseVisor`, `titulo`, `origen` |
 | `MapaConduccion` | `MinimapaCircuito3D`, `RecorridoCircuito3D`, `MinimapaTestDriveRecto`, `RecorridoTestDriveRecto` | `mostrar()`, `dibujar(visor)`, `visible` |
@@ -194,7 +195,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 | `PilotoPC` | `PilotoPrudente`, `PilotoAgresivo`, `PilotoNovato`, `PilotoExperto` (los crea `CarreraConRivales`, PRD 013) | `nombre`, `tipoAuto`, `color`, `progreso`, `decidir(carro, ritmo)`, `ubicar(carro)` |
 
 **Carpetas de jerarquías** — cada familia vive en su propia carpeta:
-- `src/view/controles/` → `ControlEntrada` + subclases + timones; también `RespuestaToque` (el botón apretado se ilumina y vibra) y `EstiloControlesCarrera` (lleva las medidas de cada diseño a los controles de la carrera), del PRD 016
+- `src/view/controles/` → `ControlEntrada` + subclases + timones; también `RespuestaToque` (el botón apretado se ilumina y vibra) y `EstiloControlesCarrera` (lleva las medidas de cada diseño a los controles de la carrera), del PRD 016; y `EstiloPedales` + subclases, `RegistroEstilosPedales` y `GaleriaPedales` (estilos de pedales, PRD 021)
 - `src/view/velocimetros/` → `Velocimetro` + subclases
 - `src/view/minimapas/` → `MinimapBase` + subclases, y `MapaConduccion` / `ParMapasConduccion` + subclases; `PuntoCarroMapa` (lugar y color de un carro en `MinimapaCarrera`, PRD 017)
 - `src/view/paneles/` → `PanelDatos` + subclases
@@ -205,6 +206,7 @@ this.#control.activar(circuito); // funciona igual con cualquier subclase
 - `src/model/cierre/` → camino de vuelta de las pistas abiertas (PRD 014): `PoseCierre`, `TrayectoDubins`, `ContornoPista`, `CierrePistaAbierta` y `FlechasCierre`. La vuelta entera la arma `TrazadoVuelta` (`src/model/trazado_vuelta.js`) y la usan `Ruta` y los mapas
 - `src/model/pilotos/` → `PilotoPC` + subclases y `Rival` (PRD 013)
 - `src/model/modos_carrera/` → `ModoCarrera` + subclases; `src/model/dificultades/` → `DificultadCarrera` + subclases (PRD 018). La elección entera es `EleccionCarrera`; `CatalogoCarrera` lista las opciones y `PreferenciasCarrera` recuerda la última (en `src/model/`)
+- Timón y pedales elegidos (PRD 021): `CatalogoControles` (las claves de timones y pedales; lo desconocido cae en Clásico) y `PreferenciasControles` (los recuerda al recargar, clave `tr_controles`), en `src/model/`
 - Récords por pista (PRD 020): `RecordPista` y `RegistroRecords` en `src/model/`; en la vista, `TextoRecordPista` (cómo se lee el récord) y `AvisoRecord` (el récord y "¡Nuevo récord!" en el resultado), en `src/view/`
 - `src/view/sonidos/` → `EfectoSonido` + subclases, `SonidosCarrera` (todos los sonidos de una carrera), `OidoCarrera` (reconoce choques y derrapes), `AudioJuego` (el audio de la partida y su silencio), `PreferenciaSonido` (recuerda 🔊/🔇) y `BotonSonido` (PRD 022)
 - `src/view/disenos/` → `DisenoCarrera` + subclases, `SelectorDisenoCarrera` y `AdaptadorDisenoCarrera`: cómo se acomoda una carrera 3D en vertical u horizontal (PRD 015); sirven para cualquier carrera 3D, también el multijugador futuro

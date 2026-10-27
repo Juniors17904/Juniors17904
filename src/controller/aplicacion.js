@@ -12,6 +12,7 @@ class Aplicacion {
     #vistaConduccion    = new VistaConduccion().cargar();
     #carreraSolo        = null;
     #preferenciasCarrera = new PreferenciasCarrera();   // PRD 018: recuerda la última elección de Jugar Solo
+    #preferenciasControles = new PreferenciasControles();   // PRD 021: recuerda el timón y los pedales
     #audio              = new AudioJuego();             // PRD 022: el sonido de la partida y su silencio
     #modos              = new ModosDisponibles();   // PRD 002 D8: decide qué modos se ven y se abren
 
@@ -22,6 +23,7 @@ class Aplicacion {
     #pistas                     = null;
     #prepararCarrera            = null;   // PRD 018: "Preparar carrera" antes de Jugar Solo
     #controles                  = null;
+    #pedales                    = null;   // PRD 021: galería de pedales
     #velocimetro                = null;
     #controladorVistaConduccion = null;
     #testDrive3D                = null;
@@ -125,6 +127,7 @@ class Aplicacion {
     #crearControladoresDePantalla() {
         const navegar = id => this.#mostrar(id);
         const limpiarPantallaJuego = () => this.#limpiadorJuego.limpiar();
+        this.#preferenciasControles.cargar(this.#estado);   // PRD 021, RF-08
         this.#disenoPistas  = new ControladorDisenoPistas(this.#estado, this.#vistaConduccion,
             navegar, limpiarPantallaJuego);
         this.#testDrive3D   = new ControladorTestDrive3D(this.#estado, navegar,
@@ -133,7 +136,8 @@ class Aplicacion {
         this.#garaje        = new ControladorGaraje(this.#estado, navegar);
         this.#disenoGeneral = new ControladorDisenoGeneral(this.#estado, this.#vistaConduccion, navegar);
         this.#disenoObjetos = new ControladorDisenoObjetos(navegar);
-        this.#controles   = new ControladorControles(this.#estado, navegar);
+        this.#controles   = new ControladorControles(this.#estado, navegar, this.#preferenciasControles);
+        this.#pedales     = new ControladorPedales(this.#estado, navegar, this.#preferenciasControles);
         this.#preferenciasCarrera.cargar(this.#estado);
         this.#prepararCarrera = new ControladorPrepararCarrera(this.#estado, navegar,
             this.#preferenciasCarrera, () => this.#iniciarCarreraSolo(), this.#audio);
@@ -149,6 +153,7 @@ class Aplicacion {
 
         this.#inicio.iniciar();
         this.#controles.iniciar();
+        this.#pedales.iniciar();
         this.#velocimetro.iniciar();
         this.#ajustes.iniciar();
         this.#giroscopio.iniciar();

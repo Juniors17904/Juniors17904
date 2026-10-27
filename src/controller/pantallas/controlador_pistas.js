@@ -34,16 +34,7 @@ class ControladorPistas extends ControladorPantalla {
         document.querySelectorAll('.pista-card').forEach(c => c.classList.remove('sel'));
         card.classList.add('sel');
         this.#estado.pista = card.dataset.pista;
-        // Cada circuito tiene su timón predeterminado: ciudad → Clásico (0)
-        const timonDePista = { ciudad: 0 };
-        if (timonDePista[card.dataset.pista] !== undefined) {
-            this.#estado.timonModelo = timonDePista[card.dataset.pista];
-        }
-        // Cada circuito tiene su velocímetro predeterminado: ciudad → F1 (2)
-        const velocimetroDePista = { ciudad: 2 };
-        if (velocimetroDePista[card.dataset.pista] !== undefined) {
-            this.#estado.velocimetroModelo = velocimetroDePista[card.dataset.pista];
-        }
+        // PRD 021 (D6, RF-09): elegir una pista no cambia el timón ni el velocímetro
         document.getElementById('detalle-pista-nombre').textContent =
             card.querySelector('.pista-nombre').textContent;
         document.getElementById('detalle-pista-desc').textContent =

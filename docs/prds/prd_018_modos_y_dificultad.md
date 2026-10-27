@@ -42,7 +42,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 - La física de los carros, los choques, las vueltas y el cronómetro (PRD 006 a 012). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)*
 - Las personalidades de los rivales (PRD 013, D2) y su manejo natural sin trampa (D3). *(Su manejo natural se puede ajustar según el PRD 019, D9, sin cambiar las personalidades.)*
 - Las pistas, el piso, los objetos, la señalética y el camino de vuelta (PRD 009 a 014).
-- Los diseños vertical y horizontal, los controles y el minimapa (PRD 015 a 017), salvo lo que dicen D6 y D8. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
+- Los diseños vertical y horizontal, los controles y el minimapa (PRD 015 a 017), salvo lo que dicen D6 y D8. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles cambian según el PRD 021, D9: estilos de timón y pedales.)*
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
 
 ## 5. Conceptos de dominio
@@ -84,7 +84,7 @@ Que el jugador arme su carrera antes de correr: con quién corre, dónde y qué 
 - **Llegada pareja:** en Difícil los rivales ya no esperan, así que pueden llegar muy separados del jugador; es lo buscado.
 - **Margen de Difícil:** varios rivales ya van al tope de su carro en las rectas; en Difícil ganan sobre todo en las curvas y porque no aflojan. La diferencia con Normal es real pero moderada.
 - **Lugar en el visor:** el visor está en 376 de 400 líneas; si la cantidad de rivales lo hace crecer, se saca código a clases nuevas (D7).
-- **Pista elegida en dos lugares:** la pantalla Pistas y "Preparar carrera" comparten la pista elegida mientras el juego está abierto; tras recargar, la que se recuerda es la de "Preparar carrera". La pantalla Pistas no cambia (sigue marcando su tarjeta y ajustando timón y velocímetro como antes).
+- **Pista elegida en dos lugares:** la pantalla Pistas y "Preparar carrera" comparten la pista elegida mientras el juego está abierto; tras recargar, la que se recuerda es la de "Preparar carrera". La pantalla Pistas no cambia (sigue marcando su tarjeta y ajustando timón y velocímetro como antes). *(Cambia según el PRD 021, D9: la pantalla Pistas ya no ajusta el timón ni el velocímetro.)*
 
 ### Historial
 - **v1** (2026-10-26): primera versión, con las 8 decisiones aprobadas por el usuario (opción A).

@@ -2,8 +2,10 @@
 
 // ================================================================
 // CLASE: EstadoJuego — lo que el jugador eligió y que comparten las
-// pantallas: nombre, color y tipo de carro, control, modelos de timón
-// y velocímetro, pista y cómo quiere correr en Jugar Solo (EleccionCarrera, PRD 018).
+// pantallas: nombre, color y tipo de carro, control, timón, estilo de
+// pedales y velocímetro, pista y cómo quiere correr en Jugar Solo (EleccionCarrera, PRD 018).
+// El timón y los pedales se guardan por su clave (PRD 021, D7); el número
+// del timón para dibujarlo lo traduce CatalogoControles.
 // Aplicacion crea una sola instancia y se la pasa a los controladores.
 // Los datos son privados; cada uno se lee y se cambia por su propiedad.
 // ================================================================
@@ -11,7 +13,9 @@ class EstadoJuego {
     #nombre            = 'Jugador';
     #color             = '#ef4444';
     #control           = 'botones';
-    #timonModelo       = 0;
+    #catalogoControles = new window.CatalogoControles();
+    #timon             = 'clasico';    // clave; la carga PreferenciasControles (PRD 021)
+    #estiloPedales     = 'clasicos';   // clave; la carga PreferenciasControles (PRD 021)
     #velocimetroModelo = 0;
     #tipoAuto          = 'deportivo';
     #pista             = 'ciudad';
@@ -26,8 +30,15 @@ class EstadoJuego {
     get control()           { return this.#control; }
     set control(valor)      { this.#control = valor; }
 
-    get timonModelo()       { return this.#timonModelo; }
-    set timonModelo(valor)  { this.#timonModelo = valor; }
+    get timon()             { return this.#timon; }
+    set timon(clave)        { this.#timon = this.#catalogoControles.timonValido(clave); }
+
+    // Lugar del timón en la lista de RenderizadorTimon (para dibujarlo)
+    get timonModelo()       { return this.#catalogoControles.indiceTimon(this.#timon); }
+    set timonModelo(indice) { this.#timon = this.#catalogoControles.claveTimon(indice); }
+
+    get estiloPedales()      { return this.#estiloPedales; }
+    set estiloPedales(clave) { this.#estiloPedales = this.#catalogoControles.pedalesValidos(clave); }
 
     get velocimetroModelo()      { return this.#velocimetroModelo; }
     set velocimetroModelo(valor) { this.#velocimetroModelo = valor; }

@@ -6,7 +6,8 @@ try {
 // carrera de acuerdo con la forma de la pantalla (PRD 015, D2 y D8).
 // Lo aplica al crearse y cada vez que la pantalla cambia de tamaño o se
 // gira el celular, sin tocar la carrera. También lleva las medidas del
-// diseño a los controles (EstiloControlesCarrera, PRD 016). destruir()
+// diseño a los controles (EstiloControlesCarrera, PRD 016) junto con el
+// estilo de pedales que le pasen (PRD 021, D7). destruir()
 // deja de escuchar y devuelve los controles a su estilo de siempre.
 // ================================================================
 class AdaptadorDisenoCarrera {
@@ -15,9 +16,11 @@ class AdaptadorDisenoCarrera {
     #alCambiar;
     #estiloControles = null;   // EstiloControlesCarrera (si hay controles en la página)
 
-    constructor(pantalla) {
+    constructor(pantalla, clavePedales = null) {
         this.#pantalla  = pantalla;
-        if (window.EstiloControlesCarrera && window.document) this.#estiloControles = new window.EstiloControlesCarrera(window.document);
+        if (window.EstiloControlesCarrera && window.document) {
+            this.#estiloControles = new window.EstiloControlesCarrera(window.document, clavePedales);
+        }
         this.#alCambiar = () => this.#aplicar();
         window.addEventListener('resize', this.#alCambiar);
         window.addEventListener('orientationchange', this.#alCambiar);

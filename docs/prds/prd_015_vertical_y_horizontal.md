@@ -14,7 +14,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 
 | # | Categoría | Decisión |
 |---|---|---|
-| D1 | Alcance | Solo Jugar Solo. Test Drive, Diseño de Pistas y Diseño General ya funcionan en horizontal y no cambian: el estilo horizontal de los controles (que son comunes a todas las pantallas) vale solo mientras la carrera está activa. |
+| D1 | Alcance | Solo Jugar Solo. Test Drive, Diseño de Pistas y Diseño General ya funcionan en horizontal y no cambian: el estilo horizontal de los controles (que son comunes a todas las pantallas) vale solo mientras la carrera está activa. *(El timón elegido también se ve en Diseño General y en Diseño de Pistas → Entrar, según el PRD 021, D9: estilos de timón y pedales.)* |
 | D2 | Alcance | Se puede jugar con el celular en vertical o en horizontal. Al girarlo en plena carrera, la carrera **sigue sin pausa**: no se reinicia, el cronómetro sigue y los rivales siguen. |
 | D3 | Alcance | No se bloquea la orientación ni aparece un aviso de "gira tu celular". Se borra el estilo del aviso viejo `#pantalla-rotar`, que quedó sin uso. |
 | D4 | Usuarios | El diseño **vertical** queda igual que hoy (PRD 001, D10). *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* |
@@ -40,13 +40,13 @@ Que Jugar Solo se juegue cómodo con el celular en cualquier posición, y que gi
 ## 4. Alcance
 **In scope:** D1 a D12.
 
-**Out of scope:** cambiar el tamaño o la forma del timón y los botones (B23); el multijugador en 3D (B3, D11); las otras pantallas 3D (D1); y todo lo de la lista única de abajo. *(Lo hace el PRD 016.)*
+**Out of scope:** cambiar el tamaño o la forma del timón y los botones (B23); el multijugador en 3D (B3, D11); las otras pantallas 3D (D1); y todo lo de la lista única de abajo. *(Lo hace el PRD 016.)* *(Cambia según el PRD 021, D9: estilos de timón y pedales.)*
 
 **Lista única de lo que NO se modifica:**
 - La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): girar no cambia nada del juego. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(El giro y el derrape suman el peso del carro, y el manejo de los rivales se puede ajustar, según el PRD 019, D9.)*
 - Las pistas, el piso, los objetos y la señalética.
 - El diseño vertical de Jugar Solo (D4). *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
-- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
+- Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje. *(El timón elegido también se ve en Diseño General y en Diseño de Pistas → Entrar, según el PRD 021, D9: estilos de timón y pedales.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

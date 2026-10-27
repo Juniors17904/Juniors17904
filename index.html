@@ -724,6 +724,7 @@
                     </div>
                     <div class="ctrl-diag-desc">Desliza el timón izquierda/derecha</div>
                     <button id="btn-disenar-timon" class="btn-disenar-timon">DISEÑAR TIMÓN ›</button>
+                    <button id="btn-disenar-pedales" class="btn-disenar-timon">DISEÑAR PEDALES ›</button>
                 </div>
             </div>
 
@@ -768,7 +769,22 @@
                 <canvas class="timon-preview" width="110" height="110"></canvas>
                 <span class="timon-nombre">Vintage</span>
             </div>
+            <div class="timon-card" data-modelo="4">
+                <canvas class="timon-preview" width="110" height="110"></canvas>
+                <span class="timon-nombre">Rally</span>
+            </div>
+            <div class="timon-card" data-modelo="5">
+                <canvas class="timon-preview" width="110" height="110"></canvas>
+                <span class="timon-nombre">Camión</span>
+            </div>
         </div>
+    </div>
+
+    <!-- Pantalla: Diseño de pedales (PRD 021): las tarjetas las arma GaleriaPedales -->
+    <div id="pantalla-pedales-diseno" class="pantalla">
+        <button id="btn-volver-pedales-diseno" class="btn-tuerca" style="top:16px;left:16px">←</button>
+        <div class="titulo-logo" style="font-size:20px;margin-bottom:24px">ELIGE TUS PEDALES</div>
+        <div class="timon-grid pedales-grid"></div>
     </div>
 
     <!-- Pantalla: Diseño de velocímetro -->
@@ -841,8 +857,8 @@
             <canvas id="canvas-timon" width="160" height="160" style="background:transparent;display:block"></canvas>
         </div>
         <div style="display:flex;flex-direction:column;gap:12px;pointer-events:all">
-            <button id="btn-acelerar" class="btn-dir" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">ACEL</button>
-            <button id="btn-freno"    class="btn-dir" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">FRENO</button>
+            <button id="btn-acelerar" class="btn-dir" data-pedal="acel" aria-label="ACEL" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">ACEL</button>
+            <button id="btn-freno"    class="btn-dir" data-pedal="freno" aria-label="FRENO" style="font-size:12px;font-family:'Orbitron',monospace;letter-spacing:1px">FRENO</button>
         </div>
     </div>
 
@@ -890,6 +906,9 @@
     <script src="src/model/carrera_vueltas.js"></script>
     <script src="src/model/punto_mundo.js"></script>
     <script src="src/model/historial_recorrido.js"></script>
+    <!-- Model: timón y pedales elegidos (PRD 021) -->
+    <script src="src/model/catalogo_controles.js"></script>
+    <script src="src/model/preferencias_controles.js"></script>
     <script src="src/model/estado_juego.js"></script>
     <!-- Model: modo y dificultad de Jugar Solo (PRD 018) -->
     <script src="src/model/modos_carrera/modo_carrera.js"></script>
@@ -916,9 +935,19 @@
     <script src="src/view/controles/timon_deportivo.js"></script>
     <script src="src/view/controles/timon_f1.js"></script>
     <script src="src/view/controles/timon_retro.js"></script>
+    <script src="src/view/controles/timon_rally.js"></script>
+    <script src="src/view/controles/timon_camion.js"></script>
     <script src="src/view/controles/renderizador_timon.js"></script>
     <script src="src/view/controles/galeria_timones.js"></script>
     <script src="src/view/controles/control_timon.js"></script>
+    <!-- Estilos de pedales (PRD 021): la superclase antes que sus subclases -->
+    <script src="src/view/controles/estilo_pedales.js"></script>
+    <script src="src/view/controles/pedales_clasicos.js"></script>
+    <script src="src/view/controles/pedales_deportivos.js"></script>
+    <script src="src/view/controles/pedales_f1.js"></script>
+    <script src="src/view/controles/pedales_retro.js"></script>
+    <script src="src/view/controles/registro_estilos_pedales.js"></script>
+    <script src="src/view/controles/galeria_pedales.js"></script>
 
     <!-- View: velocímetros -->
     <script src="src/view/velocimetros/velocimetro.js"></script>
@@ -1014,6 +1043,7 @@
     <script src="src/controller/pantallas/controlador_pistas.js"></script>
     <script src="src/controller/pantallas/controlador_preparar_carrera.js"></script>
     <script src="src/controller/pantallas/controlador_controles.js"></script>
+    <script src="src/controller/pantallas/controlador_pedales.js"></script>
     <script src="src/controller/pantallas/controlador_velocimetro.js"></script>
     <script src="src/controller/pantallas/controlador_vista_conduccion.js"></script>
     <script src="src/controller/pantallas/toque_boton_conduccion.js"></script>

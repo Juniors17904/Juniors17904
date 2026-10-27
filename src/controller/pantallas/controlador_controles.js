@@ -3,16 +3,19 @@
 // ================================================================
 // CLASE: ControladorControles — pantallas de controles y de diseño
 // del timón (PRD 004 D6). Pide a GaleriaTimones las vistas previas
-// y guarda el modelo elegido en el estado compartido de Aplicacion.
+// y guarda el modelo elegido en el estado compartido de Aplicacion y,
+// para recordarlo al recargar, en PreferenciasControles (PRD 021, RF-08).
 // ================================================================
 class ControladorControles extends ControladorPantalla {
     #estado      = null;
     #timonOrigen = 'pantalla-inicio';
     #galeria     = new GaleriaTimones();
+    #preferencias = null;
 
-    constructor(estado, navegar) {
+    constructor(estado, navegar, preferencias) {
         super(navegar);
-        this.#estado = estado;
+        this.#estado       = estado;
+        this.#preferencias = preferencias;
     }
 
     iniciar() {
@@ -26,6 +29,7 @@ class ControladorControles extends ControladorPantalla {
         document.querySelectorAll('#pantalla-timon-diseno .timon-card').forEach(card => {
             card.addEventListener('click', () => {
                 this.#estado.timonModelo = parseInt(card.dataset.modelo);
+                this.#preferencias?.guardar(this.#estado);
                 this.#estado.control     = 'timon';
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('sel'));
                 document.querySelector('[data-ctrl="timon"]').classList.add('sel');

@@ -14,7 +14,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 
 | # | Categoría | Decisión |
 |---|---|---|
-| D1 | Alcance | Solo Jugar Solo, en los dos diseños (vertical y horizontal). Las otras pantallas no cambian. |
+| D1 | Alcance | Solo Jugar Solo, en los dos diseños (vertical y horizontal). Las otras pantallas no cambian. *(El timón elegido también se ve en Diseño General y en Diseño de Pistas → Entrar, según el PRD 021, D9: estilos de timón y pedales.)* |
 | D2 | Alcance | Entran el timón y los botones ACEL y FRENO. El giroscopio y el selector Botones / Timón / Giroscopio quedan fuera (B4). |
 | D3 | Usuarios | **Girar es más fácil:** se puede tocar y arrastrar en cualquier parte del tercio izquierdo de abajo de la pantalla (nunca más chica que el timón), sin tener que acertar el timón. El timón dibujado sigue mostrando cuánto se gira. Un segundo dedo en la zona no endereza el timón. |
 | D4 | Usuarios | **Giro según la pantalla:** en horizontal, el giro máximo se alcanza arrastrando una cuarta parte del ancho de la pantalla; en vertical, con un arrastre fijo de unos 85 px, para no llegar al borde donde Android tiene el gesto de volver. *(v2: aprobado por el usuario)* |
@@ -39,13 +39,13 @@ Que manejar en Jugar Solo sea cómodo e intuitivo en el celular, en vertical y e
 ## 4. Alcance
 **In scope:** D1 a D11.
 
-**Out of scope:** el giroscopio y el selector de controles (B4); los controles de las otras pantallas; los modelos de timón del garaje; y todo lo de la lista única de abajo.
+**Out of scope:** el giroscopio y el selector de controles (B4); los controles de las otras pantallas; los modelos de timón del garaje; y todo lo de la lista única de abajo. *(Cambia según el PRD 021, D9: estilos de timón y pedales.)*
 
 **Lista única de lo que NO se modifica:**
 - La física, los choques, las vueltas, el cronómetro y los rivales (PRD 006 a 014): solo cambia cómo se toca, no cómo maneja el carro. *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(El giro y el derrape suman el peso del carro, y el manejo de los rivales se puede ajustar, según el PRD 019, D9.)*
 - El control por teclado en PC (flechas y WASD) y los botones táctiles ◀ ▲ ▼ ▶ del modo botones.
-- `VistaConduccion` y `ControladorCarreraSolo`: el timón reconoce solo la zona de giro de Jugar Solo. *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
-- Los dibujos de los timones (`TimonClasico`, `TimonDeportivo`, `TimonF1`, `TimonRetro`) y el velocímetro.
+- `VistaConduccion` y `ControladorCarreraSolo`: el timón reconoce solo la zona de giro de Jugar Solo. *(El minimapa de Jugar Solo se suma según el PRD 017, D8.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Cambia según el PRD 021, D9: estilos de timón y pedales.)*
+- Los dibujos de los timones (`TimonClasico`, `TimonDeportivo`, `TimonF1`, `TimonRetro`) y el velocímetro. *(Se suman `TimonRally` y `TimonCamion` según el PRD 021, D9; sus D5, D6 y D9 siguen valiendo.)*
 - Las otras pantallas: Test Drive, Diseño de Pistas, Diseño General, Diseño de Objetos y el garaje.
 
 ## 5. Conceptos de dominio

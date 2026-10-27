@@ -133,7 +133,8 @@ class ControladorCarreraSolo {
     // ── Privados: construcción ──────────────────────────────────
     #crearPiezas() {
         // Diseño vertical u horizontal según la forma de la pantalla; sigue al girar (PRD 015)
-        this.#adaptadorDiseno = new window.AdaptadorDisenoCarrera(document.getElementById('pantalla-carrera-solo'));
+        this.#adaptadorDiseno = new window.AdaptadorDisenoCarrera(document.getElementById('pantalla-carrera-solo'),
+            this.#estado?.estiloPedales);   // PRD 021: estilo de los pedales
         const pista = this.#resolverPista();
         this.#visor = new window.VisorCarreraSolo(
             document.getElementById('canvas-carrera-solo'), pista, this.#estado?.eleccion ?? null

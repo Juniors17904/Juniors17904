@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para implementar |
+| Estado | v3 — programado, con pruebas en `pruebas/` |
 | Fecha | 2026-10-27 |
 | Backlog | B25 (`docs/BACKLOG.md`) |
 | Depende de | PRD 016 (controles cómodos) y PRD 015 (vertical y horizontal) |
@@ -85,3 +85,4 @@ Que el jugador arme el aspecto de sus controles a su gusto (timón y pedales) y 
 ### Historial
 - **v1** (2026-10-27): primera versión, con las decisiones aceptadas por el usuario (opción A).
 - **v2** (2026-10-27): revisión única (forma corta). Detalles: D9 completa (PRD 001, 002, 005 a 009, 013, 015 a 020 y la lista exacta de `src/style.css`); la caja que se toca es la del PRD 016 (D4); las galerías se ven enteras (D2); las 3 pantallas del timón (D1); lo elegido se guarda por clave y lo roto cae en Clásico (D7); el velocímetro no se guarda; nombres de clases y carpeta; RF-10 con `CLAUDE.md` completo. Decisión del usuario: quien nunca eligió velocímetro ve el Clásico en todas partes (D6, opción A).
+- **v3** (2026-10-27): programado. Modelo: `CatalogoControles` y `PreferenciasControles` (clave `tr_controles`); `ControladorPistas` ya no cambia el timón ni el velocímetro. Vista: `TimonRally` y `TimonCamion`; `EstiloPedales` con `PedalesClasicos`, `PedalesDeportivos`, `PedalesF1` y `PedalesRetro`, `RegistroEstilosPedales` y `GaleriaPedales`; controlador `ControladorPedales`. Notas de D9 en los PRD, `CLAUDE.md` y backlog (RF-10).
