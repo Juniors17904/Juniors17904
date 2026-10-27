@@ -30,7 +30,7 @@ class SonidosCarrera {
     }
 
     cuenta(texto) {
-        this.#audio?.despertar();
+        if (!document.hidden) this.#audio?.despertar();   // con la página oculta queda en pausa (D6)
         this.#cuenta.sonar(texto);
         if (texto === '¡YA!') { this.#enCurso = true; this.#motor.sonar(0); }
     }
@@ -49,14 +49,20 @@ class SonidosCarrera {
     }
 
     reiniciar() {
-        this.#callarCarrera();
+        this.#callarTodo();
         this.#oido.reiniciar();
     }
 
     destruir() {
-        this.#callarCarrera();
+        this.#callarTodo();
         document.removeEventListener('visibilitychange', this.#alCambiarVisibilidad);
         window.removeEventListener('pagehide', this.#alCambiarVisibilidad);
+    }
+
+    // También los tonos cortos que sigan sonando (la fanfarria al tocar Menú o Revancha)
+    #callarTodo() {
+        this.#callarCarrera();
+        for (const sonido of [this.#cuenta, this.#choque, this.#meta]) sonido.callar();
     }
 
     #callarCarrera() {

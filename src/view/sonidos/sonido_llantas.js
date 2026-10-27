@@ -18,6 +18,7 @@ class SonidoLlantas extends window.EfectoSonido {
     }
 
     callar() {
+        super.callar();
         if (!this.#tono) return;
         try { this.#tono[0].stop(); } catch { /* ya parado */ }
         this.#tono = null;

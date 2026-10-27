@@ -39,13 +39,13 @@ class AudioJuego {
                 this.#salida.connect(this.#contexto.destination);
                 this.#aplicarVolumen();
             }
-            this.#contexto.resume?.();
+            this.#contexto.resume?.()?.catch?.(() => {});
         } catch { this.#contexto = null; this.#salida = null; }
     }
 
     // Pausa todo el audio (página oculta) y lo retoma
-    suspender() { try { this.#contexto?.suspend?.(); } catch { /* sin audio */ } }
-    reanudar()  { try { this.#contexto?.resume?.(); } catch { /* sin audio */ } }
+    suspender() { try { this.#contexto?.suspend?.()?.catch?.(() => {}); } catch { /* sin audio */ } }
+    reanudar()  { try { this.#contexto?.resume?.()?.catch?.(() => {}); } catch { /* sin audio */ } }
 
     #aplicarVolumen() {
         if (!this.#salida) return;

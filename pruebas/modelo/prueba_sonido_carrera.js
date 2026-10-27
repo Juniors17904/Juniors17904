@@ -128,7 +128,18 @@ class PruebaSonidoCarrera {
         this.#ok(r.reanudar === reanudas, 'RF-09 con el resultado en pantalla, volver a la página no prende nada');
         const otra = r.osciladores.length;
         s.meta(true);
-        this.#ok(r.osciladores.slice(otra).filter(o => o.type === 'sine').length === 2, 'RF-05 con récord nuevo suena además la campanita');
+        const campanita = r.osciladores.slice(otra);
+        this.#ok(campanita.filter(o => o.type === 'sine').length === 2, 'RF-05 con récord nuevo suena además la campanita');
+        s.reiniciar();
+        this.#ok(campanita.every(o => !o.sonando), 'D6/RF-09 Revancha o salir callan también la fanfarria y la campanita');
+        // Página oculta durante la cuenta: los pitidos no despiertan el audio
+        const pausas = r.reanudar;
+        c.document.hidden = true; this.#escuchas.visibilitychange();
+        s.cuenta('2'); s.cuenta('1'); s.cuenta('¡YA!');
+        this.#ok(r.reanudar === pausas, 'D6/RF-09 con la página oculta la cuenta no vuelve a prender el audio');
+        c.document.hidden = false; this.#escuchas.visibilitychange();
+        this.#ok(r.reanudar === pausas + 1, 'RF-09 al volver, con la carrera en curso, el audio sigue');
+        s.reiniciar();
         // Revancha: la vuelta a la salida (velocidad 0) no suena como choque
         s.reiniciar(); s.cuenta('¡YA!');
         visor.velocidad = 0.9; s.escuchar(visor);
@@ -152,6 +163,8 @@ class PruebaSonidoCarrera {
         let falso = false;
         for (let i = 1, vel = 0.9; i < 30; i++) { vel = Math.max(0, vel - 0.05); if (o.hayChoque(v(vel), i * 16)) falso = true; }
         this.#ok(!falso, 'RF-04 frenar a fondo no suena como choque');
+        o.reiniciar(); o.hayChoque(v(0.05), 0);
+        this.#ok(o.hayChoque({ velocidad: -0.02, pasosUltimoFrame: 5, entradaAcel: -1 }, 400) === false, 'RF-04 frenar hasta la reversa en un cuadro lento no es un choque');
         o.reiniciar(); o.hayChoque(v(0.9), 1000);
         this.#ok(o.hayChoque(v(0.4), 1016) === true, 'RF-04 una frenada brusca que no viene del pedal es un choque');
         this.#ok(o.hayDerrape({ velocidad: 0.9, velocidadMaxBase: 1, entradaAcel: 0, entradaDireccion: 1 }) === true

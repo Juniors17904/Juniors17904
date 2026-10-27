@@ -7,19 +7,22 @@
 // envolvente (sube rápido y se apaga) y un tono continuo que se puede
 // prender, cambiar y callar. Sin audio, no hace nada.
 //   - sonar(...): lo que hace sonar cada subclase.
-//   - callar(): calla lo que siga sonando.
+//   - callar(): calla lo que siga sonando (también los tonos cortos ya pedidos).
 // ================================================================
 class EfectoSonido {
     #audio;
+    #cortos = [];   // tonos cortos que pueden seguir sonando (se callan al salir)
 
     constructor(audio) {
         this.#audio = audio ?? null;
     }
 
     sonar() {}
-    callar() {}
 
-    get _audio() { return this.#audio; }
+    callar() {
+        for (const osc of this.#cortos) { try { osc.stop(); } catch { /* ya terminó */ } }
+        this.#cortos = [];
+    }
 
     // Un tono corto: forma de onda, frecuencia (Hz), cuándo empieza (s desde ahora),
     // cuánto dura (s) y su volumen (0 a 1)
@@ -36,6 +39,8 @@ class EfectoSonido {
             env.gain.exponentialRampToValueAtTime(0.0001, t0 + duracion);
             osc.connect(env); env.connect(salida);
             osc.start(t0); osc.stop(t0 + duracion + 0.02);
+            osc.onended = () => { this.#cortos = this.#cortos.filter(o => o !== osc); };
+            this.#cortos.push(osc);
         } catch { /* sin audio */ }
     }
 

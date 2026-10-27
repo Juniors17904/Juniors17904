@@ -31,7 +31,8 @@ class OidoCarrera {
         this.#velocidadAntes = v;
         if (antes === null) return false;
         const pasos = Math.max(1, Number(visor?.pasosUltimoFrame) || 1);
-        const rebote = antes > 0.03 && v < -0.01;
+        // Frenando a fondo se puede pasar a reversa en un cuadro lento: eso no es un rebote
+        const rebote = antes > 0.03 && v < -0.01 && visor?.entradaAcel !== -1;
         const caida  = Math.abs(antes) - Math.abs(v) > pasos * OidoCarrera.#MAX_CAIDA_PASO + OidoCarrera.#MARGEN_CAIDA;
         if (!(rebote || caida) || ahoraMs - this.#ultimoGolpe < OidoCarrera.#PAUSA_GOLPES_MS) return false;
         this.#ultimoGolpe = ahoraMs;
