@@ -327,3 +327,56 @@
 #pantalla-carrera-solo .resultado-titulo,
 #pantalla-carrera-solo .stat-val,
 #pantalla-carrera-solo .tabla-final-carrera { font-family: var(--font); }
+
+/* ── Que todo entre sin desplazarse (PRD 002 RNF-03, PRD 018 RF-12, PRD 020 RF-09) ── */
+#pantalla-preparar-carrera .card-preparar { gap: 10px; padding: 16px 18px 10px; }
+#pantalla-preparar-carrera .campos-preparar { gap: 10px; }
+#pantalla-preparar-carrera .campo label { margin-bottom: 4px; }
+#pantalla-preparar-carrera #opciones-modo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+#pantalla-preparar-carrera #opciones-pista { gap: 6px; }
+#pantalla-preparar-carrera #opciones-pista .opcion-carrera { min-height: 46px; font-size: 19px; }
+#pantalla-preparar-carrera #record-pista { margin-top: 4px; font-size: 17px; }
+#pantalla-preparar-carrera #btn-correr { min-height: 64px; font-size: 30px; }
+
+@media (orientation: landscape) and (max-height: 500px) {
+    /* Las pantallas con ← arriba: menos aire arriba en horizontal */
+    #pantalla-garage, #pantalla-pista, #pantalla-detalle-pista, #pantalla-controles, #pantalla-timon-diseno,
+    #pantalla-pedales-diseno, #pantalla-velocimetro-diseno, #pantalla-vista-conduccion, #pantalla-giro,
+    #pantalla-td3d-selector, #pantalla-ajustes { padding: 12px 0; }
+
+    /* Inicio en dos columnas: título y carro a la izquierda, la tarjeta a la derecha */
+    #pantalla-inicio.activa {
+        display: grid !important;   /* la navegación muestra las pantallas con display en línea */
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+        grid-template-rows: auto auto;
+        align-content: center;
+        column-gap: 16px;
+        padding: 8px 68px 8px 20px;   /* a la derecha queda lugar para ⚙ */
+    }
+    #pantalla-inicio .titulo-logo { grid-column: 1; grid-row: 1; align-self: end; justify-self: center; font-size: 46px; }
+    #pantalla-inicio .portada-inicio { grid-column: 1; grid-row: 2; align-self: start; width: 100%; }
+    #pantalla-inicio .card-setup { grid-column: 2; grid-row: 1 / span 2; width: 100%; padding: 12px 14px; gap: 8px; }
+    #pantalla-inicio .campo label { margin-bottom: 4px; }
+    #pantalla-inicio input[type="text"] { min-height: 44px; padding: 8px 12px; }
+    #pantalla-inicio .botones-acceso { flex-direction: row; gap: 8px; align-items: center; }
+    #pantalla-inicio #btn-solo { min-height: 60px; font-size: 26px; flex: 1.4; }
+    #pantalla-inicio #btn-crear { font-size: 13px; min-height: 48px; padding: 6px 8px; line-height: 1.15; }
+    #pantalla-inicio .botones-multi { margin-top: -4px; }
+    #pantalla-inicio {
+        background-image: linear-gradient(176deg, transparent 0 230px, var(--neon-v) 230px 250px, transparent 250px 258px,
+                                          var(--neon-c) 258px 265px, transparent 265px);
+        background-size: 50% 390px;
+    }
+
+    /* Preparar carrera: pistas en dos columnas, todo más bajo */
+    #pantalla-preparar-carrera { padding: 6px 0; }
+    #pantalla-preparar-carrera .card-preparar { padding: 8px 18px 4px; gap: 6px; }
+    #pantalla-preparar-carrera .titulo-preparar { font-size: 24px; }
+    #pantalla-preparar-carrera .campos-preparar { gap: 4px 18px; }
+    #pantalla-preparar-carrera #campo-pista { grid-row: span 3; }
+    #pantalla-preparar-carrera #opciones-pista { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+    #pantalla-preparar-carrera #opciones-pista .opcion-carrera { min-height: 44px; font-size: 16px; padding: 0 8px 0 16px; }
+    #pantalla-preparar-carrera .opcion-carrera { min-height: 44px; font-size: 15px; }
+    #pantalla-preparar-carrera #btn-correr { min-height: 50px; font-size: 26px; }
+    #pantalla-preparar-carrera #btn-volver-preparar { min-height: 44px; padding: 4px; }
+}

@@ -140,12 +140,13 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
       modoSel: getComputedStyle(document.querySelector('#opciones-modo .sel')).backgroundColor,
       record: getComputedStyle(document.getElementById('record-pista')).color,
       correr: c.backgroundColor, inclinado: new DOMMatrix(c.transform).c !== 0, alto: correr.getBoundingClientRect().height,
+      mayorOpcion: Math.max(...[...document.querySelectorAll('#pantalla-preparar-carrera .opcion-carrera')].map(b => b.getBoundingClientRect().height)),
     };
   });
   check(preparar.total >= 5 && preparar.colores === preparar.total && preparar.pistaSel === NARANJA, `RF-05 (${nombre}) una tarjeta con color por pista y la elegida en naranja (${preparar.colores}/${preparar.total})`);
   check(preparar.record === AMARILLO, `RF-05 (${nombre}) el récord en amarillo (${preparar.record})`);
   check(preparar.modoSel === NARANJA, `RF-02 (${nombre}) el modo elegido en naranja`);
-  check(preparar.correr === AMARILLO && preparar.inclinado && preparar.alto >= 64, `RF-06 (${nombre}) ¡CORRER! amarillo, grande e inclinado`);
+  check(preparar.correr === AMARILLO && preparar.inclinado && preparar.alto > preparar.mayorOpcion, `RF-06 (${nombre}) ¡CORRER! amarillo, inclinado y más alto que las opciones (${preparar.alto} px)`);
   await page.screenshot({ path: `${CARPETA}/preparar_${nombre}.png` });
 
   // Ajustes (RF-07) y el resto de las pantallas de D1
