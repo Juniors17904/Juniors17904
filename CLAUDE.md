@@ -321,6 +321,8 @@ Acordada con el usuario el 2026-10-24. Vale para todo PRD desde el PRD 010.
 - Al terminar cada paso se dice en qué paso va el PRD (por ejemplo, "PRD 014: paso 2 de 6, revisión única corriendo").
 - Si una prueba de navegador falla por carga lenta, primero se revisa que el servidor del puerto 8099 sea el del ejecutor (`npm run test:todo` levanta el suyo); no se deja otro servidor corriendo.
 
+**Elegir la opción recomendada** (acuerdo con el usuario del 2026-10-29): cuando hay que decidir entre opciones (A, B, C), incluidas las decisiones del paso 1 y los problemas de fondo, se elige siempre la **recomendada** y se implementa, sin esperar respuesta. En la respuesta se dice qué se eligió, para que el usuario pueda cambiarlo después.
+
 **Los acuerdos se escriben.** Todo acuerdo de trabajo con el usuario se escribe en el repositorio (este archivo, `docs/PRD_CREATOR.md`, las skills o `docs/LECCIONES_APRENDIDAS.md`). Lo que queda solo en el chat, las otras sesiones no lo saben.
 
 ---
