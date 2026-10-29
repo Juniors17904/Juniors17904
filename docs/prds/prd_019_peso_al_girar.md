@@ -45,7 +45,7 @@ Que soltar el acelerador o frenar ayude a meter el carro en la curva, y que acel
 - Las personalidades de los rivales (nombre y estilo, PRD 013 D2).
 - El pasto, el piano y los choques (PRD 008, 010 y 011).
 - Las vueltas, `Cronometro`, `MuestraRuta` y `Ruta`.
-- La cámara, los controles, el HUD y `src/style.css`. *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles y `src/style.css` —solo los estilos de los pedales y de las galerías— cambian según el PRD 021, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
+- La cámara, los controles, el HUD y `src/style.css`. *(Cambia según el PRD 020, D7: récords por pista.)* *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)* *(Los controles y `src/style.css` —solo los estilos de los pedales y de las galerías— cambian según el PRD 021, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)* *(Cambia según el PRD 026, D8: pantallas con estilo de juego de carreras.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

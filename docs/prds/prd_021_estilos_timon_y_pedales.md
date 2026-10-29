@@ -15,7 +15,7 @@ Estas decisiones se tomaron con el usuario y son definitivas. Si un requerimient
 | # | Categoría | Decisión |
 |---|---|---|
 | D1 | Alcance | Los **pedales con estilo** (ACEL y FRENO) se ven solo en Jugar Solo, en vertical y en horizontal. Los **timones nuevos** se ven en las 3 pantallas que muestran el timón elegido: Jugar Solo, Diseño General y Diseño de Pistas → Entrar. |
-| D2 | Alcance | El estilo de los pedales se elige en Ajustes → "Diseño de botones y pedales", con una galería de 4 pedales parecida a la del timón. La galería de timones pasa de 4 a 6 modelos. Las dos galerías se ven enteras en vertical y en horizontal (si no entran, su pantalla se desplaza); la galería de velocímetros no cambia. |
+| D2 | Alcance | El estilo de los pedales se elige en Ajustes → "Diseño de botones y pedales", con una galería de 4 pedales parecida a la del timón. La galería de timones pasa de 4 a 6 modelos. Las dos galerías se ven enteras en vertical y en horizontal (si no entran, su pantalla se desplaza); la galería de velocímetros no cambia. *(Cambia según el PRD 026, D8: pantallas con estilo de juego de carreras.)* |
 | D3 | Usuarios | **4 estilos de pedales:** **Clásico** (los de hoy, elegido de fábrica), **Deportivo** (pedal metálico: el acelerador alto y angosto, el freno ancho), **F1** (con forma de leva) y **Retro** (botón de arcade con borde grueso). |
 | D4 | Usuarios | **Solo cambia el dibujo de los pedales.** El área que se toca es la misma caja del PRD 016 (su tamaño, lugar y separación, D5) y cada estilo dibuja su forma dentro de ella; la luz y la vibración al tocar quedan como en el PRD 016 (D6). Así el velocímetro no se mueve. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)* |
 | D5 | Usuarios | **2 timones nuevos:** **Rally** (con una marca roja arriba) y **Camión** (de dos rayos y aro grueso, que llena su lugar), en el mismo lugar y tamaño que los de hoy. Los 4 de hoy no cambian. |
@@ -43,8 +43,8 @@ Que el jugador arme el aspecto de sus controles a su gusto (timón y pedales) y 
 - La física, los rivales, las vueltas, el cronómetro y los récords (PRD 006 a 014 y 018 a 020): solo cambia cómo se ven los controles. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Cómo se toca: la zona de giro, el recorrido de giro y los toques a la vez (PRD 016, D3, D4 y D7), y el control por teclado en PC, que no muestra timón ni pedales. *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Los diseños vertical y horizontal y sus medidas (PRD 015 y 016, D9), y el lugar del velocímetro. *(Cambia según el PRD 022, D8: sonido en Jugar Solo.)*
-- Los dibujos de los 4 timones de hoy, los 4 velocímetros y su galería.
-- Test Drive, Diseño de Objetos y el garaje; en Diseño General y Diseño de Pistas solo se suman los 2 timones nuevos (D1) y, en Diseño de Pistas, el velocímetro de fábrica (D6). *(Cambia según el PRD 024, D8: la física nueva también llega a ellas.)*
+- Los dibujos de los 4 timones de hoy, los 4 velocímetros y su galería. *(Cambia según el PRD 026, D8: pantallas con estilo de juego de carreras.)*
+- Test Drive, Diseño de Objetos y el garaje; en Diseño General y Diseño de Pistas solo se suman los 2 timones nuevos (D1) y, en Diseño de Pistas, el velocímetro de fábrica (D6). *(Cambia según el PRD 024, D8: la física nueva también llega a ellas.)* *(Cambia según el PRD 026, D8: pantallas con estilo de juego de carreras.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |

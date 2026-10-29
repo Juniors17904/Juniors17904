@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TURBO RACE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Saira+Condensed:wght@600;700;800;900&family=Saira:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="src/style.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#7c3aed">
@@ -138,6 +138,8 @@
         /* Con poca altura, el panel de resultado se puede desplazar (RF-07) */
         #pantalla-carrera-solo[data-diseno="horizontal"] #resultado-carrera-solo { overflow-y: auto; }
     </style>
+    <!-- PRD 026: tema de carreras (estilo A), después de todos los estilos -->
+    <link rel="stylesheet" href="src/tema_carreras.css">
 </head>
 <body>
 
@@ -149,6 +151,8 @@
         <button onclick="location.reload()" class="btn-tuerca" style="left:16px;right:auto">↺</button>
 
         <div class="titulo-logo">TURBO<span class="neon-c">RACE</span></div>
+        <!-- PRD 026 (D3): el carro elegido, con su color (lo dibuja PortadaCarro) -->
+        <div class="portada-inicio"><canvas id="canvas-portada-carro" role="img" aria-label="Tu carro"></canvas></div>
 
         <div class="card-setup">
             <div class="campo">
@@ -285,24 +289,11 @@
         <button id="btn-volver-ajustes" class="btn-tuerca" style="top:16px;left:16px">←</button>
         <div class="titulo-logo" style="font-size:22px;margin-bottom:28px">AJUSTES</div>
         <div class="ajustes-menu">
+            <!-- PRD 026 (D5): lo del jugador y el taller de pruebas -->
+            <div class="ajustes-grupo">Tu juego</div>
             <button id="btn-ir-garage" class="ajuste-item">
                 <span class="ajuste-icono">🚗</span>
                 <span class="ajuste-txt">Diseño de carro</span>
-                <span class="ajuste-arrow">›</span>
-            </button>
-            <button id="btn-ir-giro" class="ajuste-item">
-                <span class="ajuste-icono">🔄</span>
-                <span class="ajuste-txt">Verificar giroscopio</span>
-                <span class="ajuste-arrow">›</span>
-            </button>
-            <button id="btn-ir-pista" class="ajuste-item">
-                <span class="ajuste-icono">🛣️</span>
-                <span class="ajuste-txt">Diseño de pista</span>
-                <span class="ajuste-arrow">›</span>
-            </button>
-            <button id="btn-test-drive-3d" class="ajuste-item">
-                <span class="ajuste-icono">🌐</span>
-                <span class="ajuste-txt">Test Drive 3D</span>
                 <span class="ajuste-arrow">›</span>
             </button>
             <button id="btn-ir-controles" class="ajuste-item">
@@ -318,6 +309,22 @@
             <button id="btn-ir-vista-conduccion" class="ajuste-item">
                 <span class="ajuste-icono">👁️</span>
                 <span class="ajuste-txt">Vista de conducción</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
+            <button id="btn-ir-giro" class="ajuste-item">
+                <span class="ajuste-icono">🔄</span>
+                <span class="ajuste-txt">Verificar giroscopio</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
+            <div class="ajustes-grupo">Taller</div>
+            <button id="btn-ir-pista" class="ajuste-item">
+                <span class="ajuste-icono">🛣️</span>
+                <span class="ajuste-txt">Diseño de pista</span>
+                <span class="ajuste-arrow">›</span>
+            </button>
+            <button id="btn-test-drive-3d" class="ajuste-item">
+                <span class="ajuste-icono">🌐</span>
+                <span class="ajuste-txt">Test Drive 3D</span>
                 <span class="ajuste-arrow">›</span>
             </button>
             <button id="btn-ir-diseno-general" class="ajuste-item">
@@ -1015,6 +1022,7 @@
     <script src="src/view/perfiles_carro/perfil_carro_clasico.js"></script>
     <script src="src/view/perfiles_carro/catalogo_perfiles_carro.js"></script>
     <script src="src/view/galeria_miniaturas_carro.js"></script>
+    <script src="src/view/portada_carro.js"></script>
     <script src="src/view/vista_previa_carro.js"></script>
     <script src="src/view/vista_previa_cordillera.js"></script>
 

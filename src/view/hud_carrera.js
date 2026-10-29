@@ -164,11 +164,13 @@ class HudCarrera {
         s.height = '100%';
         s.alignItems = 'center';
         s.justifyContent = 'safe center';
-        s.fontFamily = "'Arial Black', Arial, sans-serif";
+        // Letra y colores del tema de carreras (PRD 026, D7)
+        s.fontFamily = "'Saira Condensed', 'Arial Narrow', Arial, sans-serif";
         s.fontWeight = '900';
+        s.fontStyle = 'italic';
         s.fontSize = 'clamp(72px, 28vw, 140px)';
         s.color = '#ffffff';
-        s.textShadow = '0 0 18px rgba(255,80,0,0.9), 0 4px 0 #000';
+        s.textShadow = '0 0 18px rgba(255,77,31,0.9), 0 4px 0 #000';
         s.pointerEvents = 'none';
         s.zIndex = '15';
         this.ocultarCuenta();
@@ -195,10 +197,10 @@ class HudCarrera {
             textos = document.createElement('div');
             textos.className = 'resultado-carrera-textos';
             textos.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;' +
-                'font-family:Arial,sans-serif;font-weight:bold;color:#fff;font-size:20px;';
+                "font-family:'Saira Condensed', 'Arial Narrow', Arial, sans-serif;font-weight:bold;color:#fff;font-size:20px;";
             const titulo = document.createElement('div');
             titulo.textContent = '¡META!';
-            titulo.style.cssText = 'font-size:34px;color:#ffcc00;font-weight:900;';
+            titulo.style.cssText = 'font-size:40px;color:#FFC400;font-weight:900;font-style:italic;';
             textos.appendChild(titulo);
             const primerBoton = this.#botonRevancha ?? this.#botonMenu;
             const ancla = primerBoton && primerBoton.parentNode === panel ? primerBoton : null;
@@ -263,27 +265,27 @@ class HudCarrera {
         ctx.fillRect(0, 0, ancho, altoBarra);
 
         ctx.textBaseline = 'middle';
-        ctx.font = "900 20px 'Arial Black', Arial, sans-serif";
+        ctx.font = "italic 800 22px 'Saira Condensed', 'Arial Narrow', Arial, sans-serif";   // tema de carreras (PRD 026, D7)
         ctx.lineWidth = 4;
         ctx.strokeStyle = 'rgba(0,0,0,0.8)';
 
         const textoVuelta = 'VUELTA ' + (vuelta ?? 1) + '/' + (totalVueltas ?? 3);
         ctx.textAlign = 'left';
         ctx.strokeText(textoVuelta, 14, altoBarra / 2);
-        ctx.fillStyle = '#ffcc00';
+        ctx.fillStyle = '#FFC400';
         ctx.fillText(textoVuelta, 14, altoBarra / 2);
 
         const posicion = String(textoPosicion ?? '');
         if (posicion) {
             ctx.textAlign = 'center';
             ctx.strokeText(posicion, ancho / 2, altoBarra / 2);
-            ctx.fillStyle = '#7df9ff';
+            ctx.fillStyle = '#FF7A45';
             ctx.fillText(posicion, ancho / 2, altoBarra / 2);
         }
 
         const textoTiempo = String(textoCronometro ?? '0:00.00');
         ctx.textAlign = 'right';
-        ctx.font = "bold 22px 'Courier New', monospace";
+        ctx.font = "800 24px 'Saira Condensed', 'Arial Narrow', Arial, sans-serif";
         ctx.strokeText(textoTiempo, ancho - 14, altoBarra / 2);
         ctx.fillStyle = '#ffffff';
         ctx.fillText(textoTiempo, ancho - 14, altoBarra / 2);

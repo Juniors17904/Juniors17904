@@ -79,6 +79,8 @@ class Aplicacion {
         }
         // "Preparar carrera" se rehace cada vez que se abre, también con atrás (récord al día, PRD 020)
         if (id === 'pantalla-preparar-carrera') this.#prepararCarrera?.mostrar();
+        // Inicio dibuja el carro elegido, que pudo cambiar en el garaje (PRD 026)
+        if (id === 'pantalla-inicio') this.#inicio?.mostrar();
 
         if (id !== 'pantalla-juego') {
             this.#testDrive3D.cancelarArranque();

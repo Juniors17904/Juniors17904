@@ -1,0 +1,329 @@
+/* =============================================================
+   TEMA DE CARRERAS — PRD 026 (estilo A · juego de carreras moderno)
+   Se carga después de src/style.css y de los estilos de index.html:
+   cubre sus colores y letras sin tocarlos. Los colores van en las
+   pantallas (no en :root), así los controles de la carrera (#ctrl-*)
+   y los estilos de pedales (PRD 016 y 021) siguen como estaban.
+   ============================================================= */
+.pantalla {
+    --neon-v: #FF4D1F;          /* acento naranja: lo elegido y los botones principales */
+    --neon-c: #FFC400;          /* amarillo: ¡Correr! y los récords */
+    --bg:     #0E0F12;          /* asfalto */
+    --bg2:    #16181D;
+    --card:   #1E2026;
+    --border: #34373F;
+    --txt:    #F4F4F5;
+    --txt2:   #A1A1AA;
+    --font:   'Saira Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+    --texto:  'Saira', 'Segoe UI', Roboto, Arial, sans-serif;
+    --oscuro: #0E0F12;
+    font-family: var(--texto);
+    color: var(--txt);
+}
+.pantalla:not(#pantalla-carrera-solo):not(#pantalla-juego) { background-color: var(--bg); }
+
+/* Las vistas previas de pedales y botones de las galerías muestran los colores de la carrera */
+.pantalla .btn-dir { --neon-v: #7c3aed; --neon-c: #06b6d4; }
+
+/* ── Títulos ─────────────────────────────────────────────── */
+.pantalla .titulo-logo {
+    font-family: var(--font);
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 0;
+    color: var(--txt);
+    text-shadow: none;
+    text-transform: uppercase;
+}
+.pantalla .titulo-logo .neon-c { color: var(--neon-v); text-shadow: none; }
+.pantalla .neon-c { text-shadow: none; }
+
+/* ── Tarjetas y campos ───────────────────────────────────── */
+.pantalla .card-setup {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: none;
+}
+.pantalla .campo label {
+    font-family: var(--texto);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--txt2);
+}
+.pantalla input[type="text"] {
+    background: var(--card);
+    border-color: var(--border);
+    font-family: var(--texto);
+    font-size: 16px;
+    min-height: 48px;
+}
+.pantalla input[type="text"]:focus { border-color: var(--neon-v); }
+.pantalla input[type="text"]::placeholder { color: #8A8A93; }
+.pantalla .color-btn { width: 44px; height: 44px; }
+.pantalla .colores-grid { gap: 6px; flex-wrap: nowrap; justify-content: space-between; }
+.pantalla .color-btn.sel { border-color: var(--txt); box-shadow: 0 0 0 3px var(--neon-v); }
+
+/* ── Botones ─────────────────────────────────────────────── */
+.pantalla .tab-btn,
+.pantalla .opcion-carrera {
+    min-height: 48px;
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--txt);
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: none;
+}
+.pantalla .tab-btn.sel,
+.pantalla .opcion-carrera.sel {
+    background: var(--neon-v);
+    border-color: var(--neon-v);
+    color: var(--oscuro);
+    box-shadow: none;
+}
+.pantalla .btn-neon {
+    min-height: 56px;
+    background: var(--neon-v);
+    border-radius: 8px;
+    color: var(--oscuro);
+    font-family: var(--font);
+    font-size: 22px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: none;
+}
+.pantalla .btn-neon:hover { box-shadow: none; filter: brightness(1.08); }
+.pantalla .btn-ghost {
+    min-height: 48px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    color: var(--txt2);
+    font-family: var(--font);
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.pantalla .btn-ghost:hover { border-color: var(--neon-v); color: var(--txt); }
+.pantalla .btn-ghost.modo-proximamente { border-color: var(--border); }
+.pantalla .btn-link {
+    min-height: 44px;
+    color: var(--txt2);
+    font-family: var(--texto);
+    font-size: 14px;
+}
+.pantalla .btn-link:hover { color: var(--neon-c); }
+.pantalla .btn-tuerca {
+    width: 44px; height: 44px;
+    background: var(--card);
+    border: 0;
+    border-radius: 12px;
+    color: var(--txt);
+    box-shadow: none;
+}
+.pantalla .btn-tuerca:hover { background: #2A2D35; color: var(--txt); box-shadow: none; }
+.pantalla:not(#pantalla-carrera-solo) .btn-sonido { width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--card); }
+#pantalla-carrera-solo .btn-sonido { background: rgba(14,15,18,0.7); }
+
+/* Las pantallas de menú (D1) se desplazan hacia abajo si no entran (RF-09) */
+#pantalla-inicio, #pantalla-ajustes, #pantalla-garage, #pantalla-pista, #pantalla-detalle-pista,
+#pantalla-controles, #pantalla-timon-diseno, #pantalla-pedales-diseno, #pantalla-velocimetro-diseno,
+#pantalla-vista-conduccion, #pantalla-giro, #pantalla-td3d-selector, #pantalla-preparar-carrera {
+    overflow-x: hidden;
+    overflow-y: auto;
+    justify-content: safe center;
+}
+#pantalla-garage, #pantalla-pista, #pantalla-detalle-pista, #pantalla-controles, #pantalla-timon-diseno,
+#pantalla-pedales-diseno, #pantalla-velocimetro-diseno, #pantalla-vista-conduccion, #pantalla-giro,
+#pantalla-td3d-selector { padding: 68px 0 20px; }
+
+/* Preparar carrera: sus opciones ya traen estilos en index.html con el id de la pantalla */
+#pantalla-preparar-carrera .opcion-carrera {
+    min-height: 48px;
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: var(--txt);
+    font-family: var(--font);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+#pantalla-preparar-carrera .opcion-carrera.sel {
+    background: var(--neon-v);
+    border-color: var(--neon-v);
+    color: var(--oscuro);
+    box-shadow: none;
+}
+
+/* ── Inicio (D3) ─────────────────────────────────────────── */
+#pantalla-inicio { padding: 16px 0 20px; }
+/* Franjas en diagonal detrás del título y del carro (son fondo: no ensanchan la pantalla) */
+#pantalla-inicio {
+    background-image: linear-gradient(170deg, transparent 0 250px, var(--neon-v) 250px 274px, transparent 274px 284px,
+                                      var(--neon-c) 284px 293px, transparent 293px);
+    background-repeat: no-repeat;
+    background-size: 100% 420px;
+}
+#pantalla-inicio .titulo-logo {
+    font-size: clamp(44px, 13vw, 72px);
+    line-height: 0.9;
+    margin-bottom: 0;
+    align-self: center;
+}
+#pantalla-inicio .portada-inicio { width: min(88vw, 380px); margin: 4px 0 6px; }
+#pantalla-inicio #canvas-portada-carro { display: block; width: 100%; height: 130px; }
+#pantalla-inicio .card-setup { gap: 14px; padding: 18px 18px 16px; }
+#pantalla-inicio .botones-acceso { flex-direction: column; gap: 10px; }
+#pantalla-inicio #btn-solo {
+    min-height: 72px;
+    font-size: 34px;
+    transform: skewX(-8deg);
+}
+#pantalla-inicio #btn-solo:hover { transform: skewX(-8deg); }
+@media (orientation: landscape) and (max-height: 500px) {
+    #pantalla-inicio {
+        background-image: linear-gradient(176deg, transparent 0 150px, var(--neon-v) 150px 170px, transparent 170px 178px,
+                                          var(--neon-c) 178px 185px, transparent 185px);
+        background-size: 100% 260px;
+    }
+    #pantalla-inicio .titulo-logo { font-size: 48px; }
+    #pantalla-inicio .portada-inicio { width: min(60vw, 380px); }
+    #pantalla-inicio #canvas-portada-carro { height: 100px; }
+    #pantalla-inicio .card-setup { width: min(92vw, 560px); }
+}
+
+/* ── Preparar carrera (D4) ───────────────────────────────── */
+#pantalla-preparar-carrera .titulo-preparar {
+    font-family: var(--font);
+    font-size: 30px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 0;
+    text-align: left;
+    color: var(--txt);
+}
+#pantalla-preparar-carrera .titulo-preparar .neon-c { color: var(--neon-v); }
+#pantalla-preparar-carrera #opciones-pista { flex-direction: column; gap: 8px; }
+#pantalla-preparar-carrera #opciones-pista .opcion-carrera {
+    min-height: 56px;
+    padding: 0 16px 0 22px;
+    text-align: left;
+    font-size: 21px;
+    font-style: italic;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--color-pista) 0 8px, var(--card) 8px);
+}
+#pantalla-preparar-carrera #opciones-pista .opcion-carrera.sel {
+    background: linear-gradient(90deg, var(--color-pista) 0 8px, var(--card) 8px);
+    border-color: var(--neon-v);
+    color: var(--txt);
+}
+#pantalla-preparar-carrera .opcion-carrera { --color-pista: #6B7280; }
+#pantalla-preparar-carrera .opcion-carrera[data-clave="ciudad"]   { --color-pista: #2F80FF; }
+#pantalla-preparar-carrera .opcion-carrera[data-clave="desierto"] { --color-pista: #F5A300; }
+#pantalla-preparar-carrera .opcion-carrera[data-clave="montana"]  { --color-pista: #C2410C; }
+#pantalla-preparar-carrera .opcion-carrera[data-clave="costa"]    { --color-pista: #06B6D4; }
+#pantalla-preparar-carrera .opcion-carrera[data-clave="volcan"]   { --color-pista: #DC2626; }
+#pantalla-preparar-carrera #record-pista {
+    margin-top: 8px;
+    font-family: var(--font);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--neon-c);
+    text-align: left;
+}
+#pantalla-preparar-carrera #btn-correr {
+    min-height: 72px;
+    background: var(--neon-c);
+    font-size: 34px;
+    transform: skewX(-8deg);
+}
+#pantalla-preparar-carrera #btn-correr:hover { transform: skewX(-8deg); }
+
+/* ── Ajustes (D5) ────────────────────────────────────────── */
+#pantalla-ajustes { padding: 68px 0 20px; }
+#pantalla-ajustes .ajustes-menu { gap: 8px; width: min(90vw, 420px); }
+#pantalla-ajustes .ajustes-grupo {
+    margin: 10px 0 2px;
+    font-family: var(--font);
+    font-size: 20px;
+    font-weight: 800;
+    font-style: italic;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--neon-c);
+}
+.pantalla .ajuste-item {
+    min-height: 56px;
+    color: var(--txt);
+    padding: 10px 16px;
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: 10px;
+}
+.pantalla .ajuste-item:hover { border-color: var(--neon-v); box-shadow: none; }
+.pantalla .ajuste-txt { font-family: var(--font); font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
+.pantalla .ajuste-arrow { color: var(--neon-v); }
+
+/* ── Galerías, garaje, pistas y controles ────────────────── */
+.pantalla .timon-card,
+.pantalla .carro-card,
+.pantalla .pista-card,
+.pantalla .ctrl-card {
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    box-shadow: none;
+}
+.pantalla .timon-card:hover,
+.pantalla .carro-card:hover,
+.pantalla .pista-card:hover { border-color: var(--border); box-shadow: none; }
+.pantalla .timon-card.sel,
+.pantalla .carro-card.sel,
+.pantalla .pista-card.sel {
+    border-color: var(--neon-v);
+    background: #2A1A15;
+    box-shadow: none;
+}
+.pantalla .timon-nombre,
+.pantalla .carro-card span {
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--txt);
+}
+.pantalla .pista-nombre { font-family: var(--font); font-size: 20px; font-weight: 800; font-style: italic; color: var(--txt); }
+.pantalla .pista-desc { font-family: var(--texto); color: var(--txt2); }
+.pantalla .ctrl-card-titulo { font-family: var(--font); font-size: 18px; font-weight: 800; color: var(--neon-c); }
+.pantalla .btn-disenar-timon {
+    min-height: 44px;
+    border-color: var(--neon-v);
+    color: var(--txt);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: none;
+}
+
+/* Controles: las teclas de los dibujos y los botones de diseñar */
+.pantalla .ctrl-tecla { background: rgba(255,77,31,0.15); border-color: var(--neon-v); box-shadow: none; }
+.pantalla .btn-disenar-timon { background: var(--card); }
+.pantalla .burbuja-centro { border-color: rgba(255,196,0,0.5); }
+/* Test Drive: el texto chico de los botones naranjas va oscuro para leerse */
+#pantalla-td3d-selector .btn-neon span { color: var(--oscuro) !important; }
+
+/* ── Texto de la carrera (RF-10): cuenta y resultado ─────── */
+#pantalla-carrera-solo #cuenta-carrera-solo { font-family: var(--font); font-style: italic; }
+#pantalla-carrera-solo .resultado-titulo,
+#pantalla-carrera-solo .stat-val,
+#pantalla-carrera-solo .tabla-final-carrera { font-family: var(--font); }

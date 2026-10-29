@@ -5,6 +5,7 @@
 // (PRD 020, D4 y D5): una línea con el récord y, si se batió, "¡Nuevo
 // récord!" bien visible. Crea sus dos líneas dentro de los textos del
 // panel; ocultar() las vacía para que Revancha no muestre el aviso viejo.
+// Colores del tema de carreras: el récord va en amarillo (PRD 026).
 // ================================================================
 class AvisoRecord {
     #linea = null;
@@ -13,9 +14,9 @@ class AvisoRecord {
     constructor(contenedorTextos) {
         if (!contenedorTextos || typeof document === 'undefined') return;
         this.#nuevo = this.#crear(contenedorTextos, 'resultado-carrera-nuevo-record',
-            'font-size:22px;color:#ffcc00;font-weight:900;text-shadow:0 0 12px rgba(255,204,0,0.8);');
+            'font-size:24px;color:#FFC400;font-weight:900;font-style:italic;text-shadow:0 0 12px rgba(255,196,0,0.6);');
         this.#linea = this.#crear(contenedorTextos, 'resultado-carrera-record',
-            'font-size:15px;color:#c4b5fd;font-weight:bold;text-align:center;');
+            'font-size:17px;color:#FFC400;font-weight:bold;text-align:center;');
         this.ocultar();
     }
 

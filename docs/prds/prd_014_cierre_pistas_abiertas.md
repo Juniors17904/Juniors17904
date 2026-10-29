@@ -45,7 +45,7 @@ Que las 4 pistas abiertas vuelvan a la largada por un camino que se puede maneja
 - Los datos de las 5 pistas (`ConfigPista*`): tramos, decoraciones, nombre y colores.
 - La física, la superficie y los choques (PRD 006 a 011): `Carro`, `DetectorSuperficie`, `DetectorChoques` y `FabricaObjetosSolidos`. De `MedidasEscena` no cambian las medidas que ya tiene; solo se agregan las del cierre (RNF-01). *(El giro y el derrape de `Carro` suman el peso del carro según el PRD 019, D9.)* *(Cambia según el PRD 024, D8: arranque más vivo, freno de motor y deslizar entre pedales.)*
 - Las reglas de la carrera: `CarreraVueltas`, `Cronometro` y `MuestraRuta` (solo leen el recorrido nuevo, D7).
-- La cámara, los cielos, `HudCarrera` y `src/style.css`. *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(`src/style.css` —solo los estilos de los pedales y de las galerías— cambia según el PRD 021, D9.)*
+- La cámara, los cielos, `HudCarrera` y `src/style.css`. *(Cambia según el PRD 015, D12: Jugar Solo en vertical y en horizontal.)* *(Los controles de Jugar Solo cambian según el PRD 016, D11.)* *(Cambia según el PRD 018, D8: modos de carrera y dificultad.)* *(Cambia según el PRD 020, D7: récords por pista.)* *(`src/style.css` —solo los estilos de los pedales y de las galerías— cambia según el PRD 021, D9.)* *(Cambia según el PRD 026, D8: pantallas con estilo de juego de carreras.)*
 
 ## 5. Conceptos de dominio
 | Concepto | Qué es |
