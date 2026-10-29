@@ -200,7 +200,7 @@ class HudCarrera {
                 "font-family:'Saira Condensed', 'Arial Narrow', Arial, sans-serif;font-weight:bold;color:#fff;font-size:20px;";
             const titulo = document.createElement('div');
             titulo.textContent = '¡META!';
-            titulo.style.cssText = 'font-size:40px;color:#FFC400;font-weight:900;font-style:italic;';
+            titulo.style.cssText = 'font-size:34px;color:#FFC400;font-weight:900;font-style:italic;';
             textos.appendChild(titulo);
             const primerBoton = this.#botonRevancha ?? this.#botonMenu;
             const ancla = primerBoton && primerBoton.parentNode === panel ? primerBoton : null;
@@ -265,7 +265,7 @@ class HudCarrera {
         ctx.fillRect(0, 0, ancho, altoBarra);
 
         ctx.textBaseline = 'middle';
-        ctx.font = "italic 800 22px 'Saira Condensed', 'Arial Narrow', Arial, sans-serif";   // tema de carreras (PRD 026, D7)
+        ctx.font = "italic 800 20px 'Saira Condensed', 'Arial Narrow', Arial, sans-serif";   // tema de carreras (PRD 026, D7)
         ctx.lineWidth = 4;
         ctx.strokeStyle = 'rgba(0,0,0,0.8)';
 
@@ -285,7 +285,7 @@ class HudCarrera {
 
         const textoTiempo = String(textoCronometro ?? '0:00.00');
         ctx.textAlign = 'right';
-        ctx.font = "800 24px 'Saira Condensed', 'Arial Narrow', Arial, sans-serif";
+        ctx.font = "800 22px 'Saira Condensed', 'Arial Narrow', Arial, sans-serif";
         ctx.strokeText(textoTiempo, ancho - 14, altoBarra / 2);
         ctx.fillStyle = '#ffffff';
         ctx.fillText(textoTiempo, ancho - 14, altoBarra / 2);

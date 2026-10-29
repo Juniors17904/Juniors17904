@@ -45,8 +45,10 @@ class PruebaPantallasEstiloCarreras {
         this.#ok(JSON.stringify(dibujados) === JSON.stringify([['suv', '#3b82f6']]), 'RF-03 PortadaCarro dibuja el carro elegido con su color');
         this.#ok(canvas.width === 600 && canvas.height === 240, `RF-03 el canvas se ajusta a su tamaño en pantalla (${canvas.width}×${canvas.height})`);
         portada.dibujar('desconocido', '#ef4444');
-        this.#ok(dibujados[1]?.[0] === 'deportivo', 'RF-03 un tipo desconocido dibuja el deportivo');
-        new ctx.PortadaCarro(null, catalogo).dibujar('suv', '#fff');   // sin canvas no rompe
+        this.#ok(dibujados[1]?.[0] === 'deportivo' && dibujados[1]?.[1] === '#ef4444', 'RF-03 un tipo desconocido dibuja el deportivo con el color pedido');
+        let rompe = false;
+        try { new ctx.PortadaCarro(null, catalogo).dibujar('suv', '#fff'); } catch { rompe = true; }
+        this.#ok(!rompe && dibujados.length === 2, 'RF-03 sin canvas no dibuja ni rompe');
     }
 
     #probarTema() {
@@ -58,7 +60,7 @@ class PruebaPantallasEstiloCarreras {
             'RNF-01 portada_carro.js se carga después de los perfiles y antes de ControladorInicio');
         const css = this.#leer('src/tema_carreras.css');
         this.#ok(/--neon-v:\s*#FF4D1F/i.test(css) && /--neon-c:\s*#FFC400/i.test(css) && /Saira Condensed/.test(css), 'D2 el tema define el naranja, el amarillo y la letra condensada');
-        this.#ok(!/^:root/m.test(css), 'D7 el tema no cambia :root (los controles de la carrera siguen como estaban)');
+        this.#ok(!/(^|[\s,}])(:root|html|body)\s*[{,]/.test(css), 'D7 el tema no cambia :root, html ni body (los controles de la carrera siguen como estaban)');
         const portada = this.#leer('src/view/portada_carro.js');
         this.#ok((portada.match(/^class /gm) || []).length === 1 && portada.split('\n').length <= 400, 'RNF-01/RNF-03 PortadaCarro sola en su archivo');
         this.#ok(!/getContext|PortadaCarro\(/.test(this.#leer('src/controller/aplicacion.js')), 'RNF-02 Aplicacion no dibuja nada');

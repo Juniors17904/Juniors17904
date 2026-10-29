@@ -9,6 +9,7 @@
 //   RF-08 → botones de 44 px o más y contraste 4,5:1
 //   RF-09 → sin desplazamiento de lado y nada cortado arriba
 //   RF-10 → la cuenta, la barra del HUD y el resultado con la letra y los colores nuevos
+//   D1/D7 → Diseño General y Diseño de Objetos quedan fuera del tema
 //   Sin errores de consola.
 // ================================================================
 import { mkdirSync } from 'fs';
@@ -46,6 +47,15 @@ const PANTALLAS = [
   ['pantalla-pista', 'btn-ir-pista', 'btn-volver-pista'],
   ['pantalla-td3d-selector', 'btn-test-drive-3d', 'btn-volver-td3d-selector'],
 ];
+// Pantallas que se abren desde otra (pantalla de origen, cómo se abre, id, botón de vuelta)
+const SUBPANTALLAS = [
+  ['pantalla-controles', '#btn-disenar-timon', 'pantalla-timon-diseno', 'btn-volver-timon-diseno'],
+  ['pantalla-controles', '#btn-disenar-pedales', 'pantalla-pedales-diseno', 'btn-volver-pedales-diseno'],
+  ['pantalla-pista', '.pista-card', 'pantalla-detalle-pista', 'btn-volver-detalle-pista'],
+  ['pantalla-garage', '#btn-ver-carro', 'pantalla-preview', 'btn-volver-preview'],
+];
+// "Taller": pantallas 3D de herramientas, que quedan fuera del tema (D7)
+const TALLER = [['pantalla-diseno-general', 'btn-ir-diseno-general', 'btn-volver-diseno-general'], ['pantalla-diseno-objetos', 'btn-ir-diseno-objetos', 'btn-volver-diseno-objetos']];
 
 // Revisión de la pantalla activa: morado, letra, botones de 44 px, contraste y desbordes
 const revisar = page => page.evaluate(() => {
@@ -54,32 +64,50 @@ const revisar = page => page.evaluate(() => {
   const luz = ([r, g, b]) => { const f = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
   const fondo = el => { for (let e = el; e; e = e.parentElement) { const c = rgb(getComputedStyle(e).backgroundColor); if (c.length >= 3 && (c[3] ?? 1) > 0.5) return c; } return [14, 15, 18]; };
   const visible = el => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== 'hidden'; };
-  const morado = [], chicos = [], contraste = [];
+  const morado = [], chicos = [], contraste = [], letras = [];
+  const tocable = el => el.tagName === 'BUTTON' || el.matches('.color-btn, .carro-card, .timon-card, .pista-card');
   for (const el of p.querySelectorAll('*')) {
-    if (!visible(el) || el.closest('.btn-dir, canvas, [style*="7c3aed"]')) continue;
+    if (!visible(el) || el.closest('.btn-dir, canvas')) continue;
     const c = getComputedStyle(el);
-    for (const v of [c.backgroundColor, c.borderTopColor, c.color]) if (/124, 58, 237|6, 182, 212/.test(v)) morado.push((el.id || el.className) + ':' + v);
-    if (el.tagName === 'BUTTON' && el.getBoundingClientRect().height < 43.5) chicos.push(el.id || el.textContent.trim().slice(0, 20));
+    // El morado y el cian de antes, y los lilas que los acompañaban (los colores del carro no cuentan)
+    if (!el.matches('.color-btn')) for (const v of [c.backgroundColor, c.borderTopColor, c.color]) if (/124, 58, 237|6, 182, 212|167, 139, 250|168, 85, 247|196, 181, 253|34, 211, 238/.test(v)) morado.push((el.id || el.className) + ':' + v);
+    if (tocable(el) && el.getBoundingClientRect().height < 43.5) chicos.push(el.id || el.className || el.textContent.trim().slice(0, 20));
+    if (el.tagName === 'BUTTON' && !/Saira/.test(c.fontFamily) && el.textContent.trim()) letras.push(el.id || el.textContent.trim().slice(0, 20));
     const texto = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim());
-    if (texto && !el.closest('.modo-proximamente')) {
+    if (texto) {
       const a = luz(rgb(c.color)), b = luz(fondo(el)), r = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
       if (r < 4.5) contraste.push(el.textContent.trim().slice(0, 18) + ' ' + r.toFixed(2));
     }
   }
-  const titulo = p.querySelector('.titulo-logo, .titulo-preparar');
+  const titulo = p.querySelector('.titulo-logo, .titulo-preparar, #detalle-pista-nombre, #preview-nombre');
+  // Si no entra, se puede bajar y el último botón se alcanza (RF-09)
+  const botones = [...p.querySelectorAll('button')].filter(visible);
+  let alcanza = true;
+  if (p.scrollHeight > p.clientHeight + 1) {
+    const antes = p.scrollTop; p.scrollTop = p.scrollHeight;
+    const ultimo = botones.sort((a, b) => a.getBoundingClientRect().bottom - b.getBoundingClientRect().bottom).pop();
+    alcanza = /auto|scroll/.test(getComputedStyle(p).overflowY) && (!ultimo || ultimo.getBoundingClientRect().bottom <= innerHeight + 1);
+    p.scrollTop = antes;
+  }
   return {
-    id: p.id, fondo: getComputedStyle(p).backgroundColor, letra: titulo ? getComputedStyle(titulo).fontFamily : 'Saira Condensed',
+    id: p.id, fondo: getComputedStyle(p).backgroundColor, letra: titulo ? getComputedStyle(titulo).fontFamily : '(sin título)',
+    letras: letras.slice(0, 4), alcanza,
     morado: morado.slice(0, 4), chicos: chicos.slice(0, 4), contraste: contraste.slice(0, 4),
     deLado: p.scrollWidth > p.clientWidth + 1 || document.documentElement.scrollWidth > innerWidth + 1,
     cortado: [...p.children].some(e => visible(e) && e.getBoundingClientRect().top < -1),
   };
 });
 const comprobarPantalla = (r, nombre) => {
-  check(r.fondo === 'rgb(14, 15, 18)' && /Saira Condensed/.test(r.letra), `RF-01 (${nombre}) ${r.id}: asfalto y letra condensada (${r.fondo}, ${r.letra})`);
+  check(r.fondo === 'rgb(14, 15, 18)' && /Saira Condensed/.test(r.letra), `RF-01 (${nombre}) ${r.id}: asfalto y título con letra condensada (${r.fondo}, ${r.letra})`);
+  check(r.letras.length === 0, `RF-01 (${nombre}) ${r.id}: botones con la letra nueva ${r.letras.join(' | ')}`);
   check(r.morado.length === 0, `RF-01 (${nombre}) ${r.id}: sin el morado de antes ${r.morado.join(' | ')}`);
-  check(r.chicos.length === 0, `RF-08 (${nombre}) ${r.id}: botones de 44 px o más ${r.chicos.join(' | ')}`);
+  check(r.chicos.length === 0, `RF-08 (${nombre}) ${r.id}: lo que se toca mide 44 px o más ${r.chicos.join(' | ')}`);
   check(r.contraste.length === 0, `RF-08 (${nombre}) ${r.id}: contraste 4,5:1 ${r.contraste.join(' | ')}`);
-  check(!r.deLado && !r.cortado, `RF-09 (${nombre}) ${r.id}: sin desplazamiento de lado ni cortes arriba`);
+  check(!r.deLado && !r.cortado && r.alcanza, `RF-09 (${nombre}) ${r.id}: sin desplazamiento de lado, sin cortes y se baja hasta el último botón`);
+};
+const elegidoEnNaranja = async (page, selector, propiedad, texto) => {
+  const v = await page.evaluate(([s, pr]) => { const e = document.querySelector(s); return e ? getComputedStyle(e)[pr] : null; }, [selector, propiedad]);
+  check(v && v.includes('255, 77, 31'), `RF-02 ${texto} en naranja (${v})`);
 };
 const clic = (page, id) => page.evaluate(i => document.getElementById(i).click(), id);
 const huellaPortada = page => page.evaluate(() => { const c = document.getElementById('canvas-portada-carro'); const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let h = 0, n = 0; for (let i = 0; i < d.length; i += 16) { if (d[i + 3]) n++; h = (h * 31 + d[i] * 7 + d[i + 1] * 3 + d[i + 2]) % 1e9; } return { h, n }; });
@@ -111,6 +139,7 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   check(inicio.mayor && inicio.inclinado, `RF-04 (${nombre}) JUGAR SOLO es el botón más grande e inclinado (${inicio.alto} px)`);
   const tab = await page.evaluate(() => getComputedStyle(document.querySelector('#control-tabs .tab-btn.sel')).backgroundColor);
   check(tab === NARANJA, `RF-02 (${nombre}) el control elegido en naranja (${tab})`);
+  await elegidoEnNaranja(page, '#colores-grid .color-btn.sel', 'boxShadow', `(${nombre}) el color elegido`);
   const antes = await huellaPortada(page);
   await page.evaluate(() => document.querySelector('.color-btn[data-color="#3b82f6"]').click());
   await esperar(300);
@@ -146,6 +175,8 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
   check(preparar.total >= 5 && preparar.colores === preparar.total && preparar.pistaSel === NARANJA, `RF-05 (${nombre}) una tarjeta con color por pista y la elegida en naranja (${preparar.colores}/${preparar.total})`);
   check(preparar.record === AMARILLO, `RF-05 (${nombre}) el récord en amarillo (${preparar.record})`);
   check(preparar.modoSel === NARANJA, `RF-02 (${nombre}) el modo elegido en naranja`);
+  await elegidoEnNaranja(page, '#opciones-rivales .sel', 'backgroundColor', `(${nombre}) los rivales elegidos`);
+  await elegidoEnNaranja(page, '#opciones-dificultad .sel', 'backgroundColor', `(${nombre}) la dificultad elegida`);
   check(preparar.correr === AMARILLO && preparar.inclinado && preparar.alto > preparar.mayorOpcion, `RF-06 (${nombre}) ¡CORRER! amarillo, inclinado y más alto que las opciones (${preparar.alto} px)`);
   await page.screenshot({ path: `${CARPETA}/preparar_${nombre}.png` });
 
@@ -167,20 +198,35 @@ for (const [nombre, vp] of [['vertical', { width: 390, height: 844 }], ['horizon
     const activa = await page.evaluate(() => document.querySelector('.pantalla.activa').id);
     check(activa === id, `RF-07 (${nombre}) ${ida} abre ${id} como antes`);
     comprobarPantalla(await revisar(page), nombre);
-    if (id === 'pantalla-controles') {
-      await clic(page, 'btn-disenar-pedales'); await esperar(400);
+    await page.screenshot({ path: `${CARPETA}/${id}_${nombre}.png` });
+    if (id === 'pantalla-velocimetro-diseno') await elegidoEnNaranja(page, '#pantalla-velocimetro-diseno .timon-card.sel', 'borderTopColor', `(${nombre}) el velocímetro elegido`);
+    for (const [origen, abrir, sub, volver] of SUBPANTALLAS.filter(x => x[0] === id)) {
+      await page.evaluate(s => document.querySelector(`#${s[0]} ${s[1]}`).click(), [origen, abrir]); await esperar(sub === 'pantalla-preview' ? 1500 : 500);
+      const abierta = await page.evaluate(() => document.querySelector('.pantalla.activa').id);
+      check(abierta === sub, `RF-07 (${nombre}) se abre ${sub}`);
       comprobarPantalla(await revisar(page), nombre);
-      const pedal = await page.evaluate(() => getComputedStyle(document.querySelector('#pantalla-pedales-diseno .timon-card.sel')).borderTopColor);
-      check(pedal === NARANJA, `RF-02 (${nombre}) los pedales elegidos en naranja`);
-      await clic(page, 'btn-volver-pedales-diseno'); await esperar(300);
+      await page.screenshot({ path: `${CARPETA}/${sub}_${nombre}.png` });
+      if (sub !== 'pantalla-detalle-pista' && sub !== 'pantalla-preview') await elegidoEnNaranja(page, `#${sub} .timon-card.sel`, 'borderTopColor', `(${nombre}) lo elegido en ${sub}`);
+      await clic(page, volver); await esperar(400);
     }
     await clic(page, vuelta); await esperar(300);
     if (await page.evaluate(() => document.querySelector('.pantalla.activa').id) !== 'pantalla-ajustes') await clic(page, 'btn-garage');
   }
 
+  // "Taller": abren lo de antes y quedan fuera del tema (D1, D7)
+  for (const [id, ida, vuelta] of TALLER) {
+    await clic(page, ida); await esperar(1500);
+    const t = await page.evaluate(() => { const p = document.querySelector('.pantalla.activa'); return { id: p.id, letra: getComputedStyle(p.querySelector('.btn-tuerca')).fontFamily }; });
+    check(t.id === id, `RF-07 (${nombre}) ${ida} abre ${id} como antes`);
+    check(!/Saira/.test(t.letra), `D7 (${nombre}) ${id} queda fuera del tema (${t.letra})`);
+    await clic(page, vuelta); await esperar(800);
+    if (await page.evaluate(() => document.querySelector('.pantalla.activa').id) !== 'pantalla-ajustes') await clic(page, 'btn-garage');
+  }
+
   // RF-10: la carrera (cuenta, barra del HUD y resultado)
   await clic(page, 'btn-volver-ajustes'); await clic(page, 'btn-solo'); await clic(page, 'btn-correr');
-  await page.waitForFunction(() => window.__letraHud, null, { timeout: 25000 }).catch(() => {});
+  const hudListo = await page.waitForFunction(() => window.__letraHud, null, { timeout: 25000 }).then(() => true, () => false);
+  check(hudListo, `RF-10 (${nombre}) la barra del HUD se dibuja (antes de 25 s)`);
   const carrera = await page.evaluate(() => {
     const cuenta = getComputedStyle(document.getElementById('cuenta-carrera-solo'));
     const textos = document.querySelector('.resultado-carrera-textos');

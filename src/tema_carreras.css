@@ -3,9 +3,11 @@
    Se carga después de src/style.css y de los estilos de index.html:
    cubre sus colores y letras sin tocarlos. Los colores van en las
    pantallas (no en :root), así los controles de la carrera (#ctrl-*)
-   y los estilos de pedales (PRD 016 y 021) siguen como estaban.
+   y los estilos de pedales (PRD 016 y 021) siguen como estaban. Las
+   pantallas 3D de herramientas (Diseño General, Diseño de Objetos y
+   Test Drive en marcha) quedan fuera del tema (D1 y D7).
    ============================================================= */
-.pantalla {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) {
     --neon-v: #FF4D1F;          /* acento naranja: lo elegido y los botones principales */
     --neon-c: #FFC400;          /* amarillo: ¡Correr! y los récords */
     --bg:     #0E0F12;          /* asfalto */
@@ -20,13 +22,16 @@
     font-family: var(--texto);
     color: var(--txt);
 }
-.pantalla:not(#pantalla-carrera-solo):not(#pantalla-juego) { background-color: var(--bg); }
+.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego, #pantalla-carrera-solo) { background-color: var(--bg); }
 
 /* Las vistas previas de pedales y botones de las galerías muestran los colores de la carrera */
-.pantalla .btn-dir { --neon-v: #7c3aed; --neon-c: #06b6d4; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-dir { --neon-v: #7c3aed; --neon-c: #06b6d4; }
+
+/* Todos los botones con la letra del tema (las vistas previas de pedales no) */
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) button:not(.btn-dir) { font-family: var(--font); }
 
 /* ── Títulos ─────────────────────────────────────────────── */
-.pantalla .titulo-logo {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .titulo-logo {
     font-family: var(--font);
     font-weight: 900;
     font-style: italic;
@@ -35,39 +40,39 @@
     text-shadow: none;
     text-transform: uppercase;
 }
-.pantalla .titulo-logo .neon-c { color: var(--neon-v); text-shadow: none; }
-.pantalla .neon-c { text-shadow: none; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .titulo-logo .neon-c { color: var(--neon-v); text-shadow: none; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .neon-c { text-shadow: none; }
 
 /* ── Tarjetas y campos ───────────────────────────────────── */
-.pantalla .card-setup {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .card-setup {
     background: var(--bg2);
     border: 1px solid var(--border);
     border-radius: 14px;
     box-shadow: none;
 }
-.pantalla .campo label {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .campo label {
     font-family: var(--texto);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 1.5px;
     color: var(--txt2);
 }
-.pantalla input[type="text"] {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) input[type="text"] {
     background: var(--card);
     border-color: var(--border);
     font-family: var(--texto);
     font-size: 16px;
     min-height: 48px;
 }
-.pantalla input[type="text"]:focus { border-color: var(--neon-v); }
-.pantalla input[type="text"]::placeholder { color: #8A8A93; }
-.pantalla .color-btn { width: 44px; height: 44px; }
-.pantalla .colores-grid { gap: 6px; flex-wrap: nowrap; justify-content: space-between; }
-.pantalla .color-btn.sel { border-color: var(--txt); box-shadow: 0 0 0 3px var(--neon-v); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) input[type="text"]:focus { border-color: var(--neon-v); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) input[type="text"]::placeholder { color: #8A8A93; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .color-btn { width: 44px; height: 44px; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .colores-grid { gap: 6px; flex-wrap: nowrap; justify-content: space-between; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .color-btn.sel { border-color: var(--txt); box-shadow: 0 0 0 3px var(--neon-v); }
 
 /* ── Botones ─────────────────────────────────────────────── */
-.pantalla .tab-btn,
-.pantalla .opcion-carrera {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .tab-btn,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .opcion-carrera {
     min-height: 48px;
     background: var(--card);
     border: 2px solid transparent;
@@ -80,14 +85,14 @@
     text-transform: uppercase;
     box-shadow: none;
 }
-.pantalla .tab-btn.sel,
-.pantalla .opcion-carrera.sel {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .tab-btn.sel,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .opcion-carrera.sel {
     background: var(--neon-v);
     border-color: var(--neon-v);
     color: var(--oscuro);
     box-shadow: none;
 }
-.pantalla .btn-neon {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-neon {
     min-height: 56px;
     background: var(--neon-v);
     border-radius: 8px;
@@ -100,8 +105,8 @@
     text-transform: uppercase;
     box-shadow: none;
 }
-.pantalla .btn-neon:hover { box-shadow: none; filter: brightness(1.08); }
-.pantalla .btn-ghost {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-neon:hover { box-shadow: none; filter: brightness(1.08); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-ghost {
     min-height: 48px;
     border: 2px solid var(--border);
     border-radius: 8px;
@@ -111,16 +116,16 @@
     font-weight: 700;
     text-transform: uppercase;
 }
-.pantalla .btn-ghost:hover { border-color: var(--neon-v); color: var(--txt); }
-.pantalla .btn-ghost.modo-proximamente { border-color: var(--border); }
-.pantalla .btn-link {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-ghost:hover { border-color: var(--neon-v); color: var(--txt); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-ghost.modo-proximamente { border-color: var(--border); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-link {
     min-height: 44px;
     color: var(--txt2);
     font-family: var(--texto);
     font-size: 14px;
 }
-.pantalla .btn-link:hover { color: var(--neon-c); }
-.pantalla .btn-tuerca {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-link:hover { color: var(--neon-c); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-tuerca {
     width: 44px; height: 44px;
     background: var(--card);
     border: 0;
@@ -128,14 +133,14 @@
     color: var(--txt);
     box-shadow: none;
 }
-.pantalla .btn-tuerca:hover { background: #2A2D35; color: var(--txt); box-shadow: none; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-tuerca:hover { background: #2A2D35; color: var(--txt); box-shadow: none; }
 .pantalla:not(#pantalla-carrera-solo) .btn-sonido { width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--card); }
 #pantalla-carrera-solo .btn-sonido { background: rgba(14,15,18,0.7); }
 
 /* Las pantallas de menú (D1) se desplazan hacia abajo si no entran (RF-09) */
 #pantalla-inicio, #pantalla-ajustes, #pantalla-garage, #pantalla-pista, #pantalla-detalle-pista,
 #pantalla-controles, #pantalla-timon-diseno, #pantalla-pedales-diseno, #pantalla-velocimetro-diseno,
-#pantalla-vista-conduccion, #pantalla-giro, #pantalla-td3d-selector, #pantalla-preparar-carrera {
+#pantalla-vista-conduccion, #pantalla-giro, #pantalla-td3d-selector, #pantalla-preparar-carrera, #pantalla-preview {
     overflow-x: hidden;
     overflow-y: auto;
     justify-content: safe center;
@@ -262,7 +267,7 @@
     text-transform: uppercase;
     color: var(--neon-c);
 }
-.pantalla .ajuste-item {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .ajuste-item {
     min-height: 56px;
     color: var(--txt);
     padding: 10px 16px;
@@ -270,42 +275,43 @@
     border: 2px solid transparent;
     border-radius: 10px;
 }
-.pantalla .ajuste-item:hover { border-color: var(--neon-v); box-shadow: none; }
-.pantalla .ajuste-txt { font-family: var(--font); font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
-.pantalla .ajuste-arrow { color: var(--neon-v); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .ajuste-item:hover { border-color: var(--neon-v); box-shadow: none; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .ajuste-txt { font-family: var(--font); font-size: 19px; font-weight: 700; letter-spacing: 0.5px; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .ajuste-arrow { color: var(--neon-v); }
 
 /* ── Galerías, garaje, pistas y controles ────────────────── */
-.pantalla .timon-card,
-.pantalla .carro-card,
-.pantalla .pista-card,
-.pantalla .ctrl-card {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .timon-card,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .carro-card,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .pista-card,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .ctrl-card {
     background: var(--card);
     border: 2px solid transparent;
     border-radius: 12px;
     box-shadow: none;
 }
-.pantalla .timon-card:hover,
-.pantalla .carro-card:hover,
-.pantalla .pista-card:hover { border-color: var(--border); box-shadow: none; }
-.pantalla .timon-card.sel,
-.pantalla .carro-card.sel,
-.pantalla .pista-card.sel {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .timon-card:hover,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .carro-card:hover,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .pista-card:hover { border-color: var(--border); box-shadow: none; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .timon-card.sel,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .carro-card.sel,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .pista-card.sel {
     border-color: var(--neon-v);
     background: #2A1A15;
     box-shadow: none;
 }
-.pantalla .timon-nombre,
-.pantalla .carro-card span {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .timon-nombre,
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .carro-card span {
     font-family: var(--font);
     font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.5px;
     color: var(--txt);
 }
-.pantalla .pista-nombre { font-family: var(--font); font-size: 20px; font-weight: 800; font-style: italic; color: var(--txt); }
-.pantalla .pista-desc { font-family: var(--texto); color: var(--txt2); }
-.pantalla .ctrl-card-titulo { font-family: var(--font); font-size: 18px; font-weight: 800; color: var(--neon-c); }
-.pantalla .btn-disenar-timon {
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .pista-nombre { font-family: var(--font); font-size: 20px; font-weight: 800; font-style: italic; color: var(--txt); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .pista-desc { font-family: var(--texto); color: var(--txt2); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .ctrl-card-titulo { font-family: var(--font); font-size: 18px; font-weight: 800; color: var(--neon-c); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-disenar-timon:hover { background: #2A1A15; box-shadow: none; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-disenar-timon {
     min-height: 44px;
     border-color: var(--neon-v);
     color: var(--txt);
@@ -316,9 +322,9 @@
 }
 
 /* Controles: las teclas de los dibujos y los botones de diseñar */
-.pantalla .ctrl-tecla { background: rgba(255,77,31,0.15); border-color: var(--neon-v); box-shadow: none; }
-.pantalla .btn-disenar-timon { background: var(--card); }
-.pantalla .burbuja-centro { border-color: rgba(255,196,0,0.5); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .ctrl-tecla { background: rgba(255,77,31,0.15); border-color: var(--neon-v); box-shadow: none; }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .btn-disenar-timon { background: var(--card); }
+:where(.pantalla:not(#pantalla-diseno-general, #pantalla-diseno-objetos, #pantalla-juego)) .burbuja-centro { border-color: rgba(255,196,0,0.5); }
 /* Test Drive: el texto chico de los botones naranjas va oscuro para leerse */
 #pantalla-td3d-selector .btn-neon span { color: var(--oscuro) !important; }
 

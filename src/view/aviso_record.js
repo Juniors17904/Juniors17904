@@ -14,9 +14,9 @@ class AvisoRecord {
     constructor(contenedorTextos) {
         if (!contenedorTextos || typeof document === 'undefined') return;
         this.#nuevo = this.#crear(contenedorTextos, 'resultado-carrera-nuevo-record',
-            'font-size:24px;color:#FFC400;font-weight:900;font-style:italic;text-shadow:0 0 12px rgba(255,196,0,0.6);');
+            'font-size:22px;color:#FFC400;font-weight:900;font-style:italic;text-shadow:0 0 12px rgba(255,196,0,0.6);');
         this.#linea = this.#crear(contenedorTextos, 'resultado-carrera-record',
-            'font-size:17px;color:#FFC400;font-weight:bold;text-align:center;');
+            'font-size:15px;color:#FFC400;font-weight:bold;text-align:center;');
         this.ocultar();
     }
 
