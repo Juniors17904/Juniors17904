@@ -2,7 +2,7 @@
 
 | Campo | Valor |
 |---|---|
-| Estado | v2 — revisado (forma corta), listo para programar |
+| Estado | v3 — programado y en `main` |
 | Fecha | 2026-10-29 |
 | Backlog | B27 (`docs/BACKLOG.md`) |
 | Depende de | PRD 015 (vertical y horizontal), PRD 016 y 021 (controles y pedales), PRD 018 ("Preparar carrera"), PRD 020 (récords) y PRD 022 (sonido). El PRD 025 es de la otra sesión (impares). |
@@ -81,3 +81,4 @@ Que el juego se vea como un juego de carreras moderno y se lea fácil en el celu
 ### Historial
 - **v1** (2026-10-29): primera versión. El usuario eligió la opción A en la página de muestra y pidió elegir siempre la opción recomendada en las demás decisiones.
 - **v2** (2026-10-29): revisión única (forma corta). Problema de fondo resuelto con la opción recomendada: el texto de la barra del HUD (canvas) también toma la letra y los colores nuevos, con `HudCarrera` y `AvisoRecord`. Detalles: D8 completa (las otras pantallas y el garaje, galería de velocímetros, HUD y resultado en sus listas, botón 🔊, `Aplicacion` y `ControladorInicio`); "los textos que ya existen"; las mayúsculas las pone el estilo; Inicio conserva ⚙, ↺, Multijugador y Únete; el color de cada pista lo pone el estilo; las pantallas 3D de herramientas quedan como están.
+- **v3** (2026-10-29): programado. `src/tema_carreras.css` (con `:where` para dejar fuera las pantallas 3D de herramientas), `PortadaCarro`, Ajustes en dos grupos y la letra y los colores del texto de la carrera en `HudCarrera` y `AvisoRecord` (sin cambiar su tamaño). Inicio y "Preparar carrera" van en dos columnas en horizontal y más compactos, para que sigan entrando sin desplazarse (PRD 002 RNF-03, PRD 018 RF-12 y PRD 020 RF-09).
